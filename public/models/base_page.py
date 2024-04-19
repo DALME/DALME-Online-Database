@@ -25,7 +25,12 @@ from public.extensions.bibliography.blocks import BibliographyChooserBlock
 from public.extensions.footnotes.blocks import FootnotesPlaceMarker
 from public.extensions.footnotes.models import FootnoteMixin
 from public.models.base_image import BaseImage
-from public.models.common import HEADER_POSITION
+
+HEADER_POSITION = (
+    ('top', 'Top'),
+    ('center', 'Center'),
+    ('bottom', 'Bottom'),
+)
 
 DEFAULT_TABLE_OPTIONS = {
     'minSpareRows': 0,

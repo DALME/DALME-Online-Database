@@ -1,17 +1,11 @@
-"""Common definitions for public models."""
+"""Panels for records extension."""
 
 from wagtail.admin.panels import FieldPanel
 
 from ida.models import Collection
 
-HEADER_POSITION = (
-    ('top', 'Top'),
-    ('center', 'Center'),
-    ('bottom', 'Bottom'),
-)
 
-
-class SetFieldPanel(FieldPanel):
+class RecordCollectionPanel(FieldPanel):
     def on_form_bound(self):
         qs = Collection.objects.filter(published=True)
         self.form.fields['source_set'].queryset = qs

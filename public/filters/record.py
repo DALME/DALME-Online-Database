@@ -4,11 +4,9 @@ import django_filters
 
 from ida.models import Attribute, LocaleReference, Record
 from public import forms
+from public.extensions.records.models import Corpus
 from public.filters.record_ordering import RecordOrderingFilter
-from public.models import (
-    Collection,
-    Corpus,
-)
+from public.models import Collection
 
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 

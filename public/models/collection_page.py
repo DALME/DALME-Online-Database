@@ -7,8 +7,8 @@ from wagtail.admin.panels import FieldPanel
 from django.db import models
 
 from ida.models import Collection
+from public.extensions.records.panels import RecordCollectionPanel
 from public.models.base_page import BasePage
-from public.models.common import SetFieldPanel
 from public.models.search_enabled_page import SearchEnabled
 
 
@@ -32,7 +32,7 @@ class Collection(SearchEnabled):
 
     content_panels = [
         *BasePage.content_panels,
-        SetFieldPanel('source_set'),
+        RecordCollectionPanel('source_set'),
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('citable'),

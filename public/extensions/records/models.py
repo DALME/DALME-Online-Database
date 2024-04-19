@@ -1,4 +1,4 @@
-"""Model corpus data."""
+"""Models for records extension."""
 
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel

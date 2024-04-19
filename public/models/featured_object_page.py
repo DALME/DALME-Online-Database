@@ -5,8 +5,8 @@ from wagtail.admin.panels import FieldPanel
 from django.db import models
 
 from ida.models import Collection, Record
+from public.extensions.records.panels import RecordCollectionPanel
 from public.models.base_page import BasePage
-from public.models.common import SetFieldPanel
 from public.models.featured_page import FeaturedPage
 
 
@@ -38,7 +38,7 @@ class FeaturedObject(FeaturedPage):
         FieldPanel('header_position'),
         FieldPanel('front_page_image'),
         FieldPanel('source'),
-        SetFieldPanel('source_set'),
+        RecordCollectionPanel('source_set'),
         FieldPanel('alternate_author'),
         FieldPanel('citable'),
         FieldPanel('body'),

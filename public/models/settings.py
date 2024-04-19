@@ -9,7 +9,7 @@ from wagtail.fields import StreamField
 from django.db import models
 
 from public.blocks import FooterPageChooserBlock, InlineImageBlock, SocialBlock
-from public.models.common import HEADER_POSITION
+from public.models.base_page import HEADER_POSITION
 
 
 @register_setting

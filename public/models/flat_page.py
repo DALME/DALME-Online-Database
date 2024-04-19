@@ -10,12 +10,6 @@ from django.shortcuts import render
 from public import forms
 from public.models.base_page import BasePage
 
-HEADER_POSITION = (
-    ('top', 'Top'),
-    ('center', 'Center'),
-    ('bottom', 'Bottom'),
-)
-
 
 class Flat(BasePage):
     show_contact_form = models.BooleanField(

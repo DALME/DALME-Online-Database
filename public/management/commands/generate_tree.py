@@ -11,10 +11,10 @@ from wagtail.rich_text import RichText
 from django.core.management.base import BaseCommand
 
 from ida.models import Record
+from public.extensions.records.models import Corpus
 from public.models import (
     Collection,
     Collections,
-    Corpus,
     Essay,
     FeaturedInventory,
     FeaturedObject,
