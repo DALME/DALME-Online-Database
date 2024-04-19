@@ -1,1 +1,1 @@
-"""Migrations for banners extensions."""
+"""Migrations for banners extension."""
