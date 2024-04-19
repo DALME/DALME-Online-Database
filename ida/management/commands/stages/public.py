@@ -162,6 +162,10 @@ class Stage(BaseStage):
         ]
         banners_raw = None
 
+        # the value of certain field types has to be converted to account
+        # for differences in the way Django sets up certain fields depending
+        # on database backend. E.g. certain fields that are setup as varchar in MySQL
+        # are setup as jsonb in Postgres.
         def get_value(value, field_type):
             if value is None:
                 return 'null'
@@ -173,26 +177,26 @@ class Stage(BaseStage):
 
         self.logger.info('Processing "public" models')
         for model_name in models:
+            model = apps.get_model(app_label='public', model_name=model_name)
             with connection.cursor() as cursor:
                 self.logger.info('Copying "%s"', model_name)
-                cursor.execute(sql.SQL('SELECT * FROM "restore".{};').format(sql.Identifier(f'public_{model_name}')))
+                cursor.execute(f'SELECT * FROM restore.public_{model_name};')
                 rows = self.map_rows(cursor)
 
                 for row in rows:
                     columns = []
-                    values = {}
-                    for field, value in row.items():
-                        columns.append(field)
-                        values[field] = value
+                    values = ''
+                    for idx, (field, value) in enumerate(row.items()):
+                        if model_name == 'home' and field == 'banners':
+                            banners_raw = value
+                        else:
+                            columns.append(f'{field}')
+                            values += f'{get_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
+                            if idx < len(row) - 1:
+                                values += ', '
 
-                    cursor.execute(
-                        sql.SQL('INSERT INTO "dalme".{} ({}) VALUES ({});').format(
-                            sql.Identifier(f'public_{model_name}'),
-                            sql.SQL(', ').join(sql.Identifier(column) for column in columns),
-                            sql.SQL(', ').join(sql.Placeholder(column) for column in columns),
-                        ),
-                        values,
-                    )
+                    sql = f"INSERT INTO dalme.public_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    cursor.execute(sql)
 
         if banners_raw:
             banner_data = json.loads(banners_raw)
