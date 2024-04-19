@@ -1,4 +1,4 @@
-"""Saved search Draftail/contentstate conversion."""
+"""Records Draftail/contentstate conversion."""
 
 from draftjs_exporter.dom import DOM
 from wagtail.admin.rich_text.converters.html_to_contentstate import InlineEntityElementHandler

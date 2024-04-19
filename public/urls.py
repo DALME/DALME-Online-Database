@@ -15,7 +15,7 @@ from public.api import FilterChoices, RecordsAPIViewSet, Thumbnail
 from public.extensions.bibliography.urls import urlpatterns as biblio_urls
 from public.extensions.footnotes.api import FootnotesAPIViewSet
 from public.extensions.footnotes.urls import urlpatterns as footnote_urls
-from public.extensions.saved_searches.urls import urlpatterns as saved_search_urls
+from public.extensions.records.urls import urlpatterns as record_urls
 
 api_router = WagtailAPIRouter('wagtailapi')
 
@@ -40,7 +40,7 @@ def to_ida_logout(_request):
 cmsurls = [
     *biblio_urls,
     *footnote_urls,
-    *saved_search_urls,
+    *record_urls,
     path('', include(wagtailadmin_urls)),
 ]
 

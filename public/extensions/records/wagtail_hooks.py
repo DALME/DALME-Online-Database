@@ -1,4 +1,4 @@
-"""Hooks for saved searches extension."""
+"""Hooks for records extension."""
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
 from wagtail import hooks

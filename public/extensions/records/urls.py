@@ -1,4 +1,4 @@
-"""URLs for saved searches extension."""
+"""URLs for records extension."""
 
 from django.urls import path
 

@@ -1,4 +1,4 @@
-"""Form for saved search chooser."""
+"""Form for records extension."""
 
 from django import forms
 

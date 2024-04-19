@@ -1,4 +1,4 @@
-"""Interface for the saved search rich_text module."""
+"""Interface for the records rich_text module."""
 
 from wagtail.rich_text import LinkHandler
 
