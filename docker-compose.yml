@@ -46,6 +46,7 @@ services:
       - ./static:/opt/web/static
       - ./tenants:/opt/web/tenants
       - ./templates:/opt/web/templates
+      - ./media/media:/opt/web/www/media
       - ./tests:/opt/web/tests
       - ./pyproject.toml:/opt/web/pyproject.toml
       - ./notebooks:/opt/web/notebooks
@@ -198,6 +199,7 @@ volumes:
   pgdata:
   rsdata:
   pgadmin-data:
+
 
 networks:
   app-network:
