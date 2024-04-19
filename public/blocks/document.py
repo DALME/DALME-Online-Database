@@ -23,5 +23,5 @@ class DocumentBlock(blocks.StructBlock):
     date = blocks.DateBlock()
 
     class Meta:
-        icon = 'file-lines'
+        icon = 'file-pdf'
         template = 'public/blocks/document.html'
