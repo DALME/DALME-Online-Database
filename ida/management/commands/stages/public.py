@@ -145,20 +145,20 @@ class Stage(BaseStage):
         # because all page types are subclassed from the wagtail Page model which we already
         # populated
         models = [
-            'baseimage',
-            'customrendition',
-            'home',
-            'section',
-            'flat',
-            'features',
-            'bibliography',
-            'collections',
-            'collection',
-            'corpus',
-            'corpus_collections',
-            'essay',
-            'featuredinventory',
-            'featuredobject',
+            ('public', 'baseimage'),
+            ('public', 'customrendition'),
+            ('public', 'home'),
+            ('public', 'section'),
+            ('public', 'flat'),
+            ('public', 'features'),
+            ('public', 'bibliography'),
+            ('public', 'collections'),
+            ('public', 'collection'),
+            ('publicrecords', 'corpus'),
+            ('publicrecords', 'corpus_collections'),
+            ('public', 'essay'),
+            ('public', 'featuredinventory'),
+            ('public', 'featuredobject'),
         ]
         banners_raw = None
 
@@ -176,8 +176,8 @@ class Stage(BaseStage):
             return f'$${value}$$'
 
         self.logger.info('Processing "public" models')
-        for model_name in models:
-            model = apps.get_model(app_label='public', model_name=model_name)
+        for app, model_name in models:
+            model = apps.get_model(app_label=app, model_name=model_name)
             with connection.cursor() as cursor:
                 self.logger.info('Copying "%s"', model_name)
                 cursor.execute(f'SELECT * FROM restore.public_{model_name};')
@@ -195,7 +195,7 @@ class Stage(BaseStage):
                             if idx < len(row) - 1:
                                 values += ', '
 
-                    sql = f"INSERT INTO dalme.public_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
 
         if banners_raw:

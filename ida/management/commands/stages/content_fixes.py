@@ -287,7 +287,6 @@ class Stage(BaseStage):
             'public': [
                 'collection',
                 'collections',
-                'corpus',
                 'essay',
                 'featuredinventory',
                 'featuredobject',
