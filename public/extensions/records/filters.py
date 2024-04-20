@@ -1,12 +1,14 @@
-"""Filter for records."""
+"""Filters for records extension."""
 
 import django_filters
 
+from django.db.models import OuterRef, Q, Subquery
+
 from ida.models import Attribute, LocaleReference, Record
-from public import forms
 from public.extensions.records.models import Corpus
-from public.filters.record_ordering import RecordOrderingFilter
 from public.models import Collection
+
+from .forms import RecordFilterForm
 
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 
@@ -70,6 +72,66 @@ def locale_choices():
     return [(i.id, i.name) for i in LocaleReference.objects.filter(id__in=locales).order_by('name')]
 
 
+class RecordOrderingFilter(django_filters.OrderingFilter):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.extra['choices'] += [
+            ('name', 'Name'),
+            ('-name', 'Name (descending)'),
+            ('record_type', 'Type'),
+            ('-recordtype', 'Type (descending)'),
+            ('date', 'Date'),
+            ('-date', 'Date (descending)'),
+        ]
+
+    @staticmethod
+    def get_value(field, value):
+        if not value:
+            return False
+        return next((v for v in value if v and v.endswith(field)), False)
+
+    @staticmethod
+    def annotate_dates(qs):
+        dates = Attribute.objects.filter(
+            Q(records=OuterRef('pk'), attribute_type__name='date')
+            | Q(records=OuterRef('pk'), attribute_type__name='start_date')
+            | Q(records=OuterRef('pk'), attribute_type__name='end_date'),
+        )
+        qs = qs.annotate(record_date=Subquery(dates.values('attributevaluedate__year')[:1]))
+        return qs.distinct()
+
+    @staticmethod
+    def annotate_record_type(qs):
+        record_types = Attribute.objects.filter(
+            records=OuterRef('pk'),
+            attribute_type__name='record_type',
+        )
+        return qs.annotate(
+            record_type=Subquery(record_types.values('attributevaluestr__value')[:1]),
+        ).distinct()
+
+    def filter(self, qs, value):
+        qs = super().filter(qs, value=[])
+        # For now any duplicates that remain here after filtering are
+        # eliminated on the endpoint itself before going down the wire.
+        # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#distinct
+        date = self.get_value('date', value)
+        if date:
+            self.parent.annotated = True
+            qs = self.annotate_dates(qs)
+
+        record_type = self.get_value('record_type', value)
+        if record_type:
+            self.parent.annotated = True
+            qs = self.annotate_record_type(qs)
+
+        name = self.get_value('name', value)
+        if name:
+            qs = qs.order_by(name)
+
+        return qs
+
+
 class RecordFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.annotated = False
@@ -120,7 +182,7 @@ class RecordFilter(django_filters.FilterSet):
 
     class Meta:
         model = Record
-        form = forms.RecordFilterForm
+        form = RecordFilterForm
         fields = [
             'name',
             'record_type',
@@ -166,7 +228,7 @@ class RecordFilter(django_filters.FilterSet):
             return queryset.none()
         return queryset.filter(
             collections__collection_id__in=[
-                collection.specific.source_set.pk for collection in corpus.collections.all()
+                collection.specific.record_collection.pk for collection in corpus.collections.all()
             ],
         )
 
@@ -175,7 +237,7 @@ class RecordFilter(django_filters.FilterSet):
             collection = Collection.objects.get(pk=value)
         except Collection.DoesNotExist:
             return queryset.none()
-        return queryset.filter(collections__collection_id=collection.source_set.pk)
+        return queryset.filter(collections__collection_id=collection.record_collection.pk)
 
     def filter_image(self, queryset, name, value):  # noqa: ARG002
         value = value == 'true'

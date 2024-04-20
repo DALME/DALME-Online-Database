@@ -1,4 +1,4 @@
-"""Filtered for featured pages."""
+"""Filters for public app."""
 
 import calendar
 import itertools
