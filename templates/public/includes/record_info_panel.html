@@ -29,5 +29,6 @@
 </ul>
 <hr/>
 <div class="u-type-sans mt-2 credits">
-  {{ get_credit_line }}
+  {% get_credit_line as credit_line %}
+  {{ credit_line }}
 </div>
