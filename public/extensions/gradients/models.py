@@ -1,5 +1,7 @@
 """Model gradient data."""
 
+from wagtail.admin.panels import FieldPanel
+
 from django.db import models
 
 
@@ -21,3 +23,20 @@ class Gradient(models.Model):
         return f'<div class="gradient-cell"><div style="background: {self.css}"></div></div>'
 
     gradient_as_html.short_description = 'Gradient'
+
+
+class GradientMixin(models.Model):
+    gradient = models.ForeignKey(
+        Gradient,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+
+    content_panels = [
+        FieldPanel('gradient'),
+    ]
+
+    class Meta:
+        abstract = True
