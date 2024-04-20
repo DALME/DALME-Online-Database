@@ -72,13 +72,17 @@ a.footnote_callout:hover {
     border-bottom: none;
 }
 .footnote_list blockquote {
-    margin: 1rem 2rem;
     font-family: "PT Serif", "Times New Roman", serif;
     line-height: 1.8;
 }
-.footnote_list blockquote:before {
+/* .footnote_list blockquote:before {
     content: "\301D";
+    font-size: 20px;
+    font-family: 'Asul';
+    position: relative;
+    top: 29px;
+    left: -45px;
 }
 .footnote_list blockquote:after {
     content: "\301E";
-}
+} */
