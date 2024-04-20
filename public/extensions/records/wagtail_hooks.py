@@ -8,6 +8,10 @@ from django.utils.html import format_html
 
 from .rich_text import SavedSearchLinkHandler
 from .rich_text.contentstate import SavedSearchElementHandler, saved_search_decorator
+from .views import CollectionChooserViewSet, RecordChooserViewSet
+
+hooks.register('register_admin_viewset', RecordChooserViewSet)
+hooks.register('register_admin_viewset', CollectionChooserViewSet)
 
 
 @hooks.register('insert_editor_js')

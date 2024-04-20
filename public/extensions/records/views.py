@@ -2,59 +2,26 @@
 
 from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.admin.views import chooser
+from wagtail.admin.views.generic.chooser import ChooseResultsView
 from wagtail.admin.viewsets.chooser import ChooserViewSet
-from wagtail.admin.widgets import BaseChooser
 
+from django.db.models import Q
 from django.views.generic.edit import BaseFormView
 
-from ida.models import Record
+from ida.models import Collection, Record
 
 from .forms import SavedSearchChooserForm
 
 
-class AdminRecordChooser(BaseChooser):
-    model = Record
-    chooser_modal_url_name = 'record_chooser:choose'
-    template_name = 'record_chooser.html'
+class RecordChooseResultsView(ChooseResultsView):
+    def get_object_list(self):
+        return self.model.objects.filter(workflow__is_public=True)
 
-
-#     js_constructor = 'RecordChooser'
-
-#     # def get_value_data_from_instance(self, instance):
-#     #     return {
-#     #         'id': instance.pk,
-#     #         'edit_url': AdminURLFinder().get_edit_url(instance),
-#     #         self.display_title_key: self.get_display_title(instance),
-#     #         'gradient': instance.gradient_as_html(),
-#     #         'description': instance.description,
-#     #     }
-
-#     def get_context(self, name, value_data, attrs):
-#         original_field_html = self.render_hidden_input(name, value_data.get('id'), attrs)
-#         return {
-#             'widget': self,
-#             'original_field_html': original_field_html,
-#             'attrs': attrs,
-#             'value': bool(value_data),
-#             'edit_url': value_data.get('edit_url', ''),
-#             'display_title': value_data.get(self.display_title_key, ''),
-#             'gradient': value_data.get('gradient'),
-#             'description': value_data.get('description'),
-#             'chooser_url': self.get_chooser_modal_url(),
-#             'icon': self.icon,
-#             'classname': self.classname,
-#         }
-
-# @cached_property
-# def media(self):
-#     base_media = super().media
-#     return forms.Media(
-#         js=[
-#             *base_media._js,
-#             'wagtailadmin/js/chooser-modal.js',
-#             'js/gradient-chooser-modal.js',
-#         ]
-#     )
+    def filter_object_list(self, objects):
+        query = self.request.GET.get('q')
+        if query:
+            objects = objects.filter(Q(name__icontains=query) | Q(short_name__icontains=query))
+        return objects
 
 
 class RecordChooserViewSet(ChooserViewSet):
@@ -62,15 +29,32 @@ class RecordChooserViewSet(ChooserViewSet):
     name = 'record_chooser'
     icon = 'file-lines'
     choose_one_text = 'Choose a record'
-    # base_widget_class = AdminRecordChooser
-    # choose_view_class = GradientChooseView
-    # chosen_view_class = GradientChosenView
+    ordering = 'name'
+    url_filter_parameters = ['q']
+    preserve_url_parameters = ['multiple', 'q']
+    choose_results_view_class = RecordChooseResultsView
 
+
+class CollectionChooseResultsView(ChooseResultsView):
     def get_object_list(self):
-        queryset = Record.objects.filter(type=13, workflow__is_public=True).order_by('name')
-        if self.request.GET.get('search'):
-            queryset = queryset.filter(name__icontains=self.request.GET['search'])
-        return queryset
+        return self.model.objects.filter(is_published=True)
+
+    def filter_object_list(self, objects):
+        query = self.request.GET.get('q')
+        if query:
+            objects = objects.filter(name__icontains=query)
+        return objects
+
+
+class CollectionChooserViewSet(ChooserViewSet):
+    model = Collection
+    name = 'collection_chooser'
+    icon = 'layer-group'
+    choose_one_text = 'Choose a collection'
+    ordering = 'name'
+    url_filter_parameters = ['q']
+    preserve_url_parameters = ['multiple', 'q']
+    choose_results_view_class = CollectionChooseResultsView
 
 
 class SavedSearchChooser(BaseFormView):
