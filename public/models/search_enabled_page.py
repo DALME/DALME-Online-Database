@@ -15,9 +15,9 @@ from django.utils import timezone
 from ida.forms import SearchForm
 from ida.models import Record, SavedSearch
 from ida.utils import Search, SearchContext, formset_factory
+from public.extensions.records.serializers import RecordSerializer
 from public.models.base_page import BasePage
 from public.models.settings import Settings
-from public.serializers import RecordSerializer
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
