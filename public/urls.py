@@ -1,7 +1,6 @@
 """Define cms/public URLs for the IDA."""
 
 from wagtail.admin import urls as wagtailadmin_urls
-from wagtail.api.v2.router import WagtailAPIRouter
 from wagtail.documents import urls as wagtaildocs_urls
 
 from django.conf import settings
@@ -11,18 +10,10 @@ from django.contrib.auth.models import Group
 from django.shortcuts import redirect
 from django.urls import include, path, reverse
 
-from public.api import FilterChoices, RecordsAPIViewSet, Thumbnail
 from public.extensions.bibliography.urls import urlpatterns as biblio_urls
-from public.extensions.footnotes.api import FootnotesAPIViewSet
 from public.extensions.footnotes.urls import urlpatterns as footnote_urls
+from public.extensions.records.urls import api_router
 from public.extensions.records.urls import urlpatterns as record_urls
-
-api_router = WagtailAPIRouter('wagtailapi')
-
-api_router.register_endpoint('footnotes', FootnotesAPIViewSet)
-api_router.register_endpoint('records', RecordsAPIViewSet)
-api_router.register_endpoint('choices', FilterChoices)
-api_router.register_endpoint('thumbnails', Thumbnail)
 
 admin.site.unregister(Group)
 
