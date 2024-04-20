@@ -3,28 +3,15 @@
 from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
 from wagtail.contrib.routable_page.models import route
 
-from django.db import models
 from django.template.response import TemplateResponse
 
-from public.extensions.gradients.models import Gradient
-from public.models.base_page import BasePage
+from public.extensions.bibliography.models import CitableMixin
+from public.extensions.gradients.models import GradientMixin
 from public.models.search_enabled_page import SearchEnabled
 from public.models.settings import Settings
 
 
-class Collections(SearchEnabled):
-    citable = models.BooleanField(
-        default=True,
-        help_text='Check this box to show the "Cite" menu for this page.',
-    )
-    gradient = models.ForeignKey(
-        Gradient,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
-    )
-
+class Collections(SearchEnabled, CitableMixin, GradientMixin):
     parent_page_types = ['public.Home']
     subpage_types = [
         'public.Collection',
@@ -33,12 +20,10 @@ class Collections(SearchEnabled):
     page_description = 'The "Collections" landing page.'
 
     content_panels = [
-        *BasePage.content_panels,
-        FieldPanel('header_image'),
-        FieldPanel('header_position'),
-        FieldPanel('gradient'),
+        *SearchEnabled.content_panels,
+        *CitableMixin.content_panels,
+        *GradientMixin.content_panels,
         FieldPanel('short_title'),
-        FieldPanel('citable'),
         FieldPanel('body'),
         MultiFieldPanel([InlinePanel('corpora', min_num=1, label='Corpus')], heading='Corpora'),
     ]

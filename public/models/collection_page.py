@@ -7,12 +7,11 @@ from wagtail.admin.panels import FieldPanel
 from django.db import models
 
 from ida.models import Collection
-from public.extensions.records.panels import RecordCollectionPanel
-from public.models.base_page import BasePage
+from public.extensions.bibliography.models import CitableMixin
 from public.models.search_enabled_page import SearchEnabled
 
 
-class Collection(SearchEnabled):
+class Collection(SearchEnabled, CitableMixin):
     source_set = models.ForeignKey(
         Collection,
         related_name='public_collections',
@@ -31,12 +30,7 @@ class Collection(SearchEnabled):
     page_description = 'Provides a landing page for a collection of records.'
 
     content_panels = [
-        *BasePage.content_panels,
-        RecordCollectionPanel('source_set'),
-        FieldPanel('header_image'),
-        FieldPanel('header_position'),
-        FieldPanel('citable'),
-        FieldPanel('preview'),
+        *CitableMixin.content_panels,
         FieldPanel('body'),
     ]
 

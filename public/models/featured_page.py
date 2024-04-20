@@ -3,27 +3,23 @@
 import textwrap
 
 from bs4 import BeautifulSoup as BSoup
+from wagtail.admin.panels import FieldPanel
 
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from public.extensions.bibliography.models import CitableMixin
 from public.models.base_image import BaseImage
 from public.models.base_page import BasePage
 
 
-class FeaturedPage(BasePage):
+class FeaturedPage(BasePage, CitableMixin):
     alternate_author = models.CharField(
         max_length=127,
         null=True,
         blank=True,
         help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.',
     )
-
-    citable = models.BooleanField(
-        default=True,
-        help_text='Check this box to show the "Cite" menu for this page.',
-    )
-
     front_page_image = models.ForeignKey(
         BaseImage,
         null=True,
@@ -31,6 +27,13 @@ class FeaturedPage(BasePage):
         on_delete=models.SET_NULL,
         help_text='The image that will display on the front page.',
     )
+
+    content_panels = [
+        *BasePage.content_panels,
+        *CitableMixin.content_panels,
+        FieldPanel('front_page_image'),
+        FieldPanel('alternate_author'),
+    ]
 
     class Meta:
         abstract = True

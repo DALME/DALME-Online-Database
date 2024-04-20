@@ -8,18 +8,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from public import forms
+from public.extensions.bibliography.models import CitableMixin
 from public.models.base_page import BasePage
 
 
-class Flat(BasePage):
+class Flat(BasePage, CitableMixin):
     show_contact_form = models.BooleanField(
         default=False,
         help_text='Check this box to show a contact form on the page.',
-    )
-
-    citable = models.BooleanField(
-        default=False,
-        help_text='Check this box to show the "Cite" menu for this page.',
     )
 
     parent_page_types = [
@@ -33,11 +29,7 @@ class Flat(BasePage):
 
     content_panels = [
         *BasePage.content_panels,
-        FieldPanel('header_image'),
-        FieldPanel('header_position'),
-        FieldPanel('short_title'),
-        FieldPanel('show_contact_form'),
-        FieldPanel('citable'),
+        *CitableMixin.content_panels,
         FieldPanel('body'),
     ]
 

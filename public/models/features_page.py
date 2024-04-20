@@ -2,22 +2,13 @@
 
 from wagtail.admin.panels import FieldPanel
 
-from django.db import models
 from django.db.models.functions import Coalesce
 
-from public.extensions.gradients.models import Gradient
+from public.extensions.gradients.models import GradientMixin
 from public.models.base_page import BasePage
 
 
-class Features(BasePage):
-    gradient = models.ForeignKey(
-        Gradient,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
-    )
-
+class Features(BasePage, GradientMixin):
     parent_page_types = ['public.Home']
     subpage_types = [
         'public.FeaturedObject',
@@ -28,9 +19,7 @@ class Features(BasePage):
 
     content_panels = [
         *BasePage.content_panels,
-        FieldPanel('header_image'),
-        FieldPanel('header_position'),
-        FieldPanel('gradient'),
+        *GradientMixin.content_panels,
         FieldPanel('short_title'),
         FieldPanel('body'),
     ]

@@ -10,24 +10,16 @@ from django.utils import timezone
 
 from public.blocks import SponsorBlock
 from public.extensions.banners.models import Banner
-from public.extensions.gradients.models import Gradient
+from public.extensions.gradients.models import GradientMixin
 from public.models.base_page import BasePage
 from public.models.featured_essay_page import Essay
 from public.models.featured_inventory_page import FeaturedInventory
 from public.models.featured_object_page import FeaturedObject
 
 
-class Home(BasePage):
+class Home(BasePage, GradientMixin):
     template = 'home.html'
 
-    gradient = models.ForeignKey(
-        Gradient,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
-        help_text='The gradient to be used over the header image.',
-    )
     learn_more_page = models.ForeignKey(
         'wagtailcore.Page',
         null=True,
@@ -36,7 +28,6 @@ class Home(BasePage):
         related_name='+',
         help_text='The page that should open when "Learn more..." is selected.',
     )
-
     sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
 
     subpage_types = [
