@@ -123,7 +123,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
         )
 
         with contextlib.suppress(AttributeError):
-            context.update({'set_id': self.source_set.id})
+            context.update({'collection_id': self.record_collection.id})
 
         return TemplateResponse(
             request,
@@ -138,10 +138,10 @@ class SearchEnabled(RoutablePageMixin, BasePage):
         if not qs.exists():
             raise Http404
 
-        source = qs.first()
+        record = qs.first()
         as_preview = self.preview if hasattr(self, 'preview') else False
 
-        if not source.workflow.is_public and not as_preview:
+        if not record.workflow.is_public and not as_preview:
             raise Http404
 
         pages = [
@@ -152,7 +152,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
                 'pageOrder': i.order,
                 'pageImageId': i.dam_id,
             }
-            for i in source.pages.all().order_by('order')
+            for i in record.pages.all().order_by('order')
         ]
 
         initial_folio_index = (
@@ -170,8 +170,8 @@ class SearchEnabled(RoutablePageMixin, BasePage):
         if request.META.get('HTTP_REFERER') and 'search' in request.META.get('HTTP_REFERER'):
             from_search = True
 
-        data = RecordSerializer(source).data
-        purl = f'{settings.BASE_URL}/purl/{source.id}/' if as_preview else source.get_purl()
+        data = RecordSerializer(record).data
+        purl = f'{settings.BASE_URL}/purl/{record.id}/' if as_preview else record.get_purl()
 
         context.update(
             {
@@ -192,7 +192,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
         )
 
         with contextlib.suppress(AttributeError):
-            context.update({'set_id': self.source_set.id})
+            context.update({'collection_id': self.record_collection.id})
 
         return TemplateResponse(
             request,
