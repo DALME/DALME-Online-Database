@@ -1,5 +1,6 @@
-"""Records API endpoint."""
+"""API endpoints for records extension."""
 
+from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from wagtail.api.v2.views import BaseAPIViewSet
@@ -8,9 +9,9 @@ from django.urls import path
 
 from ida.models import Record
 from ida.utils import Search, SearchContext
-from public.filters import RecordFilter
+from public.extensions.records.filters import RecordFilter
+from public.extensions.records.serializers import RecordSerializer
 from public.pagination import PublicPagination
-from public.serializers import RecordSerializer
 
 
 class RecordsAPIViewSet(BaseAPIViewSet):
@@ -22,6 +23,7 @@ class RecordsAPIViewSet(BaseAPIViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = PublicPagination
     filterset_class = RecordFilter
+    renderer_classes = [CamelCaseJSONRenderer]
     meta_fields = []
 
     def get_serializer_class(self):

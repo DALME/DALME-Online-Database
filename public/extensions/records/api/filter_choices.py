@@ -4,8 +4,8 @@ from django.http import JsonResponse
 from django.urls import path
 from django.views import View
 
+from public.extensions.records.filters import locale_choices, map_record_types
 from public.extensions.records.models import Corpus
-from public.filters import locale_choices, map_record_types
 from public.models import Collection
 
 

@@ -1,4 +1,4 @@
-"""API endpoint for returning thumbnails."""
+"""API endpoints for records extension."""
 
 from django.http import JsonResponse
 from django.urls import path
@@ -7,7 +7,7 @@ from django.views import View
 from ida.models.resourcespace import rs_resource
 
 
-class Thumbnail(View):
+class ThumbnailsAPI(View):
     """API endpoint for returning thumbnails."""
 
     @classmethod
