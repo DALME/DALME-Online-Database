@@ -66,7 +66,7 @@ def get_citation_data(context):  # noqa: C901, PLR0912
         if record:
             title = context['data']['name'].strip()
             purl = context['purl']
-            authors, corrections, contributors = context['data']['get_credits']
+            authors, corrections, contributors = context['data']['credits']
             contributors = contributors + corrections
             if not authors:
                 try:
@@ -105,12 +105,12 @@ def get_citation_data(context):  # noqa: C901, PLR0912
             coins_list += [
                 ('rft.atitle', page.title),
                 ('rft.identifier', page.get_full_url(context['request'])),
-                ('rft.au', page.source_set.owner.profile.full_name),
+                ('rft.au', page.record_collection.owner.profile.full_name),
             ]
 
             citation.update(
                 {
-                    'author': [{'literal': page.source_set.owner.profile.full_name}],
+                    'author': [{'literal': page.record_collection.owner.profile.full_name}],
                     'issued': {'date-parts': [[published.year]]},
                     'title': page.title,
                     'URL': page.get_full_url(context['request']),

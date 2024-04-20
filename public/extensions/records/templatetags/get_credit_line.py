@@ -2,16 +2,24 @@
 
 from django import template
 
-from public.templatetags import get_names_as_string
-
 register = template.Library()
+
+
+def get_names_as_string(names):
+    return (
+        f'{names[0]}'
+        if len(names) == 1
+        else f'{names[0]} and {names[1]}'
+        if len(names) == 2  # noqa: PLR2004
+        else f'{", ".join(names[:-1])}, and {names[-1]}'
+    )
 
 
 @register.simple_tag(takes_context=True)
 def get_credit_line(context):
     record = context.get('record', False)
     if record:
-        editors, corrections, contributors = context['data']['get_credits']
+        editors, corrections, contributors = context['data']['credits']
         if editors:
             cline = f'Edited by {get_names_as_string(editors)}'
         else:
@@ -32,5 +40,4 @@ def get_credit_line(context):
             else cline
         )
         return cline + '.'
-
     return ''
