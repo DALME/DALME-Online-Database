@@ -1,30 +1,30 @@
-{% load get_source_details wagtailroutablepage_tags %}
+{% load get_record_details wagtailroutablepage_tags %}
 
-{% get_source_details as source_data %}
-{% if source_data.source or source_data.source_set %}
+{% get_record_details as record_data %}
+{% if record_data.record or record_data.record_collection %}
   <div class="record-detail u-flex">
-    {% if source_data.source %}
+    {% if record_data.record %}
       <h3 class="u-small-caps-heading">RECORD</h3>
       <div>
-        <a href="{{ source_data.url }}">
-          {{ source_data.name }}
-          {% if source_data.date %}
-            <span>| {{ source_data.date }}</span>
+        <a href="{{ record_data.url }}">
+          {{ record_data.name }}
+          {% if record_data.date %}
+            <span>| {{ record_data.date }}</span>
           {% endif %}
-          {% if source_data.language %}
-            <span>| {{ source_data.language }}</span>
+          {% if record_data.language %}
+            <span>| {{ record_data.language }}</span>
           {% endif %}
-          {% if source_data.locale %}
-            <span>| {{ source_data.locale }}</span>
+          {% if record_data.locale %}
+            <span>| {{ record_data.locale }}</span>
           {% endif %}
         </a>
       </div>
     {% endif %}
-    {% if source_data.source_set %}
+    {% if record_data.record_collection %}
     <h3 class="u-small-caps-heading mt-4">COLLECTION</h3>
     <div>
-      <a href="{{ source_data.collection_url }}">
-        {{ source_data.source_set.name }}
+      <a href="{{ record_data.collection_url }}">
+        {{ record_data.record_collection.name }}
       </a>
     </div>
     {% endif %}

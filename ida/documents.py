@@ -132,7 +132,7 @@ class PublicRecord(PublicRecordBase):
         """Prepare collection for indexing."""
         cols = instance.collections.filter(is_published=True)
         if cols.exists():
-            return [{'name': i.set_id.name} for i in cols]
+            return [{'name': i.collection_id.name} for i in cols]
         return [{'name': 'none'}]
 
     def prepare_credits(self, instance):

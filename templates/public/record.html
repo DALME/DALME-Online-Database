@@ -79,12 +79,12 @@
               <span>${folioInfo}</span>
               <i class="fa fa-caret-down fa-sm ml-2 mt-1" v-if="hasMultipleFolios"></i>
             </template>
-            <template v-if="hasMultipleFolios" v-for="(folio, index) in sourceData.folios">
+            <template v-if="hasMultipleFolios" v-for="(folio, index) in recordData.folios">
               <b-dropdown-item v-if="index === folioIndex" :key="index" class="inactive dropdown-item">
-                <span>Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
+                <span>Folio ${recordData.folios[index].pageName} (${index + 1}/${folioCount})</span>
               </b-dropdown-item>
               <b-dropdown-item v-else :key="index" @click="handleFolioSelect(index)" class="dropdown-item">
-                <span>Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
+                <span>Folio ${recordData.folios[index].pageName} (${index + 1}/${folioCount})</span>
               </b-dropdown-item>
             </template>
         </b-dropdown>
@@ -310,7 +310,7 @@
   <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
 
-  {{ data|json_script:"source-data" }}
+  {{ data|json_script:"record-data" }}
 
   {% get_citation_data as citation %}
   {{ citation.2 | safe }}
@@ -411,8 +411,8 @@
               lang: this.lang
             });
           },
-          sourceData() {
-            const node = document.getElementById('source-data');
+          recordData() {
+            const node = document.getElementById('record-data');
             document.getElementsByTagName("BODY")[0].removeChild(node);
             return JSON.parse(node.textContent);
           },
@@ -426,27 +426,27 @@
             return this.folioIndex + 1 > 1;
           },
           hasNext() {
-            return this.folioIndex + 1 < this.sourceData.folios.length;
+            return this.folioIndex + 1 < this.recordData.folios.length;
           },
           folioCount() {
-            return this.sourceData.no_folios;
+            return this.recordData.no_folios;
           },
           folioImageId() {
-            return this.sourceData.folios[this.folioIndex].pageImageId;
+            return this.recordData.folios[this.folioIndex].pageImageId;
           },
           folioId() {
             return this.hasFolios
-              ? this.sourceData.folios[this.folioIndex].pageId
+              ? this.recordData.folios[this.folioIndex].pageId
               : null;
           },
           folioName() {
             return this.hasFolios
-              ? this.sourceData.folios[this.folioIndex].pageName
+              ? this.recordData.folios[this.folioIndex].pageName
               : null;
           },
           transcriptionId() {
             return this.hasFolios
-              ? this.sourceData.folios[this.folioIndex].transcriptionId
+              ? this.recordData.folios[this.folioIndex].transcriptionId
               : null;
           },
           currentFolio() {
@@ -763,7 +763,7 @@
             if (!/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path_tokens[path_tokens.length - 1])) {
               path_tokens.pop();
             }
-            const url = `${location.protocol}//${location.host}/${path_tokens.join('/')}/${this.sourceData.folios[this.folioIndex].pageName}/`;
+            const url = `${location.protocol}//${location.host}/${path_tokens.join('/')}/${this.recordData.folios[this.folioIndex].pageName}/`;
             window.history.replaceState(null, null, url);
           },
           formatBraces() {
