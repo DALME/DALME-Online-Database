@@ -54,3 +54,13 @@ def register_saved_search_feature(features):
     )
 
     features.register_link_type(SavedSearchLinkHandler)
+
+
+@hooks.register('register_icons')
+def register_extra_icons(icons):
+    return [
+        *icons,
+        'wagtailfontawesomesvg/solid/layer-group.svg',
+        'wagtailfontawesomesvg/solid/file-lines.svg',
+        'wagtailfontawesomesvg/solid/magnifying-glass-location.svg',
+    ]

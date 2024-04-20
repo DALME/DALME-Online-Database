@@ -7,15 +7,10 @@ from wagtail import hooks
 def register_extra_icons(icons):
     return [
         *icons,
-        'wagtailfontawesomesvg/solid/book.svg',
         'wagtailfontawesomesvg/solid/notes-medical.svg',
-        'wagtailfontawesomesvg/solid/swatchbook.svg',
-        'wagtailfontawesomesvg/solid/asterisk.svg',
         'wagtailfontawesomesvg/solid/book-bookmark.svg',
-        'wagtailfontawesomesvg/solid/bullhorn.svg',
         'wagtailfontawesomesvg/solid/panorama.svg',
         'wagtailfontawesomesvg/solid/chart-area.svg',
-        'wagtailfontawesomesvg/solid/file-lines.svg',
         'wagtailfontawesomesvg/solid/images.svg',
         'wagtailfontawesomesvg/solid/photo-film.svg',
         'wagtailfontawesomesvg/solid/person.svg',
@@ -25,9 +20,5 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/diagram-next.svg',
         'wagtailfontawesomesvg/solid/list-ol.svg',
         'wagtailfontawesomesvg/regular/bookmark.svg',
-        'wagtailfontawesomesvg/solid/magnifying-glass-location.svg',
-        'wagtailfontawesomesvg/solid/people-group.svg',
-        'wagtailfontawesomesvg/solid/user-tag.svg',
-        'wagtailfontawesomesvg/solid/user.svg',
         'wagtailfontawesomesvg/solid/file-pdf.svg',
     ]

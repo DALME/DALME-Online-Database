@@ -27,3 +27,11 @@ def add_gradients_js_to_editor():
 @hooks.register('insert_global_admin_css')
 def extra_admin_css():
     return format_html('<link rel="stylesheet" href="{}">', static('css/gradient-chooser.css'))
+
+
+@hooks.register('register_icons')
+def register_extra_icons(icons):
+    return [
+        *icons,
+        'wagtailfontawesomesvg/solid/swatchbook.svg',
+    ]

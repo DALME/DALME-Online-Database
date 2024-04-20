@@ -61,3 +61,11 @@ def register_reference_feature(features):
     )
 
     features.register_link_type(ReferenceLinkHandler)
+
+
+@hooks.register('register_icons')
+def register_extra_icons(icons):
+    return [
+        *icons,
+        'wagtailfontawesomesvg/solid/book.svg',
+    ]

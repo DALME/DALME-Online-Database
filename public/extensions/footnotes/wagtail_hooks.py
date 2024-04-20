@@ -66,3 +66,11 @@ def add_footnotes(page, _request, _serve_args, _serve_kwargs):
     if getattr(page, 'has_footnotes', False):
         page.footnote_list = page.footnotes.all()
     return page
+
+
+@hooks.register('register_icons')
+def register_extra_icons(icons):
+    return [
+        *icons,
+        'wagtailfontawesomesvg/solid/asterisk.svg',
+    ]
