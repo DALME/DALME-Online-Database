@@ -1,6 +1,6 @@
 """Model flat page data."""
 
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, FieldRowPanel
 
 from django.contrib import messages
 from django.db import models
@@ -30,6 +30,12 @@ class Flat(BasePage, CitableMixin):
     content_panels = [
         *BasePage.content_panels,
         *CitableMixin.content_panels,
+        FieldRowPanel(
+            [
+                FieldPanel('short_title', classname='col8'),
+                FieldPanel('show_contact_form', classname='col4'),
+            ],
+        ),
         FieldPanel('body'),
     ]
 

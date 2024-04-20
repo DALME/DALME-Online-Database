@@ -151,30 +151,44 @@ class Settings(BaseGenericSetting):
         FieldPanel('logo'),
     ]
     footer_tab_panel = [
+        FieldPanel('copyright_line'),
         FieldPanel('footer_links'),
         FieldPanel('footer_social'),
-        FieldPanel('copyright_line'),
     ]
     search_tab_panel = [
-        FieldPanel('search_help_content'),
         FieldRowPanel(
             [
-                FieldPanel('search_header_image'),
-                FieldPanel('search_header_position'),
-            ]
+                FieldPanel('search_header_image', classname='col8'),
+                FieldPanel('search_header_position', classname='col4'),
+            ],
+            heading='Header',
         ),
+        FieldPanel('search_help_content'),
     ]
     explore_tab_panel = [
+        FieldRowPanel(
+            [
+                FieldPanel('explore_header_image', classname='col8'),
+                FieldPanel('explore_header_position', classname='col4'),
+            ],
+            heading='Header',
+        ),
         FieldPanel('explore_text_before'),
         FieldPanel('explore_text_after'),
-        FieldPanel('explore_header_image'),
-        FieldPanel('explore_header_position'),
     ]
     records_tab_panel = [
-        FieldPanel('browser_header_image'),
-        FieldPanel('browser_header_position'),
-        FieldPanel('viewer_header_image'),
-        FieldPanel('viewer_header_position'),
+        FieldRowPanel(
+            [
+                FieldPanel('browser_header_image', classname='col8'),
+                FieldPanel('browser_header_position', classname='col4'),
+            ],
+        ),
+        FieldRowPanel(
+            [
+                FieldPanel('viewer_header_image', classname='col8'),
+                FieldPanel('viewer_header_position', classname='col4'),
+            ],
+        ),
     ]
 
     edit_handler = TabbedInterface(

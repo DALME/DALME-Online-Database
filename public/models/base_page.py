@@ -1,11 +1,13 @@
 """Model base page data."""
 
 from wagtail import blocks
+from wagtail.admin.panels import FieldPanel, FieldRowPanel
 from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
+from wagtail.search import index
 from wagtailcodeblock.blocks import CodeBlock
 
 from django.db import models
@@ -108,8 +110,24 @@ class BasePage(Page, FootnoteMixin):
         blank=True,
         help_text='An optional short title that will be displayed in certain space constrained contexts.',
     )
-
     body = StreamField(DEFAULT_BLOCKS, null=True)
+
+    search_fields = [
+        *Page.search_fields,
+        index.SearchField('short_title'),
+        index.SearchField('body'),
+    ]
+
+    content_panels = [
+        *Page.content_panels,
+        FieldRowPanel(
+            [
+                FieldPanel('header_image', classname='col8'),
+                FieldPanel('header_position', classname='col4'),
+            ],
+            heading='Header',
+        ),
+    ]
 
     class Meta:
         abstract = True

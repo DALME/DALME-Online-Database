@@ -25,6 +25,8 @@ FOLIO_RE = '[0-9a-z:]+'
 
 
 class SearchEnabled(RoutablePageMixin, BasePage):
+    content_panels = BasePage.content_panels
+
     class Meta:
         abstract = True
 

@@ -12,8 +12,6 @@ class Bibliography(BasePage):
 
     content_panels = [
         *BasePage.content_panels,
-        FieldPanel('header_image'),
-        FieldPanel('header_position'),
         FieldPanel('short_title'),
         FieldPanel('body'),
     ]

@@ -2,7 +2,7 @@
 
 from urllib import parse
 
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, FieldRowPanel
 
 from django.db import models
 
@@ -30,7 +30,15 @@ class Collection(SearchEnabled, CitableMixin):
     page_description = 'Provides a landing page for a collection of records.'
 
     content_panels = [
+        *SearchEnabled.content_panels,
         *CitableMixin.content_panels,
+        FieldRowPanel(
+            [
+                FieldPanel('record_collection', classname='col8'),
+                FieldPanel('preview', classname='col4'),
+            ],
+            heading='Collection',
+        ),
         FieldPanel('body'),
     ]
 
