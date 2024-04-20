@@ -70,8 +70,8 @@ class PublicPagination(pagination.PageNumberPagination):
                 'count': total_count,
                 'totalPages': num_pages,
                 'currentPage': current_page,
-                'page_numbers': page_numbers,
-                'page_start': start_offset + 1,
-                'page_end': result_end - 1 if result_end != total_count else result_end,
+                'pageNumbers': page_numbers,
+                'pageStart': start_offset + 1,
+                'pageEnd': result_end - 1 if result_end != total_count else result_end,
             },
         )
