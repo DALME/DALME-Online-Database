@@ -71,9 +71,6 @@ class FeaturedPage(BasePage, CitableMixin):
             placeholder='...',
         )
 
-    def resolve_source_url(self):
-        raise NotImplementedError
-
     def clean(self):
         if self.go_live_at:
             qs = self._meta.model.objects.filter(
@@ -84,26 +81,5 @@ class FeaturedPage(BasePage, CitableMixin):
                 title = qs.first().title
                 msg = f'{model}: {title} is already scheduled for publication at: {self.go_live_at}'
                 raise ValidationError(msg)
-
-        if self.source_set and self.source:
-            try:
-                # TODO: There must be a better way to determine Set membership
-                # than this but the (bi-directional) generic relations make it
-                # tough. UPDATE 2023: Can't we just do this?
-                #
-                # if not self.source_set.members.filter(content_object__pk=self.source.pk).exists():
-                #     msg = f'{self.source} is not a member of: {self.source_set}'
-                #     raise ValidationError(msg) from exc
-                # return super().clean()
-                #
-                # Let's capture it with a regression test and see.
-                next(
-                    source.content_object
-                    for source in self.source_set.members.all()
-                    if source.content_object.pk == self.source.pk
-                )
-            except StopIteration as exc:
-                msg = f'{self.source} is not a member of: {self.source_set}'
-                raise ValidationError(msg) from exc
 
         return super().clean()

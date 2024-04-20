@@ -2,45 +2,22 @@
 
 from wagtail.admin.panels import FieldPanel
 
-from django.db import models
-
-from ida.models import Collection, Record
-from public.extensions.records.panels import RecordCollectionPanel
-from public.models.base_page import BasePage
+from public.extensions.records.models import record_mixin_factory
 from public.models.featured_page import FeaturedPage
 
+RecordClass = record_mixin_factory(blank=False)
 
-class FeaturedInventory(FeaturedPage):
+
+class FeaturedInventory(FeaturedPage, RecordClass):
     short_title = 'Inventory'
-    source = models.ForeignKey(
-        Record,
-        related_name='featured_inventories',
-        on_delete=models.DO_NOTHING,
-        null=True,
-    )
-    source_set = models.ForeignKey(
-        Collection,
-        related_name='featured_inventories',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.',
-    )
-
     parent_page_types = ['public.Features']
     subpage_types = []
     page_description = 'A page suitable for short essays built around an inventory. Can link to records or collections.'
     template = 'public/feature.html'
 
     content_panels = [
-        *BasePage.content_panels,
-        FieldPanel('header_image'),
-        FieldPanel('header_position'),
-        FieldPanel('front_page_image'),
-        FieldPanel('source'),
-        RecordCollectionPanel('source_set'),
-        FieldPanel('alternate_author'),
-        FieldPanel('citable'),
+        *FeaturedPage.content_panels,
+        *RecordClass.content_panels,
         FieldPanel('body'),
     ]
 

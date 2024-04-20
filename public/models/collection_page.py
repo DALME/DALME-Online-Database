@@ -12,14 +12,11 @@ from public.models.search_enabled_page import SearchEnabled
 
 
 class Collection(SearchEnabled, CitableMixin):
-    source_set = models.ForeignKey(
+    record_collection = models.ForeignKey(
         Collection,
-        related_name='public_collections',
         on_delete=models.PROTECT,
-    )
-    citable = models.BooleanField(
-        default=True,
-        help_text='Check this box to show the "Cite" menu for this page.',
+        verbose_name='Collection',
+        help_text='Collection to associate with this page.',
     )
     preview = models.BooleanField(
         default=False,
@@ -54,18 +51,18 @@ class Collection(SearchEnabled, CitableMixin):
     def stats(self):
         if self.preview:
             stats_dict = {
-                'records': self.source_set.member_count(),
-                'languages': self.source_set.get_languages(),
-                'coverage': self.source_set.get_time_coverage(),
+                'records': self.record_collection.member_count(),
+                'languages': self.record_collection.get_languages(),
+                'coverage': self.record_collection.get_time_coverage(),
             }
         else:
             stats_dict = {
-                'records': self.source_set.member_count(published=True),
-                'languages': self.source_set.get_languages(published=True),
-                'coverage': self.source_set.get_time_coverage(published=True),
+                'records': self.record_collection.member_count(published=True),
+                'languages': self.record_collection.get_languages(published=True),
+                'coverage': self.record_collection.get_time_coverage(published=True),
             }
 
-        meta = self.source_set.attributes.filter(attribute_type__name='collection_metadata')
+        meta = self.record_collection.attributes.filter(attribute_type__name='collection_metadata')
         if meta.exists():
             stats_dict['other'] = meta.first().value
 
@@ -73,13 +70,13 @@ class Collection(SearchEnabled, CitableMixin):
 
     @property
     def count(self):
-        return self.source_set.member_count(published=True)
+        return self.record_collection.member_count(published=True)
 
     @property
-    def sources(self):
-        return self.source_set.members.all()
+    def records(self):
+        return self.record_collection.members.all()
 
     def clean(self):
-        if self.source_set:
-            self.slug = self.source_set.name.replace(' ', '-').lower()
+        if self.record_collection:
+            self.slug = self.record_collection.name.replace(' ', '-').lower()
         return super().clean()
