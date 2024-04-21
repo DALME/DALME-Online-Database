@@ -1,6 +1,7 @@
 """Model gradient data."""
 
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, FieldRowPanel
+from wagtail.models import Page
 
 from django.db import models
 
@@ -32,10 +33,21 @@ class GradientMixin(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
+        help_text='A gradient to overlay on the image.',
     )
 
-    content_panels = [
-        FieldPanel('gradient'),
+    metadata_panels = [
+        *Page.content_panels,
+        FieldRowPanel(
+            [
+                FieldPanel('header_image', classname='col4'),
+                FieldPanel('gradient', classname='col4'),
+                FieldPanel('header_position', classname='col4'),
+            ],
+            heading='Header',
+            classname='field-row-panel with-gradient',
+            icon='bandage',
+        ),
     ]
 
     class Meta:

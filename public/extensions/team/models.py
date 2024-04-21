@@ -52,6 +52,7 @@ class TeamMember(models.Model):
     )
     url = models.URLField(
         blank=True,
+        verbose_name='Website',
         help_text='Link to a website or online profile.',
     )
     photo = models.ForeignKey(

@@ -14,8 +14,8 @@ class Section(BasePage, GradientMixin):
     ]
     page_description = 'Defines a menu section. Can have a gradient (used by child pages), but no other content.'
 
-    content_panels = [
-        *BasePage.content_panels,
-        *GradientMixin.content_panels,
+    content_panels = None
+    metadata_panels = [
+        *GradientMixin.metadata_panels,
         FieldPanel('short_title'),
     ]

@@ -39,7 +39,7 @@ def record_mixin_factory(blank=True):
             null=True,
             blank=blank,
             on_delete=models.DO_NOTHING,
-            verbose_name='Linked record',
+            verbose_name='Record',
             help_text='A record to associate with this page.',
         )
         record_collection = models.ForeignKey(
@@ -47,17 +47,20 @@ def record_mixin_factory(blank=True):
             on_delete=models.SET_NULL,
             null=True,
             blank=True,
-            verbose_name='Linked collection',
-            help_text='An optional collection associated with this page. The record selected above must be a member of the collection or the page will not validate.',
+            verbose_name='Collection',
+            help_text='A collection to associate with this page.',
         )
 
-        content_panels = [
+        metadata_panels = [
             FieldRowPanel(
                 [
                     FieldPanel('record'),
                     FieldPanel('record_collection'),
                 ],
-                heading='Linked Record',
+                heading='Linked record/collection',
+                classname='field-row-panel',
+                icon='folder-plus',
+                help_text='If both a record and a collection are selected, then the record must be a member of the collection or the page will not validate.',
             ),
         ]
 

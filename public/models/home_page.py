@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from wagtail.admin.panels import FieldPanel, FieldRowPanel
+from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
 
 from django.db import models
@@ -36,17 +36,9 @@ class Home(BasePage, GradientMixin):
         'public.Collections',
     ]
 
-    content_panels = [
-        *BasePage.content_panels,
-        FieldRowPanel(
-            [
-                FieldPanel('header_image'),
-                FieldPanel('gradient'),
-            ],
-            heading='Header',
-        ),
+    metadata_panels = [
+        *GradientMixin.metadata_panels,
         FieldPanel('learn_more_page'),
-        FieldPanel('body'),
         FieldPanel('sponsors'),
     ]
 

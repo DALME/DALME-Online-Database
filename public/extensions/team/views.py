@@ -1,6 +1,6 @@
 """Views for team extension."""
 
-from wagtail.admin.panels import FieldPanel, FieldRowPanel
+from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
 from wagtail.admin.ui.tables import Column, UpdatedAtColumn
 from wagtail.admin.views.generic.models import IndexView
 from wagtail.admin.viewsets.base import ViewSetGroup
@@ -55,28 +55,44 @@ class TeamMemberViewSet(ModelViewSet):
     search_fields = ['name', 'title', 'affiliation', 'biography']
     index_results_template_name = 'team_list/index_results.html'
 
-    panels = [
+    general_panels = [
         FieldRowPanel(
             [
                 FieldPanel('name', classname='col8'),
                 FieldPanel('user', classname='col4'),
             ],
-        ),
-        FieldRowPanel(
-            [
-                FieldPanel('title', classname='col8'),
-                FieldPanel('affiliation', classname='col4'),
-            ],
+            heading='ID',
+            classname='field-row-panel',
         ),
         FieldRowPanel(
             [
                 FieldPanel('roles', classname='col8'),
                 FieldPanel('photo', classname='col4'),
             ],
+            heading='Roles and photo',
+            classname='field-row-panel',
         ),
-        FieldPanel('biography'),
+    ]
+    professional_panels = [
+        FieldRowPanel(
+            [
+                FieldPanel('title', classname='col8'),
+                FieldPanel('affiliation', classname='col4'),
+            ],
+            heading='Affiliation',
+            classname='field-row-panel',
+        ),
         FieldPanel('url'),
     ]
+    bio_panels = [FieldPanel('biography')]
+
+    edit_handler = TabbedInterface(
+        [
+            ObjectList(general_panels, heading='General'),
+            ObjectList(professional_panels, heading='Professional'),
+            ObjectList(bio_panels, heading='Biography'),
+        ]
+    )
 
 
 class TeamViewSetGroup(ViewSetGroup):

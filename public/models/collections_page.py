@@ -7,6 +7,7 @@ from django.template.response import TemplateResponse
 
 from public.extensions.bibliography.models import CitableMixin
 from public.extensions.gradients.models import GradientMixin
+from public.models.base_page import BasePage
 from public.models.search_enabled_page import SearchEnabled
 from public.models.settings import Settings
 
@@ -19,12 +20,14 @@ class Collections(SearchEnabled, CitableMixin, GradientMixin):
     ]
     page_description = 'The "Collections" landing page.'
 
-    content_panels = [
-        *SearchEnabled.content_panels,
-        *CitableMixin.content_panels,
-        *GradientMixin.content_panels,
+    metadata_panels = [
+        *GradientMixin.metadata_panels,
+        *CitableMixin.metadata_panels,
         FieldPanel('short_title'),
-        FieldPanel('body'),
+    ]
+
+    content_panels = [
+        *BasePage.content_panels,
         MultiFieldPanel([InlinePanel('corpora', min_num=1, label='Corpus')], heading='Corpora'),
     ]
 

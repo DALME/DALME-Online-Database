@@ -132,6 +132,7 @@ class GradientViewSet(ModelViewSet):
                 FieldPanel('angle'),
             ],
             heading='Gradient Attributes',
+            classname='field-row-panel',
         ),
         FieldPanel('description'),
     ]

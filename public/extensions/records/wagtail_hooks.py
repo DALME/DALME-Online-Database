@@ -67,4 +67,5 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/layer-group.svg',
         'wagtailfontawesomesvg/solid/file-lines.svg',
         'wagtailfontawesomesvg/solid/magnifying-glass-location.svg',
+        'wagtailfontawesomesvg/solid/folder-plus.svg',
     ]

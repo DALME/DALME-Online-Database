@@ -18,19 +18,19 @@ class FeaturedPage(BasePage, CitableMixin):
         max_length=127,
         null=True,
         blank=True,
-        help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.',
+        help_text='The name to display as the author of this page (instead of the user who created it).',
     )
     front_page_image = models.ForeignKey(
         BaseImage,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        help_text='The image that will display on the front page.',
+        help_text='The image to use on the front page when this page is featured.',
     )
 
-    content_panels = [
-        *BasePage.content_panels,
-        *CitableMixin.content_panels,
+    metadata_panels = [
+        *BasePage.metadata_panels,
+        *CitableMixin.metadata_panels,
         FieldPanel('front_page_image'),
         FieldPanel('alternate_author'),
     ]

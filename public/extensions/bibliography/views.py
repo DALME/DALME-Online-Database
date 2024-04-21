@@ -60,6 +60,7 @@ class BiblioViewSet(ModelViewSet):
                 FieldPanel('id'),
                 FieldPanel('has_biblio_sources'),
             ],
+            classname='field-row-panel',
         ),
         FieldPanel('label'),
     ]

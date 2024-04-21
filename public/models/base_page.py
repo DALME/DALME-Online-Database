@@ -1,13 +1,14 @@
 """Model base page data."""
 
 from wagtail import blocks
-from wagtail.admin.panels import FieldPanel, FieldRowPanel
+from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
 from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
 from wagtail.search import index
+from wagtail.utils.decorators import cached_classmethod
 from wagtailcodeblock.blocks import CodeBlock
 
 from django.db import models
@@ -102,7 +103,7 @@ class BasePage(Page, FootnoteMixin):
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        help_text='Position of the header image within its container.',
+        help_text='The section of the image that should be centered on the header.',
     )
     short_title = models.CharField(
         max_length=63,
@@ -118,7 +119,7 @@ class BasePage(Page, FootnoteMixin):
         index.SearchField('body'),
     ]
 
-    content_panels = [
+    metadata_panels = [
         *Page.content_panels,
         FieldRowPanel(
             [
@@ -126,11 +127,36 @@ class BasePage(Page, FootnoteMixin):
                 FieldPanel('header_position', classname='col4'),
             ],
             heading='Header',
+            classname='field-row-panel',
+            icon='bandage',
         ),
     ]
+    content_panels = [FieldPanel('body')]
+    promote_panels = [*Page.promote_panels]
 
     class Meta:
         abstract = True
+
+    def get_metadata_panels(self):
+        panels = super().get_metadata_panels() if hasattr(super(), 'get_metadata_panels') else []
+        if hasattr(self, 'metadata_panels'):
+            panels += self.metadata_panels
+        return panels
+
+    @cached_classmethod
+    def get_edit_handler(self):
+        tabs = []
+        if self.metadata_panels:
+            tabs.append(ObjectList(self.metadata_panels, heading='Metadata'))
+        if self.content_panels:
+            tabs.append(ObjectList(self.content_panels, heading='Content'))
+        if self.promote_panels:
+            tabs.append(ObjectList(self.promote_panels, heading='Promote'))
+        if self.settings_panels:
+            tabs.append(ObjectList(self.settings_panels, heading='Settings'))
+
+        edit_handler = TabbedInterface(tabs, base_form_class=self.base_form_class)
+        return edit_handler.bind_to_model(self)
 
     def get_context(self, request):
         context = super().get_context(request)

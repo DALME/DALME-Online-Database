@@ -115,14 +115,14 @@ class Settings(BaseGenericSetting):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
-        verbose_name='Browser header image',
+        verbose_name='Header image',
         help_text='The image that will display in the header of the record browser.',
     )
     browser_header_position = models.CharField(
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        verbose_name='Browser header position',
+        verbose_name='Header position',
         help_text='Position of the header image within its container in the record browser.',
     )
     viewer_header_image = models.ForeignKey(
@@ -131,14 +131,14 @@ class Settings(BaseGenericSetting):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
-        verbose_name='Viewer header image',
+        verbose_name='Header image',
         help_text='The image that will display in the header of the record viewer.',
     )
     viewer_header_position = models.CharField(
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        verbose_name='Viewer header position',
+        verbose_name='Header position',
         help_text='Position of the header image within its container in the record viewer.',
     )
 
@@ -162,6 +162,7 @@ class Settings(BaseGenericSetting):
                 FieldPanel('search_header_position', classname='col4'),
             ],
             heading='Header',
+            classname='field-row-panel',
         ),
         FieldPanel('search_help_content'),
     ]
@@ -172,6 +173,7 @@ class Settings(BaseGenericSetting):
                 FieldPanel('explore_header_position', classname='col4'),
             ],
             heading='Header',
+            classname='field-row-panel',
         ),
         FieldPanel('explore_text_before'),
         FieldPanel('explore_text_after'),
@@ -182,12 +184,16 @@ class Settings(BaseGenericSetting):
                 FieldPanel('browser_header_image', classname='col8'),
                 FieldPanel('browser_header_position', classname='col4'),
             ],
+            heading='Browser',
+            classname='field-row-panel',
         ),
         FieldRowPanel(
             [
                 FieldPanel('viewer_header_image', classname='col8'),
                 FieldPanel('viewer_header_position', classname='col4'),
             ],
+            heading='Viewer',
+            classname='field-row-panel',
         ),
     ]
 

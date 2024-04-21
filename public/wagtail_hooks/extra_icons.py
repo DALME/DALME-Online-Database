@@ -21,4 +21,5 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/list-ol.svg',
         'wagtailfontawesomesvg/regular/bookmark.svg',
         'wagtailfontawesomesvg/solid/file-pdf.svg',
+        'wagtailfontawesomesvg/solid/bandage.svg',
     ]

@@ -10,8 +10,7 @@ class Bibliography(BasePage):
     subpage_types = ['public.Flat']
     page_description = 'A flat page that can include one or many bibliographies.'
 
-    content_panels = [
-        *BasePage.content_panels,
+    metadata_panels = [
+        *BasePage.metadata_panels,
         FieldPanel('short_title'),
-        FieldPanel('body'),
     ]

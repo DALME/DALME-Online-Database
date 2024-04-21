@@ -20,23 +20,25 @@ class Collection(SearchEnabled, CitableMixin):
     )
     preview = models.BooleanField(
         default=False,
-        help_text='Check this box to set this collection to Preview mode only. It will be made public but not added to the search or map. Only people with the link will be able to access it.',
+        help_text='Check this box to set this collection to Preview mode only.',
     )
     parent_page_types = ['public.Collections']
     subpage_types = ['public.Flat']
     page_description = 'Provides a landing page for a collection of records.'
 
-    content_panels = [
-        *SearchEnabled.content_panels,
-        *CitableMixin.content_panels,
+    metadata_panels = [
+        *SearchEnabled.metadata_panels,
+        *CitableMixin.metadata_panels,
         FieldRowPanel(
             [
                 FieldPanel('record_collection', classname='col8'),
                 FieldPanel('preview', classname='col4'),
             ],
             heading='Collection',
+            classname='field-row-panel',
+            icon='layer-group',
+            help_text='A collection in Preview mode will be made public, but not added to the search index or to the map in the Explore page. Only someone with the full url will be able to access it.',
         ),
-        FieldPanel('body'),
     ]
 
     def get_context(self, request):

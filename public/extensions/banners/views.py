@@ -26,6 +26,7 @@ class BannersViewSet(ModelViewSet):
                 FieldPanel('show_title', classname='col1'),
                 FieldPanel('color', classname='col3'),
             ],
+            classname='field-row-panel',
         ),
         FieldPanel('info'),
         FieldPanel('page'),
@@ -36,5 +37,6 @@ class BannersViewSet(ModelViewSet):
                 FieldPanel('end_date'),
             ],
             heading='Display dates',
+            classname='field-row-panel',
         ),
     ]

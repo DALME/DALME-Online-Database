@@ -27,16 +27,16 @@ class Flat(BasePage, CitableMixin):
     subpage_types = ['public.Flat']
     page_description = 'A generic page for all kinds of content. Can be cited and show a contact form.'
 
-    content_panels = [
-        *BasePage.content_panels,
-        *CitableMixin.content_panels,
+    metadata_panels = [
+        *BasePage.metadata_panels,
+        *CitableMixin.metadata_panels,
         FieldRowPanel(
             [
                 FieldPanel('short_title', classname='col8'),
                 FieldPanel('show_contact_form', classname='col4'),
             ],
+            classname='field-row-panel',
         ),
-        FieldPanel('body'),
     ]
 
     def serve(self, request):

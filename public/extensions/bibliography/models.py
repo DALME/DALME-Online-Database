@@ -11,7 +11,7 @@ class CitableMixin(models.Model):
         help_text='Check this box to show the "Cite" menu for this page.',
     )
 
-    content_panels = [
+    metadata_panels = [
         FieldPanel('citable'),
     ]
 

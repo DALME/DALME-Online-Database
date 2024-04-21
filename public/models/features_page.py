@@ -17,11 +17,9 @@ class Features(BasePage, GradientMixin):
     ]
     page_description = 'The "Features" landing page.'
 
-    content_panels = [
-        *BasePage.content_panels,
-        *GradientMixin.content_panels,
+    metadata_panels = [
+        *GradientMixin.metadata_panels,
         FieldPanel('short_title'),
-        FieldPanel('body'),
     ]
 
     def get_context(self, request):
