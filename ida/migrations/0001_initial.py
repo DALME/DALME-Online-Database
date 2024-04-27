@@ -505,7 +505,7 @@ class Migration(migrations.Migration):
                         db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
                     ),
                 ),
-                ('filefield', models.FileField(upload_to='attachments/%Y/%m/')),
+                ('filefield', models.FileField(upload_to='attachments/%Y/%m/', max_length=255)),
                 ('filetype', models.CharField(blank=True, max_length=255)),
                 (
                     'creation_user',
