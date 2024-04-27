@@ -10,7 +10,7 @@ register = template.Library()
 @register.simple_tag(takes_context=True)
 def get_header_image_styles(context, header_image, header_position):
     page = context['page']
-    gradient = 'linear-gradient(59deg, #11587c 54.62%, #1b1b1b)'
+    gradient = 'linear-gradient(59deg, #5f516fb3 0%, #173e65e6 100%)'
     try:
         if hasattr(page, 'gradient'):
             gradient = page.gradient.css
