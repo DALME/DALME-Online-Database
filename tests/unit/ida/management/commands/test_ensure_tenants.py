@@ -61,10 +61,10 @@ def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
                     'name': 'DALME',
                     'schema_name': 'dalme',
                 },
-                'GLOBALPHARMACOPEIAS': {
-                    'domain': 'globalpharmacopeias.localhost',
-                    'name': 'Global Pharmacopeias',
-                    'schema_name': 'globalpharmacopeias',
+                'PHARMACOPEIAS': {
+                    'domain': 'pharmacopeias.localhost',
+                    'name': 'Pharmacopeias',
+                    'schema_name': 'pharmacopeias',
                 },
             }
         )
@@ -87,16 +87,16 @@ def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
         mock.call.objects.filter().exists(),
         mock.call.objects.filter(domains__domain='dalme.localhost'),
         mock.call.objects.filter().exists(),
-        mock.call.objects.filter(name='Global Pharmacopeias'),
+        mock.call.objects.filter(name='Pharmacopeias'),
         mock.call.objects.filter().exists(),
         mock.call.objects.create(
-            name='Global Pharmacopeias',
-            schema_name='globalpharmacopeias',
+            name='Pharmacopeias',
+            schema_name='pharmacopeias',
         ),
     ]
     assert mock_domain.mock_calls == [
         mock.call.objects.create(
-            domain='globalpharmacopeias.localhost',
+            domain='pharmacopeias.localhost',
             tenant=new_tenant,
             is_primary=False,
         ),

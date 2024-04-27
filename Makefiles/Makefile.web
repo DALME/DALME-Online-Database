@@ -1,7 +1,7 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 RESOLVER := /etc/resolver/localhost
-TENANTS = dalme globalpharmacopeias
+TENANTS = dalme pharmacopeias
 
 web.build:
 	 docker compose up -d --no-deps --build $(PROJECT).web

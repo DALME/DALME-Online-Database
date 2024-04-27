@@ -34,8 +34,8 @@ def test_ensure_oauth_create_appliaction_some_failure(mock_logger, mock_applicat
             client_secret='django-insecure-development-environment-oauth-client-secret',
             algorithm='RS256',
             name='IDA',
-            redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://globalpharmacopeias.localhost:8000/api/oauth/authorize/callback/',
-            post_logout_redirect_uris='http://dalme.localhost:8000/ http://globalpharmacopeias.localhost:8000/',
+            redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://pharmacopeias.localhost:8000/api/oauth/authorize/callback/',
+            post_logout_redirect_uris='http://dalme.localhost:8000/ http://pharmacopeias.localhost:8000/',
             skip_authorization=True,
         )
     ]
@@ -71,15 +71,12 @@ def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, m
             client_secret='django-insecure-development-environment-oauth-client-secret',
             algorithm='RS256',
             name='IDA',
-            redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://globalpharmacopeias.localhost:8000/api/oauth/authorize/callback/',
-            post_logout_redirect_uris='http://dalme.localhost:8000/ http://globalpharmacopeias.localhost:8000/',
+            redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://pharmacopeias.localhost:8000/api/oauth/authorize/callback/',
+            post_logout_redirect_uris='http://dalme.localhost:8000/ http://pharmacopeias.localhost:8000/',
             skip_authorization=True,
         )
     ]
-    assert (
-        mock_oauth_application.allowed_origins
-        == 'http://dalme.localhost:8000 http://globalpharmacopeias.localhost:8000'
-    )
+    assert mock_oauth_application.allowed_origins == 'http://dalme.localhost:8000 http://pharmacopeias.localhost:8000'
     assert mock_oauth_application.mock_calls == [
         mock.call.save(),
     ]

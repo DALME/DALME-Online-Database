@@ -396,16 +396,16 @@ class Development(Base, Configuration):
             'name': 'DALME',
             'schema_name': 'dalme',
         },
-        'GLOBALPHARMACOPEIAS': {
-            'domain': 'globalpharmacopeias.localhost',
-            'name': 'Global Pharmacopeias',
-            'schema_name': 'globalpharmacopeias',
+        'PHARMACOPEIAS': {
+            'domain': 'pharmacopeias.localhost',
+            'name': 'Pharmacopeias',
+            'schema_name': 'pharmacopeias',
         },
     }
 
     ALLOWED_HOSTS = [
         'dalme.localhost',
-        'globalpharmacopeias.localhost',
+        'pharmacopeias.localhost',
     ]
 
     CORS_ALLOW_ALL_ORIGINS = False
@@ -413,7 +413,7 @@ class Development(Base, Configuration):
     CORS_ALLOWED_ORIGINS = [
         'http://ida.localhost:8000',
         'http://dalme.localhost:8000',
-        'http://globalpharmacopeias.localhost:8000',
+        'http://pharmacopeias.localhost:8000',
         'http://localhost:8888',
     ]
 
@@ -421,7 +421,7 @@ class Development(Base, Configuration):
     CSRF_TRUSTED_ORIGINS = [
         'http://ida.localhost:8000',
         'http://dalme.localhost:8000',
-        'http://globalpharmacopeias.localhost:8000',
+        'http://pharmacopeias.localhost:8000',
         'http://localhost:8888',
     ]
     SESSION_COOKIE_SECURE = False
@@ -710,9 +710,9 @@ class Staging(Production, Configuration):
             'name': 'DALME',
             'schema_name': 'dalme',
         },
-        'GLOBALPHARMACOPEIAS': {
+        'PHARMACOPEIAS': {
             'domain': 'globalpharmacopeias.ocp.systems',
-            'name': 'Global Pharmacopeias',
-            'schema_name': 'globalpharmacopeias',
+            'name': 'Pharmacopeias',
+            'schema_name': 'pharmacopeias',
         },
     }

@@ -117,8 +117,8 @@ class Stage(BaseStage):
     @transaction.atomic
     def update_global_ph_group(self):
         """Update legacy Team Pharmacopeia group data."""
-        self.logger.info('Renaming and scoping the existing Global Pharmacopeias auth group')
-        name = 'Global Pharmacopeias'
+        self.logger.info('Renaming and scoping the existing Pharmacopeias auth group')
+        name = 'Pharmacopeias'
         try:
             group = Group.objects.get(name='Team Pharmacopeia')
         except Group.DoesNotExist:
@@ -134,15 +134,15 @@ class Stage(BaseStage):
         """Register existing DALME users with the DALME tenant."""
         self.logger.info('Scoping users to the DALME tenant')
         dalme = Tenant.objects.get(name='DALME')
-        non_members = User.objects.filter(groups__name='Global Pharmacopeias')
+        non_members = User.objects.filter(groups__name='Pharmacopeias')
         members = User.objects.exclude(id__in=non_members.values_list('id', flat=True))
         dalme.members.add(*members)
 
     @transaction.atomic
     def scope_global_ph_members(self):
-        """Register existing Global Pharmacopeias users with the Global Pharmacopeias tenant."""
-        self.logger.info('Scoping users to the Global Pharmacopeias tenant')
-        name = 'Global Pharmacopeias'
+        """Register existing Global Pharmacopeias users with the Pharmacopeias tenant."""
+        self.logger.info('Scoping users to the Pharmacopeias tenant')
+        name = 'Pharmacopeias'
         global_ph = Tenant.objects.get(name=name)
         members = User.objects.filter(groups__name=name)
         global_ph.members.add(*members)

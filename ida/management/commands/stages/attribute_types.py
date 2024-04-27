@@ -494,7 +494,7 @@ class Stage(BaseStage):
         if OptionsList.objects.count() == 0:
             self.logger.info('Migrating options lists')
             dalme_tenant = Tenant.objects.get(name='DALME').id
-            gp_tenant = Tenant.objects.get(name='Global Pharmacopeias').id
+            gp_tenant = Tenant.objects.get(name='Pharmacopeias').id
 
             auth_list = OptionsList.objects.create(
                 name='record authority',
