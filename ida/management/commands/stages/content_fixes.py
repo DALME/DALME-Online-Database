@@ -1,5 +1,6 @@
 """Create entries necessary for new data schemas."""
 
+import copy
 import json
 import os
 import re
@@ -70,6 +71,7 @@ class Stage(BaseStage):
     """Fixes after finishing all data migrations."""
 
     name = '11 Content fixes'
+    FN_REGISTER = {}  # register to keep track of footnote indices
 
     @transaction.atomic
     def apply(self):
@@ -80,6 +82,7 @@ class Stage(BaseStage):
         self.update_footnote_state()
         self.fix_biblio_page()
         self.migrate_people()
+        self.process_images()
 
     @transaction.atomic
     def adjust_id_columns(self):
@@ -206,8 +209,9 @@ class Stage(BaseStage):
 
         return soup
 
-    def fix_entities(self, text, page):
+    def fix_entities(self, text, obj, is_rev=False):
         soup = BeautifulSoup(text, features='lxml')
+
         # references
         references = soup.find_all('a', href=REFERENCE_HREF)
         if references:
@@ -216,23 +220,41 @@ class Stage(BaseStage):
         # footnotes
         footnotes = soup.find_all('span', attrs={'data-footnote': True})
         if footnotes:
-            for idx, fn in enumerate(footnotes, start=1):
-                # format: <a data-footnote="c847f9da-3780-4085-9426-73e7a0228b3d" linktype="footnote">✱</a>
-                fn_content = self.markdown_to_html(fn['data-footnote'])
-                with schema_context('dalme'):
-                    from public.extensions.footnotes.models import Footnote
+            with schema_context('dalme'):
+                from wagtail.models import Page
 
-                    new_footnote = Footnote.objects.create(
-                        id=uuid.uuid4(),
-                        page=page,
-                        text=fn_content,
-                        sort_order=idx,
-                    )
+                from public.extensions.footnotes.models import Footnote
 
-                fn.name = 'a'
-                fn['data-footnote'] = new_footnote.id
-                fn['linktype'] = 'footnote'
-                del fn['data-note_id']
+                page = obj if isinstance(obj, Page) else obj.content_object
+                fn_index = self.FN_REGISTER.get(page.id, 1)
+
+                for idx, fn in enumerate(footnotes, start=fn_index):
+                    # format: <a data-footnote="c847f9da-3780-4085-9426-73e7a0228b3d" linktype="footnote">✱</a>
+                    fn_content = self.markdown_to_html(fn['data-footnote'])
+
+                    if is_rev:
+                        # we don't create footnote records for page revisions as they would be repeats
+                        # of notes that already exist in the live pages
+                        fn_record = Footnote.objects.filter(text=fn_content, page=page)
+                        if fn_record.exists() and fn_record.count() == 1:
+                            fn['data-footnote'] = fn_record.first().id
+                        else:
+                            fn['data-footnote'] = True
+                    else:
+                        new_footnote = Footnote.objects.create(
+                            id=uuid.uuid4(),
+                            page=page,
+                            text=fn_content,
+                            sort_order=idx,
+                        )
+                        fn['data-footnote'] = new_footnote.id
+
+                    self.FN_REGISTER[page.id] = idx  # update footnote index for page with last used one
+                    fn.name = 'a'
+                    fn['linktype'] = 'footnote'
+                    del fn['data-note_id']
+
+                self.FN_REGISTER[page.id] += 1  # increment last index by one for next run
 
         # saved searches
         # source format: <a id="01d5187e-2752-466e-9e7d-64e51051facd" linktype="saved_search">storage</a>
@@ -244,30 +266,90 @@ class Stage(BaseStage):
                     search_obj = SavedSearch.objects.get(pk=ss['id'])
                     ss['data-saved-search'] = search_obj.name
                 except:  # noqa: E722
-                    self.logger.info('Failed to migrate saved search entity in page %s', page.id)
+                    self.logger.info('Failed to migrate saved search entity in page %s', obj.id)
 
         return ''.join(str(b) for b in soup.body.findChildren(recursive=False))
 
+    def parse_streamfield(self, content, obj, is_rev=False):  # noqa: C901, PLR0912, PLR0915
+        """We parse streamfields to convert the old subsection blocks into the new nested system."""
+        new_content = []
+        subsection = None
+        nested_subsection = None
+        for sblock in content:
+            block = copy.deepcopy(sblock)
+            if block.get('type') in ['subsection', 'subsection_end_marker']:
+                if block.get('value', {}).get('minor_heading'):
+                    block['type'] = 'nested_subsection'
+                    if nested_subsection is None:
+                        nested_subsection = block
+                    else:
+                        if subsection:
+                            if not subsection['value'].get('body'):
+                                subsection['value']['body'] = [nested_subsection]
+                            else:
+                                subsection['value']['body'].append(nested_subsection)
+                        else:
+                            new_content.append(nested_subsection)
+                        nested_subsection = block
+                else:
+                    if nested_subsection:
+                        if subsection:
+                            if not subsection['value'].get('body'):
+                                subsection['value']['body'] = [nested_subsection]
+                            else:
+                                subsection['value']['body'].append(nested_subsection)
+                        else:
+                            new_content.append(nested_subsection)
+
+                        nested_subsection = None
+
+                    if subsection:
+                        new_content.append(subsection)
+
+                    subsection = block if block.get('type') == 'subsection' else None
+            else:
+                if block.get('type') == 'text' and block.get('value'):
+                    block['value'] = self.fix_entities(block['value'], obj, is_rev=is_rev)
+
+                if nested_subsection:
+                    if not nested_subsection['value'].get('body'):
+                        nested_subsection['value']['body'] = [block]
+                    else:
+                        nested_subsection['value']['body'].append(block)
+
+                elif subsection:
+                    if not subsection['value'].get('body'):
+                        subsection['value']['body'] = [block]
+                    else:
+                        subsection['value']['body'].append(block)
+
+                else:
+                    new_content.append(block)
+
+        if nested_subsection:
+            if subsection:
+                if not subsection['value'].get('body'):
+                    subsection['value']['body'] = [nested_subsection]
+                else:
+                    subsection['value']['body'].append(nested_subsection)
+            else:
+                new_content.append(nested_subsection)
+
+        if subsection:
+            new_content.append(subsection)
+
+        return new_content
+
     def process_content_field(self, field_value, field_type, obj):
         if field_type == 'JSONField':
-            if isinstance(field_value, dict):
-                content = json.loads(field_value['body'])
-                for block in content:
-                    if isinstance(block, dict) and block.get('type') == 'text':  # noqa: SIM102
-                        if block.get('value') and isinstance(block.get('value'), list):
-                            block['value'] = self.fix_entities(block['value'], obj)
+            is_rev = isinstance(field_value, dict)
+            content = json.loads(field_value['body']) if is_rev else field_value.get_prep_value()
+            new_content = self.parse_streamfield(content, obj, is_rev=is_rev)
 
-                field_value['body'] = json.dumps(content)
-
+            if is_rev:
+                field_value['body'] = json.dumps(new_content)
             else:
-                for block in field_value:
-                    if block.block_type == 'text':
-                        block.value = block.block.to_python(
-                            self.fix_entities(
-                                block.block.get_prep_value(block.value),
-                                obj,
-                            )
-                        )
+                field_value = field_value.stream_block.to_python(new_content)
 
         else:
             field_value = self.fix_entities(field_value, obj)
@@ -285,7 +367,6 @@ class Stage(BaseStage):
     def content_conversions(self):
         """Convert content between old and new formats (footnotes, references, people/team members)."""
         targets = {
-            'wagtailcore': ['revision'],
             'public': [
                 'collection',
                 'collections',
@@ -295,6 +376,7 @@ class Stage(BaseStage):
                 'features',
                 'flat',
             ],
+            'wagtailcore': ['revision'],
         }
 
         for app_label, models in targets.items():
@@ -388,20 +470,22 @@ class Stage(BaseStage):
             }
 
             people_page = Page.objects.get(title='People').specific
-            current_role = None
 
             for block in people_page.body:
+                current_role = None
                 if block.block_type == 'subsection':
                     block_value = block.block.get_prep_value(block.value)
                     current_role = roles.get(block_value.get('subsection'))
 
-                elif block.block_type == 'person':
-                    block_value = block.block.get_prep_value(block.value)
-                    tm = TeamMember.objects.create(
-                        name=block_value.get('name'),
-                        title=block_value.get('job'),
-                        affiliation=block_value.get('institution'),
-                        url=block_value.get('url'),
-                        photo_id=block_value.get('photo'),
-                    )
-                    tm.roles.add(current_role)
+                    for sub_block in block_value['body']:
+                        if sub_block.get('type') == 'person':
+                            sub_block_value = sub_block.get('value')
+                            tm = TeamMember.objects.create(
+                                name=sub_block_value.get('name'),
+                                title=sub_block_value.get('job'),
+                                affiliation=sub_block_value.get('institution'),
+                                url=sub_block_value.get('url'),
+                                photo_id=sub_block_value.get('photo'),
+                            )
+                            tm.roles.add(current_role)
+                            log(instance=tm, action='wagtail.create')
