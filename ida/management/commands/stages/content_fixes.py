@@ -489,3 +489,20 @@ class Stage(BaseStage):
                             )
                             tm.roles.add(current_role)
                             log(instance=tm, action='wagtail.create')
+
+    @transaction.atomic
+    def process_images(self):
+        """Apply feature recognition to images and get rendition for people."""
+        with schema_context('dalme'):
+            from wagtail.images import get_image_model
+
+            Image = get_image_model()  # noqa: N806
+
+            for image in Image.objects.all():
+                try:
+                    if not image.has_focal_point():
+                        image.set_focal_point(image.get_suggested_focal_point())
+                        image.save()
+                        image.get_rendition('fill-100x100')
+                except:  # noqa: E722
+                    pass
