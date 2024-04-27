@@ -13,8 +13,9 @@ from ida.models import Collection, Record
 
 
 class Corpus(Orderable, ClusterableModel):
-    title = models.CharField(max_length=255)
-    description = RichTextField()
+    title = models.CharField(max_length=255, help_text='Corpus name or short description to use as title.')
+    description = RichTextField(help_text='A description of the corpus.')
+    collapsed = models.BooleanField(default=False, help_text='If checked the corpus will be initially closed.')
 
     page = ParentalKey('public.Collections', related_name='corpora')
     collections = ParentalManyToManyField(
@@ -24,6 +25,7 @@ class Corpus(Orderable, ClusterableModel):
 
     panels = [
         FieldPanel('title'),
+        FieldPanel('collapsed'),
         FieldPanel('description'),
         FieldPanel('collections'),
     ]
