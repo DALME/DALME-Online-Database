@@ -65,7 +65,6 @@ class Stage(BaseStage):
             'taggit',
             'wagtailadmin',
             'wagtailcore',
-            'wagtaildocs',
             'wagtailembeds',
             'wagtailforms',
             'wagtailimages',
@@ -147,6 +146,7 @@ class Stage(BaseStage):
         models = [
             ('publicimages', 'baseimage'),
             ('publicimages', 'customrendition'),
+            ('wagtaildocs', 'document'),
             ('public', 'home'),
             ('public', 'section'),
             ('public', 'flat'),
@@ -160,6 +160,9 @@ class Stage(BaseStage):
             ('public', 'featuredinventory'),
             ('public', 'featuredobject'),
         ]
+
+        paths_to_fix = ['baseimage_file', 'customrendition_file', 'document_file']
+
         banners_raw = None
         sponsors_raw = None
 
@@ -182,9 +185,21 @@ class Stage(BaseStage):
                             sponsors_raw = value
                         else:
                             columns.append(f'{field}')
+                            # the paths in all fields pointing to files in media
+                            # have to be corrected to include the tenant
+                            if f'{model_name}_{field}' in paths_to_fix:
+                                value = f'dalme/{value}'  # noqa: PLW2901
+                            # the value of certain field types has to be converted to account
+                            # for differences in the way Django sets up certain fields depending
+                            # on database backend. E.g. certain fields that are setup as varchar in MySQL
+                            # are setup as jsonb in Postgres.
                             values += f'{self.clean_db_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
                             if idx < len(row) - 1:
                                 values += ', '
+
+                    if model_name == 'corpus':
+                        columns.append('collapsed')
+                        values = values + ',False'
 
                     sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
