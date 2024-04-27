@@ -21,3 +21,9 @@ button[name="FOOTNOTE"] > svg > path:nth-child(1) {
 .Tooltip {
   display: flex;
 }
+.tooltip-entity-footnote-icon {
+  height: .8em !important;
+  width: .8em !important;
+  margin-inline-end: unset !important;
+  vertical-align: super !important;
+}

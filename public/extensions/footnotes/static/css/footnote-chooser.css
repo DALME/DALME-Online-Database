@@ -25,9 +25,3 @@
 #footnote-dialogue .modal-content {
     box-shadow: none;
 }
-
-.tooltip-entity-footnote-icon {
-    height: .8em !important;
-    width: .8em !important;
-    margin-bottom: 10px;
-}
