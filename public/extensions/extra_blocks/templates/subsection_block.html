@@ -1,0 +1,18 @@
+{% load wagtailcore_tags %}
+
+<div
+  id="{{ value.subsection|slugify }}"
+  class="u-subsection u-flex"
+  data-collapsed="{{ value.collapsed|yesno:"true,false" }}"
+  onclick="window.CustomUtils.toggleSection(this)"
+>
+  <a href="#{{ value.subsection|slugify }}" class="anchor">
+    {% block subsection_title %}
+      <h3>{{ value.subsection }}</h4>
+    {% endblock %}
+  </a>
+  <i class="fas {% if value.collapsed %}fa-caret-down{% else %}fa-caret-up{% endif %} subsection"></i>
+</div>
+<div class="subsection-container {% if value.collapsed %}u-none{% endif %}">
+  {% include_block value.body %}
+</div>
