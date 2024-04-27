@@ -191,7 +191,7 @@ class Stage(BaseStage):
                             banners_raw = value
                         else:
                             columns.append(f'{field}')
-                            values += f'{get_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
+                            values += f'{self.clean_db_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
                             if idx < len(row) - 1:
                                 values += ', '
 

@@ -172,3 +172,12 @@ class BaseStage(abc.ABC):
         codename, old_ctype = self.old_permissions_index[old_id]
         target_ctype = self.map_content_type(old_ctype, id_only=True)
         return auth_permission.objects.get(codename=codename, content_type_id=target_ctype).id
+
+    def clean_db_value(self, value, field_type):
+        if value is None:
+            return 'null'
+        if field_type == 'JSONField':
+            return f'$${value}$$::jsonb'
+        if field_type in ['AutoField', 'BigAutoField', 'BigIntegerField', 'IntegerField']:
+            return value if isinstance(value, int) else int(value)
+        return f'$${value}$$'
