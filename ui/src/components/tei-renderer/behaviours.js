@@ -202,7 +202,7 @@ export const dalmeTeiBehaviours = {
       [
         ":not([type]), [type=renvoi]",
         (e) => {
-          e.setAttribute("class", "d-none");
+          e.setAttribute("class", "u-none");
         },
       ],
     ],

@@ -139,7 +139,7 @@ const dalmeTeiBehaviours = {
       let ref = e.getAttribute('ref', false);
       if (ref) e.innerText = String.fromCharCode(parseInt(ref, 16));
     },
-    'gloss': function(e) { e.setAttribute('class', 'd-none'); },
+    'gloss': function(e) { e.setAttribute('class', 'u-none'); },
     'hi': [
       ['[rend=superscript]', function(e) {
         if (e.innerText.length > 3) {
@@ -183,7 +183,7 @@ const dalmeTeiBehaviours = {
         e.innerHTML = '<i class="fas fa-sticky-note"></i>';
       }],
       [':not([type]), [type=renvoi], [type=gloss], [type=footnote]', function(e) {
-        e.setAttribute('class', 'd-none');
+        e.setAttribute('class', 'u-none');
       }]
     ],
   }
