@@ -56,7 +56,7 @@ class Settings(BaseGenericSetting):
         help_text='Content to show in the search page help section.',
     )
     search_header_image = models.ForeignKey(
-        'public.BaseImage',
+        'publicimages.BaseImage',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -94,7 +94,7 @@ class Settings(BaseGenericSetting):
         help_text='Content to show after the map in the explore page.',
     )
     explore_header_image = models.ForeignKey(
-        'public.BaseImage',
+        'publicimages.BaseImage',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -110,7 +110,7 @@ class Settings(BaseGenericSetting):
         help_text='Position of the header image within its container in the explore page.',
     )
     browser_header_image = models.ForeignKey(
-        'public.BaseImage',
+        'publicimages.BaseImage',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -126,7 +126,7 @@ class Settings(BaseGenericSetting):
         help_text='Position of the header image within its container in the record browser.',
     )
     viewer_header_image = models.ForeignKey(
-        'public.BaseImage',
+        'publicimages.BaseImage',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
