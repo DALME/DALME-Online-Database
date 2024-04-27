@@ -138,7 +138,7 @@ class Stage(BaseStage):
                             target_model.objects.bulk_create(objs)
 
     @transaction.atomic
-    def migrate_public_tables(self):  # noqa: C901
+    def migrate_public_tables(self):  # noqa: C901, PLR0915
         """Migrate existing Public tables to the DALME schema (BUT NOT INDICES)."""
         # we need to do these tables differently, i.e. by inserting data directly in SQL
         # because the constraints on foreign keys won't allow use of the ORM, for example
@@ -161,26 +161,15 @@ class Stage(BaseStage):
             ('public', 'featuredobject'),
         ]
         banners_raw = None
+        sponsors_raw = None
 
-        # the value of certain field types has to be converted to account
-        # for differences in the way Django sets up certain fields depending
-        # on database backend. E.g. certain fields that are setup as varchar in MySQL
-        # are setup as jsonb in Postgres.
-        def get_value(value, field_type):
-            if value is None:
-                return 'null'
-            if field_type == 'JSONField':
-                return f'$${value}$$::jsonb'
-            if field_type in ['AutoField', 'BigAutoField', 'BigIntegerField', 'IntegerField']:
-                return value if isinstance(value, int) else int(value)
-            return f'$${value}$$'
-
-        self.logger.info('Processing "public" models')
+        self.logger.info('Processing additional models')
         for app, model_name in models:
             model = apps.get_model(app_label=app, model_name=model_name)
             with connection.cursor() as cursor:
-                self.logger.info('Copying "%s"', model_name)
-                cursor.execute(f'SELECT * FROM restore.public_{model_name};')
+                self.logger.info('Copying "%s"', f'{app}_{model_name}')
+                target = f'{app}_{model_name}' if app.startswith('w') else f'public_{model_name}'
+                cursor.execute(f'SELECT * FROM restore.{target};')
                 rows = self.map_rows(cursor)
 
                 for row in rows:
@@ -189,6 +178,8 @@ class Stage(BaseStage):
                     for idx, (field, value) in enumerate(row.items()):
                         if model_name == 'home' and field == 'banners':
                             banners_raw = value
+                        elif model_name == 'home' and field == 'sponsors':
+                            sponsors_raw = value
                         else:
                             columns.append(f'{field}')
                             values += f'{self.clean_db_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
@@ -208,7 +199,31 @@ class Stage(BaseStage):
                     if value:
                         value.pop('page')
                         value['show_title'] = True
-                        Banner.objects.create(**value)
+                        new_banner = Banner.objects.create(**value)
+
+                        log(instance=new_banner, action='wagtail.create')
+
+        if sponsors_raw:
+            sponsor_data = json.loads(sponsors_raw)
+            with schema_context('dalme'):
+                from public.models import Sponsor
+
+                for block in sponsor_data:
+                    if block.get('type') == 'sponsors':
+                        value = block['value']
+                        url = value['url']
+                        if 'acls' in url:
+                            name = 'ACLS'
+                        elif 'ias' in url:
+                            name = 'Institute for Advanced Studies'
+                        elif 'sohp' in url:
+                            name = 'SOHP'
+                        else:
+                            name = "Dean's Competitive Fund"
+
+                        new_sponsor = Sponsor.objects.create(name=name, url=url, logo_id=value['logo'])
+
+                        log(instance=new_sponsor, action='wagtail.create')
 
     @transaction.atomic
     def transfer_avatars(self):
@@ -225,24 +240,26 @@ class Stage(BaseStage):
 
     @transaction.atomic
     def transfer_snippets(self):
-        """Transfer snippet data to settings table."""
-        data = {}
+        """Transfer snippet data to relevant tables."""
+        footer_links = None
+        footer_social = None
+        settings = {}
 
+        # GET DATA
         with connection.cursor() as cursor:
             self.logger.info('Transfering snippet data')
-            # footer
+
+            # FOOTER DATA
             cursor.execute('SELECT * FROM restore.public_footer;')
             row = next(self.map_rows(cursor))
-            data.update(
-                {
-                    'footer_links': row['pages'],
-                    'footer_social': row['social'],
-                }
-            )
+            footer_links = row['pages']
+            footer_social = row['social']
+
+            # SETTINGS DATA
             # searchpage
             cursor.execute('SELECT * FROM restore.public_searchpage;')
             row = next(self.map_rows(cursor))
-            data.update(
+            settings.update(
                 {
                     'search_help_content': row['help_content'],
                     'search_header_image': row['header_image_id'],
@@ -252,7 +269,7 @@ class Stage(BaseStage):
             # explorepage
             cursor.execute('SELECT * FROM restore.public_explorepage;')
             row = next(self.map_rows(cursor))
-            data.update(
+            settings.update(
                 {
                     'explore_text_before': row['text_before'],
                     'explore_text_after': row['text_after'],
@@ -263,7 +280,7 @@ class Stage(BaseStage):
             # recordbrowser
             cursor.execute('SELECT * FROM restore.public_recordbrowser;')
             row = next(self.map_rows(cursor))
-            data.update(
+            settings.update(
                 {
                     'browser_header_image': row['header_image_id'],
                     'browser_header_position': row['header_position'],
@@ -272,31 +289,56 @@ class Stage(BaseStage):
             # recordviewer
             cursor.execute('SELECT * FROM restore.public_recordviewer;')
             row = next(self.map_rows(cursor))
-            data.update(
+            settings.update(
                 {
                     'viewer_header_image': row['header_image_id'],
                     'viewer_header_position': row['header_position'],
                 }
             )
 
+            # CREATE NEW RECORDS
             with schema_context('dalme'):
-                from public.models import BaseImage, Settings
+                from public.extensions.images.models import BaseImage
+                from public.models import FooterLink, Settings, SocialMedia
 
-                data.update(
+                # FOOTER LINKS
+                link_data = json.loads(footer_links)
+                for block in link_data:
+                    if block.get('type') == 'page':
+                        value = block['value']
+                        footer_link = FooterLink.objects.create(label=value['title'], page_id=value['page'])
+
+                        log(instance=footer_link, action='wagtail.create')
+
+                # SOCIAL MEDIA LINKS
+                social_data = json.loads(footer_social)
+                for block in social_data:
+                    if block.get('type') == 'social':
+                        value = block['value']
+                        url = value['url']
+                        name = 'Twitter/X' if 'twitter' in url else 'Facebook' if 'facebook' in url else 'Share'
+                        SocialMedia.objects.create(
+                            name=name, icon=value['fa_icon'], css_class=value['css_class'], url=url
+                        )
+
+                # SETTINGS
+                settings.update(
                     {
-                        'search_header_image': BaseImage.objects.get(pk=data['search_header_image']),
-                        'explore_header_image': BaseImage.objects.get(pk=data['explore_header_image']),
-                        'browser_header_image': BaseImage.objects.get(pk=data['browser_header_image']),
-                        'viewer_header_image': BaseImage.objects.get(pk=data['viewer_header_image']),
+                        'search_header_image': BaseImage.objects.get(pk=settings['search_header_image']),
+                        'explore_header_image': BaseImage.objects.get(pk=settings['explore_header_image']),
+                        'browser_header_image': BaseImage.objects.get(pk=settings['browser_header_image']),
+                        'viewer_header_image': BaseImage.objects.get(pk=settings['viewer_header_image']),
                     }
                 )
 
                 Settings.objects.create(
                     name='DALME',
+                    short_form='DALME',
                     tagline='The Documentary Archaeology of Late Medieval Europe',
                     logo='images/dalme_logo.svg',
                     copyright_line='The Documentary Archaeology of Late Medieval Europe',
-                    **data,
+                    analytics_domain='dalme.org',
+                    **settings,
                 )
 
     @transaction.atomic
