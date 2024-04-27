@@ -1,0 +1,18 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+  <article class="u-flex">
+    <aside class="side-column left u-flex">
+      {% block left_side_column %}{% endblock %}
+    </aside>
+
+    <div class="main-column u-flex">
+      {% block main_column %}{% endblock %}
+      {% if page.has_footnotes and not page.has_placemarker %}
+        <div class="content">
+          {% include "footnote_container.html" %}
+        </div>
+      {% endif %}
+    </div>
+  </article>
+{% endblock %}

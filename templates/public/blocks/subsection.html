@@ -1,8 +1,0 @@
-<div id="{{ value.subsection|slugify }}" class="u-subsection handle {% if value.minor_heading %}u-subsection-minor{% endif %} u-flex" data-collapsed="{{ value.collapsed|yesno:"true,false" }}">
-  {% if value.minor_heading %}
-      <h4>{{ value.subsection }}</h4>
-  {% else %}
-      <h3>{{ value.subsection }}</h3>
-  {% endif %}
-  <i class="fas {% if value.collapsed %}fa-plus{% else %}fa-minus{% endif %} subsection"></i>
-</div>

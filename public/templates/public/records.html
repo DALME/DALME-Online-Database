@@ -1,0 +1,717 @@
+{% extends "public/layouts/single_column.html" %}
+{% load get_breadcrumbs_nav static %}
+
+{% block title %}{{ block.super }} &ndash; Record Browser{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css" />
+{% endblock %}
+
+{% block header_extra %}
+  <nav id="breadcrumb-app" class="breadcrumbs u-flex" v-cloak>
+    <ul>
+      <template v-for="(crumb, index) in breadcrumb">
+        <li v-if="index == 0" class="home">
+          <a :href="crumb.url">
+            <i class="fas fa-home"></i>
+          </a>
+        </li>
+        <li v-else-if="crumb.active" class="active">
+          ${crumb.title}
+        </li>
+        <li v-else>
+          <a :href="crumb.url"> ${crumb.title} </a>
+        </li>
+      </template>
+    </ul>
+  </nav>
+{% endblock %}
+
+{% block main_column %}
+  <div id="app" class="app inventory-list inventory-toolbar">
+    <nav>
+      <ul class="u-flex">
+        <li>
+          <small>${statusInfo}</small>
+        </li>
+        {% include "public/includes/pagination.html" %}
+
+        <li class="search ml-auto position-relative" v-if="showModes">
+          <input
+            type="search"
+            placeholder="Search"
+            v-model="search"
+            :value="search"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+          >
+        </li>
+        <li class="dropdown p-0 nav_button" :class="{ 'ml-auto': !showModes }">
+          <div class="filter dropdown-button" id="filter_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span>Filter</span>
+            <i class="fa fa-sort fa-sm" aria-hidden="true"></i>
+          </div>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="filter_menu">
+            <b-form method="get" class="filter-form u-flex">
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-2"
+                  :options="choices.corpusChoices"
+                  @change="setCorpus"
+                  v-model="corpus">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="corpus !== ''"
+                  v-on:click.stop="clearSelect('corpus')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-2"
+                  :options="choices.collectionChoices"
+                  @input="setCollection"
+                  v-model="collection">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="collection !== ''"
+                  v-on:click.stop="clearSelect('collection')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-2"
+                  :options="choices.recordTypeChoices"
+                  @input="setrecordType"
+                  v-model="recordType">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="recordType !== ''"
+                  v-on:click.stop="clearSelect('recordType')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-3"
+                  :options="choices.localeChoices"
+                  @input="setLocale"
+                  v-model="locale">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="locale !== ''"
+                  v-on:click.stop="clearSelect('locale')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="position-relative">
+                <label class="label">Filter by date</label>
+                <vue-slider
+                  ref="slider"
+                  v-model="date"
+                  tooltip="always"
+                  lazy="true"
+                  stop-propagation="true"
+                  :min="dateMin"
+                  :max="dateMax"
+                >
+                </vue-slider>
+              </div>
+              <div class="dropdown-divider mb-3"></div>
+              <b-form-checkbox
+                class="mb-2 ml-1"
+                id="imageCheckbox"
+                @input="setHasImage"
+                v-model="hasImage"
+                value="true"
+              >
+                Show only records with images
+              </b-form-checkbox>
+              <b-form-checkbox
+                class="mb-2 ml-1"
+                id="transcriptionCheckbox"
+                @input="setHasTranscription"
+                v-model="hasTranscription"
+                value="true"
+              >
+                Show only records with transcriptions
+              </b-form-checkbox>
+            </b-form>
+          </div>
+        </li>
+
+        <li v-if="showModes" id="detail" class="mode detail nav_button" v-bind:class="{ active: mode == 'detail' }" @click="setMode">
+          <i class="fa fa-th-large" aria-hidden="true"></i>
+        </li>
+        <li v-if="showModes" id="wide" class="mode wide nav_button" v-bind:class="{ active: mode == 'wide' }" @click="setMode">
+          <i class="fa fa-th-list" aria-hidden="true"></i>
+        </li>
+        <li v-if="showModes" id="compact" class="mode compact nav_button" v-bind:class="{ active: mode == 'compact' }" @click="setMode">
+          <i class="fa fa-list fa-flip-horizontal" aria-hidden="true"></i>
+        </li>
+      </ul>
+    </nav>
+
+    <beat-loader v-if="spinner" :loading="spinner" color="#aaa"></beat-loader>
+    <section v-else class="inventory-container" :class="mode">
+      <template v-if="mode === 'compact'">
+        <p v-if="noResults">No records found.</p>
+        <div v-else class="u-grid inventories">
+          <div class="grid-row-wrapper compact u-contents">
+            <span class="heading first">
+              <strong @click="toggleNameOrder">Name</strong>
+              <template v-if="nameOrder">
+                <i v-if="nameOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <span class="heading">
+              <strong @click="togglerecordTypeOrder">Type</strong>
+              <template v-if="recordTypeOrder">
+                <i v-if="recordTypeOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <span class="heading">
+              <strong @click="toggleDateOrder">Date</strong>
+              <template v-if="dateOrder">
+                <i v-if="dateOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <!-- Placeholder element to regulate the grid. -->
+            <span class="heading last"></span>
+          </div>
+
+          <template v-for="(record, index) in records" :key="index">
+            <div class="grid-row-wrapper compact u-contents">
+              <span class="inventory-field name">
+                <a :href="recordUrl(record)">
+                  ${record.name}<span class="short-name"> ${record.shortName}</span>
+                </a>
+              </span>
+              <span class="inventory-field record-type">${record.recordType}</span>
+              <span class="inventory-field date">${record.date}</span>
+              <span class="inventory-field icons">
+                <i
+                  class="fas fa-book-open fa-sm ml-auto"
+                  v-bind:class="{ active: record.noFolios > 0 }">
+                </i>
+                <i
+                  class="fas fa-sm fa-images"
+                  v-bind:class="{ active: record.hasTranscriptions }">
+                </i>
+              </span>
+            </div>
+          </template>
+        </template>
+
+        <template v-if="mode === 'wide'">
+          <template v-for="(record, index) in records" :key="index">
+              <a class="u-flex inventory-wide" :href="recordUrl(record)">
+                <div
+                  class="u-flex list-thumb"
+                  v-bind:style="recordThumbStyle(record)">
+                </div>
+                <div class="u-flex inventory-details">
+                  <div class="u-flex mb-1">
+                    <span class="name">${record.name}</span>
+                    <span class="short-name ml-auto">${record.shortName}</span>
+                  </div>
+                  <div class="u-flex">
+                    <div class="mr-auto">
+                      ${componentInstance.truncate(record.description)}
+                    </div>
+                    <div class="u-flex inventory-metadata flex-column">
+                      <span class="city">${record.date}</span>
+                      <span class="folios" v-if="record.noFolios > 1">${record.noFolios} Folios</span>
+                      <span class="folios" v-else>${record.noFolios} Folio</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="u-flex icons">
+                  <div class="u-flex first">
+                    <i class="fas fa-book-open"></i>
+                    <span class="icon-count" :class="record.noFolios === 0 ? 'red' : ''">
+                      ${record.noFolios}
+                    </span>
+                  </div>
+                  <div class="u-flex second">
+                    <i class="fas fa-feather-alt fa-flip-horizontal"></i>
+                    <span class="icon-count" :class="record.noTranscriptions === 0 ? 'red' : record.noTranscriptions === record.noFolios ? '' : 'yellow'">
+                      ${record.noTranscriptions}
+                    </span>
+                  </div>
+                </div>
+              </a>
+          </template>
+        </template>
+
+        <template v-if="mode === 'detail'">
+          <template v-for="(partition, index) in partitionedRecords" :key="index">
+            <div class="grid-row-wrapper detail u-contents">
+              <template v-for="record in partition" :key="record.id">
+                <div
+                  class="detail-thumb"
+                  v-bind:style="recordThumbStyle(record)">
+                  <a
+                    class="inventory-detail u-flex"
+                    :href="recordUrl(record)">
+                      <div class="u-flex top">
+                        <p>${record.name}</p>
+                        <div class="u-flex icons">
+                          <div class="u-flex first">
+                            <i class="fas fa-book-open"></i>
+                            <span class="icon-count" :class="record.noFolios === 0 ? 'red' : ''">
+                              ${record.noFolios}
+                            </span>
+                          </div>
+                          <div class="u-flex first">
+                            <i class="fas fa-images"></i>
+                            <span class="icon-count" :class="record.noImages === 0 ? 'red' : record.noImages === record.noFolios ? '' : 'yellow'">
+                              ${record.noImages}
+                            </span>
+                          </div>
+                          <div class="u-flex first">
+                            <i class="fas fa-feather-alt fa-flip-horizontal"></i>
+                            <span class="icon-count" :class="record.noTranscriptions === 0 ? 'red' : record.noTranscriptions === record.noFolios ? '' : 'yellow'">
+                              ${record.noTranscriptions}
+                            </span>
+                          </div>
+                          <div class="u-flex">
+                            <i class="fas fa-info-circle" :id="record.id"></i>
+                            <b-popover
+                              :target="record.id"
+                              title="Description"
+                              triggers="hover focus"
+                              placement="left">
+                              ${componentInstance.truncate(record.description, 65)}
+                            </b-popover>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="u-flex bottom">
+                        <span class="short-name">${record.shortName}</span>
+                        <span class="city">${record.date}</span>
+                      </div>
+                  </a>
+                </div>
+              </template>
+            </div>
+          </template>
+        </template>
+    </section>
+    <div v-if="!spinner" class="pager">
+      <ul class="pagination">
+        {% include "public/includes/pagination.html" %}
+      </ul>
+    </div>
+  </div>
+</div>
+<style>
+  .detail-thumb, .list-thumb {
+    background-image: url('{% static "common/images/eye-slash-solid.svg" %}');
+  }
+</style>
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  {% get_breadcrumbs_nav as breadcrumb %}
+  {{ breadcrumb | json_script:"breadcrumb_data" }}
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js" integrity="sha256-ur/YlHMU96MxHEsy3fHGszZHas7NzH4RQlD4tDVvFhw=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
+  <script>
+    Vue.component('beat-loader', VueSpinner.BeatLoader);
+    const breadcrumb_app = new Vue({
+      el: '#breadcrumb-app',
+      delimiters: ['${', '}'],
+      data: {
+        breadcrumb: JSON.parse($('#breadcrumb_data').remove().text()),
+      },
+      computed: {
+        crumbCount() {
+          return this.breadcrumb.length;
+        },
+      }
+    });
+
+    const app = new Vue({
+      el: '#app',
+      delimiters: ['${', '}'],
+      created() {
+        this.fetchChoices();
+        if (!new URLSearchParams(window.location.search).keys().length) {
+          this.fetchData();
+        }
+        this.setInitialSortOrder(new URLSearchParams(window.location.search).get('order_by', null));
+        window.componentInstance = this;
+        window.addEventListener('resize', this.onResize);
+      },
+      components: {
+        'vue-slider': window['vue-slider-component'],
+      },
+      data: {
+        fetching: false,
+        records: null,
+        thumbnails: {},
+        next: null,
+        previous: null,
+        count: null,
+        totalPages: null,
+        currentPage: null,
+        pageNumbers: [],
+        showFirst: false,
+        showLast: false,
+        pageStart: null,
+        pageEnd: null,
+        search: new URLSearchParams(window.location.search).get('search'),
+        showFilters: false,
+        corpus: '',
+        mode: '{{ browse_mode }}',
+        thumbSize: '{{ browse_mode }}' == 'detail' ? 'scr' : 'thm',
+        collection: '',
+        recordType: '',
+        date: [1200, 1500],
+        locale: '',
+        hasImage: null,
+        hasTranscription: null,
+        nameOrder: 'name',
+        recordTypeOrder: null,
+        dateOrder: null,
+        choices: {},
+        windowWidth: window.innerWidth,
+        hasThumb: false,
+        session_data: null
+      },
+      watch: {
+        records: 'fetchThumbnails',
+        thumbSize: 'fetchThumbnails',
+        collection: 'updateCollection',
+        search: _.debounce(function() {
+          this.filterData('search', this.search)
+        }, 300),
+        date: _.debounce(function() {
+          const [min, max] = this.date;
+          if (min === this.dateMin && max === this.dateMax) {
+            const params = this.setParam('date_range', null).toString();
+            this.updateURL(params);
+            this.fetchData();
+          } else {
+            this.filterData('date_range', this.date);
+          }
+        }, 250),
+      },
+      computed: {
+        showModes() {
+          return this.windowWidth >= 950;
+        },
+        dateMin() {
+          return 1200;
+        },
+        dateMax() {
+          return 1500;
+        },
+        isFiltered() {
+          return [
+            this.corpus,
+            this.collection,
+            this.recordType,
+            this.date,
+            this.hasImage,
+            this.hasTranscription,
+            this.locale
+          ].some(value => value);
+        },
+        endpoint() {
+          return '/api/public/records';
+        },
+        choicesEndpoint() {
+          return '/api/public/choices/';
+        },
+        thumbnailEndpoint() {
+          return '/api/public/thumbnails';
+        },
+        spinner() {
+          return (this.records === null) || this.fetching == true;
+        },
+        noResults() {
+          return Array.isArray(this.records) && !this.records.length;
+        },
+        statusInfo() {
+          if (this.noResults) {
+            return 'No records found';
+          } else if (this.pageStart && this.pageEnd && this.count) {
+            return `Showing records ${this.pageStart} to ${this.pageEnd} of ${this.count}`;
+          } else {
+            return ''
+          }
+        },
+        currentParams() {
+          return new URLSearchParams(window.location.search);
+        },
+        partitionedRecords() {
+          const partition = 3;
+          return this.records
+            ? Array(Math.ceil(this.records.length / partition))
+                .fill()
+                .map((_, index) => index * partition)
+                .map(begin => this.records.slice(begin, begin + partition))
+            : null;
+        },
+        collectionName() {
+          return this.choices.collectionChoices.find(x => x.value === this.collection).text || null;
+        },
+        collectionSlug() {
+          return this.collectionName.replace(/\s+/g, '-').toLowerCase() || null;
+        }
+      },
+      methods: {
+        recordThumbStyle(record) {
+          const thumbnail = Object.keys(this.thumbnails).length
+            ? this.thumbnails[record.id]
+            : null;
+          if (thumbnail) {
+            return {
+              'background-image': `url("${thumbnail}")`,
+              'background-size': 'cover',
+              'background-origin': 'content-box',
+              'background-clip': 'content-box',
+            };
+          } else {
+            return false;
+          }
+        },
+        onResize(e) {
+          this.windowWidth = window.innerWidth;
+          if (this.windowWidth < 950) {
+            this.mode = 'compact';
+          }
+        },
+        truncate(str, max = 25) {
+          if (typeof str != 'undefined') {
+            const array = str.trim().split(' ');
+            const ellipsis = array.length > max ? ' ...' : '';
+            return array.slice(0, max).join(' ') + ellipsis;
+          } else {
+            return 'N/A'
+          }
+        },
+        setMode(e) {
+          let mode = e.currentTarget.id;
+          window.CustomUtils.updateSession({ 'public-browse-mode': mode });
+          let target_size = mode == 'detail' ? 'scr' : 'thm';
+          this.mode = mode;
+          if (mode == 'detail' && target_size != this.thumbSize) {
+            this.thumbSize = target_size;
+          }
+          // this.$forceUpdate();
+        },
+        setCorpus() {
+          const value = this.corpus ? this.corpus : '';
+          this.filterData('corpus', value);
+        },
+        setCollection() {
+          const value = this.collection ? this.collection : '';
+          this.filterData('collection', value);
+        },
+        setrecordType() {
+          const value = this.recordType ? this.recordType : '';
+          this.filterData('record_type', value);
+        },
+        setHasImage() {
+          this.filterData('has_image', this.hasImage);
+        },
+        setHasTranscription() {
+          this.filterData('has_transcription', this.hasTranscription);
+        },
+        setLocale() {
+          const value = this.locale ? this.locale : '';
+          this.filterData('locale', value);
+        },
+        toggleNameOrder() {
+          this.recordTypeOrder = null;
+          this.dateOrder = null;
+          this.nameOrder = this.nameOrder
+            ? this.nameOrder === 'name'
+              ? this.nameOrder = '-name'
+              : this.nameOrder = 'name'
+            : this.nameOrder = '-name';
+          this.filterData('order_by', this.nameOrder);
+        },
+        togglerecordTypeOrder() {
+          this.nameOrder = null;
+          this.dateOrder = null;
+          this.recordTypeOrder = this.recordTypeOrder
+            ? this.recordTypeOrder === 'record_type'
+              ? this.recordTypeOrder = '-record_type'
+              : this.recordTypeOrder = 'record_type'
+            : this.recordTypeOrder = '-record_type';
+          this.filterData('order_by', this.recordTypeOrder);
+        },
+        toggleDateOrder() {
+          this.nameOrder = null;
+          this.recordTypeOrder = null;
+          this.dateOrder = this.dateOrder
+            ? this.dateOrder === 'date'
+              ? this.dateOrder = '-date'
+              : this.dateOrder = 'date'
+            : this.dateOrder = '-date'
+          this.filterData('order_by', this.dateOrder);
+        },
+        destructureParams() {
+          let params = {};
+          this.currentParams.forEach((val, key) => {
+            const camelized = key.replace(/(_\w)/g, k => k[1].toUpperCase());
+            if (['collection', 'corpus', 'record_type', 'locale'].includes(key)) {
+              val = this.choices[`${camelized}Choices`]
+                .filter(item => {
+                  return key === 'record_type' ? item.value == val : item.value === parseInt(val);
+                });
+            }
+            return params[camelized] = typeof val === 'object' ? val[0]['value'] : val['value'];
+          });
+          return params;
+        },
+        fetchChoices() {
+          fetch(this.choicesEndpoint)
+            .then(response => response.json())
+            .then(data => {
+              this.choices = data;
+              const params = this.destructureParams();
+              for (let [key, value] of Object.entries(params)) {
+                this[key] = value;
+              }
+            });
+        },
+        fetchData(url = null) {
+          this.fetching = true;
+          fetch(url || `${this.endpoint}/?${this.currentParams.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+              this.records = data.results;
+              this.next = data.next;
+              this.previous = data.previous;
+              this.count = data.count;
+              this.totalPages = data.totalPages;
+              this.currentPage = data.currentPage;
+              this.pageNumbers = data.pageNumbers;
+              this.pageStart = data.pageStart,
+              this.pageEnd = data.pageEnd,
+              this.showFirst = !data.pageNumbers.includes(1);
+              this.showLast = !data.pageNumbers.includes(data.totalPages);
+              this.fetching = false;
+              // this.updateCollection();
+            });
+        },
+        async fetchThumbnails() {
+          const records = this.records.filter(record =>
+            record.imageRef !== null // && !(record.id in this.thumbnails)
+          );
+          await Promise.all(records.map(record => {
+            fetch(`${this.thumbnailEndpoint}/?image_ref=${record.imageRef}&size=${this.thumbSize}`)
+              .then(response => response.json())
+              .then(data => {
+                this.thumbnails[record.id] = data.image_url;
+                // Not ideal.
+                this.$forceUpdate();
+              })
+            }));
+        },
+        setParam(key, value) {
+          let params = this.currentParams;
+          if (!value || typeof value == 'undefined') {
+            params.delete(key);
+          } else {
+            params.set(key, value);
+          }
+          return params;
+        },
+        url(urlPath = location.pathname) {
+          return location.protocol + '//' + location.host + urlPath;
+        },
+        updateURL(params, urlPath = null) {
+          let base_url = urlPath ? this.url(urlPath) : this.url();
+          const url = params ? `${base_url}?${params}` : base_url;
+          window.history.replaceState(null, null, url);
+        },
+        clearSelect(field) {
+          this.filterData(field, '');
+          this[field] = '';
+        },
+        filterData(key, value) {
+          if (typeof value !== 'undefined') {
+            const params = this.setParam(key, value).toString();
+            this.fetchData(`${this.endpoint}/?${params}`);
+            this.updateURL(params);
+          }
+        },
+        recordUrl(record) {
+          return `${location.pathname}${record.id}`;
+        },
+        handlePreviousPage() {
+          if (this.previous) {
+            const params = this.setParam('page', this.previous).toString();
+            this.fetchData(`${this.endpoint}/?${params}`);
+            this.updateURL(params);
+          }
+        },
+        handleNextPage() {
+          if (this.next) {
+            const params = this.setParam('page', this.next).toString();
+            this.fetchData(`${this.endpoint}/?${params}`);
+            this.updateURL(params);
+          }
+        },
+        handlePage(page) {
+          const params = this.setParam('page', page).toString();
+          this.fetchData(`${this.endpoint}/?${params}`);
+          this.updateURL(params);
+        },
+        updateCollection() {
+          let params = this.currentParams.toString();
+          let del = breadcrumb_app.crumbCount === 4 ? 1 : 0;
+          if (this.collection != '') {
+            this.updateURL(params, `/collections/${this.collectionSlug}/records/`);
+            breadcrumb_app.breadcrumb.splice(2, del, {
+              title: this.collectionName,
+              url: `/collections/${this.collectionSlug}/`,
+              active: false
+            });
+          } else {
+            this.updateURL(params, '/collections/records/');
+            breadcrumb_app.breadcrumb.splice(2, del);
+          }
+        },
+        setInitialSortOrder(order) {
+          if (order) {
+            if (order.endsWith('name')) {
+              this.recordTypeOrder = null;
+              this.dateOrder = null;
+              this.nameOrder = order;
+            } else if (order.endsWith('date')) {
+              this.recordTypeOrder = null;
+              this.dateOrder = order;
+              this.nameOrder = null;
+            } else {
+              this.recordTypeOrder = order;
+              this.dateOrder = null;
+              this.nameOrder = null;
+            }
+          }
+        }
+      },
+    });
+  </script>
+{% endblock %}
