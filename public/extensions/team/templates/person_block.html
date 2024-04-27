@@ -1,0 +1,24 @@
+{% load wagtailimages_tags %}
+
+<div class="u-flex">
+  {% if value.photo %}
+    <a href="#{{ value.name|slugify }}" class="anchor">
+      <div class="headshot">
+      {% image value.photo fill-168x168-c100 %}
+      </div>
+    </a>
+  {% else %}
+    <div class="headshot no-photo"></div>
+  {% endif %}
+  <div class="person">
+    {% if value.url %}
+      <h4>
+        <a href="{{ value.url }}">{{ value.name }}</a>
+      </h4>
+    {% else %}
+      <h4>{{ value.name }}</h4>
+    {% endif %}
+    <p class="u-type-sans">{{ value.job }}</p>
+    <p class="u-type-sans">{{ value.institution }}</p>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-"""Person block."""
+"""Blocks for team extension."""
 
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
@@ -13,4 +13,4 @@ class PersonBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'person'
-        template = 'public/blocks/person.html'
+        template = 'person_block.html'
