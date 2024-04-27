@@ -3,7 +3,7 @@
     <div class="footnote_list">
         <hr>
         <ol>
-            {% for footnote in footnotes %}
+            {% for footnote in page.footnote_list %}
             <li id="fn_{{ footnote.id }}">
                 <div class="footnote-entry">
                     {{ footnote.text|richtext }}
