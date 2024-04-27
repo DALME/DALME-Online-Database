@@ -163,10 +163,10 @@ class Stage(BaseStage):
 
         # GP
         self.logger.info('Creating project and library entries for GP')
-        tenant = Tenant.objects.get(name='Global Pharmacopeias')
+        tenant = Tenant.objects.get(name='Pharmacopeias')
         new_project = Project.objects.create(
-            name='GP',
-            description='Global Pharmacopeias',
+            name='Pharmacopeias',
+            description='Pharmacopeias',
             zotero_library_id=int(os.environ['ZOTERO_LIBRARY_ID_GP']),
             zotero_api_key=os.environ['ZOTERO_API_KEY_GP'],
             tenant=tenant,
