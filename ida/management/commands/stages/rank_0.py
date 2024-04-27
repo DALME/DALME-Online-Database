@@ -147,7 +147,7 @@ class Stage(BaseStage):
 
                 objs = []
                 for row in rows:
-                    filefield = row.pop('file')
+                    filefield = f"dalme/{row.pop('file')}"
                     filetype = row.pop('type')
                     objs.append(
                         Attachment(**{**row, 'tenant_id': tenant_id, 'filefield': filefield, 'filetype': filetype})

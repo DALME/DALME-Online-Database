@@ -15,7 +15,7 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 class Attachment(ScopedBase, IDAUuid, IDAOwned):
     """Stores attachment information."""
 
-    filefield = models.FileField(upload_to='attachments/%Y/%m/')
+    filefield = models.FileField(upload_to='attachments/%Y/%m/', max_length=255)
     filetype = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
