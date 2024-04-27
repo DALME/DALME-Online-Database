@@ -44,7 +44,6 @@ services:
       - ./purl:/opt/web/purl
       - ./public:/opt/web/public
       - ./static:/opt/web/static
-      - ./tenants:/opt/web/tenants
       - ./templates:/opt/web/templates
       - ./media/media:/opt/web/www/media
       - ./tests:/opt/web/tests
@@ -104,7 +103,6 @@ services:
       - ida.web
     volumes:
       - "./config/nginx/development/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - assets:/static
     networks:
       - app-network
     ports:
@@ -194,7 +192,6 @@ services:
       - SYS_NICE
 
 volumes:
-  assets:
   esdata:
   pgdata:
   rsdata:

@@ -66,9 +66,10 @@ class Base(Configuration):
 
     STATICFILES_DIRS = [
         (BASE_DIR / 'static').as_posix(),
+        (BASE_DIR / 'public/static/common').as_posix(),
     ]
     MULTITENANT_STATICFILES_DIRS = [
-        (BASE_DIR / 'tenants/%s/static').as_posix(),
+        (BASE_DIR / 'public/static/%s').as_posix(),
     ]
     STATICFILES_FINDERS = [
         'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
@@ -160,6 +161,7 @@ class Base(Configuration):
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
                 'DIRS': [
                     (self.BASE_DIR / 'templates').as_posix(),
+                    (self.BASE_DIR / 'public/templates/public').as_posix(),
                 ],
                 'OPTIONS': {
                     'context_processors': [
@@ -184,7 +186,7 @@ class Base(Configuration):
     @property
     def MULTITENANT_TEMPLATE_DIRS(self):  # noqa: N802
         return [
-            (self.BASE_DIR / 'tenants/%s/templates').as_posix(),
+            (self.BASE_DIR / 'public/templates/%s').as_posix(),
         ]
 
     DATABASE_ROUTERS = [

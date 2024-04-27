@@ -34,7 +34,7 @@ RUN apt-get update && \
     graphviz && \
     apt-get clean
 COPY --from=dev-reqs /opt/build/wheels ./wheels
-# RUN pip install --user --no-cache-dir --upgrade pip
+RUN pip install --user --no-cache-dir --upgrade pip
 RUN pip install --no-cache ./wheels/*
 
 ### TARGET: development
@@ -47,7 +47,6 @@ WORKDIR /opt/web
 COPY ./config/env.web.dev ./.env
 RUN mkdir /opt/web/www
 COPY ./config/oidc.key ./oidc.key
-COPY ./tenants ./tenants
 COPY ./static ./static
 COPY ./manage.py ./
 CMD ["python", "manage.py", "runserver_plus", "--nostatic", "0.0.0.0:8001"]
@@ -88,7 +87,6 @@ COPY ./api ./api
 COPY ./public ./public
 COPY ./purl ./purl
 COPY ./templates ./templates
-COPY ./tenants ./tenants
 COPY ./static ./static
 COPY ./tests ./tests
 COPY ./manage.py ./
@@ -126,6 +124,5 @@ COPY ./api ./api
 COPY ./public ./public
 COPY ./purl ./purl
 COPY ./templates ./templates
-COPY ./tenants ./tenants
 COPY ./static ./static
 COPY ./manage.py ./
