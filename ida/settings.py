@@ -132,6 +132,7 @@ class Base(Configuration):
         'public.extensions.gradients',
         'public.extensions.banners',
         'public.extensions.records',
+        'public.extensions.extra_blocks',
         'public',
     ]
 
