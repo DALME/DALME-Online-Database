@@ -125,6 +125,7 @@ class Base(Configuration):
         'wagtailmodelchooser',
         'wagtailfontawesomesvg',
         'wagtailcodeblock',
+        'public.extensions.images',
         'public.extensions.team',
         'public.extensions.bibliography',
         'public.extensions.footnotes',
@@ -322,6 +323,7 @@ class Base(Configuration):
     # Wagtail
     SITE_ID = 1
     WAGTAILADMIN_BASE_URL = 'cms/'
+    WAGTAILIMAGES_IMAGE_MODEL = 'publicimages.BaseImage'
     WAGTAILIMAGES_FEATURE_DETECTION_ENABLED = True
 
     # reference urls

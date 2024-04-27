@@ -145,8 +145,8 @@ class Stage(BaseStage):
         # because all page types are subclassed from the wagtail Page model which we already
         # populated
         models = [
-            ('public', 'baseimage'),
-            ('public', 'customrendition'),
+            ('publicimages', 'baseimage'),
+            ('publicimages', 'customrendition'),
             ('public', 'home'),
             ('public', 'section'),
             ('public', 'flat'),

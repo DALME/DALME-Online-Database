@@ -56,7 +56,7 @@ class TeamMember(models.Model):
         help_text='Link to a website or online profile.',
     )
     photo = models.ForeignKey(
-        'public.BaseImage',
+        'publicimages.BaseImage',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,

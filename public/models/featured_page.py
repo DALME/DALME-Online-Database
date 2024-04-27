@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from public.extensions.bibliography.models import CitableMixin
-from public.models.base_image import BaseImage
+from public.extensions.images.models import BaseImage
 from public.models.base_page import BasePage
 
 

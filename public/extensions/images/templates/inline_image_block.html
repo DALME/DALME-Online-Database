@@ -1,0 +1,9 @@
+{% load render_image wagtailimages_tags %}
+
+<div class="inline-image u-flex {{ value.alignment }}" onclick="window.CustomUtils.toggleLightbox(this)">
+  {% render_image value as img %}
+  {{ img | safe }}
+  {% if value.show_caption and value.caption %}
+    <div class="caption">{{ value.caption }}</div>
+  {% endif %}
+</div>

@@ -46,7 +46,7 @@ ALTERED_MODEL_MAP = {
     ('core', 'attachment'): 'ida.attachment',
     ('core', 'savedsearch'): 'ida.savedsearch',
     ('core', 'tag'): 'ida.tag',
-    ('public', 'dalmeimage'): 'public.baseimage',
+    ('public', 'dalmeimage'): 'publicimages.baseimage',
 }
 
 SOURCES_MODEL_MAP = {

@@ -27,7 +27,7 @@ from public.blocks import (
 from public.extensions.bibliography.blocks import BibliographyChooserBlock
 from public.extensions.footnotes.blocks import FootnotesPlaceMarker
 from public.extensions.footnotes.models import FootnoteMixin
-from public.models.base_image import BaseImage
+from public.extensions.images.models import BaseImage
 
 HEADER_POSITION = (
     ('top', 'Top'),
