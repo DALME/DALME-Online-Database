@@ -320,7 +320,7 @@ class Base(Configuration):
     # Wagtail
     SITE_ID = 1
     WAGTAILADMIN_BASE_URL = 'cms/'
-    WAGTAILIMAGES_IMAGE_MODEL = 'public.BaseImage'
+    WAGTAILIMAGES_FEATURE_DETECTION_ENABLED = True
 
     # reference urls
     BASE_URL = 'http://dalme.localhost:8000'
