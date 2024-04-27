@@ -10,7 +10,7 @@ def extra_admin_css():
         '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" /> \
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" /> \
         <link rel="stylesheet" href="{}">',
-        static('css/public_admin.css'),
+        static('common/css/admin.css'),
     )
 
 
@@ -22,7 +22,7 @@ def extra_admin_js():
         <script type="text/javascript" src="{}"></script>\
         <script type="text/javascript" src="{}"></script>\
         <script type="text/javascript">window.APIURL = "{}"</script>',
-        static('js/wagtailUtils.js'),
-        static('js/wagtailStartup.js'),
+        static('common/js/wagtailUtils.js'),
+        static('common/js/wagtailAdminStartup.js'),
         settings.API_URL,
     )
