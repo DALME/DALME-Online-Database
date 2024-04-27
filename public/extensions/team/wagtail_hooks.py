@@ -23,3 +23,9 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/user-tag.svg',
         'wagtailfontawesomesvg/solid/user.svg',
     ]
+
+
+@hooks.register('construct_settings_menu')
+def hide_users_menu(request, menu_items):  # noqa: ARG001
+    """Hide user menu item in settings."""
+    menu_items[:] = [item for item in menu_items if item.name not in ['users', 'groups']]
