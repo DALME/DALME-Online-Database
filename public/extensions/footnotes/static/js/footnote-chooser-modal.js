@@ -37,9 +37,7 @@ class FootnoteSource extends window.React.Component {
           dialogue.remove();
           modalBg.remove();
           $(document.body).removeClass("footnote-modal-body");
-          document.querySelectorAll(".Draftail-Editor").forEach((el) => el.classList.remove("Draftail-Editor--readonly"));
-          document.querySelectorAll(".public-DraftEditor-content").forEach((el) => el.contentEditable = true);
-          this.onClose;
+          onClose();
         }
 
         // add dialogue to body and hide it, so content can be added to it before display
@@ -87,41 +85,51 @@ class FootnoteSource extends window.React.Component {
     }
 
     onChosen(data) {
-      var { editorState, entity, entityType, entityKey, onComplete } = this.props;
-      var content = editorState.getCurrentContent();
-      var selection = editorState.getSelection();
-      var finalContentState = {};
-      var finalChangeType = "";
+      const { editorState, entity, entityType, entityKey, onComplete } = this.props;
+      const contentState = editorState.getCurrentContent();
+      let selectionState = editorState.getSelection();
+      let nextState = null;
 
-      if (selection.getStartOffset() != selection.getEndOffset()) {
-        let newSelection = selection.merge({ anchorOffset: selection.focusOffset });
-        selection = newSelection;
-      }
-
-      // if entity needs to be created
-      if (!entity) {
-          const contentWithEntity = content.createEntity(entityType.type, "IMMUTABLE", data);
-          entityKey = contentWithEntity.getLastCreatedEntityKey();
-
-          const contentWithCallout = window.DraftJS.Modifier.insertText(
-            content,
-            selection,
+      if (!entity) { // if entity needs to be created
+          // collapse selection if necessary
+          if (selectionState.getStartOffset() != selectionState.getEndOffset()) {
+            selectionState = selectionState.merge({ anchorOffset: selectionState.focusOffset });
+          }
+          // determine if we're at the very end of the block
+          const block = contentState.getBlockForKey(selectionState.getStartKey());
+          const atEnd = block.getLength() == selectionState.anchorOffset;
+          // create entity
+          const contentWithEntity = contentState.createEntity(entityType.type, "IMMUTABLE", data);
+          // add the call-out
+          let contentWithCallout = window.DraftJS.Modifier.insertText(
+            contentState,
+            selectionState,
             "✱",
             null,
-            entityKey
+            contentWithEntity.getLastCreatedEntityKey()
           );
+          // set selection after call-out
+          const selectionStateAfterCallout = selectionState.merge({
+            anchorOffset: selectionState.anchorOffset + 1,
+            focusOffset: selectionState.focusOffset + 1,
+          });
+          // add space after if at end
+          if (atEnd) {
+            contentWithCallout = window.DraftJS.Modifier.insertText(
+              contentWithCallout, selectionStateAfterCallout, " ", null, null
+            );
+          }
+          // create new editorState object
+          const newEditorState = window.DraftJS.EditorState.set(
+            editorState, { currentContent: contentWithCallout }
+          );
+          // move selection after call-out
+          nextState = window.DraftJS.EditorState.forceSelection(newEditorState, selectionStateAfterCallout);
 
-          editorState = window.DraftJS.EditorState.push(editorState, contentWithCallout, "insert-characters");
-          content = editorState.getCurrentContent();
-
-          finalContentState = window.DraftJS.Modifier.applyEntity(content, selection, entityKey);
-          finalChangeType = "apply-entity"
-      } else {
-        finalContentState = content.mergeEntityData(entityKey, data);
-        finalChangeType = "merge-entity-data"
+      } else { // if entity already exists
+        const contentMerged = contentState.mergeEntityData(entityKey, data);
+        nextState = window.DraftJS.EditorState.push(editorState, contentMerged, "merge-entity-data");
       }
-
-      const nextState = window.DraftJS.EditorState.push(editorState, finalContentState, finalChangeType);
       this.workflow.close();
       onComplete(nextState);
     }
