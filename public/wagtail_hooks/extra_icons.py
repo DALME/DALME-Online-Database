@@ -9,7 +9,6 @@ def register_extra_icons(icons):
         *icons,
         'wagtailfontawesomesvg/solid/notes-medical.svg',
         'wagtailfontawesomesvg/solid/book-bookmark.svg',
-        'wagtailfontawesomesvg/solid/chart-area.svg',
         'wagtailfontawesomesvg/solid/person.svg',
         'wagtailfontawesomesvg/solid/square-share-nodes.svg',
         'wagtailfontawesomesvg/solid/hand-holding-heart.svg',
@@ -17,6 +16,5 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/diagram-next.svg',
         'wagtailfontawesomesvg/solid/list-ol.svg',
         'wagtailfontawesomesvg/regular/bookmark.svg',
-        'wagtailfontawesomesvg/solid/file-pdf.svg',
         'wagtailfontawesomesvg/solid/bandage.svg',
     ]

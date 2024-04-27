@@ -1,0 +1,42 @@
+{% load wagtailcore_tags %}
+
+<div class="u-flex">
+  <div class="metadata">
+    <div class="doc-title">
+      <a href="#{{ value.title|slugify }}" class="anchor"><h4>{{ value.title }}</h4></a>
+
+      {% if value.page %}
+        <a href="{% pageurl value.page %}" class="doc-icon"><i class="fas fa-link"></i></a>
+      {% endif %}
+
+      {% if value.url %}
+        <a href="{{ value.url }}" target="_blank" class="doc-icon"><i class="fas fa-external-link-alt"></i></a>
+      {% endif %}
+
+      {% if value.document %}
+        <a href="{{ value.document.url }}" target="_blank" class="doc-icon"><i class="fas fa-download"></i></a>
+      {% endif %}
+
+    </div>
+    <div class="doc-detail">
+        {% if value.type == 'publication' or value.type == 'talk' %}
+          <span>{{ value.author }}{% if value.detail %} | {{ value.detail }}{% endif %}</span>
+          {% if value.type == 'publication' %}
+            <div class="doc-date">{{ value.date.year }}</div>
+          {% elif value.type == 'talk' %}
+            <div class="doc-date">{{ value.date|date:"M Y" }}</div>
+          {% endif %}
+        {% else %}
+          {% if value.version %}
+            <span>v.{{value.version}}</span>
+          {% endif %}
+          <div class="doc-date">{{ value.date|date:"j M Y" }}</div>
+        {% endif %}
+      </div>
+      {% if value.abstract %}
+        <div class="abstract-container">
+          <div class="abstract-text">{{ value.abstract }}</div>
+        </div>
+      {% endif %}
+  </div>
+</div>

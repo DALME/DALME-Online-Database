@@ -24,4 +24,4 @@ class DocumentBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'file-pdf'
-        template = 'public/blocks/document.html'
+        template = 'document_block.html'
