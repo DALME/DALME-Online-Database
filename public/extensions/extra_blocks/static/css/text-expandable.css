@@ -1,0 +1,27 @@
+.show-more {
+    font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+    margin-top: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    float: right;
+    border: 1px solid #e4e4e4;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 5px;
+    color: #cbcbcb;
+    margin-left: 1rem;
+    margin-bottom: 1rem;
+    width: 74px;
+    text-align: center;
+}
+
+.show-more::before {
+    content: "Show more";
+}
+
+.show-more:hover {
+    background-color: #e6ecf6;
+    color: #354d87;
+    border-color: #354d87;
+}

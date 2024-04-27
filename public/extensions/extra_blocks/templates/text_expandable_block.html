@@ -1,0 +1,26 @@
+{% load wagtailcore_tags %}
+
+<div class="text-expandable-container">
+  {% value|richtext %}
+  <div class="show-more u-none">Show more</div>
+</div>
+
+<script>
+    $(document).ready(function() {
+      $('.text-expandable-container').each( function() {
+        if ($(this).prop('scrollHeight') > $(this).outerHeight()) {
+          $(this).find('.show-more').removeClass('u-none')
+        }
+      });
+
+      $('.show-more').on('click', function() {
+        if ($(this).text() == 'Show more') {
+          $(this).parent().css({"maxHeight":"1000px"});
+          $(this).text('Show less');
+        } else {
+          $(this).parent().css({"maxHeight":"126px"});
+          $(this).text('Show more');
+        }
+      });
+    });
+  </script>
