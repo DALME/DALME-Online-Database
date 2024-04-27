@@ -8,7 +8,7 @@ from wagtail.fields import StreamField
 
 from django.db import models
 
-from public.blocks import FooterPageChooserBlock, InlineImageBlock, SocialBlock
+from public.extensions.images.blocks import InlineImageBlock
 from public.models.base_page import HEADER_POSITION
 
 
@@ -20,6 +20,11 @@ class Settings(BaseGenericSetting):
         max_length=255,
         blank=True,
         help_text='Name to be used for this site, e.g. "DALME".',
+    )
+    short_form = models.CharField(
+        max_length=10,
+        blank=True,
+        help_text='Initialism or short form of project name, e.g. "DALME".',
     )
     tagline = models.CharField(
         max_length=255,
@@ -35,16 +40,6 @@ class Settings(BaseGenericSetting):
         max_length=255,
         blank=True,
         help_text='Text to add to the auto-generated copyright statement (Copyright © 20XX), e.g. "The Documentary Archaeology of Late Medieval Europe"',
-    )
-    footer_links = StreamField(
-        [('page', FooterPageChooserBlock())],
-        null=True,
-        help_text='Choose pages that will appear as links in the footer.',
-    )
-    footer_social = StreamField(
-        [('social', SocialBlock())],
-        null=True,
-        help_text='Choose social media apps to appear in the footer.',
     )
     search_help_content = StreamField(
         [
@@ -141,6 +136,11 @@ class Settings(BaseGenericSetting):
         verbose_name='Header position',
         help_text='Position of the header image within its container in the record viewer.',
     )
+    analytics_domain = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Data domain to use for Plausible analytics, e.g. "dalme.org".',
+    )
 
     class Meta:
         verbose_name = 'Site preferences'
@@ -148,12 +148,8 @@ class Settings(BaseGenericSetting):
     branding_tab_panels = [
         FieldPanel('name'),
         FieldPanel('tagline'),
-        FieldPanel('logo'),
-    ]
-    footer_tab_panel = [
         FieldPanel('copyright_line'),
-        FieldPanel('footer_links'),
-        FieldPanel('footer_social'),
+        FieldPanel('logo'),
     ]
     search_tab_panel = [
         FieldRowPanel(
@@ -200,7 +196,6 @@ class Settings(BaseGenericSetting):
     edit_handler = TabbedInterface(
         [
             ObjectList(branding_tab_panels, heading='Branding'),
-            ObjectList(footer_tab_panel, heading='Footer'),
             ObjectList(search_tab_panel, heading='Search Page'),
             ObjectList(explore_tab_panel, heading='Explore Page'),
             ObjectList(records_tab_panel, heading='Record Browser/Viewer'),

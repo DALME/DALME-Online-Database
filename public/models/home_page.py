@@ -3,12 +3,10 @@
 from datetime import datetime
 
 from wagtail.admin.panels import FieldPanel
-from wagtail.fields import StreamField
 
 from django.db import models
 from django.utils import timezone
 
-from public.blocks import SponsorBlock
 from public.extensions.banners.models import Banner
 from public.extensions.gradients.models import GradientMixin
 from public.models.base_page import BasePage
@@ -28,8 +26,6 @@ class Home(BasePage, GradientMixin):
         related_name='+',
         help_text='The page that should open when "Learn more..." is selected.',
     )
-    sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
-
     subpage_types = [
         'public.Section',
         'public.Features',
@@ -39,7 +35,6 @@ class Home(BasePage, GradientMixin):
     metadata_panels = [
         *GradientMixin.metadata_panels,
         FieldPanel('learn_more_page'),
-        FieldPanel('sponsors'),
     ]
 
     def get_context(self, request):
