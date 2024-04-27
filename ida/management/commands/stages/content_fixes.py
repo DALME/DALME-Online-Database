@@ -61,6 +61,8 @@ REF_CITATIONS = {
     'J9BYMBP2': '(Deregnaucourt, 1982)',
     'Y44RIA8Q': '(Mane & Piponnier, 1992)',
     'XL9F9RTZ': '(Carroll-Clark, 2005)',
+    'MJWEGUKG': '(Blaschitz, Hundsbichler, Jaritz, & Vavra, 1992)',
+    'XXD7JM9D': '(Baumgarten, 2014)',
 }
 
 
