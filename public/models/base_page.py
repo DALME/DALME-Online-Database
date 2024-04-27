@@ -1,31 +1,14 @@
 """Model base page data."""
 
-from wagtail import blocks
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
-from wagtail.contrib.table_block.blocks import TableBlock
-from wagtail.embeds.blocks import EmbedBlock
 from wagtail.fields import StreamField
-from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
 from wagtail.search import index
 from wagtail.utils.decorators import cached_classmethod
-from wagtailcodeblock.blocks import CodeBlock
 
 from django.db import models
 
-from public.blocks import (
-    CarouselBlock,
-    ChartEmbedBlock,
-    DocumentBlock,
-    ExternalResourceBlock,
-    InlineImageBlock,
-    MainImageBlock,
-    PersonBlock,
-    SubsectionBlock,
-    SubsectionEndMarkerBlock,
-)
-from public.extensions.bibliography.blocks import BibliographyChooserBlock
-from public.extensions.footnotes.blocks import FootnotesPlaceMarker
+from public.extensions.extra_blocks.blocks import DEFAULT_BLOCKS
 from public.extensions.footnotes.models import FootnoteMixin
 from public.extensions.images.models import BaseImage
 
@@ -34,60 +17,6 @@ HEADER_POSITION = (
     ('center', 'Center'),
     ('bottom', 'Bottom'),
 )
-
-DEFAULT_TABLE_OPTIONS = {
-    'minSpareRows': 0,
-    'startRows': 3,
-    'startCols': 3,
-    'colHeaders': False,
-    'rowHeaders': False,
-    'contextMenu': [
-        'row_above',
-        'row_below',
-        '---------',
-        'col_left',
-        'col_right',
-        '---------',
-        'remove_row',
-        'remove_col',
-        '---------',
-        'undo',
-        'redo',
-        '---------',
-        'copy',
-        'cut',
-        '---------',
-        'alignment',
-    ],
-    'editor': 'text',
-    'stretchH': 'all',
-    'height': 108,
-    'renderer': 'text',
-    'autoColumnSize': False,
-}
-
-
-DEFAULT_BLOCKS = [
-    ('bibliography', BibliographyChooserBlock()),
-    ('carousel', CarouselBlock(ImageChooserBlock())),
-    ('chart_embed', ChartEmbedBlock()),
-    ('code', CodeBlock()),
-    ('document', DocumentBlock()),
-    ('embed', EmbedBlock(icon='media')),
-    ('external_resource', ExternalResourceBlock()),
-    ('footnotes_placemarker', FootnotesPlaceMarker()),
-    ('heading', blocks.CharBlock()),
-    ('html', blocks.RawHTMLBlock()),
-    ('inline_image', InlineImageBlock()),
-    ('main_image', MainImageBlock()),
-    ('page', blocks.PageChooserBlock()),
-    ('person', PersonBlock()),
-    ('pullquote', blocks.RichTextBlock(icon='openquote')),
-    ('subsection', SubsectionBlock()),
-    ('subsection_end_marker', SubsectionEndMarkerBlock()),
-    ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS)),
-    ('text', blocks.RichTextBlock()),
-]
 
 
 class BasePage(Page, FootnoteMixin):
