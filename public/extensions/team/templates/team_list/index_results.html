@@ -1,4 +1,4 @@
-{% load wagtailadmin_tags wagtailimages_tags i18n %}
+{% load wagtailadmin_tags wagtailimages_tags i18n static %}
 
 {% block before_results %}{% endblock %}
 {% if object_list %}
@@ -26,14 +26,12 @@
                     <tr{% include "wagtailadmin/shared/attrs.html" with attrs=row.attrs %}>
                         {% for cell in row.values %}
                             {% if cell.column.name == 'photo' %}
-                                <td {% if column.classname %}class="{{ column.classname }}"{% endif %}>
-                                    <div class="image">
-                                        {% if cell.instance.photo %}
-                                            {% image cell.instance.photo fill-100x100 class="show-transparency" alt="" %}
-                                        {% else %}
-                                            {% icon name="user" classname="user_placeholder" title="no_photo" %}
-                                        {% endif %}
-                                    </div>
+                                <td class="{% if column.classname %}{{ column.classname }}{% endif %} avatar-cell">
+                                    {% if cell.instance.avatar %}
+                                        <div class="avatar-bg" style="background: center / cover url({% get_media_prefix %}{{ cell.instance.avatar }});"></div>
+                                    {% else %}
+                                        {% icon name="user" classname="user-placeholder" title="no_photo" %}
+                                    {% endif %}
                                 </td>
                             {% else %}
                                 {% component cell %}
