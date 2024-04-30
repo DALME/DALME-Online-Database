@@ -1,4 +1,4 @@
-"""Interface for the public.extensions.extra_blocks.blocks module."""
+"""Interface for the public.extensions.extras.blocks module."""
 
 from public.extensions.images.blocks import CarouselBlock, InlineImageBlock, MainImageBlock
 from public.extensions.team.blocks import PersonBlock

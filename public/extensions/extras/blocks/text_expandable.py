@@ -9,4 +9,3 @@ class TextExpandableBlock(blocks.StructBlock):
     class Meta:
         icon = 'expandable-text'
         template = 'text_expandable_block.html'
-        form_classname = 'struct-block text-expandable-block'

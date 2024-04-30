@@ -1,4 +1,4 @@
-.show-more {
+.show-button {
     font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
     margin-top: 2px;
     border-radius: 3px;
@@ -15,13 +15,19 @@
     width: 74px;
     text-align: center;
 }
-
-.show-more::before {
+.show-button::before {
     content: "Show more";
 }
-
-.show-more:hover {
+.show-button.show-less::before {
+    content: "Show less";
+}
+.show-button:hover {
     background-color: #e6ecf6;
     color: #354d87;
     border-color: #354d87;
+}
+.text-expandable-container {
+    max-height: 126px;
+    overflow-y: hidden;
+    transition: max-height 0.8s ease-out;
 }

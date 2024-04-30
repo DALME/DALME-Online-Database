@@ -1,0 +1,6 @@
+{% load wagtailcore_tags %}
+
+<div class="text-expandable-container">
+  <div class="show-button show-more u-none" onclick="window.CustomUtils.toggleShowMore(this)"></div>
+  {{ value.body|richtext }}
+</div>
