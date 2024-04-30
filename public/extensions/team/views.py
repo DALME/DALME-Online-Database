@@ -8,6 +8,8 @@ from wagtail.admin.viewsets.model import ModelViewSet
 
 from django.utils.functional import cached_property
 
+from public.extensions.extras.widgets import MultiSelect, UserSelect
+
 from .models import TeamMember, TeamRole
 
 
@@ -58,16 +60,16 @@ class TeamMemberViewSet(ModelViewSet):
     general_panels = [
         FieldRowPanel(
             [
+                FieldPanel('user', classname='col4', widget=UserSelect(handle_form_fields=True)),
                 FieldPanel('name', classname='col8'),
-                FieldPanel('user', classname='col4'),
             ],
             heading='ID',
             classname='field-row-panel',
         ),
         FieldRowPanel(
             [
-                FieldPanel('roles', classname='col8'),
-                FieldPanel('photo', classname='col4'),
+                FieldPanel('roles', classname='col6', widget=MultiSelect(placeholder='Select roles...')),
+                FieldPanel('photo', classname='col6'),
             ],
             heading='Roles and photo',
             classname='field-row-panel',
