@@ -44,8 +44,9 @@ class Stage(BaseStage):
                 self.logger.info('Migrating user profiles')
                 profiles = cursor.execute('SELECT id, full_name, user_id FROM restore.core_profile;')
                 profiles = self.map_rows(cursor)
-                profile_objs = [Profile(**row) for row in profiles]
-                Profile.objects.bulk_create(profile_objs)
+                # Can't bulk create a multi-table inherited model
+                for row in profiles:
+                    Profile.objects.create(**row)
                 self.logger.info('Created %s Profile instances', Profile.objects.count())
         else:
             self.logger.info('User data already exists')
@@ -151,7 +152,7 @@ class Stage(BaseStage):
     def ensure_user_profile(self):
         """Make sure all users have a profile record."""
         self.logger.info('Ensuring all users have a user profile')
-        objs = User.objects.filter(profile__isnull=True)
+        objs = User.objects.filter(wagtail_userprofile__profile__isnull=True)
         for obj in objs:
             Profile.objects.create(user=obj, full_name=f'{obj.first_name} {obj.last_name}')
         self.logger.info('Linked %s Profile instances', len(objs))

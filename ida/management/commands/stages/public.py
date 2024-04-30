@@ -9,8 +9,6 @@ from wagtail.log_actions import log
 from django.apps import apps
 from django.db import connection, transaction
 
-from ida.models import Profile
-
 from .base import BaseStage
 
 SOURCE_SCHEMA = 'restore'
@@ -30,7 +28,7 @@ class Stage(BaseStage):
         self.drop_cloned_schema()
         self.migrate_wagtail_tables()
         self.migrate_public_tables()
-        self.transfer_avatars()
+        self.transfer_wagtail_user_profiles()
         self.transfer_snippets()
         self.transfer_gradients()
         self.drop_restore_schema()
@@ -69,7 +67,6 @@ class Stage(BaseStage):
             'wagtailforms',
             'wagtailimages',
             'wagtailredirects',
-            'wagtailusers',
         ]
         reset = [
             'wagtailcore_collection',
@@ -144,21 +141,22 @@ class Stage(BaseStage):
         # because all page types are subclassed from the wagtail Page model which we already
         # populated
         models = [
-            ('publicimages', 'baseimage'),
-            ('publicimages', 'customrendition'),
-            ('wagtaildocs', 'document'),
-            ('public', 'home'),
-            ('public', 'section'),
-            ('public', 'flat'),
-            ('public', 'features'),
-            ('public', 'bibliography'),
-            ('public', 'collections'),
-            ('public', 'collection'),
-            ('publicrecords', 'corpus'),
-            ('publicrecords', 'corpus_collections'),
-            ('public', 'essay'),
-            ('public', 'featuredinventory'),
-            ('public', 'featuredobject'),
+            ('dalme', 'publicimages', 'baseimage'),
+            ('dalme', 'publicimages', 'customrendition'),
+            ('dalme', 'wagtaildocs', 'document'),
+            ('dalme', 'public', 'home'),
+            ('dalme', 'public', 'section'),
+            ('dalme', 'public', 'flat'),
+            ('dalme', 'public', 'features'),
+            ('dalme', 'public', 'bibliography'),
+            ('dalme', 'public', 'collections'),
+            ('dalme', 'public', 'collection'),
+            ('dalme', 'publicrecords', 'corpus'),
+            ('dalme', 'publicrecords', 'corpus_collections'),
+            ('dalme', 'public', 'essay'),
+            ('dalme', 'public', 'featuredinventory'),
+            ('dalme', 'public', 'featuredobject'),
+            # ('public', 'wagtailusers', 'userprofile'),
         ]
 
         paths_to_fix = ['baseimage_file', 'customrendition_file', 'document_file']
@@ -167,7 +165,7 @@ class Stage(BaseStage):
         sponsors_raw = None
 
         self.logger.info('Processing additional models')
-        for app, model_name in models:
+        for schema, app, model_name in models:
             model = apps.get_model(app_label=app, model_name=model_name)
             with connection.cursor() as cursor:
                 self.logger.info('Copying "%s"', f'{app}_{model_name}')
@@ -201,7 +199,7 @@ class Stage(BaseStage):
                         columns.append('collapsed')
                         values = values + ',False'
 
-                    sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    sql = f"INSERT INTO {schema}.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
 
         if banners_raw:
@@ -241,17 +239,24 @@ class Stage(BaseStage):
                         log(instance=new_sponsor, action='wagtail.create')
 
     @transaction.atomic
-    def transfer_avatars(self):
-        """Transfer avatar field from wagtail to profile."""
+    def transfer_wagtail_user_profiles(self):
+        """Transfer user profiles from Wagtail."""
         with connection.cursor() as cursor:
-            self.logger.info('Transfering avatars')
+            self.logger.info('Transfering user profiles from Wagtail')
             cursor.execute('SELECT * FROM restore.wagtailusers_userprofile;')
             rows = self.map_rows(cursor)
-            for row in rows:
-                if row['avatar']:
-                    profile = Profile.objects.get(user=row['user_id'])
-                    profile.avatar = row['avatar']
-                    profile.save(update_fields=['avatar'])
+            with schema_context('public'):
+                from wagtail.users.models import UserProfile
+
+                for row in rows:
+                    row.pop('id')
+                    row.pop('dismissibles')
+                    profile = UserProfile.objects.filter(user=row['user_id'])
+                    if profile.exists():
+                        row.pop('user_id')
+                        profile.update(**row)
+                    else:
+                        UserProfile.objects.create(**row)
 
     @transaction.atomic
     def transfer_snippets(self):
