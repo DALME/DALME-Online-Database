@@ -1,0 +1,15 @@
+.block-main_image {
+    margin-bottom: 1rem;
+}
+.main-image {
+    flex-direction: column;
+}
+.main-image .caption {
+    color: #aaa;
+    margin: 3px auto 0 auto;
+    font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+    max-width: 75%;
+}

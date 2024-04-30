@@ -66,6 +66,19 @@ pre[class*=language-]:before {
 }
 
 /* Adjustments to admin CSS */
+
+input[type=file] {
+  font-size: 14px;
+  height: 42px;
+  line-height: 34px;
+  padding: 4px 10px;
+  vertical-align: middle;
+}
+input[type=file]::file-selector-button {
+  margin-bottom: 5px;
+  margin-right: 10px;
+}
+
 .w-panel.title:first-child input {
   margin-inline-start: -.875rem;
   padding-inline-start: .875rem;
@@ -75,7 +88,6 @@ pre[class*=language-]:before {
   padding: 10px 15px;
   border-color: inherit;
 }
-
 .w-panel__header {
   background-color: var(--w-color-admin-panel-header);
   margin-bottom: .8rem;
@@ -88,7 +100,6 @@ pre[class*=language-]:before {
 .w-panel--nested .w-panel__anchor {
   background-color: unset;
 }
-
 [data-streamfield-stream-container] > [data-contentpath] > .w-panel > .w-panel__header,
 [data-streamfield-list-container] > [data-contentpath] > .w-panel > .w-panel__header {
   background-color: unset;
@@ -189,13 +200,9 @@ pre[class*=language-]:before {
   margin-right: 0.5em;
 }
 
-.listing td.title {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
+table.listing tbody td {
+  vertical-align: middle;
 }
-
 
 /* OLDER DEFINITIONS */
 
@@ -220,9 +227,7 @@ td.status.features.live > .status-tag {
   border: 1px solid #528a52;
   background-color: #eaf3ea;
 }
-table.listing tbody td {
-  vertical-align: middle;
-}
+
 input[type=checkbox]:before {
   top: 5px;
 }

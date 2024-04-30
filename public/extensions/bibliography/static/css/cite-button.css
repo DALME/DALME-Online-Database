@@ -1,0 +1,25 @@
+.cite-side-button {
+    border: none;
+    border-bottom: 1px dotted #9c9c9c;
+    border-top: 1px dotted #9c9c9c;
+    padding: 0.5rem;
+    width: 100%;
+    background: none;
+    text-align: right;
+    color: #636363;
+}
+.cite-side-button:hover{
+    background-color: #e6ecf6;
+    color: #354d87;
+    text-decoration: none;
+}
+.cite-side-button:focus, .cite-side-button:active {
+    outline: none !important;
+}
+.cite-side-button .dropdown-toggle::after {
+    font-size: 12px;
+    color: #a2a0a0;
+}
+#citation {
+    border-color: #aaa;
+}

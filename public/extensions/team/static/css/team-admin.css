@@ -1,6 +1,33 @@
-.user_placeholder {
+.avatar-cell {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+.user-placeholder,
+.avatar-bg {
+    width: 50px;
+    height: 50px;
+    border: 1px solid var(--w-color-border-field-default);
+    border-radius: 5px;
+}
+.user-placeholder {
+    background: var(--w-color-surface-header);
+    color: var(--w-color-border-field-default);
+    padding: 10px;
+}
+#user-form-avatar-preview {
+    border: 1px solid var(--w-color-border-field-default);
+    border-radius: 5px;
     width: 100px;
-    height: 100px;
-    background: grey;
-    padding: 15px;
+    height: 112px;
+    position: absolute;
+    top: -21px;
+    right: 0;
+}
+#user-form-avatar-preview .user-placeholder {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+input#id_photo {
+    max-width: calc(100% - 110px);
 }
