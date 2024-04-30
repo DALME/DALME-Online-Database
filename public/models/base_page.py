@@ -8,7 +8,7 @@ from wagtail.utils.decorators import cached_classmethod
 
 from django.db import models
 
-from public.extensions.extra_blocks.blocks import DEFAULT_BLOCKS
+from public.extensions.extras.blocks import DEFAULT_BLOCKS
 from public.extensions.footnotes.models import FootnoteMixin
 from public.extensions.images.models import BaseImage
 
