@@ -1,0 +1,25 @@
+.select2-container input.select2-search__field {
+    min-height: unset;
+    line-height: 20px;
+    margin-top: 0px !important;
+    width: auto !important;
+}
+.select2-container input.select2-search__field:focus,
+.select2-container input.select2-search__field:focus-visible {
+    outline: 0 !important;
+}
+.select2-container .select2-selection--multiple {
+    height: 42px;
+    border: 1px solid var(--w-color-border-field-default);
+}
+.select2-container ul.select2-selection__rendered {
+    min-height: 40px;
+    line-height: 20px;
+    padding: 10px 10px !important;
+}
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    outline: 3px solid var(--w-color-focus) !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    margin-top: 0;
+}
