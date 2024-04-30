@@ -5,7 +5,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('ida', '0001_initial'),
+        ('ida', '0002_initial'),
     ]
 
     operations = [
