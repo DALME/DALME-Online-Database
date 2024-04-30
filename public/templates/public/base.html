@@ -101,10 +101,16 @@
     {% block js_foot %}
       {% if page.citable and not records and not record and not search %}
         {% get_citation_data as citation %}
-        {{ citation.2 | safe }}
-        {{ citation | json_script:"citation_data" }}
+        {{ citation.2|safe }}
+        {{ citation|json_script:"citation_data" }}
         <script type="text/javascript" src="{% static 'js/citation-app.js' %}"></script>
       {% endif %}
+
+      <!-- EXTENSION SCRIPTS START -->
+      <script type="text/javascript" src="{% static 'js/extra-blocks.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/images.js' %}"></script>
+      <!-- EXTENSION SCRIPTS END -->
+
     {% endblock %}
   </body>
 {% endwith %}

@@ -43,19 +43,4 @@ window.CustomUtils = {
     menu.classList.toggle("u-flex");
     menu.classList.toggle("u-none");
   },
-  toggleLightbox: (el) => {
-    document.querySelector(".lightbox-image").src = el.querySelector("img").src;
-    document.querySelector(".lightbox-caption").innerHTML = el.querySelector(".caption").innerHTML;
-    document.getElementById("lightbox").modal("show");
-  },
-  toggleSection: (el) => {
-    const icon = el.querySelector("i");
-    icon.classList.toggle("fa-caret-up");
-    icon.classList.toggle("fa-caret-down");
-    el.setAttribute(
-      "data-collapsed",
-      el.getAttribute("data-collapsed") === "true" ? "false" : "true",
-    );
-    el.nextElementSibling.classList.toggle("u-none");
-  },
 }
