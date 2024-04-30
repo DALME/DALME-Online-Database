@@ -1,7 +1,6 @@
 if (typeof(window.reference_dialogue) == "undefined") {
   window.reference_dialogue = function (target, entityId) {
     const selector = $(target).select2({
-      debug: true,
       placeholder: "Type to search bibliography...",
       width: "100%",
       dropdownParent: $(".modal"),
