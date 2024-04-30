@@ -19,7 +19,7 @@ def render_image(record):
     )
     img_tag = f'<img alt="{img.alt}" height="{img.height}" width="{img.width}" src="{img.url}" '
     img_tag = img_tag + f'id="{image_id}" ' if image_id and resize_rule != 'background' else img_tag
-    img_tag = img_tag + 'class="display-none" ' if resize_rule == 'background' else img_tag
+    img_tag = img_tag + 'class="u-none" ' if resize_rule == 'background' else img_tag
     img_tag += '/>'
 
     if resize_rule == 'background':
