@@ -1,6 +1,7 @@
 """Models for team extension."""
 
 from wagtail.fields import RichTextField
+from wagtail.users.models import upload_avatar_to
 
 from django.conf import settings
 from django.db import models
@@ -55,14 +56,34 @@ class TeamMember(models.Model):
         verbose_name='Website',
         help_text='Link to a website or online profile.',
     )
-    photo = models.ForeignKey(
-        'publicimages.BaseImage',
-        blank=True,
+    photo = models.ImageField(
+        verbose_name='profile picture',
+        upload_to=upload_avatar_to,
         null=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
+        blank=True,
         help_text='Profile image or avatar.',
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(name='unique_user', fields=['user']),
+            models.UniqueConstraint(name='unique_name_title', fields=['name', 'title']),
+        ]
+
     def __str__(self):
         return str(self.name)
+
+    def save(self, *args, **kwargs):
+        """Override the save method to save avatar image if this is a user adding a photo."""
+        if self.user and self.photo:
+            profile_obj = self.user.wagtail_userprofile
+            profile_obj.avatar = self.photo
+            profile_obj.save()
+            self.photo = None
+        return super().save(*args, **kwargs)
+
+    @property
+    def avatar(self):
+        if self.user:
+            return self.user.wagtail_userprofile.avatar
+        return self.photo

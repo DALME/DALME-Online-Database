@@ -1,6 +1,7 @@
 """Model user and profile data."""
 
 import humps
+from wagtail.users.models import UserProfile
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -60,7 +61,7 @@ class User(AbstractUser):
         # Capture this here before it mutates during super().save().
         created = self._state.adding
         if created:
-            self.profile = Profile(full_name=f'{self.first_name} {self.last_name}')
+            # self.profile = Profile(full_name=f'{self.first_name} {self.last_name}')
             super().save(*args, **kwargs)
 
             # Add the new user to the current tenant.
@@ -71,21 +72,14 @@ class User(AbstractUser):
             super().save(*args, **kwargs)
 
 
-class Profile(models.Model):
-    """One-to-one extension of user model.
+class Profile(UserProfile):
+    """Extends the Wagtail UserProfile model to add additional user related data."""
 
-    Accomodate additional user related data, including permissions of
-    associated accounts on other platforms.
-
-    """
-
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
-    avatar = models.CharField(blank=True, default='')
     preferences = models.JSONField(default=get_default_preferences)
 
     def __str__(self):
-        return self.user.username
+        return self.user.get_username()
 
     def get_absolute_url(self):
         """Return instance absolute url."""

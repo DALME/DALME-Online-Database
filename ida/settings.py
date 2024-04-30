@@ -101,6 +101,8 @@ class Base(Configuration):
         'oauth2_provider',
         'api',
         'purl',
+        'wagtail.users',
+        'public.extensions.team',
     ]
     TENANT_APPS = [
         'django_filters',
@@ -112,7 +114,6 @@ class Base(Configuration):
         'wagtail.contrib.settings',
         'wagtail.embeds',
         'wagtail.sites',
-        'wagtail.users',
         'wagtail.snippets',
         'wagtail.documents',
         'wagtail.images',
@@ -125,14 +126,13 @@ class Base(Configuration):
         'wagtailmodelchooser',
         'wagtailfontawesomesvg',
         'wagtailcodeblock',
-        'public.extensions.images',
-        'public.extensions.team',
         'public.extensions.bibliography',
         'public.extensions.footnotes',
         'public.extensions.gradients',
         'public.extensions.banners',
         'public.extensions.records',
-        'public.extensions.extra_blocks',
+        'public.extensions.extras',
+        'public.extensions.images',
         'public',
     ]
 

@@ -12,10 +12,10 @@ from api.resources.groups import GroupSerializer
 class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     """Serializes user and profile data."""
 
-    full_name = serializers.CharField(max_length=255, source='profile.full_name', required=False)
+    full_name = serializers.CharField(max_length=255, source='wagtail_userprofile.profile.full_name', required=False)
     groups = GroupSerializer(many=True, field_set='attribute', required=False)
-    avatar = serializers.URLField(max_length=255, source='profile.profile_image', required=False)
-    preferences = serializers.JSONField(source='profile.preferences', required=False)
+    avatar = serializers.URLField(max_length=255, source='wagtail_userprofile.profile.profile_image', required=False)
+    preferences = serializers.JSONField(source='wagtail_userprofile.profile.preferences', required=False)
 
     class Meta:
         model = get_user_model()

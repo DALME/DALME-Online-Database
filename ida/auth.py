@@ -75,13 +75,13 @@ class IDAOAuth2Validator(OAuth2Validator):
     def get_userinfo_claims(self, request):
         """Enhance the default OIDC claims payload."""
         claims = super().get_userinfo_claims(request)
-        full_name = request.user.profile.full_name
-        profile_image = request.user.profile.profile_image
+        full_name = request.user.wagtail_userprofile.profile.full_name
+        avatar = request.user.wagtail_userprofile.profile.profile_image
         tenant = get_current_tenant()
 
         claims.update(
             {
-                'avatar': profile_image,
+                'avatar': avatar,
                 'email': request.user.email,
                 'username': request.user.username,
                 'full_name': full_name,
