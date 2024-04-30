@@ -18,8 +18,9 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic.base import View
 
+from public.extensions.extras.widgets import ColourPickerWidget
+
 from .models import Gradient
-from .widgets import ColourPickerWidget
 
 
 class GradientChooseView(ChooseView):
