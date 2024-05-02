@@ -3124,9 +3124,9 @@ parsererror div {
 .no-scroll-bar::-webkit-scrollbar {
     display: none;
 }
-.dalme-button,
-.dalme-button.focus,
-.dalme-button:focus {
+.base-button,
+.base-button.focus,
+.base-button:focus {
   border: 1px solid #aaa;
   font-size: 10px;
   font-weight: 700;
@@ -3138,14 +3138,14 @@ parsererror div {
   border-radius: .3rem;
   text-transform: uppercase;
 }
-.dalme-button.large {
+.base-button.large {
   font-size: 12px;
   padding: .2rem .5rem;
 }
-.dalme-button:not(:disabled):not(.disabled):hover,
-.dalme-button:not(:disabled):not(.disabled).active,
-.dalme-button:not(:disabled):not(.disabled):active,
-.show>.dalme-button.dropdown-toggle {
+.base-button:not(:disabled):not(.disabled):hover,
+.base-button:not(:disabled):not(.disabled).active,
+.base-button:not(:disabled):not(.disabled):active,
+.show>.base-button.dropdown-toggle {
   background-color: #e6ecf6;
   color: #354d87 !important;
   border-color: #354d87 !important;
