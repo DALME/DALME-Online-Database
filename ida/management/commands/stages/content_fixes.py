@@ -1,6 +1,7 @@
 """Create entries necessary for new data schemas."""
 
 import copy
+import io
 import json
 import os
 import re
@@ -13,12 +14,16 @@ from django_tenants.utils import schema_context
 from wagtail.log_actions import log
 
 from django.apps import apps
+from django.core.files import File
+from django.core.files.storage import FileSystemStorage
 from django.db import connection, transaction
+from django.db.utils import IntegrityError
 
 from ida.models import (
     Project,
     SavedSearch,
     Tenant,
+    User,
     ZoteroCollection,
 )
 
@@ -446,14 +451,32 @@ class Stage(BaseStage):
             biblio_page.save(update_fields=['body'])
 
     @transaction.atomic
-    def migrate_people(self):
+    def migrate_people(self):  # noqa: C901
         """Convert people blocks to TeamMember entities."""
+        user_name_concordance = {
+            'Anne E. Lester': 'Anne Lester',
+            'Juan Vicente García Marsilla': 'Juan-Vicente Garcia Marsilla',
+            'Juliette Calvarin': 'Jules Calvarin',
+            'Pablo Sanahuja Ferrer': 'Pablo Sanahuja',
+        }
+
+        def user_match(name):
+            name = user_name_concordance.get(name, name)
+            match = User.objects.filter(wagtail_userprofile__profile__full_name=name)
+            if match.exists():
+                if match.count() != 1:
+                    self.logger.info('Name %s matches multiple users.', name)
+                else:
+                    return match.get()
+            return None
+
         with schema_context('dalme'):
             from wagtail.models import Page
 
             from public.extensions.images.models import BaseImage
             from public.extensions.team.models import TeamMember, TeamRole
 
+            self.logger.info('Creating TeamRole records...')
             roles = {
                 'PI': TeamRole.objects.create(
                     role='PI',
@@ -476,25 +499,51 @@ class Stage(BaseStage):
             self.logger.info('Converting people blocks to TeamMember entities')
             people_page = Page.objects.get(title='People').specific
             for block in people_page.body:
-                current_role = None
                 if block.block_type == 'subsection':
                     block_value = block.block.get_prep_value(block.value)
                     current_role = roles.get(block_value.get('subsection'))
 
                     for sub_block in block_value['body']:
                         if sub_block.get('type') == 'person':
-                            sub_block_value = sub_block.get('value')
+                            sub_block_value = sub_block['value']
+                            name = sub_block_value.get('name')
+                            tm_object = {
+                                'name': name,
+                                'title': sub_block_value.get('job'),
+                                'defaults': {
+                                    'affiliation': sub_block_value.get('institution'),
+                                    'url': sub_block_value.get('url'),
+                                },
+                            }
+
+                            user = user_match(name)
+                            if user:
+                                tm_object['user'] = user
+
                             photo_id = sub_block_value.get('photo')
-                            photo = BaseImage.objects.get(pk=photo_id).file if photo_id else None
-                            tm = TeamMember.objects.create(
-                                name=sub_block_value.get('name'),
-                                title=sub_block_value.get('job'),
-                                affiliation=sub_block_value.get('institution'),
-                                url=sub_block_value.get('url'),
-                                photo=photo,
-                            )
-                            tm.roles.add(current_role)
-                            log(instance=tm, action='wagtail.create')
+                            if photo_id:
+                                photo = BaseImage.objects.get(pk=photo_id)
+                                if user:
+                                    wt_profile = user.wagtail_userprofile
+                                    # django-tenants will try to add the tenant to the path
+                                    # to prevent it, we override the "storage" attribute of
+                                    # the field class with Django's default storage model
+                                    wt_profile.avatar.storage = FileSystemStorage()
+                                    wt_profile.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
+
+                                else:
+                                    tm_object['defaults']['photo'] = photo
+
+                            try:
+                                tm, created = TeamMember.objects.get_or_create(**tm_object)
+                                tm.roles.add(current_role)
+                                action = 'wagtail.create' if created else 'wagtail.edit'
+                                log(instance=tm, action=action)
+
+                            except IntegrityError:
+                                tm = TeamMember.objects.get(user=user)
+                                tm.roles.add(current_role)
+                                self.logger.info('Found duplicate record for %s.', name)
 
     @transaction.atomic
     def process_images(self):
