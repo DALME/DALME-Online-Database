@@ -84,7 +84,7 @@ function setTitle(e) {
   return e
 }
 
-const dalmeTeiBehaviours = {
+const idaTeiBehaviours = {
   'tei': {
     'ab': [
       ['[type=column]', function(e) {

@@ -7,7 +7,7 @@ import { computed, defineComponent, nextTick, onMounted, ref, watch } from "vue"
 import { useConstants, useStores } from "@/use";
 import { notNully } from "@/utils";
 import CETEI from "CETEIcean";
-import { dalmeTeiBehaviours } from "./behaviours.js";
+import { idaTeiBehaviours } from "./behaviours.js";
 import { createPopper } from "@popperjs/core";
 
 export default defineComponent({
@@ -30,7 +30,7 @@ export default defineComponent({
     const hasLeaders = ref(false);
     const teiRenderer = new CETEI();
 
-    teiRenderer.addBehaviors(dalmeTeiBehaviours);
+    teiRenderer.addBehaviors(idaTeiBehaviours);
     /* eslint-disable */
     // const teiDoc = computed(() => {
     //   let transcription = "";

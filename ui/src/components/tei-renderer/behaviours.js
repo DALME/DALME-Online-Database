@@ -95,7 +95,7 @@ const setTitle = (e) => {
   return e;
 };
 
-export const dalmeTeiBehaviours = {
+export const idaTeiBehaviours = {
   tei: {
     ab: [
       [

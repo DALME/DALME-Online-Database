@@ -338,7 +338,7 @@
         created() {
           window.addEventListener("resize", this.windowResized);
           this.tei = new CETEI();
-          this.tei.addBehaviors(dalmeTeiBehaviours);
+          this.tei.addBehaviors(idaTeiBehaviours);
           const Cite = require('citation-js');
           this.styles = this.citationData[0];
           this.config = Cite.plugins.config.get('@csl');
