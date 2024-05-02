@@ -156,10 +156,7 @@ class Stage(BaseStage):
             ('dalme', 'public', 'essay'),
             ('dalme', 'public', 'featuredinventory'),
             ('dalme', 'public', 'featuredobject'),
-            # ('public', 'wagtailusers', 'userprofile'),
         ]
-
-        paths_to_fix = ['baseimage_file', 'customrendition_file', 'document_file']
 
         banners_raw = None
         sponsors_raw = None
@@ -183,10 +180,6 @@ class Stage(BaseStage):
                             sponsors_raw = value
                         else:
                             columns.append(f'{field}')
-                            # the paths in all fields pointing to files in media
-                            # have to be corrected to include the tenant
-                            if f'{model_name}_{field}' in paths_to_fix:
-                                value = f'dalme/{value}'  # noqa: PLW2901
                             # the value of certain field types has to be converted to account
                             # for differences in the way Django sets up certain fields depending
                             # on database backend. E.g. certain fields that are setup as varchar in MySQL
