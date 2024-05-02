@@ -3206,51 +3206,6 @@ parsererror div {
   border-bottom: 1px dotted #084094;
 }
 
-.badge-container {
-  float: right;
-  margin-left: 2rem;
-  display: flex;
-  flex-direction: column;
-  margin-top: .5rem;
-}
-.github-badge,
-.dataverse-badge {
-  display: flex;
-  flex-direction: column;
-  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
-  font-size: 11px;
-  color: #084094;
-  border: 1px solid #aaa;
-  border-radius: 3px;
-}
-.github-badge {
-  margin-bottom: 2rem;
-}
-.github-badge img,
-.dataverse-badge img {
-  width: 160px;
-  margin: 1rem 1.5rem;
-}
-.github-badge a:first-child {
-  background: none;
-}
-.github-badge a:last-child {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
-.github-badge a:not(:first-child) {
-  width: 100%;
-  border-top: 1px dotted #aaa;
-  padding: .2rem;
-  background-color: #f8f9fa;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.github-badge a:not(:first-child):hover {
-  background-color: #497bbb24;
-  color: #354d87;
-}
 a.anchor {
   cursor: default;
 }

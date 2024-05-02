@@ -46,7 +46,7 @@
 {% block js_foot %}
   {{ block.super }}
   {% if page.title == 'Open Access' %}
-    {% include "public/includes/repo_badges.html" %}
+    {% include "repo_badges.html" %}
   {% endif %}
   {% include "public/includes/highlighter.html" %}
 {% endblock%}
