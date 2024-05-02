@@ -24,7 +24,7 @@ class Settings(BaseGenericSetting):
     short_form = models.CharField(
         max_length=10,
         blank=True,
-        help_text='Initialism or short form of project name, e.g. "DALME".',
+        help_text='Short form of project name, e.g. "DALME", for use in places like menus.',
     )
     tagline = models.CharField(
         max_length=255,
