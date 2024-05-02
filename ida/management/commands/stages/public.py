@@ -344,15 +344,23 @@ class Stage(BaseStage):
                     }
                 )
 
-                Settings.objects.create(
+                new_settings = Settings.objects.create(
                     name='DALME',
                     short_form='DALME',
                     tagline='The Documentary Archaeology of Late Medieval Europe',
                     logo='images/dalme_logo.svg',
                     copyright_line='The Documentary Archaeology of Late Medieval Europe',
                     analytics_domain='dalme.org',
+                    contact_email='projectdalme@gmail.com',
+                    publication_title='The Documentary Archaeology of Late Medieval Europe',
+                    publication_url='https://dalme.org',
+                    search_tagline='DALME Corpora and Collections',
+                    explore_tagline='DALME Corpora and Collections',
                     **settings,
                 )
+
+                for editor in [5, 1, 35]:  # smail, pizzorno, morreale
+                    new_settings.editors.add(editor)
 
     @transaction.atomic
     def transfer_gradients(self):
