@@ -87,6 +87,7 @@ class Stage(BaseStage):
         self.update_footnote_state()
         self.fix_biblio_page()
         self.migrate_people()
+        self.fix_media_paths()
         self.process_images()
 
     @transaction.atomic
@@ -544,6 +545,16 @@ class Stage(BaseStage):
                                 tm = TeamMember.objects.get(user=user)
                                 tm.roles.add(current_role)
                                 self.logger.info('Found duplicate record for %s.', name)
+
+    @transaction.atomic
+    def fix_media_paths(self):
+        """Adjust paths to media files to include the tenant."""
+        self.logger.info('Adjusting media file paths...')
+        # we do this directly in SQL to avoid triggering any of the methods in the FileField
+        tables = ['publicimages_baseimage', 'publicimages_customrendition', 'wagtaildocs_document']
+        with connection.cursor() as cursor:
+            for table in tables:
+                cursor.execute(f"UPDATE dalme.{table} SET file = 'dalme/' || file;")
 
     @transaction.atomic
     def process_images(self):
