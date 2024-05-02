@@ -53,7 +53,7 @@
         loading: true,
         config: null,
         format: 'html',
-        template: 'dalme',
+        template: 'ida',
         output_format: 'bibliography',
         lang: 'en-US',
         collections: {},
@@ -66,7 +66,7 @@
           xhttp.onreadystatechange = function() {
             if (xhttp.readyState == 4 && xhttp.status == 200 && xhttp.responseXML !== null) {
               let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
-              that.config.templates.add('dalme', xml_data);
+              that.config.templates.add('ida', xml_data);
             }
           };
           xhttp.open("GET", "{% static 'common/citation_styles/dalme_bibliography.csl' %}", true);
