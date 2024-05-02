@@ -379,6 +379,7 @@ class Stage(BaseStage):
             'wagtailcore': ['revision'],
         }
 
+        self.logger.info('Performing content entity conversions...')
         for app_label, models in targets.items():
             for model_name in models:
                 qualified_name = f'{app_label}_{model_name}'
@@ -416,6 +417,7 @@ class Stage(BaseStage):
             'flat',
         ]
 
+        self.logger.info('Updating footnote state fields...')
         for model_name in targets:
             qualified_name = f'public_{model_name}'
             self.logger.info('Processing "%s"', qualified_name)
@@ -430,6 +432,7 @@ class Stage(BaseStage):
     @transaction.atomic
     def fix_biblio_page(self):
         """Fix collection block references in bibliography page."""
+        self.logger.info('Fix collection block references in bibliography page')
         with schema_context('dalme'):
             from public.models import Bibliography
 
@@ -470,8 +473,8 @@ class Stage(BaseStage):
                 ),
             }
 
+            self.logger.info('Converting people blocks to TeamMember entities')
             people_page = Page.objects.get(title='People').specific
-
             for block in people_page.body:
                 current_role = None
                 if block.block_type == 'subsection':
@@ -496,6 +499,7 @@ class Stage(BaseStage):
     @transaction.atomic
     def process_images(self):
         """Apply feature recognition to images and get rendition for people."""
+        self.logger.info('Applying feature recognition to images and generating renditions...')
         with schema_context('dalme'):
             from wagtail.images import get_image_model
 
