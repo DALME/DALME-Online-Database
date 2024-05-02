@@ -66,6 +66,16 @@ class Settings(BaseGenericSetting):
         verbose_name='Header position',
         help_text='Position of the header image within its container.',
     )
+    search_tagline = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Tagline to show below page name in header of search page, e.g. "DALME Corpora and Collections".',
+    )
+    explore_tagline = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Tagline to show below page name in header of explore page, e.g. "DALME Corpora and Collections".',
+    )
     explore_text_before = StreamField(
         [
             ('text', blocks.RichTextBlock()),

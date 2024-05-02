@@ -4,10 +4,10 @@
 <div class="title u-flex u-type-serif">
   {% if search %}
     <h1>Search</h1>
-    <h2>DALME Corpora and Collections</h2>
+    <h2>{{ settings.public.Settings.search_tagline }}</h2>
   {% elif explore %}
     <h1>Explore</h1>
-    <h2>DALME Corpora and Collections</h2>
+    <h2>{{ settings.public.Settings.explore_tagline }}</h2>
   {% else %}
   {% if page.preview %}
       <h1>{{ page.title }} [preview]</h1>
