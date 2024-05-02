@@ -5,6 +5,8 @@ from django_recaptcha import fields, widgets
 from django import forms
 from django.core.mail import EmailMessage
 
+from public.models.settings import Settings
+
 
 class ContactForm(forms.Form):
     name = forms.CharField(
@@ -36,7 +38,7 @@ class ContactForm(forms.Form):
             self.cleaned_data['subject'],
             self.cleaned_data['message'],
             f"{self.cleaned_data['name']} <{self.cleaned_data['email']}>",
-            ['projectdalme@gmail.com'],
+            [Settings.objects.first().contact_email],
             reply_to=[self.cleaned_data['email']],
         )
         try:
