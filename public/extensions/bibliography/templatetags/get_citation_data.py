@@ -8,11 +8,13 @@ from datetime import datetime
 from django import template
 from django.utils import timezone
 
+from public.models.settings import Settings
+
 register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def get_citation_data(context):  # noqa: C901, PLR0912
+def get_citation_data(context):  # noqa: C901, PLR0912, PLR0915
     today = datetime.now(tz=timezone.get_current_timezone()).date()
     accessed = today
     page = context['page']
@@ -20,6 +22,7 @@ def get_citation_data(context):  # noqa: C901, PLR0912
     page_class = page.get_verbose_name()
     formats = None
     record = context.get('record', False)
+    settings = Settings.objects.first()
 
     with open(
         os.path.join('public', 'static', 'common', 'citation_styles', 'citation_formats.json'), encoding='utf-8'
@@ -30,29 +33,38 @@ def get_citation_data(context):  # noqa: C901, PLR0912
         ('url_ver', 'Z39.88-2004'),
         ('ctx_ver', 'Z39.88-2004'),
         ('rft_val_fmt', 'info:ofi/fmt:kev:mtx:book'),
-        ('rft.au', 'Daniel Lord Smail'),
-        ('rft.au', 'Gabriel H. Pizzorno'),
-        ('rft.au', 'Laura Morreale'),
-        ('rft.btitle', 'The Documentary Archaeology of Late Medieval Europe'),
+        ('rft.btitle', settings.publication_title),
         ('rft.date', f'{published.year}/{published.month}/{published.day}'),
-        # ('rft.identifier', 'info:doi/10.1000/xyz123')
     ]
+
+    editor_names = []
+    for editor in settings.editors.all():
+        coins_list.append(('rft.au', editor.wagtail_userprofile.profile.full_name))
+        editor_names.append(
+            {
+                'family': editor.last_name,
+                'given': editor.first_name,
+            }
+        )
+
+    if settings.doi_handle:
+        coins_list.append(('rft.identifier', f'info:doi/{settings.doi_handle}'))
+
     citation = {
-        'editor': [
-            {'family': 'Smail', 'given': 'Daniel Lord'},
-            {'family': 'Pizzorno', 'given': 'Gabriel H.'},
-            {'family': 'Morreale', 'given': 'Laura'},
-        ],
+        'editor': editor_names,
         'accessed': {'date-parts': [[accessed.year, accessed.month, accessed.day]]},
     }
 
     if page_class == 'Collections' and not record:
-        coins_list += [('rft.genre', 'book'), ('rft.identifier', 'https://dalme.org')]
+        coins_list += [
+            ('rft.genre', 'book'),
+            ('rft.identifier', settings.publication_url),
+        ]
         citation.update(
             {
                 'type': 'book',
-                'title': 'The Documentary Archaeology of Late Medieval Europe',
-                'URL': 'https://dalme.org',
+                'title': settings.publication_title,
+                'URL': settings.publication_url,
                 'issued': {'date-parts': [[published.year]]},
             },
         )
@@ -61,7 +73,7 @@ def get_citation_data(context):  # noqa: C901, PLR0912
         citation.update(
             {
                 'type': 'chapter',
-                'container-title': 'The Documentary Archaeology of Late Medieval Europe',
+                'container-title': settings.publication_title,
             },
         )
 

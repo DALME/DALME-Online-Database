@@ -6,8 +6,10 @@ from wagtail.contrib.settings.models import BaseGenericSetting, register_setting
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.fields import StreamField
 
+from django.conf import settings as django_settings
 from django.db import models
 
+from public.extensions.extras.widgets import UserSelect
 from public.extensions.images.blocks import InlineImageBlock
 from public.models.base_page import HEADER_POSITION
 
@@ -151,6 +153,26 @@ class Settings(BaseGenericSetting):
         blank=True,
         help_text='Data domain to use for Plausible analytics, e.g. "dalme.org".',
     )
+    contact_email = models.EmailField(
+        blank=True,
+        help_text='Email address to use as destination for contact forms.',
+    )
+    editors = models.ManyToManyField(django_settings.AUTH_USER_MODEL, help_text='List of editors (in desired order).')
+    publication_title = models.CharField(
+        max_length=255,
+        verbose_name='Title',
+        help_text='String to be used as title of the publication/site.',
+    )
+    publication_url = models.URLField(
+        verbose_name='URL',
+        help_text='Reference URL/PURL for publication/site.',
+    )
+    doi_handle = models.CharField(
+        max_length=55,
+        blank=True,
+        verbose_name='DOI',
+        help_text='DOI handle, formatted as "prefix/suffix", if available.',
+    )
 
     class Meta:
         verbose_name = 'Site preferences'
@@ -158,8 +180,24 @@ class Settings(BaseGenericSetting):
     branding_tab_panels = [
         FieldPanel('name'),
         FieldPanel('tagline'),
-        FieldPanel('copyright_line'),
         FieldPanel('logo'),
+        FieldPanel('copyright_line'),
+        FieldPanel('contact_email'),
+    ]
+    citation_tab_panels = [
+        FieldRowPanel(
+            [
+                FieldPanel(
+                    'editors',
+                    classname='col8',
+                    widget=UserSelect(multiselect=True, placeholder='Select editors...'),
+                ),
+                FieldPanel('doi_handle', classname='col4'),
+            ],
+            classname='field-row-panel',
+        ),
+        FieldPanel('publication_title'),
+        FieldPanel('publication_url'),
     ]
     search_tab_panel = [
         FieldRowPanel(
@@ -170,6 +208,7 @@ class Settings(BaseGenericSetting):
             heading='Header',
             classname='field-row-panel',
         ),
+        FieldPanel('search_tagline'),
         FieldPanel('search_help_content'),
     ]
     explore_tab_panel = [
@@ -181,6 +220,7 @@ class Settings(BaseGenericSetting):
             heading='Header',
             classname='field-row-panel',
         ),
+        FieldPanel('explore_tagline'),
         FieldPanel('explore_text_before'),
         FieldPanel('explore_text_after'),
     ]
@@ -206,6 +246,7 @@ class Settings(BaseGenericSetting):
     edit_handler = TabbedInterface(
         [
             ObjectList(branding_tab_panels, heading='Branding'),
+            ObjectList(citation_tab_panels, heading='Citation'),
             ObjectList(search_tab_panel, heading='Search Page'),
             ObjectList(explore_tab_panel, heading='Explore Page'),
             ObjectList(records_tab_panel, heading='Record Browser/Viewer'),
