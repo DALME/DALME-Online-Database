@@ -66,7 +66,6 @@ class Base(Configuration):
 
     STATICFILES_DIRS = [
         (BASE_DIR / 'static').as_posix(),
-        (BASE_DIR / 'public/static/common').as_posix(),
     ]
     MULTITENANT_STATICFILES_DIRS = [
         (BASE_DIR / 'public/static/%s').as_posix(),
@@ -102,7 +101,6 @@ class Base(Configuration):
         'api',
         'purl',
         'wagtail.users',
-        'public.extensions.team',
     ]
     TENANT_APPS = [
         'django_filters',
@@ -126,13 +124,14 @@ class Base(Configuration):
         'wagtailmodelchooser',
         'wagtailfontawesomesvg',
         'wagtailcodeblock',
+        'public.extensions.images',
         'public.extensions.bibliography',
         'public.extensions.footnotes',
         'public.extensions.gradients',
         'public.extensions.banners',
         'public.extensions.records',
         'public.extensions.extras',
-        'public.extensions.images',
+        'public.extensions.team',
         'public',
     ]
 
