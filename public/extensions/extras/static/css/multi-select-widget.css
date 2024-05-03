@@ -1,25 +1,51 @@
-.select2-container input.select2-search__field {
+.select2-container ul.select2-choices,
+.select2-container a.select2-choice {
+    border: 1px solid var(--w-color-border-field-default);
+    border-radius: 5px;
+    background-image: none;
+    line-height: 20px;
+    box-shadow: none !important;
+    background-color: unset;
+}
+.select2-container ul.select2-choices:focus-within {
+    outline: 3px solid var(--w-color-focus) !important;
+}
+.select2-container.select2-dropdown-open:not(.select-multiple) a.select2-choice {
+    outline: 3px solid var(--w-color-focus) !important;
+}
+.select2-container ul.select2-choices {
+    min-height: 42px;
+    padding: 5px 5px !important;
+}
+.select2-container a.select2-choice {
+    height: 42px;
+}
+.select2-container a.select2-choice .select2-arrow {
+    border-left: 1px solid var(--w-color-border-field-default);
+    background-image: none;
+    background-color: unset;
+}
+.select2-container a.select2-choice .select2-arrow b {
+    background-position-y: 8px !important;
+}
+.select2-container.select-multiple li.select2-search-choice {
+    height: 21px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.select2-container.select-multiple .select2-search-field input {
     min-height: unset;
     line-height: 20px;
     margin-top: 0px !important;
     width: auto !important;
 }
-.select2-container input.select2-search__field:focus,
-.select2-container input.select2-search__field:focus-visible {
+.select2-container.select-multiple .select2-search-field input:focus,
+.select2-container.select-multiple .select2-search-field input:focus-visible {
     outline: 0 !important;
 }
-.select2-container .select2-selection--multiple {
-    height: 42px;
-    border: 1px solid var(--w-color-border-field-default);
+.select2-search input.select2-input:focus {
+    outline: 0 !important;
 }
-.select2-container ul.select2-selection__rendered {
-    min-height: 40px;
-    line-height: 20px;
-    padding: 10px 10px !important;
-}
-.select2-container--default.select2-container--focus .select2-selection--multiple {
-    outline: 3px solid var(--w-color-focus) !important;
-}
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-    margin-top: 0;
+.select2-drop ul.select2-results li.select2-result {
+    border-bottom: 1px dotted var(--w-color-border-field-default);
 }

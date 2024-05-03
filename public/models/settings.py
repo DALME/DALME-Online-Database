@@ -10,8 +10,8 @@ from wagtail.fields import StreamField
 from django.conf import settings as django_settings
 from django.db import models
 
-from public.extensions.extras.widgets import UserSelect
 from public.extensions.images.blocks import InlineImageBlock
+from public.extensions.team.widgets import UserSelect
 from public.models.base_page import HEADER_POSITION
 
 
@@ -191,7 +191,11 @@ class Settings(BaseGenericSetting):
                 FieldPanel(
                     'editors',
                     classname='col8',
-                    widget=UserSelect(multiselect=True, placeholder='Select editors...'),
+                    widget=UserSelect(
+                        placeholder='Select editors...',
+                        sortable=True,
+                        use_state='userSelectState',
+                    ),
                 ),
                 FieldPanel('doi_handle', classname='col4'),
             ],

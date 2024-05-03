@@ -1,0 +1,12 @@
+<input
+    type="hidden"
+    name="{{ widget.name }}"
+    {% if widget.value != None %}
+        value="{{ widget.value|stringformat:'s' }}"
+    {% endif %}
+    {% for name, value in widget.attrs.items %}
+        {% if value is not False %}
+            {{ name }}{% if value is not True %}="{{ value|stringformat:'s' }}"{% endif %}
+        {% endif %}
+    {% endfor %}
+>
