@@ -98,4 +98,4 @@ class TeamMember(models.Model):
     def avatar(self):
         if self.user:
             return self.user.wagtail_userprofile.avatar
-        return self.photo.file
+        return self.photo.file if self.photo else None
