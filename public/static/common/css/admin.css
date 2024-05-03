@@ -84,7 +84,7 @@ input[type=file]::file-selector-button {
   padding-inline-start: .875rem;
 }
 .button.chooser__choose-button {
-  height: 44px;
+  height: 42px;
   padding: 10px 15px;
   border-color: inherit;
 }
