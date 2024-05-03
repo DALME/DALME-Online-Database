@@ -1,5 +1,6 @@
 """Model wagtail settings data."""
 
+from sortedm2m.fields import SortedManyToManyField
 from wagtail import blocks
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
 from wagtail.contrib.settings.models import BaseGenericSetting, register_setting
@@ -157,7 +158,7 @@ class Settings(BaseGenericSetting):
         blank=True,
         help_text='Email address to use as destination for contact forms.',
     )
-    editors = models.ManyToManyField(django_settings.AUTH_USER_MODEL, help_text='List of editors (in desired order).')
+    editors = SortedManyToManyField(django_settings.AUTH_USER_MODEL, help_text='List of editors (in desired order).')
     publication_title = models.CharField(
         max_length=255,
         verbose_name='Title',
