@@ -1,12 +1,22 @@
 .select2-container ul.select2-choices,
 .select2-container a.select2-choice {
     border: 1px solid var(--w-color-border-field-default);
-    border-radius: 5px;
+    color: var(--w-color-text-context) !important;
+    background-color: var(--w-color-surface-field);
     background-image: none;
-    line-height: 20px;
     box-shadow: none !important;
-    background-color: unset;
+    font-size: 1.1875rem;
+    font-weight: 400;
+    border-radius: .3125rem;
+    max-width: 100%;
+    min-height: 2.625rem;
+    padding: 0 1.25rem;
+    padding-inline-end: 2.625rem;
 }
+.select2-container ul.select2-choices:hover,
+.select2-container a.select2-choice:hover {
+    border-color: var(--w-color-border-field-hover);
+  }
 .select2-container ul.select2-choices:focus-within {
     outline: 3px solid var(--w-color-focus) !important;
 }
@@ -14,24 +24,47 @@
     outline: 3px solid var(--w-color-focus) !important;
 }
 .select2-container ul.select2-choices {
+    line-height: 20px;
     min-height: 42px;
     padding: 5px 5px !important;
 }
 .select2-container a.select2-choice {
+    line-height: 2.2;
     height: 42px;
 }
 .select2-container a.select2-choice .select2-arrow {
-    border-left: 1px solid var(--w-color-border-field-default);
+    border-left: none;
     background-image: none;
     background-color: unset;
+    width: 42px;
 }
 .select2-container a.select2-choice .select2-arrow b {
-    background-position-y: 8px !important;
+    border: none;
+    left: unset;
+    margin: 0;
+    top: unset;
+    background-image: linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
+      linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-position-x: calc(100% - 1.5rem), calc(100% - 1.125rem);
+    background-position-y: 1.125rem, 1.125rem;
+    background-repeat: no-repeat !important;
+    background-size: .375rem .375rem, .375rem .375rem !important;
+}
+.select2-container.select2-dropdown-open a.select2-choice .select2-arrow b {
+    border: none;
+    background-image: linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
+        linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
+    background-position-x: calc(100% - 1.375rem), calc(100% - 1.125rem);
 }
 .select2-container.select-multiple li.select2-search-choice {
     height: 21px;
     margin-top: 5px;
     margin-bottom: 5px;
+    font-size: 14px;
 }
 .select2-container.select-multiple .select2-search-field input {
     min-height: unset;

@@ -26,7 +26,7 @@ class MultiSelectController extends window.StimulusModule.Controller {
       }
     }
 
-    if (selectMultiple && isSortable && !state.store.useAPI) {
+    if (selectMultiple && isSortable) {
       selOptions.multiple = true;
       selOptions.initSelection = (el, callback) => {
         const data = [];
@@ -38,7 +38,7 @@ class MultiSelectController extends window.StimulusModule.Controller {
       };
     }
 
-    if (state.store.useAPI) {
+    if (state && state.store.useAPI) {
       selOptions.initSelection = state["initialFormatter"];
     }
 
@@ -48,8 +48,8 @@ class MultiSelectController extends window.StimulusModule.Controller {
       if (isSortable) {
         selectEl.select2("container").find("ul.select2-choices").sortable({
           containment: "parent",
-          start: () => selectEl.select2("onSortStart"),
-          update: () => selectEl.select2("onSortEnd"),
+          start: selectEl.select2("onSortStart"),
+          update: selectEl.select2("onSortEnd"),
         });
       }
     }
