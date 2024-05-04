@@ -83,6 +83,7 @@ class Stage(BaseStage):
             'wagtailcore_workflowtask',
         ]
         no_bulk = ['wagtailcore_groupapprovaltask']
+        skip = ['wagtailcore_uploadedfile']
 
         # delete existing records
         with connection.cursor() as cursor:
@@ -97,41 +98,44 @@ class Stage(BaseStage):
                 for model in app_config.get_models():
                     model_name = model.__name__.lower()
                     qualified_name = f'{label}_{model_name}'
-                    self.logger.info('Copying "%s"', qualified_name)
-                    use_bulk = qualified_name not in no_bulk
-                    json_fields = self.get_fields_by_type(model, 'JSONField')
+                    if qualified_name not in skip:
+                        self.logger.info('Copying "%s"', qualified_name)
+                        use_bulk = qualified_name not in no_bulk
+                        json_fields = self.get_fields_by_type(model, 'JSONField')
 
-                    with connection.cursor() as cursor:
-                        cursor.execute(sql.SQL('SELECT * FROM "restore".{};').format(sql.Identifier(qualified_name)))
-                        rows = self.map_rows(cursor)
+                        with connection.cursor() as cursor:
+                            cursor.execute(
+                                sql.SQL('SELECT * FROM "restore".{};').format(sql.Identifier(qualified_name))
+                            )
+                            rows = self.map_rows(cursor)
 
-                    with schema_context('dalme'):
-                        target_model = apps.get_model(app_label=label, model_name=model_name)
-                        objs = []
-                        for row in rows:
-                            for field_name in ['content_type_id', 'base_content_type_id']:
-                                if row.get(field_name):
-                                    new_ct = self.map_content_type(row[field_name], id_only=True)
-                                    row[field_name] = new_ct
+                        with schema_context('dalme'):
+                            target_model = apps.get_model(app_label=label, model_name=model_name)
+                            objs = []
+                            for row in rows:
+                                for field_name in ['content_type_id', 'base_content_type_id']:
+                                    if row.get(field_name):
+                                        new_ct = self.map_content_type(row[field_name], id_only=True)
+                                        row[field_name] = new_ct
 
-                                    if model_name == 'revision' and field_name == 'content_type_id':
-                                        content = json.loads(row['content'])
-                                        content['content_type'] = new_ct
-                                        row['content'] = json.dumps(content)
+                                        if model_name == 'revision' and field_name == 'content_type_id':
+                                            content = json.loads(row['content'])
+                                            content['content_type'] = new_ct
+                                            row['content'] = json.dumps(content)
 
-                            if row.get('permission_id'):
-                                row['permission_id'] = self.map_permissions(row['permission_id'])
+                                if row.get('permission_id'):
+                                    row['permission_id'] = self.map_permissions(row['permission_id'])
 
-                            if json_fields:
-                                for field in json_fields:
-                                    row[field] = json.loads(row[field])
+                                if json_fields:
+                                    for field in json_fields:
+                                        row[field] = json.loads(row[field])
+                                if use_bulk:
+                                    objs.append(target_model(**row))
+                                else:
+                                    target_model.objects.create(**row)
+
                             if use_bulk:
-                                objs.append(target_model(**row))
-                            else:
-                                target_model.objects.create(**row)
-
-                        if use_bulk:
-                            target_model.objects.bulk_create(objs)
+                                target_model.objects.bulk_create(objs)
 
     @transaction.atomic
     def migrate_public_tables(self):  # noqa: C901, PLR0915
