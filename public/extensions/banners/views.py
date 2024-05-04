@@ -14,8 +14,7 @@ class BannersViewSet(ModelViewSet):
     menu_name = 'banners'
     menu_order = 900
     add_to_admin_menu = True
-    list_display = ['id', 'title', 'start_date', 'end_date', UpdatedAtColumn()]
-    columns = ['Id', 'Title', 'Start date', 'End Date', 'Updated']
+    list_display = ['title', 'start_date', 'end_date', UpdatedAtColumn()]
     list_filter = ['title', 'info']
     search_fields = ['title', 'info']
 
