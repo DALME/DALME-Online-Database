@@ -52,11 +52,11 @@ class ReferenceSource extends window.React.Component {
               containerCssClass: "select-reference",
               ajax: {
                 url: `${window.APIURL}/library/`,
-                datatype: "json",
-                delay: 500,
-                processResults: processAPIResults,
-                data: (params) => ({
-                  search: params.term,
+                dataType: "json",
+                quietMillis: 500,
+                results: processAPIResults,
+                data: (term, page) => ({
+                  search: term,
                   limit: 10,
                   content: "csljson",
                   format: "json"
