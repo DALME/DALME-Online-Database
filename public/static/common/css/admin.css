@@ -1,5 +1,5 @@
 :root.w-theme-light {
-  --w-color-admin-panel-header: #7edcfa6e;
+  --w-color-admin-panel-header: #007d7e12;
 }
 :root.w-theme-dark {
   --w-color-admin-panel-header: #264b417d;
@@ -7,7 +7,7 @@
 
 @media (prefers-color-scheme: light) {
   .w-theme-system {
-    --w-color-admin-panel-header: #7edcfa6e;
+    --w-color-admin-panel-header: #007d7e12;
   }
 }
 @media (prefers-color-scheme: dark) {
@@ -20,35 +20,17 @@
   font-family: "PT Serif", "Times New Roman", serif !important;
 }
 
-.modal-content {
-  width: unset !important;
-  padding-bottom: 0;
-}
-
-.modal-dialog {
-  margin-right: auto !important;
-  margin-left: auto !important;
-  width: fit-content !important;
-  max-width: 80%;
-}
-
 .base-modal-box {
   padding: 0 55px;
   display: flex;
   flex-direction: column;
 }
-
 .base-modal-buttons {
   display: flex;
   justify-content: flex-end;
 }
-
 .base-modal-buttons .button+.button {
   margin-inline-start: 5px;
-}
-
-.modal-content {
-  box-shadow: 0px 0px 15px 0px #00000069;
 }
 
 .flex-grow {
@@ -66,7 +48,6 @@ pre[class*=language-]:before {
 }
 
 /* Adjustments to admin CSS */
-
 input[type=file] {
   font-size: 14px;
   height: 42px;
@@ -79,6 +60,7 @@ input[type=file]::file-selector-button {
   margin-right: 10px;
 }
 
+/* Panel headers */
 .w-panel.title:first-child input {
   margin-inline-start: -.875rem;
   padding-inline-start: .875rem;
@@ -89,10 +71,20 @@ input[type=file]::file-selector-button {
   border-color: inherit;
 }
 .w-panel__header {
-  background-color: var(--w-color-admin-panel-header);
+  background: linear-gradient(5deg, var(--w-color-admin-panel-header) 0%, rgb(0 125 126 / 0%) 100%);
   margin-bottom: .8rem;
-  padding: 3px 0;
-  border-radius: 6px;
+  padding: 2px 0;
+  border-left: 5px solid var(--w-color-surface-button-default);
+  border-bottom: 1px dotted var(--w-color-surface-button-default);
+}
+.w-panel__anchor,
+.w-panel__controls .button.button--icon,
+.w-panel__toggle,
+.w-panel__heading--label {
+  color: var(--w-color-surface-button-default);
+}
+.w-panel__heading--label {
+  font-size: 14px;
 }
 .w-panel {
   margin-bottom: 1rem;
@@ -145,35 +137,90 @@ input[type=file]::file-selector-button {
 #id_gradient-chooser .chooser__title {
   display: none;
 }
-/* Temporary fixes for bugs */
-.modal-body .w-header > .row {
-  padding-top: .625rem !important;
-}
 
-.modal-content .close.button {
-  height: 2rem !important;
-  width: 2rem !important;
-  top: .38rem !important;
+/* Temporary fixes for bugs */
+/* modals */
+.modal-dialog .modal-content {
+  box-shadow: 0px 0px 15px 0px #00000069;
+  padding-bottom: 0;
+}
+.modal-dialog {
+  margin-right: auto !important;
+  margin-left: auto !important;
+  width: fit-content !important;
+  max-width: 80%;
+}
+.modal-dialog .w-header {
+  height: 50px;
+}
+.modal-dialog .w-header > div.row {
+  display: flex;
+  padding-top: .625rem !important;
+  height: 100%;
+  padding-inline-end: 55px !important;
+  padding-inline-start: 15px !important;
+}
+.modal-dialog .w-header h1.w-header__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-wrap: nowrap;
+}
+.modal-dialog .w-header .w-header__glyph.icon {
+  position: relative;
+  inset-inline-start: 0;
+  top: unset;
+}
+.modal-dialog .w-header form.search-form .w-field__wrapper {
+  display: inline;
+}
+.modal-dialog .w-header form.search-form .w-field__input {
+  margin-top: 0;
+}
+.modal-dialog .w-header form.search-form .w-field__input input {
+  font-size: 14px;
+  line-height: 1;
+  min-height: 2px;
+  padding: 5px 20px 5px 30px;
+  background-color: #ffffff4d;
+  color: white;
+  border-color: var(--w-color-icon-primary);
+}
+.modal-dialog .w-header form.search-form .w-field__input input::placeholder {
+  color: var(--w-color-text-label-menus-default);
+}
+.modal-dialog .w-header form.search-form .icon-search.w-field__icon {
+  top: 7px;
+  top: 7px;
+  inset-inline-start: 5px;
+  color: #ffffff8a;
+}
+.modal-dialog .modal-content .close.button {
+  height: 40px !important;
+  width: 40px !important;
+  top: 5px !important;
   align-items: center;
   background-color: initial;
   color: var(--w-color-text-button);
   display: inline-flex;
-  inset-inline-end: .75rem;
+  inset-inline-end: 5px;
   justify-content: center;
   padding: 0;
   position: absolute;
   z-index: 1;
 }
-
-.tippy-box {
-  white-space: nowrap !important;
-  max-width: unset !important;
+.modal-dialog .modal-content .close.button:hover {
+  background-color: var(--w-color-surface-menu-item-active);
+  color: var(--w-color-text-button);
+}
+.modal-dialog .modal-body nav.pagination {
+  margin-bottom: 2em;
 }
 
+/* tooltips */
 .Tooltip {
   display: flex;
 }
-
 .TooltipText {
   margin-right: 10px;
   width: max-content;
@@ -185,9 +232,12 @@ input[type=file]::file-selector-button {
   display: inline-block;
   height: 100%;
 }
-
 .Tooltip__button {
   overflow: visible;
+}
+.tippy-box {
+  white-space: nowrap !important;
+  max-width: unset !important;
 }
 
 .w-combobox,
@@ -200,9 +250,10 @@ input[type=file]::file-selector-button {
   margin-right: 0.5em;
 }
 
-table.listing tbody td {
+
+/* table.listing tbody td {
   vertical-align: middle;
-}
+} */
 
 /* OLDER DEFINITIONS */
 
