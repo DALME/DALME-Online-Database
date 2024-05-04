@@ -9,7 +9,7 @@ class SavedSearchSource extends window.React.Component {
 
   componentDidMount() {
       const { onClose, entity } = this.props;
-      const url = window.chooserUrls.savedSearchChooser;
+      const url = this.props.entityType?.chooserUrls["savedSearchChooser"];
       $(document.body).on("hidden.bs.modal", this.onClose);
       const urlParams = {}
       let entityId = null;

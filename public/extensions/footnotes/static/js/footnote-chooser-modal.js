@@ -8,7 +8,7 @@ class FootnoteSource extends window.React.Component {
 
     componentDidMount() {
         const { onClose, entity } = this.props;
-        const url = window.chooserUrls.footnoteEntry;
+        const url = this.props.entityType?.chooserUrls["footnoteEntry"];
         const urlParams = {};
 
         if (entity) {

@@ -3,23 +3,10 @@
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
 from wagtail import hooks
 
-from django.urls import reverse
-from django.utils.html import format_html
+from django.urls import reverse_lazy
 
 from .rich_text import FootnoteLinkHandler
 from .rich_text.contentstate import FootnoteElementHandler, footnote_decorator
-
-
-@hooks.register('insert_editor_js')
-def add_footnotes_js_to_editor():
-    return format_html(
-        """
-            <script type="text/javascript">
-                window.chooserUrls.footnoteEntry = '{}';
-            </script>
-        """,
-        reverse('footnote_chooser'),
-    )
 
 
 @hooks.register('register_rich_text_features')
@@ -32,6 +19,7 @@ def enable_footnotes(features):
         'type': type_,
         'icon': 'asterisk',
         'description': 'Footnote',
+        'chooserUrls': {'footnoteEntry': reverse_lazy('footnote_chooser')},
     }
 
     features.register_editor_plugin(

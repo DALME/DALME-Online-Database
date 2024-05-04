@@ -3,8 +3,7 @@
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
 from wagtail import hooks
 
-from django.urls import reverse
-from django.utils.html import format_html
+from django.urls import reverse_lazy
 
 from .rich_text import SavedSearchLinkHandler
 from .rich_text.contentstate import SavedSearchElementHandler, saved_search_decorator
@@ -12,18 +11,6 @@ from .views import CollectionChooserViewSet, RecordChooserViewSet
 
 hooks.register('register_admin_viewset', RecordChooserViewSet)
 hooks.register('register_admin_viewset', CollectionChooserViewSet)
-
-
-@hooks.register('insert_editor_js')
-def add_saved_search_js_to_editor():
-    return format_html(
-        """
-            <script type="text/javascript">
-                window.chooserUrls.savedSearchChooser = '{}';
-            </script>
-        """,
-        reverse('saved_search_chooser'),
-    )
 
 
 @hooks.register('register_rich_text_features')
@@ -36,6 +23,7 @@ def register_saved_search_feature(features):
         'type': type_,
         'icon': 'magnifying-glass-location',
         'description': 'Saved search',
+        'chooserUrls': {'savedSearchChooser': reverse_lazy('saved_search_chooser')},
     }
 
     features.register_editor_plugin(

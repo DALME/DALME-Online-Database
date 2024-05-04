@@ -7,8 +7,8 @@ class ReferenceSource extends window.React.Component {
 
   componentDidMount() {
       const { onClose, entity } = this.props;
-      const url = window.chooserUrls.referenceChooser;
-      const urlParams = {}
+      const url = this.props.entityType?.chooserUrls["referenceChooser"];
+      const urlParams = {};
       let entityId = null;
 
       if (entity) {
