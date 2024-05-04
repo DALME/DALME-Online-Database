@@ -96,8 +96,8 @@ input[type=file]::file-selector-button {
 
 /* Panel headers */
 .w-panel.title:first-child input {
-  margin-inline-start: -.875rem;
-  padding-inline-start: .875rem;
+  margin-inline-start: -0.875rem;
+  padding-inline-start: 0.875rem;
 }
 .button.chooser__choose-button {
   height: 42px;
@@ -105,16 +105,19 @@ input[type=file]::file-selector-button {
   border-color: inherit;
 }
 .w-panel__header {
-  background: linear-gradient(5deg, var(--w-color-admin-panel-header) 0%, rgb(0 125 126 / 0%) 100%);
+  background: linear-gradient(357deg, var(--w-color-admin-panel-header) 0%, rgb(0 125 126 / 0%) 100%);
   margin-bottom: .8rem;
   padding: 2px 0;
-  border-left: 5px solid var(--w-color-surface-button-default);
-  border-bottom: 1px dotted var(--w-color-surface-button-default);
+  border-image: linear-gradient(285deg, #007d7e75, #ffffff00) 10;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-right-width: 5px;
 }
 .w-panel__anchor,
 .w-panel__controls .button.button--icon,
 .w-panel__toggle,
-.w-panel__heading--label {
+.w-panel__heading--label,
+.w-panel__header .w-panel__heading {
   color: var(--w-color-surface-button-default);
 }
 .w-panel__heading--label {
@@ -136,6 +139,10 @@ input[type=file]::file-selector-button {
 .image-chooser .chooser__image {
   max-height: 95px;
   max-width: 125px;
+}
+
+.listing tbody tr:first-child {
+  border-top: none;
 }
 
 .field-row-panel .w-panel__wrapper {
@@ -251,6 +258,15 @@ input[type=file]::file-selector-button {
   margin-bottom: 2em;
 }
 
+/* listing choosers */
+.listing.chooser td.title {
+  min-height: 52px;
+}
+.listing.chooser .w-human-readable-date,
+.listing.chooser .w-status.w-status--primary {
+  text-wrap: nowrap;
+}
+
 /* tooltips */
 .Tooltip {
   display: flex;
@@ -274,15 +290,26 @@ input[type=file]::file-selector-button {
   max-width: unset !important;
 }
 
+/* date range fields */
+.w-drilldown__contents .daterange_field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.w-drilldown__contents .daterange_field input:last-of-type {
+  margin-top: 0;
+}
+
+/* other */
 .w-combobox,
 .w-combobox__optgroup {
   width: unset !important;
 }
 
-.listing .title .title-wrapper, .listing .title h2 {
+/* .listing .title .title-wrapper, .listing .title h2 {
   font-size: 0.8rem;
   margin-right: 0.5em;
-}
+} */
 
 
 /* table.listing tbody td {
