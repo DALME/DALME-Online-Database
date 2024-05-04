@@ -28,6 +28,6 @@
   height: 15px;
   min-width: 200px;
 }
-table.listing tbody td.title.gradient_as_html {
-  padding-inline-start: 0.5rem !important;
+td.gradient_as_html > div.title-wrapper > a {
+  width: 100%;
 }

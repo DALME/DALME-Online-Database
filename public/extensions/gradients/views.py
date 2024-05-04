@@ -118,8 +118,8 @@ class GradientViewSet(ModelViewSet):
     menu_name = 'gradients'
     menu_order = 900
     add_to_settings_menu = True
-    list_display = ['id', 'gradient_as_html', 'description', UpdatedAtColumn()]
-    columns = ['Id', 'Gradient', 'Description', 'Updated']
+    list_display = ['gradient_as_html', 'description', UpdatedAtColumn()]
+    columns = ['Gradient', 'Description', 'Updated']
     chooser_viewset_class = GradientChooserViewSet
     list_filter = ['description']
     search_fields = ['description']
