@@ -47,6 +47,40 @@ pre[class*=language-]:before {
   box-shadow: none !important;
 }
 
+/* General purpose adjustments to select2 */
+.select2-container ul.select2-choices,
+.select2-container a.select2-choice {
+    border: 1px solid var(--w-color-border-field-default);
+    color: var(--w-color-text-context) !important;
+    background-color: var(--w-color-surface-field);
+    background-image: none;
+    box-shadow: none !important;
+}
+.select2-drop {
+  background: var(--w-color-surface-field);
+  color: var(--w-color-text-context) !important;
+}
+.select2-drop-active {
+  border: 1px solid var(--w-color-border-field-default);
+}
+.select2-search input {
+  border: 1px solid var(--w-color-border-field-default);
+}
+.select2-container ul.select2-choices:focus-within {
+  outline: 3px solid var(--w-color-focus) !important;
+}
+.select2-container li.select2-search-choice {
+  color: var(--w-color-text-context) !important;
+}
+.select2-search input.select2-input:focus {
+  outline: 0 !important;
+}
+.select2-drop ul.select2-results li.select2-result {
+  border-bottom: 1px dotted var(--w-color-border-field-default);
+}
+.select2-drop ul.select2-results li.select2-no-results {
+  background: var(--w-color-surface-field);
+}
 /* Adjustments to admin CSS */
 input[type=file] {
   font-size: 14px;
