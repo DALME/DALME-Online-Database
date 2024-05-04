@@ -17,7 +17,7 @@ from .widgets import UserSelect
 class TeamRoleViewSet(ModelViewSet):
     model = TeamRole
     icon = 'user-tag'
-    menu_label = 'Team Roles'
+    menu_label = 'Roles'
     menu_name = 'team_roles'
     menu_order = 900
     list_display = ['id', 'role', 'description', 'parent', UpdatedAtColumn()]
@@ -49,7 +49,7 @@ class TeamMemberIndexView(IndexView):
 class TeamMemberViewSet(ModelViewSet):
     model = TeamMember
     icon = 'user'
-    menu_label = 'Team Members'
+    menu_label = 'Members'
     menu_name = 'team_members'
     menu_order = 900
     index_view_class = TeamMemberIndexView
