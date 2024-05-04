@@ -20,7 +20,7 @@ class TeamRoleViewSet(ModelViewSet):
     menu_label = 'Roles'
     menu_name = 'team_roles'
     menu_order = 900
-    list_display = ['id', 'role', 'description', 'parent', UpdatedAtColumn()]
+    list_display = ['role', 'description', 'parent', UpdatedAtColumn()]
     list_filter = ['role']
     search_fields = ['role']
 

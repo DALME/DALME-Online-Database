@@ -31,3 +31,18 @@
 input#id_photo {
     max-width: calc(100% - 110px);
 }
+.listing.team td {
+    min-height: 77px;
+}
+.listing.team .title-wrapper {
+    font-size: 0.9rem;
+}
+.w-username {
+    text-transform: lowercase;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 2px 8px;
+    color: var(--w-color-surface-button-default) !important;
+    border-color: var(--w-color-surface-button-default) !important;
+    background: var(--w-color-admin-panel-header) !important;
+}

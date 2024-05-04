@@ -3,7 +3,7 @@
 {% block before_results %}{% endblock %}
 {% if object_list %}
     {% block results %}
-        <table{% include "wagtailadmin/shared/attrs.html" with attrs=table.attrs %}>
+        <table class="team listing">
             {% with caption=table.get_caption %}
                 {% if caption %}
                     <caption class="w-sr-only">{{ caption }}</caption>
@@ -31,6 +31,12 @@
                                         <div class="avatar-bg" style="background: center / cover url({% get_media_prefix %}{{ cell.instance.avatar }});"></div>
                                     {% else %}
                                         {% icon name="user" classname="user-placeholder" title="no_photo" %}
+                                    {% endif %}
+                                </td>
+                            {% elif cell.column.name == 'user' %}
+                                <td class="username">
+                                    {% if cell.instance.user %}
+                                        <div class="w-status w-status--primary w-username">{{ cell.instance.user }}</div>
                                     {% endif %}
                                 </td>
                             {% else %}
