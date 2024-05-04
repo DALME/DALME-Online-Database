@@ -35,7 +35,9 @@ window.CustomUtils.userSelectState = {
 
       const togglePreview = () => {
         photoChooser.querySelector(".chooser__image").src = store.avatarUrl ? store.avatarUrl : "#";
-        photoChooser.classList.toggle("blank");
+        if (!photoChooser.classList.contains("blank") || store.avatarUrl) {
+          photoChooser.classList.toggle("blank");
+        }
       }
 
       const toggleForm = () => {
