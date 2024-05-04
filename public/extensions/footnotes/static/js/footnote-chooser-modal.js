@@ -47,10 +47,6 @@ class FootnoteSource extends window.React.Component {
 
         const onload = {
           enter_footnote: function(modal, jsonData) {
-              // execute script that sets up note rich_text field
-              // ModalWorkflow uses innerHTML to set the body, which doesn't eval the script
-              eval(document.getElementById("id_footnote-text").nextElementSibling.innerHTML);
-
               openDialogue();
 
               $("form", modal.body).on("submit", function() {
