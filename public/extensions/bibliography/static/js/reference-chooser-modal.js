@@ -1,6 +1,4 @@
-
 class ReferenceSource extends window.React.Component {
-
   constructor(props) {
       super(props);
       this.onChosen = this.onChosen.bind(this);
@@ -10,7 +8,6 @@ class ReferenceSource extends window.React.Component {
   componentDidMount() {
       const { onClose, entity } = this.props;
       const url = window.chooserUrls.referenceChooser;
-      $(document.body).on("hidden.bs.modal", this.onClose);
       const urlParams = {}
       let entityId = null;
 
@@ -22,13 +19,56 @@ class ReferenceSource extends window.React.Component {
         urlParams.mode = "edit";
       }
 
+      $(document.body).on("hidden.bs.modal", this.onClose);
+
+      const processAPIResults = (data) => {
+        return {results: data.map((entry) => {
+          const citation = new window.cite(entry);
+          return {
+            id: entry.id.split("/")[1],
+            text: citation.format("citation", { format: "text", template: "apa", lang: "en-US" }),
+            html: $(citation.format("bibliography", { format: "html", template: "apa", lang: "en-US" })),
+          };
+        })};
+      }
+
+      const getInitialValue = (el, callback) => {
+        fetch(`${window.APIURL}/library/${entityId}/?content=csljson&format=json`)
+        .then(response => response.json())
+        .then(data => {
+          const citation = new window.cite(data[0]);
+          const text = citation.format("citation", { format: "text", template: "apa", lang: "en-US" });
+          callback({id: entityId, text:text});
+        });
+      }
+
       const onload = {
         enter_reference: function(modal, jsonData) {
-            const selector = window.reference_dialogue("#id_reference-id", entityId);
+            const selectEl = $("#id_reference-id");
+            selectEl.select2({
+              placeholder: "Select reference or type to search...",
+              width: "100%",
+              dropdownParent: $(".modal"),
+              containerCssClass: "select-reference",
+              ajax: {
+                url: `${window.APIURL}/library/`,
+                datatype: "json",
+                delay: 500,
+                processResults: processAPIResults,
+                data: (params) => ({
+                  search: params.term,
+                  limit: 10,
+                  content: "csljson",
+                  format: "json"
+                }),
+              },
+              initSelection: getInitialValue,
+              formatResult: (entry) => entry.html,
+              formatSelection: (entry) => entry.text,
+            });
 
-            $("form", modal.body).on("submit", function() {
-                const sdata = selector.select2("data");
-                $("#id_reference-reference").val(sdata[0].text);
+            $("form", modal.body).on("submit", function(evt) {
+                $("#id_reference-reference").val(selectEl.select2("data").text);
                 modal.postForm(this.action, $(this).serialize());
                 return false;
             });
