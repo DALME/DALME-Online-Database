@@ -12,7 +12,7 @@ from django.db.models.functions import Lower
 
 
 class TeamRole(models.Model):
-    role = models.CharField(max_length=255, help_text='Name of the role.')
+    role = models.CharField(max_length=255, unique=True, help_text='Name of the role.')
     description = models.TextField(help_text='Description of the role.')
     parent = models.ForeignKey(
         'self',
