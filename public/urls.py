@@ -14,6 +14,7 @@ from public.extensions.bibliography.urls import urlpatterns as biblio_urls
 from public.extensions.footnotes.urls import urlpatterns as footnote_urls
 from public.extensions.records.urls import api_router
 from public.extensions.records.urls import urlpatterns as record_urls
+from public.extensions.team.api import TeamAPIViewSet
 
 admin.site.unregister(Group)
 
@@ -28,13 +29,14 @@ def to_ida_logout(_request):
     return redirect(settings.LOGOUT_URL)
 
 
+api_router.register_endpoint('team', TeamAPIViewSet)
+
 cmsurls = [
     *biblio_urls,
     *footnote_urls,
     *record_urls,
     path('', include(wagtailadmin_urls)),
 ]
-
 
 urlpatterns = [
     path('api/public/', api_router.urls, name='public_api_endpoints'),
