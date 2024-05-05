@@ -12,6 +12,7 @@ from .features_page import Features
 from .flat_page import Flat
 from .footer_links import FooterLink
 from .home_page import Home
+from .people_list_page import PeopleList
 from .search_enabled_page import SearchEnabled
 from .section_page import Section
 from .settings import Settings
@@ -31,6 +32,7 @@ __all__ = [
     'FooterLink',
     'Flat',
     'Home',
+    'PeopleList',
     'SearchEnabled',
     'Section',
     'Settings',

@@ -19,10 +19,10 @@ class Flat(BasePage, CitableMixin):
     )
 
     parent_page_types = [
-        'public.Section',
         'public.Collection',
-        'public.Flat',
         'public.Collections',
+        'public.Flat',
+        'public.Section',
     ]
     subpage_types = ['public.Flat']
     page_description = 'A generic page for all kinds of content. Can be cited and show a contact form.'

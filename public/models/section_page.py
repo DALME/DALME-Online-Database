@@ -9,8 +9,9 @@ from public.models.base_page import BasePage
 class Section(BasePage, GradientMixin):
     parent_page_types = ['public.Home']
     subpage_types = [
-        'public.Flat',
         'public.Bibliography',
+        'public.Flat',
+        'public.PeopleList',
     ]
     page_description = 'Defines a menu section. Can have a gradient (used by child pages), but no other content.'
 
