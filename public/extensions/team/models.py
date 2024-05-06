@@ -99,3 +99,9 @@ class TeamMember(models.Model):
         if self.user:
             return self.user.wagtail_userprofile.avatar
         return self.photo.file if self.photo else None
+
+    @property
+    def avatar_url(self):
+        if self.avatar:
+            return f'{settings.MEDIA_URL}/{self.avatar}'
+        return None
