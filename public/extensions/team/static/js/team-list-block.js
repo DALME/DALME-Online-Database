@@ -2,17 +2,22 @@ class TeamListBlockDefinition extends window.wagtailStreamField.blocks.StructBlo
     render(placeholder, prefix, initialState, initialError) {
         const block = super.render(placeholder, prefix, initialState, initialError);
         const modeSelect = document.getElementById(`${prefix}-mode`);
+        const roleSelect = document.getElementById(`${prefix}-role`);
+        const membersSelect = document.getElementById(`${prefix}-members`);
+
         const fields = {
-          role: document.querySelector("[data-contentpath=role]"),
-          members: document.querySelector("[data-contentpath=members]"),
+          role: document.getElementById(`w-field-${prefix}-role`),
+          members: document.getElementById(`w-field-${prefix}-members`),
         }
+
+        window.test = membersSelect;
 
         const listByRole = document.createElement("div");
         listByRole.classList.add("list-by-role");
-        document.querySelector("[data-contentpath=role] .w-field__input").appendChild(listByRole);
+        fields["role"].querySelector(".w-field__input").appendChild(listByRole);
 
         const onRoleChange = () => {
-          const role = fields["role"].querySelector("select").value;
+          const role = roleSelect.value;
           if (role) {
             fetch(`/api/public/team/?roles=${role}`)
             .then(response => response.json())
