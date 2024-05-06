@@ -5,23 +5,24 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from wagtail.api.v2.views import BaseAPIViewSet
 
+from django.contrib import auth
 from django.urls import path
 
-from .filters import TeamMemberFilter
+from .filters import TeamMemberFilter, UserFilter
 from .models import TeamMember
-from .serializers import TeamMemberSerializer
+from .serializers import TeamMemberSerializer, UserSerializer
 
 
 class TeamAPIViewSet(BaseAPIViewSet):
     base_serializer_class = TeamMemberSerializer
     name = 'team'
     model = TeamMember
-    queryset = TeamMember.objects.all()
     lookup_url_kwarg = 'pk'
     permission_classes = [IsAuthenticated]
     renderer_classes = [CamelCaseJSONRenderer]
     meta_fields = []
     filterset_class = TeamMemberFilter
+    order_field = 'name'
 
     def get_serializer_class(self):
         return self.base_serializer_class
@@ -47,6 +48,14 @@ class TeamAPIViewSet(BaseAPIViewSet):
     def get_queryset(self):
         self.filterset = self.filterset_class(
             self.request.GET,
-            queryset=self.queryset.order_by('name'),
+            queryset=self.model.objects.all().order_by(self.order_field),
         )
         return self.filterset.qs.distinct()
+
+
+class UserAPIViewSet(TeamAPIViewSet):
+    base_serializer_class = UserSerializer
+    name = 'user'
+    model = auth.get_user_model()
+    filterset_class = UserFilter
+    order_field = 'first_name'

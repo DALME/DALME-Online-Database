@@ -14,7 +14,7 @@ from public.extensions.bibliography.urls import urlpatterns as biblio_urls
 from public.extensions.footnotes.urls import urlpatterns as footnote_urls
 from public.extensions.records.urls import api_router
 from public.extensions.records.urls import urlpatterns as record_urls
-from public.extensions.team.api import TeamAPIViewSet
+from public.extensions.team.api import TeamAPIViewSet, UserAPIViewSet
 
 admin.site.unregister(Group)
 
@@ -30,6 +30,7 @@ def to_ida_logout(_request):
 
 
 api_router.register_endpoint('team', TeamAPIViewSet)
+api_router.register_endpoint('user', UserAPIViewSet)
 
 cmsurls = [
     *biblio_urls,
