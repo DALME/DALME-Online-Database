@@ -1,30 +1,52 @@
 window.CustomUtils.userSelectState = {
   store: {
+    baseApiUrl: "/api/public/user/",
     placeholder: "",
     handleFormFields: false,
-    formatOptions: true,
-    useAPI: false,
     avatarUrl: "",
-    selectedUserData: {},
-    dataMatcher: {},
-    optionsList: [],
     iconPlaceholder: '<svg class="icon icon-user user-placeholder" aria-hidden="true"><use href="#icon-user"></use></svg>',
     getAvatarHTML: (url) => `<div class="avatar-bg" style="background: center/cover url(${url});"></div>`,
+    getFormattedItem: (item) => {
+      const store = window.CustomUtils.userSelectState.store;
+      const avatar = item.avatar ? store.getAvatarHTML(item.avatar) : store.iconPlaceholder;
+      return `<div class="user-option">${avatar}<div class="user-label">${item.name} <span>${item.username}</span></div></div>`;
+    },
+    getIdList: (val) => JSON.parse(val.replaceAll(`'`, `"`)),
+    fetchResults: (url, callback) => {
+      const results = [];
+      const store = window.CustomUtils.userSelectState.store;
+      fetch(url)
+      .then(response => response.json())
+      .then(data => {
+          data.forEach((item) => {
+            results.push({
+              id: item.id,
+              text: store.getFormattedItem(item),
+              item: item,
+            });
+          });
+          callback(results);
+      });
+    },
   },
-  resultFormatter: (item) => {
+  queryAPI: (options) => {
     const store = window.CustomUtils.userSelectState.store;
-    if (item.text == store.placeholder) {
-      return `<div class="user-option"><div class="text-placeholder">${store.placeholder}</div></div>`;
-    } else {
-      return item.text;
-    }
+    const url = options.term ? `${store.baseApiUrl}?name=${options.term}` : store.baseApiUrl;
+    store.fetchResults(url, (results) => {
+      options.callback({
+        results: results,
+        more: false,
+        context: null,
+      });
+    });
   },
-  selectionFormatter: this.resultFormatter,
-  initialFormatter: (id) => {
+  initialFormatter: (el, callback) => {
     const store = window.CustomUtils.userSelectState.store;
-    const item = store.dataMatcher[id];
-    const avatar = item.avatar ? store.getAvatarHTML(item.avatar) : store.iconPlaceholder;
-    return `<div class="user-option">${avatar}<div class="user-label">${item.name} <span>${item.username}</span></div></div>`;
+    const id_list = store.getIdList(el.val());
+    store.fetchResults(`${store.baseApiUrl}?id__in=${id_list}`, (results) => {
+      el.val('');
+      callback(results);
+    });
   },
   connectCallback: (selectEl) => {
     const store = window.CustomUtils.userSelectState.store;
@@ -41,9 +63,10 @@ window.CustomUtils.userSelectState = {
       }
 
       const toggleForm = () => {
-        if (store.selectedUserData) {
-          nameField.value = store.selectedUserData.name;
-          store.avatarUrl = store.selectedUserData.avatar ? store.selectedUserData.avatar : "";
+        const value = selectEl.select2("data");
+        if (value) {
+          nameField.value = value.item.name;
+          store.avatarUrl = value.item.avatar ? value.item.avatar : "";
         } else {
           nameField.value = "";
           store.avatarUrl = "";
@@ -51,11 +74,7 @@ window.CustomUtils.userSelectState = {
         togglePreview();
       }
 
-      selectEl.on("change", () => {
-        const selID = selectEl.val();
-        store.selectedUserData = selID ? store.dataMatcher[selID] : "";
-        toggleForm();
-      });
+      selectEl.on("change", toggleForm);
     }
   },
   disconnectCallback: (selectEl) => {

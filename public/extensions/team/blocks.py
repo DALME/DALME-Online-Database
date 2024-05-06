@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 
 from .models import TeamMember, TeamRole
+from .widgets import TeamMemberSelect
 
 MODE_CHOICES = [
     ('members', 'Manual list'),
@@ -30,7 +31,7 @@ def get_role_choices():
 
 
 def get_member_choices():
-    return TeamMember.objects.values_list('user_id', 'name')
+    return TeamMember.objects.values_list('id', 'name')
 
 
 class PersonBlock(blocks.StructBlock):
@@ -68,7 +69,10 @@ class TeamListBlock(blocks.StructBlock):
         label='Members',
         choices=get_member_choices,
         required=False,
-        # widget=None,
+        widget=TeamMemberSelect(
+            placeholder='Select members...',
+            api_state='userSelectState',
+        ),
         help_text='Manually select team members to include in the list.',
     )
     role = blocks.ChoiceBlock(

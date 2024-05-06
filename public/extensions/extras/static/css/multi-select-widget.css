@@ -90,3 +90,14 @@
 .select2-drop ul.select2-results li.select2-result {
     border-bottom: 1px dotted var(--w-color-border-field-default);
 }
+.select2-dropdown-open.select2-drop-above .select2-choice,
+.select2-dropdown-open.select2-drop-above .select2-choices {
+    background-image: none;
+    border: 1px solid var(--w-color-border-field-default);
+    background-color: var(--w-color-surface-field);
+    border-top-color: transparent;
+}
+.select2-dropdown-open.select2-drop-above .select2-choice:focus-within,
+.select2-dropdown-open.select2-drop-above .select2-choices:focus-within {
+    outline: 3px solid var(--w-color-focus) !important;
+}

@@ -194,7 +194,7 @@ class Settings(BaseGenericSetting):
                     widget=UserSelect(
                         placeholder='Select editors...',
                         sortable=True,
-                        use_state='userSelectState',
+                        api_state='userSelectState',
                     ),
                 ),
                 FieldPanel('doi_handle', classname='col4'),

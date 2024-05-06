@@ -15,16 +15,17 @@ class MultiSelect(Select):
         container_classes=None,
         multiselect=True,
         sortable=False,
-        use_state=False,
+        api_state=None,
     ):
         super().__init__(attrs, choices)
         self.placeholder = placeholder
         self.container_classes = container_classes if container_classes else []
         self.allow_multiple_selected = multiselect
         self.is_sortable = sortable
-        self.use_state = use_state
+        self.use_api = api_state is not None
+        self.state_name = api_state
         self.option_list = []
-        if sortable:
+        if sortable or api_state:
             self.input_type = 'hidden'
             self.template_name = 'multi_select_input.html'
 
@@ -41,12 +42,9 @@ class MultiSelect(Select):
             option_attrs['id'] = self.id_for_label(option_attrs['id'], index)
 
         label = self.format_label(value, label)
-        self.option_list.append(
-            {
-                'id': value if isinstance(value, str) else value.instance.id,
-                'text': label,
-            }
-        )
+
+        if not self.use_api:
+            self.option_list.append({'id': value if isinstance(value, str) else value.instance.id, 'text': label})
 
         return {
             'name': name,
@@ -67,22 +65,19 @@ class MultiSelect(Select):
     def build_attrs(self, *args, **kwargs):
         attrs = super().build_attrs(*args, **kwargs)
         attrs['data-controller'] = 'multiselect'
-        if self.placeholder:
-            attrs['data-placeholder'] = self.placeholder
+        attrs['data-placeholder'] = self.placeholder
+        attrs['data-use-api'] = self.use_api
+        attrs['data-state-name'] = self.state_name if self.state_name else False
+        attrs['data-options'] = json.dumps(self.get_option_data()) if not self.use_api else False
 
         if self.allow_multiple_selected:
             self.container_classes.append('select-multiple')
             attrs['data-multiple'] = True
-            if not self.is_sortable:
-                attrs['multiple'] = True
-            else:
-                attrs['data-sortable'] = True
-
-        if self.use_state:
-            attrs['data-options'] = json.dumps(self.get_option_data())
-            attrs['data-use-state'] = self.use_state
+            attrs['multiple'] = bool(not self.is_sortable and not self.use_api)
+            attrs['data-sortable'] = self.is_sortable
 
         attrs['data-container-classes'] = ' '.join(self.container_classes)
+
         return attrs
 
     @cached_property

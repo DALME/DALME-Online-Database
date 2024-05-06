@@ -3,7 +3,8 @@ class MultiSelectController extends window.StimulusModule.Controller {
     const selectEl = $(this.element);
     const selectMultiple = typeof selectEl.data("multiple") !== "undefined";
     const isSortable = typeof selectEl.data("sortable") !== "undefined";
-    const state = selectEl.data("use-state") ? window.CustomUtils[selectEl.data("use-state")] : false;
+    const useAPI = typeof selectEl.data("use-api") !== "undefined";
+    const state = useAPI ? window.CustomUtils[selectEl.data("state-name")] : false;
 
     const selOptions = {
       width: "100%",
@@ -12,46 +13,28 @@ class MultiSelectController extends window.StimulusModule.Controller {
       containerCssClass: selectEl.data("container-classes"),
     }
 
-    if (state) {
-      state.store.placeholder = selectEl.data("placeholder");
-      if (!state.store.useAPI) {
-        state.store.dataMatcher = selectEl.data("options").data;
-        state.store.optionsList = selectEl.data("options").options;
-      }
-      if (state.store.formatOptions) {
-        selOptions.formatResult = state["resultFormatter"];
-        selOptions.formatSelection = state["selectionFormatter"];
-        selOptions.escapeMarkup = (option) => option;
-        if (isSortable && !state.store.useAPI) selOptions.data = state.store.optionsList;
-      }
-    }
-
-    if (selectMultiple && isSortable) {
+    if (selectMultiple && selectEl.prop("tagName") != "SELECT") {
       selOptions.multiple = true;
-      selOptions.initSelection = (el, callback) => {
-        const data = [];
-        JSON.parse(el.val().replaceAll(`'`, `"`)).forEach((id) => {
-            data.push({id: id, text: state["initialFormatter"](id)});
-        });
-        selectEl.val('');
-        callback(data);
-      };
     }
 
-    if (state && state.store.useAPI) {
+    if (useAPI) {
+      state.store.placeholder = selectEl.data("placeholder");
+      selOptions.query = state["queryAPI"];
+      selOptions.escapeMarkup = (option) => option;
+    }
+
+    if (isSortable || useAPI) {
       selOptions.initSelection = state["initialFormatter"];
     }
 
     selectEl.select2(selOptions);
 
-    if (selectMultiple) {
-      if (isSortable) {
-        selectEl.select2("container").find("ul.select2-choices").sortable({
-          containment: "parent",
-          start: selectEl.select2("onSortStart"),
-          update: selectEl.select2("onSortEnd"),
-        });
-      }
+    if (isSortable) {
+      selectEl.select2("container").find("ul.select2-choices").sortable({
+        containment: "parent",
+        start: selectEl.select2("onSortStart"),
+        update: selectEl.select2("onSortEnd"),
+      });
     }
 
     if (state && state.connectCallback) state.connectCallback(selectEl);

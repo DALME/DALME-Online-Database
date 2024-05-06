@@ -68,7 +68,7 @@ class TeamMemberViewSet(ModelViewSet):
                         placeholder='Select user...',
                         handle_form_fields=True,
                         multiselect=False,
-                        use_state='userSelectState',
+                        api_state='userSelectState',
                     ),
                 ),
                 FieldPanel('name', classname='col8'),
