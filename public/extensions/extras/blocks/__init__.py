@@ -10,10 +10,7 @@ from .external_resource import ExternalResourceBlock
 from .subsection import SubsectionBlock
 from .text_expandable import TextExpandableBlock
 
-DEFAULT_BLOCKS = [
-    *BASE_BLOCKS,
-    ('subsection', SubsectionBlock()),
-].sort(key=lambda x: x[0])
+DEFAULT_BLOCKS = sorted([*BASE_BLOCKS, ('subsection', SubsectionBlock())], key=lambda x: x[0])
 
 __all__ = [
     'CarouselBlock',
