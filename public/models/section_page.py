@@ -11,7 +11,7 @@ class Section(BasePage, GradientMixin):
     subpage_types = [
         'public.Bibliography',
         'public.Flat',
-        'public.PeopleList',
+        'public.People',
     ]
     page_description = 'Defines a menu section. Can have a gradient (used by child pages), but no other content.'
 
