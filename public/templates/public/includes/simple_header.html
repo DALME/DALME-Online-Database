@@ -8,8 +8,11 @@
   {% elif explore %}
     <h1>Explore</h1>
     <h2>{{ settings.public.Settings.explore_tagline }}</h2>
+  {% elif person %}
+    <h1>{{ title }}</h1>
+    <h2>{{ page.get_parent.title }}</h2>
   {% else %}
-  {% if page.preview %}
+    {% if page.preview %}
       <h1>{{ page.title }} [preview]</h1>
     {% else %}
       <h1>{{ page.title }}</h1>
