@@ -10,7 +10,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.urls import include, re_path  # , reverse
+from django.urls import include, re_path
 
 from api import urls as api_urls
 from ida import auth
@@ -35,30 +35,8 @@ urlpatterns = [
     *public_urls,
     re_path(r'^api/', include(api_urls)),
     re_path(r'^purl/', include(purl_urls)),
-    # path('choose-reroute/', reroute_chooser, name='wagtailadmin_chooser_page_reroute'),
-    # path('choose-reroute/<slug:route>/', reroute_chooser, name='wagtailadmin_chooser_page_reroute_child'),
     re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve'),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
-
-
-# def reroute_chooser(request, route=None):
-#     """View for rerouting chooser modals."""
-#     params = urllib.parse.urlencode(request.GET)
-
-#     if route:
-#         if str(route).isdigit():
-#             rev = reverse('wagtailadmin_choose_page_child', args=[route])
-#         elif route == 'saved_search':
-#             rev = reverse('wagtailadmin_choose_saved_search')
-#         # elif route == 'reference':
-#         #     rev = reverse('wagtailadmin_choose_reference')
-#     else:
-#         rev = reverse('wagtailadmin_choose_page')
-
-#     if params:
-#         rev = f'{rev}?{params}'
-
-#     return HttpResponseRedirect(rev)
