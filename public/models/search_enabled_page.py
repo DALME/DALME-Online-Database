@@ -4,7 +4,7 @@ import contextlib
 import json
 from datetime import datetime, timedelta
 
-from wagtail.contrib.routable_page.models import RoutablePageMixin, route
+from wagtail.contrib.routable_page.models import RoutablePageMixin, path
 
 from django.conf import settings
 from django.http import Http404
@@ -19,10 +19,6 @@ from public.extensions.records.serializers import RecordSerializer
 from public.models.base_page import BasePage
 from public.models.settings import Settings
 
-# https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
-UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-FOLIO_RE = '[0-9a-z:]+'
-
 
 class SearchEnabled(RoutablePageMixin, BasePage):
     metadata_panels = BasePage.metadata_panels
@@ -30,8 +26,8 @@ class SearchEnabled(RoutablePageMixin, BasePage):
     class Meta:
         abstract = True
 
-    @route(r'^search/$', name='search')
-    @route(rf'^search/({UUID_RE})/$', name='saved_search')
+    @path('search/', name='search')
+    @path('search/<uuid:pk>/', name='saved_search')
     def search(self, request, pk=None):
         context = self.get_context(request)
         search_context = SearchContext(public=True)
@@ -109,7 +105,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
             context,
         )
 
-    @route(r'^records/$', name='records')
+    @path('records/', name='records')
     def records(self, request, scoped=True):  # noqa: ARG002
         context = self.get_context(request)
 
@@ -131,8 +127,8 @@ class SearchEnabled(RoutablePageMixin, BasePage):
             context,
         )
 
-    @route(rf'^records/({UUID_RE})/$', name='record')
-    @route(rf'^records/({UUID_RE})/({FOLIO_RE})/$', name='record_folio')
+    @path('records/<uuid:pk>/', name='record')
+    @path('records/<uuid:pk>/<str:folio>/', name='record_folio')
     def record(self, request, pk, folio=None, scoped=True):  # noqa: ARG002
         qs = Record.objects.filter(pk=pk)
         if not qs.exists():

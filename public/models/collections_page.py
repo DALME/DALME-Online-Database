@@ -1,7 +1,7 @@
 """Model collections page data."""
 
 from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
-from wagtail.contrib.routable_page.models import route
+from wagtail.contrib.routable_page.models import path
 
 from django.template.response import TemplateResponse
 
@@ -36,7 +36,7 @@ class Collections(SearchEnabled, CitableMixin, GradientMixin):
         context['corpora'] = [(corpus, corpus.collections.all()) for corpus in self.corpora.all()]
         return context
 
-    @route(r'^explore/$', name='explore')
+    @path('explore/', name='explore')
     def explore(self, request):
         context = self.get_context(request)
 
