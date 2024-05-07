@@ -388,7 +388,7 @@ class SearchContext:
         filter_options = {}
 
         if self.public:
-            filter_options.update({'published': True})
+            filter_options.update({'is_published': True})
 
         return [
             {'value': i, 'text': i}
@@ -399,14 +399,14 @@ class SearchContext:
         """Return languages as options."""
         filter_options = {'attribute_type': 15}
         if self.public:
-            filter_options.update({'records__workflow__is_public': True})
+            filter_options.update({'record__workflow__is_public': True})
 
         return [
             {'value': i, 'text': i}
             for i in Attribute.objects.filter(**filter_options)
             .distinct()
-            .order_by('value__name')
-            .values_list('value__name', flat=True)
+            .order_by('attributevaluefkey__language__name')
+            .values_list('attributevaluefkey__language__name', flat=True)
         ]
 
     def record_type(self):
@@ -414,12 +414,12 @@ class SearchContext:
         filter_options = {'attribute_type': 28}
 
         if self.public:
-            filter_options.update({'records__workflow__is_public': True})
+            filter_options.update({'record__workflow__is_public': True})
 
         return [
             {'value': i, 'text': i}
             for i in Attribute.objects.filter(**filter_options)
-            .order_by('value')
-            .values_list('value', flat=True)
+            .order_by('attributevaluestr__value')
+            .values_list('attributevaluestr__value', flat=True)
             .distinct()
         ]
