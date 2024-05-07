@@ -26,6 +26,16 @@ class Agent(IDAUuid):
     instances = GenericRelation('ida.EntityPhrase')
     comments = GenericRelation('ida.Comment')
     tags = GenericRelation('ida.Tag')
+    relationships_as_source = GenericRelation(
+        'ida.Relationship',
+        content_type_field='source_content_type',
+        object_id_field='source_object_id',
+    )
+    relationships_as_target = GenericRelation(
+        'ida.Relationship',
+        content_type_field='target_content_type',
+        object_id_field='target_object_id',
+    )
 
 
 class Organization(Agent):
