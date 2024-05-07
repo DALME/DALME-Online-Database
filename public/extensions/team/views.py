@@ -57,6 +57,7 @@ class TeamMemberViewSet(ModelViewSet):
     list_filter = ['name', 'title', 'affiliation']
     search_fields = ['name', 'title', 'affiliation', 'biography']
     index_results_template_name = 'team_list/index_results.html'
+    ordering = ['name']
 
     general_panels = [
         FieldRowPanel(
