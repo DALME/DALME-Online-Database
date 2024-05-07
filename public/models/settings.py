@@ -158,6 +158,11 @@ class Settings(BaseGenericSetting):
         blank=True,
         help_text='Email address to use as destination for contact forms.',
     )
+    team_profiles_url = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Base URL for team member profiles, e.g. "/about/people/".',
+    )
     editors = SortedManyToManyField(django_settings.AUTH_USER_MODEL, help_text='List of editors (in desired order).')
     publication_title = models.CharField(
         max_length=255,
@@ -178,12 +183,15 @@ class Settings(BaseGenericSetting):
     class Meta:
         verbose_name = 'Site preferences'
 
+    preference_tab_panels = [
+        FieldPanel('team_profiles_url'),
+        FieldPanel('contact_email'),
+    ]
     branding_tab_panels = [
         FieldPanel('name'),
         FieldPanel('tagline'),
         FieldPanel('logo'),
         FieldPanel('copyright_line'),
-        FieldPanel('contact_email'),
     ]
     citation_tab_panels = [
         FieldRowPanel(
@@ -250,6 +258,7 @@ class Settings(BaseGenericSetting):
 
     edit_handler = TabbedInterface(
         [
+            ObjectList(preference_tab_panels, heading='Preferences'),
             ObjectList(branding_tab_panels, heading='Branding'),
             ObjectList(citation_tab_panels, heading='Citation'),
             ObjectList(search_tab_panel, heading='Search Page'),
