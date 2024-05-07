@@ -12,7 +12,7 @@ window.CustomUtils.userSelectState = {
     getFormattedItem: (item) => {
       const store = window.CustomUtils.userSelectState.store;
       const avatar = item.avatar ? store.getAvatarHTML(item.avatar) : store.iconPlaceholder;
-      return `<div class="user-option">${avatar}<div class="user-label">${item.name} <span>${item.username}</span></div></div>`;
+      return `<div class="user-option">${avatar}<div class="user-label"><span>${item.name}</span> <span class="user-username">${item.username}</span></div></div>`;
     },
     getIdList: (val) => JSON.parse(val.replaceAll(`'`, `"`)),
     fetchResults: (url, callback) => {
@@ -33,8 +33,9 @@ window.CustomUtils.userSelectState = {
     },
     togglePreview: () => {
       const store = window.CustomUtils.userSelectState.store;
-      store.photoChooser.querySelector(".chooser__image").src = store.avatarUrl ? store.avatarUrl : "#";
-      if (!store.photoChooser.classList.contains("blank") || store.avatarUrl) {
+      const value = store.selectEl.select2("data");
+      store.photoChooser.querySelector(".chooser__image").src = value.item.avatar ? value.item.avatar : "#";
+      if (!store.photoChooser.classList.contains("blank") || value.item.avatar) {
         store.photoChooser.classList.toggle("blank");
       }
     },
@@ -42,11 +43,9 @@ window.CustomUtils.userSelectState = {
       const store = window.CustomUtils.userSelectState.store;
       const value = store.selectEl.select2("data");
       if (value) {
-        if (!store.nameField.value) store.nameField.value = value.item.name;
-        store.avatarUrl = value.item.avatar ? value.item.avatar : "";
+        store.nameField.value = value.item.name;
       } else {
         store.nameField.value = "";
-        store.avatarUrl = "";
       }
       store.togglePreview();
     },
@@ -68,7 +67,7 @@ window.CustomUtils.userSelectState = {
     el.val(id_list);
     store.fetchResults(`${store.baseApiUrl}?id__in=${id_list}`, (results) => {
       callback(el.multiple ? results : results[0]);
-      store.toggleForm();
+      store.togglePreview();
     });
   },
   connectCallback: (selectEl) => {

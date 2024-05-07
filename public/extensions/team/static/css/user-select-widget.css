@@ -18,13 +18,18 @@
 .user-option .user-label {
     display: flex;
     flex-direction: column;
+}
+.user-option .user-label span {
     font-size: 14px;
     font-weight: 500;
     line-height: 1;
 }
-.user-option .user-label span {
+.user-option .user-label span.user-username {
     font-size: 12px;
     font-weight: 300;
+}
+.user-option .user-label span.select2-match {
+    font-weight: 800;
 }
 a.select2-choice .select2-chosen .user-option svg {
     margin-left: 0;
