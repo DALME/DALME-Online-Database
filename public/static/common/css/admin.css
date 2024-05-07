@@ -97,6 +97,30 @@ input[type=file]::file-selector-button {
   margin-right: 10px;
 }
 
+.w-field__errors {
+  display: flex;
+  align-items: baseline;
+  position: absolute;
+  width: 100%;
+}
+.w-field__errors .error-message {
+  font-size: 12px;
+  line-height: 1.2;
+  background-color: var(--w-color-critical-50);
+  border-radius: 6px;
+  min-height: 24px;
+  max-height: 42px;
+  width: 100%;
+  padding: 3px 10px 3px 30px;
+  overflow: hidden;
+}
+.w-field__errors-icon {
+  margin-inline-end: 8px;
+  top: 7px;
+  left: 9px;
+  position: absolute;
+}
+
 /* help panels */
 div.struct-block > span > div.help {
   margin: 15px 0;
