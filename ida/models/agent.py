@@ -1,4 +1,4 @@
-"""Model agent data."""
+"""Agent-related models."""
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation

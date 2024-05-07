@@ -1,4 +1,4 @@
-"""Model token data."""
+"""Token model."""
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models

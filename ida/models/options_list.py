@@ -1,4 +1,4 @@
-"""Model option list data."""
+"""Options-related models."""
 
 from django.db import models
 from django.db.models import options

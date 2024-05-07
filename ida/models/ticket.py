@@ -1,4 +1,4 @@
-"""Model ticket data."""
+"""Ticket model."""
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation

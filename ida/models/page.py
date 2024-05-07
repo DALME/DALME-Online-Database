@@ -1,4 +1,4 @@
-"""Model page data."""
+"""Pages model."""
 
 import json
 

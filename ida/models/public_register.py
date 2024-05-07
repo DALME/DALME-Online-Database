@@ -1,4 +1,4 @@
-"""Model public register data."""
+"""Public register model."""
 
 from django_currentuser.middleware import get_current_user
 

@@ -1,4 +1,4 @@
-"""Model attachment data."""
+"""Attachment model."""
 
 import mimetypes
 import pathlib

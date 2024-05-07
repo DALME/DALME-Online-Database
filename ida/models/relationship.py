@@ -1,4 +1,4 @@
-"""Model relationship data."""
+"""Relationship-related models."""
 
 from django.contrib.contenttypes.fields import (
     GenericForeignKey,

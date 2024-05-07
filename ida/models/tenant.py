@@ -1,4 +1,4 @@
-"""Model multitenancy data."""
+"""Multitenancy-related models."""
 
 from django_tenants.models import DomainMixin, TenantMixin
 

@@ -1,4 +1,4 @@
-"""Model attribute type data."""
+"""Attribute type model."""
 
 from django.db import models
 

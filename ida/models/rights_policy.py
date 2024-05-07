@@ -1,4 +1,4 @@
-"""Model rights policy data."""
+"""Rights policy model."""
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models

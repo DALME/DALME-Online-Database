@@ -1,4 +1,4 @@
-"""Model relationship scope data."""
+"""Scope-related models."""
 
 from django.db import models
 from django.db.models import options

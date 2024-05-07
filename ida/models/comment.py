@@ -1,4 +1,4 @@
-"""Model comment data."""
+"""Comments model."""
 
 import textwrap
 

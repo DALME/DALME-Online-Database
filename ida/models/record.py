@@ -1,4 +1,4 @@
-"""Model record data."""
+"""Record-related models."""
 
 from wagtail.search import index
 

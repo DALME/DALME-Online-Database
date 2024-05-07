@@ -1,4 +1,4 @@
-"""Model saved search data."""
+"""Saved search model."""
 
 from django.db import models
 from django.db.models import options

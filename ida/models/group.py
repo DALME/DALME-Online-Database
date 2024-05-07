@@ -1,4 +1,4 @@
-"""Model group data."""
+"""Group properties model."""
 
 from django.db import models
 

@@ -1,4 +1,4 @@
-"""Model collection data."""
+"""Collections-related models."""
 
 from collections import Counter
 

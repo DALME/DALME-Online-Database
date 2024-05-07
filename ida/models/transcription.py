@@ -1,4 +1,4 @@
-"""Model transcription data."""
+"""Transcription model."""
 
 import lxml.etree as et
 

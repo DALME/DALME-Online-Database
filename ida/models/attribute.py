@@ -1,4 +1,4 @@
-"""Model attribute data."""
+"""Attribute-related models."""
 
 import calendar
 import datetime

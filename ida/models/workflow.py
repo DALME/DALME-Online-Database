@@ -1,4 +1,4 @@
-"""Model workform data."""
+"""Workflow-related models."""
 
 from django_currentuser.middleware import get_current_user
 

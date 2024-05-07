@@ -1,4 +1,4 @@
-"""Model resourcespace data."""
+"""Resourcespace models."""
 
 import hashlib
 import json

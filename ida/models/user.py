@@ -1,4 +1,4 @@
-"""Model user and profile data."""
+"""User-related models."""
 
 import humps
 from wagtail.users.models import UserProfile

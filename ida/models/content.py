@@ -1,4 +1,4 @@
-"""Model content data."""
+"""Content-related models."""
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import models

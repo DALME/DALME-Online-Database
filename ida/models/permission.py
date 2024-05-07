@@ -1,4 +1,4 @@
-"""Model permission data."""
+"""Permissions model."""
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType

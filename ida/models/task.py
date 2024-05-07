@@ -1,4 +1,4 @@
-"""Model task data."""
+"""Task-related models."""
 
 import os
 from datetime import datetime

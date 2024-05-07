@@ -1,4 +1,4 @@
-"""Model location data."""
+"""Location model."""
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
