@@ -5,13 +5,13 @@
     grid-template-columns: repeat(auto-fill, minmax(calc(50% - 20px), 1fr));
     grid-gap: 20px;
 }
-.block-team_list .headshot-bg {
+.headshot-bg {
     width: 84px;
     height: 84px;
     margin-right: 1.5rem;
     border: 1px solid #000;
 }
-.block-team_list .headshot.no-photo {
+.headshot-bg.no-photo {
     background-color: #efefef;
     width: 84px;
     height: 84px;
@@ -19,7 +19,7 @@
     flex: 0 0 auto;
     border: 1px solid #dcdcdc;
 }
-.block-team_list .headshot.no-photo:after {
+.headshot.no-photo:after {
     content: "\f007";
     font-family: "Font Awesome 5 Free";
     font-size: 4rem;
