@@ -120,6 +120,12 @@ input[type=file]::file-selector-button {
   left: 9px;
   position: absolute;
 }
+.empty-chooser-message {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  max-width: 300px;
+}
 
 /* help panels */
 div.struct-block > span > div.help {
