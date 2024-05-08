@@ -12,8 +12,8 @@
     {% endif %}
 
     <div class="copyright">
-      {% if settings.public.Settings.copyright %}
-        Copyright &copy; {% now "Y" %} {{ settings.public.Settings.copyright }}
+      {% if settings.copyright_line %}
+        Copyright &copy; {% now "Y" %} {{ settings.copyright_line }}
       {% else %}
         Copyright &copy; {% now "Y" %} Initiative for Documentary Archaeology
       {% endif %}
@@ -85,8 +85,8 @@
           return `sms://&body=${this.page_url}`;
         },
         email() {
-          let subject = `{{ settings.public.Settings.short_form }} - ${this.page_title}`;
-          let body = `{{ settings.public.Settings.name }} - ${this.page_title}: ${this.page_url}`;
+          let subject = `{{ settings.short_form }} - ${this.page_title}`;
+          let body = `{{ settings.name }} - ${this.page_title}: ${this.page_url}`;
           return `mailto:?subject=${subject}&body=${body}`;
         }
       }

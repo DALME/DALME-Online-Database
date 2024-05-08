@@ -2,7 +2,7 @@
 
 from django import template
 
-from public.models import FooterLink, SocialMedia
+from public.models import FooterLink, Settings, SocialMedia
 
 register = template.Library()
 
@@ -12,6 +12,7 @@ def footer(context):
     return {
         'links': FooterLink.objects.all(),
         'social': SocialMedia.objects.all(),
+        'settings': Settings.objects.first(),
         'page': context['page'],
         'request': context['request'],
     }
