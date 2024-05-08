@@ -8,7 +8,7 @@
       {% if parent|classname == 'Collection' %}
         <a href="{% pageurl parent %}">{{ parent.title }}</a>
       {% else %}
-          <a href="/">The Documentary Archaeology of Late Medieval Europe</a>
+          <a href="/">{{ settings.public.Settings.tagline }}</a>
       {% endif %}
     {% endwith %}
   </h2>
