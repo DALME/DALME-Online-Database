@@ -8,6 +8,8 @@ from wagtail.api.v2.views import BaseAPIViewSet
 from django.contrib import auth
 from django.urls import path
 
+from ida.context import get_current_tenant
+
 from .filters import TeamMemberFilter, UserFilter
 from .models import TeamMember
 from .serializers import TeamMemberSerializer, UserSerializer
@@ -59,3 +61,11 @@ class UserAPIViewSet(TeamAPIViewSet):
     model = auth.get_user_model()
     filterset_class = UserFilter
     order_field = 'first_name'
+
+    def get_queryset(self):
+        """Override method to return only users for current tenant."""
+        self.filterset = self.filterset_class(
+            self.request.GET,
+            queryset=get_current_tenant().members.all().order_by(self.order_field),
+        )
+        return self.filterset.qs.distinct()
