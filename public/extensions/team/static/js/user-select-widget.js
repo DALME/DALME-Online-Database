@@ -14,7 +14,13 @@ window.CustomUtils.userSelectState = {
       const avatar = item.avatar ? store.getAvatarHTML(item.avatar) : store.iconPlaceholder;
       return `<div class="user-option">${avatar}<div class="user-label"><span>${item.name}</span> <span class="user-username">${item.username}</span></div></div>`;
     },
-    getIdList: (val) => JSON.parse(val.replaceAll(`'`, `"`)),
+    getIdList: (val) => {
+      let result = JSON.parse(val.replaceAll(`'`, `"`));
+      if (typeof result == "object") {
+        result = result.filter((x) => x.trim() != "");
+      }
+      return result;
+    },
     fetchResults: (url, callback) => {
       const results = [];
       const store = window.CustomUtils.userSelectState.store;
@@ -64,6 +70,7 @@ window.CustomUtils.userSelectState = {
   initialFormatter: (el, callback) => {
     const store = window.CustomUtils.userSelectState.store;
     const id_list = store.getIdList(el.val());
+    console.log(id_list);
     if (id_list.length) {
       el.val(id_list);
       store.fetchResults(`${store.baseApiUrl}?id__in=${id_list}`, (results) => {

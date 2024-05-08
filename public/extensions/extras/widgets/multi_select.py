@@ -89,6 +89,8 @@ class MultiSelect(Select):
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
+        if not value or (isinstance(value, list) and len(value) == 1 and value[0] == ''):
+            return None
         if self.allow_multiple_selected and value and len(value) == 1 and ',' in value[0]:
-            value = [int(i) for i in value[0].split(',')]
+            return [int(i) for i in value[0].split(',')]
         return value
