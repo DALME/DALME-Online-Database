@@ -104,6 +104,7 @@ class Stage(BaseStage):
             ('dalme', 'wagtailredirects'),
             ('public', 'wagtailusers'),
             ('dalme', 'public'),
+            ('dalme', 'publicimages'),
         ]
 
         for schema, app in app_labels:
