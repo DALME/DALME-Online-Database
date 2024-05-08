@@ -50,6 +50,48 @@ pre[class*=language-]:before {
   box-shadow: none !important;
 }
 
+/* Landing page */
+.homepage .w-header .row {
+  padding-inline-start: 7rem;
+}
+.homepage .w-header__glyph {
+  height: 84px;
+  width: 84px;
+  margin-inline-start: -4rem !important;
+}
+.homepage .w-header__title {
+  font-size: 2rem;
+  line-height: 1.5;
+}
+.homepage .w-header__description {
+  font-size: 1.25rem;
+}
+.homepage .w-summary .icon {
+  font-size: 70px;
+  margin-inline-end: 15px;
+  color: #0000002e;
+}
+.homepage .w-summary .w-summary__list {
+  justify-content: flex-start;
+  gap: 40px;
+}
+.homepage .w-summary li {
+  flex-grow: 0;
+  border: 2px solid var(--w-color-border-field-default);
+  border-radius: 10px;
+  padding: 20px;
+  background-color: var(--w-color-surface-header);
+}
+.homepage .w-summary a {
+  font-size: 20px;
+  text-align: center;
+}
+.homepage .w-summary a > span {
+  font-size: 58px;
+  font-weight: 800;
+  line-height: .8;
+}
+
 /* General purpose adjustments to select2 */
 .select2-container ul.select2-choices,
 .select2-container a.select2-choice {
