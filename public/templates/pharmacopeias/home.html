@@ -1,2 +1,31 @@
-{% load static %}
-<img src="{% static 'images/hello.jpg' %}" alt="Hello, World!">
+{% extends "public/layouts/single_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags sponsors static %}
+
+{% block extra_styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/banners.css' %}" />
+{% endblock %}
+
+{% block header_extra %}
+  <div class="title u-flex u-type-serif">
+    <h1 class="small">{{ settings.public.Settings.short_form }}</h1>
+    <h1>{{ settings.public.Settings.name }}</h1>
+    <h1 class="last">{{ settings.public.Settings.tagline }}</h1>
+    {% if page.learn_more_page %}
+      <a class="u-lozenge" href="{% pageurl page.learn_more_page %}">LEARN MORE</a>
+    {% endif %}
+  </div>
+
+  {% if banners %}
+    <div class="banners-container">
+      {% for banner in banners %}
+        {% include "banner.html" with value=banner %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block main_column %}
+    {% include "public/includes/featured.html" %}
+    {% include_block page.body %}
+    {% sponsors %}
+{% endblock %}
