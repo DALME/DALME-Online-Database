@@ -167,7 +167,7 @@ class Stage(BaseStage):
                 tenant_id = Tenant.objects.get(name='DALME').id
                 cursor.execute('SELECT * FROM restore.core_savedsearch;')
                 rows = self.map_rows(cursor)
-                objs = [SavedSearch(**{**row, 'tenant_id': tenant_id}) for row in rows]
+                objs = [SavedSearch(**{**row, 'tenant_id': tenant_id, 'shareable': False}) for row in rows]
                 SavedSearch.objects.bulk_create(objs)
                 self.logger.info('Created %s SavedSearch instances', SavedSearch.objects.count())
         else:

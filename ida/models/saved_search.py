@@ -13,4 +13,5 @@ class SavedSearch(ScopedBase, IDAUuid, IDAOwned):
     """Stores saved searches."""
 
     name = models.CharField(max_length=255)
+    shareable = models.BooleanField(default=False)
     search = models.JSONField()

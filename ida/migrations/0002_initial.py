@@ -1992,6 +1992,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ('name', models.CharField(max_length=255)),
+                ('shareable', models.BooleanField(default=False)),
                 ('search', models.JSONField()),
                 (
                     'creation_user',
@@ -2489,7 +2490,7 @@ class Migration(migrations.Migration):
                 (
                     'project',
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name='zoter_collections', to='ida.project'
+                        on_delete=django.db.models.deletion.CASCADE, related_name='zotero_collections', to='ida.project'
                     ),
                 ),
             ],
