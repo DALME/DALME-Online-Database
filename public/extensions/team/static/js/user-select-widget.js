@@ -64,11 +64,13 @@ window.CustomUtils.userSelectState = {
   initialFormatter: (el, callback) => {
     const store = window.CustomUtils.userSelectState.store;
     const id_list = store.getIdList(el.val());
-    el.val(id_list);
-    store.fetchResults(`${store.baseApiUrl}?id__in=${id_list}`, (results) => {
-      callback(el.multiple ? results : results[0]);
-      store.togglePreview();
-    });
+    if (id_list.length) {
+      el.val(id_list);
+      store.fetchResults(`${store.baseApiUrl}?id__in=${id_list}`, (results) => {
+        callback(el.multiple ? results : results[0]);
+        store.togglePreview();
+      });
+    }
   },
   connectCallback: (selectEl) => {
     const store = window.CustomUtils.userSelectState.store;

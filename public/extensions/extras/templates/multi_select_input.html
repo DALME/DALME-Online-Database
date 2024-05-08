@@ -3,7 +3,6 @@
     name="{{ widget.name }}"
     {% if widget.value != None %}
         value="{{ widget.value|stringformat:'s' }}"
-        value="{{ widget.value }}"
     {% endif %}
     {% for name, value in widget.attrs.items %}
         {% if value is not False %}
