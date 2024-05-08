@@ -4,15 +4,23 @@ from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.admin.panels import FieldPanel, FieldRowPanel
 from wagtail.admin.ui.tables import UpdatedAtColumn
 from wagtail.admin.views import chooser
+from wagtail.admin.views.generic.models import IndexView
 from wagtail.admin.viewsets.chooser import ChooserViewSet
 from wagtail.admin.viewsets.model import ModelViewSet
 
 from django.views.generic.edit import BaseFormView
 
-from ida.context import get_biblio_pages
+from ida.context import get_biblio_pages, get_current_tenant
 from ida.models import ZoteroCollection
 
 from .forms import ReferenceChooserForm
+
+
+class BiblioIndexView(IndexView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(project=get_current_tenant().project)
+        return self.search_queryset(queryset)
 
 
 class BiblioChooserViewSet(ChooserViewSet):
@@ -51,6 +59,7 @@ class BiblioViewSet(ModelViewSet):
     menu_name = 'biblio'
     menu_order = 900
     add_to_admin_menu = True
+    index_view_class = BiblioIndexView
     list_display = ['id', 'label', 'has_biblio_sources', UpdatedAtColumn()]
     chooser_viewset_class = BiblioChooserViewSet
 
