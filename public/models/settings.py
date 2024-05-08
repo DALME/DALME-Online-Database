@@ -50,6 +50,7 @@ class Settings(BaseGenericSetting):
             ('html', blocks.RawHTMLBlock()),
         ],
         null=True,
+        blank=True,
         verbose_name='Help content',
         help_text='Content to show in the search page help section.',
     )
@@ -86,6 +87,7 @@ class Settings(BaseGenericSetting):
             ('html', blocks.RawHTMLBlock()),
         ],
         null=True,
+        blank=True,
         verbose_name='Text before',
         help_text='Content to show before the map in the explore page.',
     )
@@ -98,6 +100,7 @@ class Settings(BaseGenericSetting):
             ('embed', EmbedBlock(icon='media')),
         ],
         null=True,
+        blank=True,
         verbose_name='Text after',
         help_text='Content to show after the map in the explore page.',
     )
@@ -163,14 +166,20 @@ class Settings(BaseGenericSetting):
         blank=True,
         help_text='Base URL for team member profiles, e.g. "/about/people/".',
     )
-    editors = SortedManyToManyField(django_settings.AUTH_USER_MODEL, help_text='List of editors (in desired order).')
+    editors = SortedManyToManyField(
+        django_settings.AUTH_USER_MODEL,
+        blank=True,
+        help_text='List of editors (in desired order).',
+    )
     publication_title = models.CharField(
         max_length=255,
+        blank=True,
         verbose_name='Title',
         help_text='String to be used as title of the publication/site.',
     )
     publication_url = models.URLField(
         verbose_name='URL',
+        blank=True,
         help_text='Reference URL/PURL for publication/site.',
     )
     doi_handle = models.CharField(
