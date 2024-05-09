@@ -15,7 +15,7 @@ from public.extensions.team.widgets import UserSelect
 from public.models.base_page import HEADER_POSITION
 
 
-@register_setting
+@register_setting(icon='sliders')
 class Settings(BaseGenericSetting):
     """Stores per-tenant settings for Wagtail."""
 
@@ -190,14 +190,21 @@ class Settings(BaseGenericSetting):
     )
 
     class Meta:
-        verbose_name = 'Site preferences'
+        verbose_name = 'Configuration'
 
     preference_tab_panels = [
         FieldPanel('team_profiles_url'),
         FieldPanel('contact_email'),
     ]
     branding_tab_panels = [
-        FieldPanel('name'),
+        FieldRowPanel(
+            [
+                FieldPanel('name'),
+                FieldPanel('short_form'),
+            ],
+            heading='Site name',
+            classname='field-row-panel',
+        ),
         FieldPanel('tagline'),
         FieldPanel('logo'),
         FieldPanel('copyright_line'),
