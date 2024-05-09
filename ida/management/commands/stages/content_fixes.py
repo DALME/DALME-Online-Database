@@ -539,6 +539,8 @@ class Stage(BaseStage):
                             try:
                                 tm, created = TeamMember.objects.get_or_create(**tm_object)
                                 tm.roles.add(current_role)
+                                if user and user.id in [1, 5]:
+                                    tm.roles.add(roles['PI'])
                                 action = 'wagtail.create' if created else 'wagtail.edit'
                                 log(instance=tm, action=action)
 
