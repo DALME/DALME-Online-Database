@@ -3,6 +3,7 @@
 from .attribute_types import Stage as AttributeTypesStage
 from .attributes import Stage as AttributesStage
 from .auth import Stage as AuthStage
+from .bootstrap_pharmacopeias import Stage as PharmaStage
 from .collections import Stage as CollectionsStage
 from .content_fixes import Stage as ContentFixes
 from .finalize import Stage as FinalizeStage
@@ -24,4 +25,5 @@ __all__ = [
     'RankTwoStage',
     'RankZeroStage',
     'RecordsStage',
+    'PharmaStage',
 ]

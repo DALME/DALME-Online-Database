@@ -19,6 +19,7 @@ from .stages import (
     CollectionsStage,
     ContentFixes,
     FinalizeStage,
+    PharmaStage,
     PublicStage,
     RankOneStage,
     RankTwoStage,
@@ -40,6 +41,7 @@ STAGES = [
     FinalizeStage,
     PublicStage,
     ContentFixes,
+    PharmaStage,
 ]
 
 
