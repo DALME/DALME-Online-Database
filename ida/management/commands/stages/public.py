@@ -257,7 +257,7 @@ class Stage(BaseStage):
 
     @transaction.atomic
     def transfer_snippets(self):
-        """Transfer snippet data to relevant tables."""
+        """Transfer snippet data to relevant tables and create settings."""
         footer_links = None
         footer_social = None
         settings = {}
@@ -360,6 +360,7 @@ class Stage(BaseStage):
                     publication_url='https://dalme.org',
                     search_tagline='DALME Corpora and Collections',
                     explore_tagline='DALME Corpora and Collections',
+                    team_profiles_url='/about/people/',
                     **settings,
                 )
 
@@ -408,7 +409,7 @@ class Stage(BaseStage):
                 'page_title': 'About',
             },
         ]
-        self.logger.info('Transfering gradient data')
+        self.logger.info('Transfering gradient data to DALME tenant')
         with schema_context('dalme'):
             from public.extensions.gradients.models import Gradient
 
