@@ -55,10 +55,9 @@ class BiblioViewSet(ModelViewSet):
     model = ZoteroCollection
     add_to_reference_index = False
     icon = 'book'
-    menu_label = 'Zotero'
+    menu_label = 'Zotero Collections'
     menu_name = 'biblio'
     menu_order = 900
-    add_to_admin_menu = True
     index_view_class = BiblioIndexView
     list_display = ['id', 'label', 'has_biblio_sources', UpdatedAtColumn()]
     chooser_viewset_class = BiblioChooserViewSet

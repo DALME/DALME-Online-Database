@@ -7,9 +7,8 @@ from django.urls import reverse_lazy
 
 from .rich_text import ReferenceLinkHandler
 from .rich_text.contentstate import ReferenceElementHandler, reference_decorator
-from .views import BiblioChooserViewSet, BiblioViewSet
+from .views import BiblioChooserViewSet
 
-hooks.register('register_admin_viewset', BiblioViewSet)
 hooks.register('register_admin_viewset', BiblioChooserViewSet)
 
 

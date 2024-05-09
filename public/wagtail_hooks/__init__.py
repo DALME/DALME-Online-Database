@@ -1,9 +1,8 @@
 """Interface for the public.wagtail_hooks module."""
 
 from wagtail import hooks
-from wagtail.snippets.models import register_snippet
 
-from public.views import FooterLinksViewSet, SocialMediaViewSet, SponsorsViewSet
+from public.views import SnippetsViewSetGroup
 
 from .admin_extra_css_js import extra_admin_css, extra_admin_js
 from .extra_icons import register_extra_icons
@@ -15,8 +14,4 @@ hooks.register('insert_global_admin_js', extra_admin_js)
 hooks.register('before_serve_page', add_redirects_before_serving_pages)
 hooks.register('register_rich_text_features', enable_rich_text_features)
 hooks.register('register_icons', register_extra_icons)
-
-# register snippets
-register_snippet(FooterLinksViewSet)
-register_snippet(SponsorsViewSet)
-register_snippet(SocialMediaViewSet)
+hooks.register('register_admin_viewset', SnippetsViewSetGroup)

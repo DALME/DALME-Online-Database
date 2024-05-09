@@ -2,8 +2,9 @@
 
 from wagtail.admin.panels import FieldPanel
 from wagtail.admin.ui.tables import UpdatedAtColumn
-from wagtail.snippets.views.snippets import SnippetViewSet
+from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 
+from public.extensions.bibliography.views import BiblioViewSet
 from public.models import FooterLink, SocialMedia, Sponsor
 
 
@@ -41,3 +42,11 @@ class SocialMediaViewSet(SnippetViewSet):
         FieldPanel('css_class'),
         FieldPanel('url'),
     ]
+
+
+class SnippetsViewSetGroup(SnippetViewSetGroup):
+    items = (FooterLinksViewSet, SponsorsViewSet, SocialMediaViewSet, BiblioViewSet)
+    menu_icon = 'snippet'
+    menu_label = 'Snippets'
+    menu_name = 'snippets'
+    menu_order = 900
