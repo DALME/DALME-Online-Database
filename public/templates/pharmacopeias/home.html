@@ -7,9 +7,9 @@
 
 {% block header_extra %}
   <div class="title u-flex u-type-serif">
-    <h1 class="small">{{ settings.public.Settings.short_form }}</h1>
-    <h1>{{ settings.public.Settings.name }}</h1>
+    <h1 class="small">{{ settings.public.Settings.name }}</h1>
     <h1 class="last">{{ settings.public.Settings.tagline }}</h1>
+    <br />
     {% if page.learn_more_page %}
       <a class="u-lozenge" href="{% pageurl page.learn_more_page %}">LEARN MORE</a>
     {% endif %}
