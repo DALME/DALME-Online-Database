@@ -8,44 +8,35 @@
   line-height: 1.8;
   text-shadow: 0px 0px 3px rgb(255 255 255 / 47%);
 }
-
 .banner-box {
   width: 1068px;
   margin-left: auto;
   margin-right: auto;
 }
-
 .banner-content {
   padding: 0 59px;
 }
-
 .banner-content:first-of-type {
   padding-top: 1.5rem;
 }
-
 .banner-content:last-of-type {
   padding-bottom: 3rem;
 }
-
 .banner-content.green {
   background: linear-gradient(180deg, #25542157, transparent);
   color: #174e17;
 }
-
 .banner-container a {
   color: inherit;
   text-shadow: inherit;
 }
-
 .banner-container a:hover {
   color: inherit;
   text-shadow: 0px 0px 3px rgb(130 124 124 / 47%);
 }
-
 .banner-info {
   color: #373737;
 }
-
 .banner-title {
   font-weight: 800;
   font-size: 18px;
