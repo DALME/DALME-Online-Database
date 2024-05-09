@@ -40,6 +40,53 @@
 .u-none {
   display: none;
 }
+
+/* TABS */
+.w-tabs__wrapper {
+  margin-left: 40px;
+}
+.nice-padding .w-tabs__wrapper {
+  margin-left: -40px;
+}
+#page-edit-form .w-tabs__wrapper {
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+.w-tabs__list {
+  padding-inline-start: 40px !important;
+  padding-inline-end: 80px !important;
+  border-color: var(--w-color-border-field-default);
+}
+.w-tabs__tab {
+  border-top: 1px solid var(--w-color-border-field-default);
+  border-right: 1px solid var(--w-color-border-field-default);
+  border-left: 1px solid var(--w-color-border-field-default);
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  padding: 0.6rem 1rem;
+  opacity: 0.6;
+}
+.w-tabs__tab:after {
+  inset-inline-start: -1px;
+  height: 3px;
+  bottom: -2px;
+}
+.w-tabs__tab[aria-selected=true] {
+  font-weight: 700;
+  border-color: var(--w-color-border-field-default);
+  opacity: 1;
+}
+.w-tabs__tab[aria-selected=true]:after {
+  width: calc(100% + 2px);
+}
+.w-tabs__list>:not([hidden])~:not([hidden]) {
+  margin-inline-end: 0;
+  margin-inline-start: 2px;
+}
+.w-tabs__tab:hover:after {
+  width: calc(100% + 2px);
+}
+
 /* code block extension */
 .code-block textarea {
   font-size: 14px;
