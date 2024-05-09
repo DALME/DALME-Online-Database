@@ -12,6 +12,8 @@ from wagtail.images.models import (
 
 from django.db import models
 
+from ida.context import get_current_tenant
+
 
 class BaseImage(AbstractImage):
     caption = models.CharField(max_length=255, null=True, blank=True)
@@ -23,6 +25,11 @@ class BaseImage(AbstractImage):
         height_field='height',
         max_length=255,
     )
+
+    def get_upload_to(self, filename):
+        """We override this method to add the current tenant to the path."""
+        full_path = super().get_upload_to(filename)
+        return f'{get_current_tenant()}/{full_path}'
 
 
 class CustomRendition(AbstractRendition):
@@ -37,3 +44,8 @@ class CustomRendition(AbstractRendition):
 
     class Meta:
         unique_together = ('image', 'filter_spec', 'focal_point_key')
+
+    def get_upload_to(self, filename):
+        """We override this method to add the current tenant to the path."""
+        full_path = super().get_upload_to(filename)
+        return f'{get_current_tenant()}/{full_path}'
