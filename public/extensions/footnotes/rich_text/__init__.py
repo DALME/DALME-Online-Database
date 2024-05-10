@@ -10,5 +10,9 @@ class FootnoteLinkHandler(LinkHandler):
 
     @classmethod
     def expand_db_attributes(cls, attrs):
-        instance = Footnote.objects.get(pk=attrs['data-footnote'])
-        return f'<a href="#fn_{instance.id}" class="footnote_callout" id="{instance.id}" data-index="{instance.sort_order}">'
+        try:
+            instance = Footnote.objects.get(pk=attrs['data-footnote'])
+        except Footnote.DoesNotExist:
+            return ''
+        else:
+            return f'<a href="#fn_{instance.id}" class="footnote_callout" id="{instance.id}" data-index="{instance.sort_order}">'
