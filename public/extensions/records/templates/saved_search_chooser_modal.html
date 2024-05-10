@@ -5,7 +5,7 @@
   <div class="base-modal-box">
     <form action="{% url 'saved_search_chooser' %}" method="post" novalidate>
       {% csrf_token %}
-      {% if has_saved_searches %}
+      {% if form.has_saved_searches %}
         {% if panel %}
             {{ panel.render_form_content }}
         {% else %}
