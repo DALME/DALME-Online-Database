@@ -52,7 +52,14 @@ class FootnoteMixin(models.Model):
         self.has_placemarker = 'footnotes_placemarker' in raw_content
         if self.has_footnotes:
             footnote_ids = FOOTNOTE_ID.findall(raw_content)
-            ordered = sorted(Footnote.objects.filter(id__in=footnote_ids), key=lambda x: footnote_ids.index(str(x.id)))
+
+            if not self._state.adding:  # existing page
+                this_page_fns = list(Footnote.objects.filter(page_id=self.id))  # all footnotes saved for this page
+                for fn in this_page_fns:
+                    if str(fn) not in footnote_ids:  # fn removed from page, we delete it
+                        fn.delete()
+
+            ordered = sorted(Footnote.objects.filter(id__in=footnote_ids), key=lambda x: footnote_ids.index(str(x)))
             footnotes = []
             for idx, fn in enumerate(ordered, start=1):
                 fn.sort_order = idx
