@@ -1,5 +1,7 @@
 """Migrate rank 0 (no dependencies other than auth) models."""
 
+import json
+
 from django.db import connection, transaction
 
 from ida.models import (
@@ -167,8 +169,17 @@ class Stage(BaseStage):
                 tenant_id = Tenant.objects.get(name='DALME').id
                 cursor.execute('SELECT * FROM restore.core_savedsearch;')
                 rows = self.map_rows(cursor)
-                objs = [SavedSearch(**{**row, 'tenant_id': tenant_id, 'shareable': False}) for row in rows]
-                SavedSearch.objects.bulk_create(objs)
+                for row in rows:
+                    # fix JSON field
+                    search_data = json.loads(row.pop('search'))
+                    row.update(
+                        {
+                            'search': search_data,
+                            'tenant_id': tenant_id,
+                            'shareable': False,
+                        }
+                    )
+                    SavedSearch.objects.create(**row)
                 self.logger.info('Created %s SavedSearch instances', SavedSearch.objects.count())
         else:
             self.logger.info('SavedSearch data already exists')
