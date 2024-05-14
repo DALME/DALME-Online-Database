@@ -1,13 +1,14 @@
-# https://terragrunt.gruntwork.io
+# Root terragrunt configuration.
 # https://github.com/gruntwork-io/terragrunt
+
 locals {
-  env_vars           = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  environment_vars   = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
   region_vars        = read_terragrunt_config(find_in_parent_folders("region.hcl"))
-  aws_account        = local.env_vars.locals.aws_account
-  environment        = local.env_vars.locals.environment
-  gha_oidc_role_name = local.env_vars.locals.gha_oidc_role_name
-  lock_table         = local.env_vars.locals.lock_table
-  service            = local.env_vars.locals.service
+  aws_account        = local.environment_vars.locals.aws_account
+  environment        = local.environment_vars.locals.environment
+  gha_oidc_role_name = local.environment_vars.locals.gha_oidc_role_name
+  lock_table         = local.environment_vars.locals.lock_table
+  namespace          = local.environment_vars.locals.namespace
   aws_region         = local.region_vars.locals.aws_region
 }
 
@@ -50,28 +51,73 @@ provider "aws" {
   # Ensure all resources have these common, project tags.
   default_tags {
     tags = {
+      Namespace   = "${local.namespace}"
       Environment = "${local.environment}"
-      Service     = "${local.service}"
-    }
-  }
-}
-
-# Cloudfront also needs the us-east-1 provider so let's just alias it here and
-# keep all provider details in the same location.
-provider "aws" {
-  alias  = "acm"
-  region = "us-east-1" # NOTE: Region must be us-east-1 for Cloudfront etc.
-
-  allowed_account_ids = ["${local.aws_account}"]
-
-  default_tags {
-    tags = {
-      Environment = "${local.environment}"
-      Service     = "${local.service}"
     }
   }
 }
 EOF
+}
+
+# Generate variable declarations that all modules require.
+generate "metadata" {
+  path      = "metadata.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+# tflint-ignore: terraform_unused_declarations
+variable "aws_account" {
+  description = "The AWS account where resources are created."
+  type        = number
+  default     = "${local.aws_account}"
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "aws_region" {
+  description = "The AWS region where resources are created."
+  type        = string
+  default     = "${local.aws_region}"
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "environment" {
+  description = "Identify the deployment environment."
+  type        = string
+  default     = "${local.environment}"
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "namespace" {
+  description = "The project namespace."
+  type        = string
+  default     = "${local.namespace}"
+}
+EOF
+}
+
+terraform {
+  before_hook "before_hook" {
+    commands = ["apply", "plan"]
+    execute  = ["tflint"]
+  }
+
+  after_hook "init_lock_providers" {
+    commands = ["init"]
+    execute = [
+      "terraform",
+      "providers",
+      "lock",
+      "-platform=linux_amd64",
+      "-platform=darwin_amd64",
+      "-platform=darwin_arm64",
+    ]
+    run_on_error = false
+  }
+
+  after_hook "init_copy_back_lockfile" {
+    commands     = ["init"]
+    execute      = ["cp", ".terraform.lock.hcl", "${get_terragrunt_dir()}"]
+    run_on_error = false
+  }
 }
 
 # Generate a modular remote state template.
@@ -82,7 +128,7 @@ remote_state {
 
   config = {
     encrypt        = true
-    bucket         = "${local.service}-tfstate-${local.environment}-${local.aws_account}"
+    bucket         = "${local.namespace}-${local.environment}-tfstate-${local.aws_account}"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = local.aws_region
     dynamodb_table = local.lock_table
@@ -98,6 +144,6 @@ remote_state {
 # These variables apply to all configurations in this subfolder. They are
 # pulled in by any module that needs them via an `include` block.
 inputs = merge(
-  local.env_vars.locals,
+  local.environment_vars.locals,
   local.region_vars.locals,
 )

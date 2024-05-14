@@ -5,6 +5,7 @@ JUMP_HOST := $(PROJECT)-asg-jump-host-$(ENVIRONMENT)
 REGION := eu-west-2
 TF_LOG := WARN
 TF_PROVIDER := "~> 5.0"
+TF_MODULES := modules
 
 CLUSTER := $(PROJECT)-ecs-cluster-$(ENVIRONMENT)
 SERVICE := $(PROJECT)-ecs-service-$(ENVIRONMENT)
@@ -173,14 +174,16 @@ endif
 .PHONY: deploy.state.rm
 
 deploy.tf.docs:
-	docker compose run -T --rm \
-		$(PROJECT).deploy \
-		terraform-docs \
-		markdown \
-		--recursive \
-		--output-mode inject \
-		--output-file README.md \
-		/opt/tf
+	for dir in infra services _reusable; do \
+		docker compose run -T --rm \
+			$(PROJECT).deploy \
+			terraform-docs \
+			markdown \
+			--recursive \
+			--recursive-path $$dir \
+			--output-file README.md \
+			/opt/tf/$(TF_MODULES); \
+	done
 .PHONY: deploy.tf.docs
 
 deploy.tf.fmt:

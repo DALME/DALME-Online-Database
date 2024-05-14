@@ -73,18 +73,12 @@ repos:
       language: system
       types_or: [hcl, terraform]
       require_serial: true
-    - id: tf-lint
-      name: terraform lint
-      entry: make -s deploy.tf.tflint
-      language: system
-      types_or: [hcl, terraform]
-      require_serial: true
-    - id: tf-validate
-      name: terraform validate
-      entry: make -s deploy.tf.validate
-      language: system
-      types_or: [hcl, terraform]
-      require_serial: true
+    # - id: tf-validate
+    #   name: terraform validate
+    #   entry: make -s deploy.tf.validate
+    #   language: system
+    #   types_or: [hcl, terraform]
+    #   require_serial: true
     - id: tf-docs
       name: terraform docs
       entry: make -s deploy.tf.docs

@@ -9,7 +9,7 @@ RUN apt-get update && \
 
 FROM base as iamlive
 ARG TARGETARCH
-ARG VERSION=v1.1.1
+ARG VERSION=v1.1.8
 RUN curl -Lo \
   ./iamlive.tar.gz \
   https://github.com/iann0036/iamlive/releases/download/$VERSION/iamlive-$VERSION-$(uname)-$TARGETARCH.tar.gz
@@ -19,7 +19,7 @@ RUN mv iamlive /usr/local/iamlive
 
 FROM base as terragrunt
 ARG TARGETARCH
-ARG VERSION=v0.51.7
+ARG VERSION=v0.58.4
 RUN curl -Lo \
   ./terragrunt \
   https://github.com/gruntwork-io/terragrunt/releases/download/$VERSION/terragrunt_$(uname)_$TARGETARCH
@@ -28,7 +28,7 @@ RUN mv terragrunt /usr/local/terragrunt
 
 FROM base as tfdocs
 ARG TARGETARCH
-ARG VERSION=v0.16.0
+ARG VERSION=v0.17.0
 RUN curl -Lo \
   ./terraform-docs.tar.gz \
   https://github.com/terraform-docs/terraform-docs/releases/download/$VERSION/terraform-docs-$VERSION-$(uname)-$TARGETARCH.tar.gz
@@ -39,7 +39,7 @@ RUN mv terraform-docs /usr/local/terraform-docs
 FROM base as tfupdate
 ARG TARGETARCH
 # Omit the 'v' here as their release naming convention is asymmetrical.
-ARG VERSION=0.7.2
+ARG VERSION=0.8.2
 RUN curl -Lo \
   tfupdate.tar.gz \
   https://github.com/minamijoyo/tfupdate/releases/download/v$VERSION/tfupdate_${VERSION}_$(uname)_$TARGETARCH.tar.gz
@@ -54,15 +54,13 @@ RUN apt-get update && \
     procps \
     git && \
     apt-get clean
-COPY --from=hashicorp/terraform:1.5.5 /bin/terraform /usr/local/bin/terraform
+COPY --from=hashicorp/terraform:1.8.3 /bin/terraform /usr/local/bin/terraform
 COPY --from=iamlive /usr/local/iamlive /usr/local/bin/iamlive
 COPY --from=terragrunt /usr/local/terragrunt /usr/local/bin/terragrunt
+COPY --from=ghcr.io/terramate-io/terramate:0.8.4 /usr/local/bin/terramate /usr/local/bin/terramate
 COPY --from=tfdocs /usr/local/terraform-docs /usr/local/bin/terraform-docs
 COPY --from=tfupdate /usr/local/tfupdate /usr/local/bin/tfupdate
 COPY --from=aquasec/tfsec-ci:latest /usr/bin/tfsec /usr/local/bin/tfsec
-# NOTE: Release tflint==0.48.0 breaks default tag handling so don't upgrade for now.
-COPY --from=ghcr.io/terraform-linters/tflint-bundle:v0.47.0.0 /usr/local/bin/tflint /usr/local/bin/tflint
-COPY --from=ghcr.io/terraform-linters/tflint-bundle:v0.47.0.0 /root/.tflint.d/plugins /root/.tflint.d/plugins/
 RUN pip install --user --no-cache-dir --upgrade pip
 RUN pip install --no-cache ecs-deploy
 WORKDIR /opt/tf
