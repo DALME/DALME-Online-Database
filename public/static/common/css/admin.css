@@ -266,7 +266,6 @@ div.struct-block > span > div.help svg.icon-help {
 [data-streamfield-list-container] > [data-contentpath] > .w-panel > .w-panel__header {
   background-color: unset;
   padding: unset;
-  margin-bottom: .125rem;
 }
 
 .image-chooser .chooser__image {
@@ -439,6 +438,12 @@ div.struct-block > span > div.help svg.icon-help {
   width: unset !important;
 }
 
+.w-field--date_field .w-field__comment-button,
+.w-field--date_time_field .w-field__comment-button,
+.w-field--time_field .w-field__comment-button {
+  position: absolute;
+  top: unset;
+}
 /* .listing .title .title-wrapper, .listing .title h2 {
   font-size: 0.8rem;
   margin-right: 0.5em;
