@@ -13,6 +13,7 @@ def register_extra_icons(icons):
         'icons/expandable-text.svg',
         'wagtailfontawesomesvg/solid/chart-area.svg',
         'wagtailfontawesomesvg/solid/file-pdf.svg',
+        'wagtailfontawesomesvg/solid/table-cells.svg',
     ]
 
 

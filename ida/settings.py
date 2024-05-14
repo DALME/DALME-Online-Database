@@ -124,6 +124,7 @@ class Base(Configuration):
         'wagtailmodelchooser',
         'wagtailfontawesomesvg',
         'wagtailcodeblock',
+        'wagtail.contrib.typed_table_block',
         'public.extensions.images',
         'public.extensions.bibliography',
         'public.extensions.footnotes',
