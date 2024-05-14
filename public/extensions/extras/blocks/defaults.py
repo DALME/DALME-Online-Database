@@ -15,7 +15,6 @@ from public.extensions.team.blocks import PersonBlock
 
 from .chart_embed import ChartEmbedBlock
 from .document import DocumentBlock
-from .external_resource import ExternalResourceBlock
 from .text_expandable import TextExpandableBlock
 
 DEFAULT_TABLE_OPTIONS = {
@@ -66,7 +65,6 @@ BASE_BLOCKS = [
     ('code', CodeBlock()),
     ('document', DocumentBlock()),
     ('embed', EmbedBlock(icon='media')),
-    ('external_resource', ExternalResourceBlock()),
     ('footnotes_placemarker', FootnotesPlaceMarker()),
     ('heading', blocks.CharBlock()),
     ('html', blocks.RawHTMLBlock()),
