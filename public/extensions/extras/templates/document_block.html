@@ -34,9 +34,10 @@
         {% endif %}
       </div>
       {% if value.abstract %}
-        <div class="abstract-container">
-          <div class="abstract-text">{{ value.abstract }}</div>
-        </div>
+          <div class="abstract-container text-expandable-container">
+            <div class="show-button show-more u-none" onclick="window.CustomUtils.toggleShowMore(this)"></div>
+            {{ value.abstract|richtext }}
+          </div>
       {% endif %}
   </div>
 </div>

@@ -1,10 +1,3 @@
-.block-document a,
-.block-document a:visited,
-.block-external_resource a,
-.block-external_resource a:visited {
-  color: #5e5e5e;
-}
-
 .block-iframe {
     margin-bottom: 1rem;
 }
