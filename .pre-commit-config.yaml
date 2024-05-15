@@ -61,33 +61,27 @@ repos:
   # Terraform
   - repo: local
     hooks:
-    - id: tf-fmt
+    - id: tf-format
       name: terraform fmt
-      entry: make -s deploy.tf.fmt
-      language: system
-      types_or: [hcl, terraform]
-      require_serial: true
-    - id: tf-hclfmt
-      name: terraform hclfmt
-      entry: make -s deploy.tf.hclfmt
+      entry: make -s _deploy.format
       language: system
       types_or: [hcl, terraform]
       require_serial: true
     # - id: tf-validate
     #   name: terraform validate
-    #   entry: make -s deploy.tf.validate
+    #   entry: make -s deploy.validate
     #   language: system
     #   types_or: [hcl, terraform]
     #   require_serial: true
     - id: tf-docs
       name: terraform docs
-      entry: make -s deploy.tf.docs
+      entry: make -s _deploy.docs
       language: system
       types_or: [hcl, terraform]
       require_serial: true
     - id: tfsec
       name: terraform tfsec
-      entry: make -s deploy.tf.tfsec
+      entry: make -s _deploy.tfsec
       language: system
       types_or: [hcl, terraform]
       require_serial: true
