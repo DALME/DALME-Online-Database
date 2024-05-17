@@ -10,7 +10,84 @@ TF_MODULES := modules
 CLUSTER := $(PROJECT)-ecs-cluster-$(ENVIRONMENT)
 SERVICE := $(PROJECT)-ecs-service-$(ENVIRONMENT)
 
-### PUBLIC INTERFACE
+_deploy.confirm.destroy:
+	@echo "CAUTION - Are you certain? Confirm with 'destroy' [destroy/N] " && \
+		read ans && [ $${ans:-N} = destroy ]
+.PHONY: _deploy.confirm.destroy
+
+_deploy.docs:
+	for dir in infra services _reusable; do \
+		docker compose run -T --rm \
+			$(PROJECT).deploy \
+			terraform-docs \
+			markdown \
+			--recursive \
+			--recursive-path $$dir \
+			--output-file README.md \
+			/opt/tf/$(TF_MODULES); \
+	done
+.PHONY: _deploy.docs
+
+_deploy.ensure.cache:
+	@mkdir -p $(HOME)/.terraform.d/plugin-cache
+.PHONY: _deploy.ensure.cache
+
+_deploy.fmt:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		terraform fmt -diff -write
+.PHONY: _deploy.fmt
+
+_deploy.hclfmt:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		terragrunt hclfmt -diff -write
+.PHONY: _deploy.hclfmt
+
+_deploy.format: _deploy.fmt _deploy.hclfmt
+.PHONY: _deploy.format
+
+_deploy.tfsec:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		tfsec .
+.PHONY: _deploy.tfsec
+
+_deploy.update.message:
+	@echo "You must call 'make deploy.init.update' \
+		to install the new dependencies."
+.PHONY: _deploy.update.message
+
+_deploy.update.module:
+ifndef args
+	$(error Supply a module version and module name pair. \
+		Usage: make _deploy.update.module \
+		args='3.15.1 terraform-aws-modules/s3-bucket/aws')
+else
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		tfupdate module -r --version $(args) modules
+endif
+	@$(MAKE) _deploy.update.message
+.PHONY: _deploy.update.module
+
+_deploy.update.provider:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		tfupdate provider aws modules -r
+	@$(MAKE) _deploy.update.message
+.PHONY: _deploy.update.provider
+
+_deploy.validate:
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		$(PROJECT).deploy \
+		terragrunt run-all validate \
+		--terragrunt-working-dir environments/$(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: _deploy.validate
+
+### PUBLIC INTERFACE ###
 deploy.apply:
 ifndef module
 	$(error Supply module for operation. \
@@ -155,84 +232,6 @@ deploy.tunnel:
 
 deploy.update: _deploy.update.provider _deploy.update.module
 .PHONY: deploy.update
-
-### PRIVATE
-_deploy.confirm.destroy:
-	@echo "CAUTION - Are you certain? Confirm with 'destroy' [destroy/N] " && \
-		read ans && [ $${ans:-N} = destroy ]
-.PHONY: _deploy.confirm.destroy
-
-_deploy.docs:
-	for dir in infra services _reusable; do \
-		docker compose run -T --rm \
-			$(PROJECT).deploy \
-			terraform-docs \
-			markdown \
-			--recursive \
-			--recursive-path $$dir \
-			--output-file README.md \
-			/opt/tf/$(TF_MODULES); \
-	done
-.PHONY: _deploy.docs
-
-_deploy.ensure.cache:
-	@mkdir -p $(HOME)/.terraform.d/plugin-cache
-.PHONY: _deploy.ensure.cache
-
-_deploy.fmt:
-	docker compose run -T --rm \
-		$(PROJECT).deploy \
-		terraform fmt -diff -write
-.PHONY: _deploy.fmt
-
-_deploy.hclfmt:
-	docker compose run -T --rm \
-		$(PROJECT).deploy \
-		terragrunt hclfmt -diff -write
-.PHONY: _deploy.hclfmt
-
-_deploy.format: _deploy.fmt _deploy.hclfmt
-.PHONY: _deploy.format
-
-_deploy.tfsec:
-	docker compose run -T --rm \
-		$(PROJECT).deploy \
-		tfsec .
-.PHONY: _deploy.tfsec
-
-_deploy.update.message:
-	@echo "You must call 'make deploy.init.update' \
-		to install the new dependencies."
-.PHONY: deploy.update.message
-
-_deploy.update.module:
-ifndef args
-	$(error Supply a module version and module name pair. \
-		Usage: make _deploy.update.module \
-		args='3.15.1 terraform-aws-modules/s3-bucket/aws')
-else
-	docker compose run -T --rm \
-		$(PROJECT).deploy \
-		tfupdate module -r --version $(args) modules
-endif
-	@$(MAKE) deploy.update.message
-.PHONY: _deploy.update.module
-
-_deploy.update.provider:
-	docker compose run -T --rm \
-		$(PROJECT).deploy \
-		tfupdate provider aws modules -r
-	@$(MAKE) deploy.update.message
-.PHONY: _deploy.update.provider
-
-_deploy.validate:
-	docker compose run -T --rm \
-		-e TF_DISABLE_INIT=true \
-		$(PROJECT).deploy \
-		terragrunt run-all validate \
-		--terragrunt-working-dir environments/$(ENVIRONMENT) \
-		--terragrunt-log-level $(TF_LOG)
-.PHONY: _deploy.validate
 
 deploy.help:
 	@echo "  deploy.apply           provision a single module"

@@ -1,20 +1,21 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 
-docs.build:
+_docs.build:
 	docker compose up -d --no-deps --build $(PROJECT).docs
-.PHONY: docs.build
+.PHONY: _docs.build
 
-docs.clean:
+_docs.clean:
 	docker compose run --rm -T \
 		$(PROJECT).docs \
 		rm -rf /opt/docs/_build
-.PHONY: docs.clean
+.PHONY: _docs.clean
 
-docs.init: docs.build
-.PHONY: docs.init
+_docs.init: _docs.build
+.PHONY: _docs.init
 
-docs.render: docs.clean
+### PUBLIC INTERFACE ###
+docs.render: _docs.clean
 	docker compose run --rm -T \
 		$(PROJECT).docs \
 		sphinx-build -b html -nW /opt/docs /opt/docs/_build/html
@@ -26,7 +27,7 @@ docs.shell:
 		bash
 .PHONY: docs.shell
 
-docs.sync: docs.build
+docs.sync: _docs.build
 .PHONY: docs.sync
 
 docs.write:
@@ -34,8 +35,6 @@ docs.write:
 .PHONY: docs.write
 
 docs.help:
-	@echo "  docs.build             rebuild the docs service"
-	@echo "  docs.init              initialize the docs service"
 	@echo "  docs.render            output the documentation as html"
 	@echo "  docs.shell             shell into the docs container"
 	@echo "  docs.sync              compile the docs requirements file and rebuild the service"

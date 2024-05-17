@@ -4,18 +4,19 @@ DB_VOLUME := pgdata
 DUMPS := /opt/db/dumps
 RESTORE_SCHEMA := restore
 
-db.create_restore_schema:
+_db.create_restore_schema:
 	docker compose exec \
 		$(PROJECT).db \
 		psql -wx \
 		--dbname $(PROJECT) \
 		--username $(PROJECT) \
 		-c 'CREATE SCHEMA IF NOT EXISTS $(RESTORE_SCHEMA)'
-.PHONY: db.create_restore_schema
+.PHONY: _db.create_restore_schema
 
-# TODO: The db volume prefix comes automatically from the directory so
-# eventually this will need to become ida_$(DB_VOLUME) probably.
-db.drop: confirm
+### PUBLIC INTERFACE ###
+# TODO: The db volume prefix comes automatically from the **project directory**
+# so eventually this will probably need to become ida_$(DB_VOLUME).
+db.drop: _confirm
 	@$(MAKE) infra.stop
 	docker rm -f $$(docker ps -a -q)
 	docker volume rm dalme_$(DB_VOLUME)
@@ -32,7 +33,7 @@ db.dump:
 		-f $(DUMPS)/$(PROJECT)-$$(date -u +"%Y%m%d-T%s").dump
 .PHONY: db.dump
 
-db.load: db.create_restore_schema
+db.load: _db.create_restore_schema
 ifndef dump
 	$(error No local dump specified to restore. \
 		Usage: make db.load dump='dalme-20231025-T1698276955.dump')

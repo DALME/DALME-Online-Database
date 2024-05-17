@@ -1,6 +1,53 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 
+_infra.build:
+	docker compose up -d --build
+.PHONY: _infra.build
+
+_infra.env:
+	@$(MAKE) _infra.pg.check || $(MAKE) _infra.pg.warn
+	@$(MAKE) _infra.pyenv.check || $(MAKE) _infra.pyenv.warn
+	@$(MAKE) _infra.pyenv.local || $(MAKE) _infra.pyenv.install
+	pyenv exec python -m venv $(VENV)
+	$(VENV_BIN)/pip install --upgrade pip
+.PHONY: _infra.env
+
+_infra.hooks.install:
+	$(VENV_BIN)/pre-commit install
+.PHONY: _infra.hooks.install
+
+_infra.oidc.key:
+	if [ ! -f $(CONFIG)/oidc.key ]; \
+		then openssl genrsa -out $(CONFIG)/oidc.key 4096; fi;
+.PHONY: _infra.oidc.key
+
+_infra.pg.check:
+	@command -v 'postgres' >/dev/null 2>&1
+.PHONY: _infra.pg.check
+
+_infra.pg.warn:
+	$(error 'ERROR: Install postgres so psycopg can be compiled locally)
+.PHONY: _infra.pg.warn
+
+_infra.pyenv.check:
+	@command -v 'pyenv' >/dev/null 2>&1
+.PHONY: _infra.pyenv.check
+
+_infra.pyenv.local:
+	pyenv local $(PY)
+.PHONY: _infra.pyenv.local
+
+_infra.pyenv.install:
+	pyenv install $(PY)
+	@$(MAKE) _infra.pyenv.local
+.PHONY: _infra.pyenv.install
+
+_infra.pyenv.warn:
+	$(error 'ERROR: Install pyenv')
+.PHONY: _infra.pyenv.warn
+
+### PUBLIC INTERFACE ###
 infra.bootstrap:
 ifndef dump
 	$(error No local dump specified to restore. \
@@ -16,59 +63,13 @@ else
 endif
 .PHONY: infra.bootstrap
 
-infra.build:
-	docker compose up -d --build
-.PHONY: infra.build
-
-infra.hooks.install:
-	$(VENV_BIN)/pre-commit install
-.PHONY: infra.hooks.install
-
 infra.hooks.update:
 	$(VENV_BIN)/pre-commit autoupdate
 .PHONY: infra.hooks.update
 
-infra.env:
-	@$(MAKE) infra.pg.check || $(MAKE) infra.pg.warn
-	@$(MAKE) infra.pyenv.check || $(MAKE) infra.pyenv.warn
-	@$(MAKE) infra.pyenv.local || $(MAKE) infra.pyenv.install
-	pyenv exec python -m venv $(VENV)
-	$(VENV_BIN)/pip install --upgrade pip
-.PHONY: infra.env
-
 infra.log:
 	docker compose logs --follow
 .PHONY: infra.log
-
-infra.oidc.key:
-	if [ ! -f $(CONFIG)/oidc.key ]; \
-		then openssl genrsa -out $(CONFIG)/oidc.key 4096; fi;
-.PHONY: infra.oidc.key
-
-infra.pg.check:
-	@command -v 'postgres' >/dev/null 2>&1
-.PHONY: infra.pg.check
-
-infra.pg.warn:
-	$(error 'ERROR: Install postgres so psycopg can be compiled locally)
-.PHONY: infra.pg.warn
-
-infra.pyenv.check:
-	@command -v 'pyenv' >/dev/null 2>&1
-.PHONY: infra.pyenv.check
-
-infra.pyenv.local:
-	pyenv local $(PY)
-.PHONY: infra.pyenv.local
-
-infra.pyenv.install:
-	pyenv install $(PY)
-	@$(MAKE) infra.pyenv.local
-.PHONY: infra.pyenv.install
-
-infra.pyenv.warn:
-	$(error 'ERROR: Install pyenv')
-.PHONY: infra.pyenv.warn
 
 infra.rebuild:
 	docker compose up -d --build --force-recreate
@@ -84,9 +85,7 @@ infra.stop:
 
 infra.help:
 	@echo "  infra.bootstrap        ready the development environment"
-	@echo "  infra.build            build the containers"
 	@echo "  infra.log              tail the container logs"
-	@echo "  infra.oidc.key         generate a private key for signing oauth/oidc tokens"
 	@echo "  infra.rebuild          rebuild the containers"
 	@echo "  infra.start            spin up the container network"
 	@echo "  infra.stop             stop the container network"

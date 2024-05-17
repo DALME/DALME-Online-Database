@@ -3,17 +3,18 @@
 NODE_MODULES := $(UI)/node_modules
 PROXY_PORT := 8000
 
-ui.build:
+_ui.build:
 	docker compose up -d --no-deps --build $(PROJECT).ui
-.PHONY: ui.build
+.PHONY: _ui.build
 
-ui.init: ui.install
-.PHONY: ui.init
+_ui.init: _ui.install
+.PHONY: _ui.init
 
-ui.install:
+_ui.install:
 	yarn --cwd $(UI) install
-.PHONY: ui.install
+.PHONY: _ui.install
 
+### PUBLIC INTERFACE ###
 ui.lint:
 	docker compose run -T --rm \
 		$(PROJECT).ui \
@@ -30,7 +31,7 @@ ui.shell:
 		bash
 .PHONY: ui.shell
 
-ui.sync: ui.install ui.build
+ui.sync: _ui.install _ui.build
 .PHONY: ui.sync
 
 ui.test:
@@ -46,8 +47,6 @@ ui.test.watch:
 .PHONY: ui.test.watch
 
 ui.help:
-	@echo "  ui.build               rebuild the ui service"
-	@echo "  ui.install             install the ui requirements"
 	@echo "  ui.lint                invoke eslint over the ui code"
 	@echo "  ui.open                view the ui in your browser"
 	@echo "  ui.shell               shell into the ui container"
