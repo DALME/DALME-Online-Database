@@ -19,7 +19,7 @@
     flex: 0 0 auto;
     border: 1px solid #dcdcdc;
 }
-.headshot.no-photo:after {
+.headshot-bg.no-photo:after {
     content: "\f007";
     font-family: "Font Awesome 5 Free";
     font-size: 4rem;
