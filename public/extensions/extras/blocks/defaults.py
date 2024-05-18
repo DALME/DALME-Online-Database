@@ -11,7 +11,6 @@ from public.extensions.bibliography.blocks import BibliographyChooserBlock
 from public.extensions.footnotes.blocks import FootnotesPlaceMarker
 from public.extensions.images.blocks import InlineImageBlock, MainImageBlock
 from public.extensions.images.blocks.carousel import CarouselBlock
-from public.extensions.team.blocks import PersonBlock
 
 from .chart_embed import ChartEmbedBlock
 from .document import DocumentBlock
@@ -71,7 +70,6 @@ BASE_BLOCKS = [
     ('inline_image', InlineImageBlock()),
     ('main_image', MainImageBlock()),
     ('page', blocks.PageChooserBlock()),
-    ('person', PersonBlock()),
     ('pullquote', blocks.RichTextBlock(icon='openquote')),
     ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS, icon='table-cells')),
     ('table_typed', typed_table),

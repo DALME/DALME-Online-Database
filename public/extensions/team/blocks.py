@@ -2,7 +2,6 @@
 
 from wagtail import blocks
 from wagtail.blocks.struct_block import StructBlockAdapter
-from wagtail.images.blocks import ImageChooserBlock
 from wagtail.telepath import register
 
 from django import forms
@@ -32,18 +31,6 @@ def get_role_choices():
 
 def get_member_choices():
     return TeamMember.objects.values_list('id', 'name')
-
-
-class PersonBlock(blocks.StructBlock):
-    name = blocks.CharBlock()
-    job = blocks.CharBlock(required=False)
-    institution = blocks.CharBlock(required=False)
-    url = blocks.URLBlock(required=False)
-    photo = ImageChooserBlock(required=False)
-
-    class Meta:
-        icon = 'person'
-        template = 'person_block.html'
 
 
 class TeamListStructValue(blocks.StructValue):
