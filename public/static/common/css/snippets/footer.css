@@ -6,32 +6,41 @@ body footer {
     justify-content: space-between;
     padding: 0;
     z-index: 2;
+    height: 54px;
 }
 nav.footer {
-    display: none;
-    flex: 0 0 auto;
+    display: flex;
+    padding-left: 20px;
 }
 nav.footer ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    display: flex;
 }
 nav.footer ul li {
-    display: inline;
+    display: inline-flex;
+    align-items: center;
 }
-nav.footer ul li:not(:last-child)::after {
-    content: " \2022 ";
-}
-nav.footer ul li a {
+nav.footer ul li a,
+nav.footer ul li .login-icon {
     color: #ccc;
     text-decoration: none;
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.9rem;
-    padding: 0 0.2rem;
 }
-nav.footer ul li a:hover {
+nav.footer ul li a:hover,
+nav.footer ul li .login-icon:hover {
     color: #fff;
+}
+nav.footer ul li a {
+    display: none;
+}
+nav.footer ul li .login-icon {
+    display: inline;
+    font-size: 10px;
+    cursor: pointer;
 }
 .footer-button {
     color: #5e5e5e;
@@ -39,8 +48,28 @@ nav.footer ul li a:hover {
 }
 .copyright {
     font-size: 0.6rem;
-    padding: 1rem;
+    padding: 0 1rem;
     flex: 4 0 auto;
-    text-align: center;
     color: #ccc;
+    display: flex;
+    justify-content: center;
+}
+
+@media only screen and (min-width: 600px) {
+    .copyright {
+        font-size: 0.9rem;
+    }
+}
+
+@media only screen and (min-width: 950px) {
+    body footer {
+        padding: 0 4rem;
+    }
+    nav.footer ul li a {
+        display: block;
+    }
+    nav.footer ul li:not(:last-child)::after {
+        content: "\2022";
+        padding: 0 8px;
+    }
 }

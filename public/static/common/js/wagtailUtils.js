@@ -43,4 +43,31 @@ window.CustomUtils = {
     menu.classList.toggle("u-flex");
     menu.classList.toggle("u-none");
   },
+  goToLogin: async () => {
+    const screenshot = document.documentElement.cloneNode(true);
+    const reader = new FileReader();
+    screenshot.style.pointerEvents = "none";
+    screenshot.style.overflow = "hidden";
+    screenshot.style.webkitUserSelect = "none";
+    screenshot.style.mozUserSelect = "none";
+    screenshot.style.msUserSelect = "none";
+    screenshot.style.oUserSelect = "none";
+    screenshot.style.userSelect = "none";
+    screenshot.dataset.scrollX = window.scrollX;
+    screenshot.dataset.scrollY = window.scrollY;
+    screenshot.querySelector("[data-domain]").remove();
+    screenshot.querySelectorAll("link").forEach((el) => el.href = el.href);
+    screenshot.querySelectorAll("script").forEach((el) => el.src = el.src);
+    screenshot.querySelectorAll("img").forEach((el) => el.src = el.src);
+    screenshot.querySelectorAll("[style]").forEach((el) => {
+      el.setAttribute("style", el.getAttribute("style").replace(/url\((.+)\)/gi, `url(${window.location.href}$1)`));
+    });
+    console.log(screenshot);
+    const blob = new Blob([screenshot.outerHTML], { type: "text/html" });
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      window.localStorage.setItem("origin_background", reader.result);
+      window.location.assign("/db/?next=/cms/");
+    }
+  },
 }

@@ -5,6 +5,7 @@
     transition-show="scale"
     transition-hide="scale"
     class="frosted-background"
+    v-if="pageBackdropLoaded"
   >
     <q-card class="login-modal">
       <q-card-section class="login-card-header">
@@ -106,6 +107,7 @@ export default defineComponent({
     const { fetchAPI, status } = apiInterface();
 
     const prefSubscription = inject("prefSubscription");
+    const pageBackdropLoaded = inject("pageBackdropLoaded");
 
     const username = ref("");
     const password = ref("");
@@ -149,6 +151,7 @@ export default defineComponent({
       isPassword,
       logout,
       onSubmit,
+      pageBackdropLoaded,
       password,
       passwordRules,
       submitting,

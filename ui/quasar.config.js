@@ -13,11 +13,14 @@ const { configure } = require("quasar/wrappers");
 
 const getDevCSP = () => {
   const defaultSrc =
-    "default-src 'self' ws://0.0.0.0:8000 https://dam.dalme.org https://fonts.gstatic.com";
+    "default-src 'self' data: ws://0.0.0.0:8000 https://dam.dalme.org https://ka-f.fontawesome.com/";
   const imgSrc = "img-src 'self' https://dam.dalme.org";
-  const scriptSrc = "script-src 'self' 'unsafe-eval' 'unsafe-inline'";
-  const styleSrc = "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'";
-  return `${defaultSrc}; ${imgSrc}; ${scriptSrc}; ${styleSrc};`;
+  const scriptSrc =
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net/ https://kit.fontawesome.com/ https://code.jquery.com/ https://cdnjs.cloudflare.com/ https://maxcdn.bootstrapcdn.com/ https://unpkg.com/";
+  const styleSrc =
+    "style-src 'self' https://fonts.googleapis.com https://stackpath.bootstrapcdn.com/ 'unsafe-inline'";
+  const fontSrc = "font-src 'self' https://ka-f.fontawesome.com/ https://fonts.gstatic.com/";
+  return `${defaultSrc}; ${imgSrc}; ${scriptSrc}; ${styleSrc}; ${fontSrc}`;
 };
 
 module.exports = configure(function (ctx) {

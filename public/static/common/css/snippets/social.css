@@ -2,11 +2,11 @@
     display: none;
     background: #000;
     color: #ccc;
-    text-align: center;
-    flex: 1 0 0;
+    align-items: center;
     font-size: 1.7rem;
-    padding: .75rem 2rem;
+    padding: 10px 50px;
     white-space: nowrap;
+    gap: 10px;
 }
 .social > i:not(:first-child):not(:last-child) {
     margin: 0 0.3rem;
@@ -33,4 +33,16 @@
 }
 #share-button a:hover {
     background: none;
+}
+
+@media only screen and (min-width: 600px) {
+    .social {
+        display: flex !important;
+    }
+}
+
+@media only screen and (min-width: 950px) {
+    .social > i {
+        font-size: 1.5rem
+    }
 }

@@ -61,10 +61,12 @@ class User(AbstractUser):
         # Capture this here before it mutates during super().save().
         created = self._state.adding
         if created:
+            # TODO: is this necessary? should this be part of the create form?
             # self.profile = Profile(full_name=f'{self.first_name} {self.last_name}')
             super().save(*args, **kwargs)
 
             # Add the new user to the current tenant.
+            # TODO: should superusers/users belonging to certain groups be added to ALL tenants?
             tenant = get_current_tenant()
             if bool(tenant):  # This just checks the proxy is actually bound to a value.
                 tenant.members.add(self)

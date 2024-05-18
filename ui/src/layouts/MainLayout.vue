@@ -10,6 +10,15 @@
         <router-view />
       </q-page-container>
     </template>
+    <template v-else>
+      <iframe
+        id="login-background-page"
+        ref="pageBackdrop"
+        :class="{ 'q-transparent': !pageBackdropLoaded }"
+        :src="originPage"
+      >
+      </iframe>
+    </template>
   </q-layout>
 </template>
 
@@ -40,9 +49,12 @@ export default defineComponent({
     const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
     const userDrawerEl = ref(null);
+    const pageBackdrop = ref(null);
 
     const render = computed(() => auth.authorized || auth.reauthenticate);
-    const showMap = computed(() => auth.authenticate);
+    const originPage = window.localStorage.getItem("origin_background");
+    const showMap = computed(() => auth.authenticate && !originPage);
+    const pageBackdropLoaded = ref(originPage ? false : true);
 
     const prefSubscription = (action) => {
       let unsubscribe = () => {};
@@ -72,6 +84,7 @@ export default defineComponent({
 
     provide("prefSubscription", prefSubscription);
     provide("userDrawerEl", userDrawerEl);
+    provide("pageBackdropLoaded", pageBackdropLoaded);
 
     onMounted(() => {
       if ($route.query.logout) {
@@ -83,12 +96,20 @@ export default defineComponent({
       ui.resizeListener();
 
       document.addEventListener("click", outsideDrawerClick);
+      if (!render.value && originPage) {
+        pageBackdrop.value.onload = () => {
+          pageBackdropLoaded.value = true;
+        };
+      }
     });
 
     return {
       auth,
       render,
       showMap,
+      originPage,
+      pageBackdrop,
+      pageBackdropLoaded,
     };
   },
 });
@@ -110,5 +131,10 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+}
+#login-background-page {
+  border: none;
+  width: 100vw;
+  height: 100vh;
 }
 </style>

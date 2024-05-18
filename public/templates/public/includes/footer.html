@@ -1,15 +1,23 @@
 {% load wagtailcore_tags %}
 
 <footer class="u-flex" id="footer-app">
-    {% if links %}
-      <nav class="footer">
-        <ul>
-          {% for link in links %}
-            <li><a href="{% pageurl link.page %}">{{ link.label }}</a></li>
-          {% endfor %}
-        </ul>
-      </nav>
-    {% endif %}
+    <nav class="footer">
+      <ul>
+        <li>{{ show_login }}</li>
+        {% if links %}
+              {% for link in links %}
+                <li><a href="{% pageurl link.page %}">{{ link.label }}</a></li>
+              {% endfor %}
+        {% endif %}
+        {% if show_login %}
+          <li>
+            <div class="login-icon" onclick="window.CustomUtils.goToLogin()">
+              <i class="fa fa-solid fa-unlock"></i>
+            </div>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
 
     <div class="copyright">
       {% if settings.copyright_line %}

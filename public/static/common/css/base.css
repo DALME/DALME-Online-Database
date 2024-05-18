@@ -1711,13 +1711,6 @@ div.description[data-collapsed='true'] {
   .block-person {
     width: 49%;
   }
-
-  .copyright {
-    font-size: 0.9rem;
-  }
-  .social {
-    display: block;
-  }
 }
 
 @media only screen and (min-width: 950px) {
@@ -1803,16 +1796,6 @@ div.description[data-collapsed='true'] {
   }
   .folios {
     margin: 0;
-  }
-
-  body footer {
-    padding: 0 4rem;
-  }
-  nav.footer {
-    display: flex;
-  }
-  footer .social > i {
-    font-size: 1.5rem
   }
 
   .richtext-image.right {
