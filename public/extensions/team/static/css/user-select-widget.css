@@ -73,7 +73,7 @@ a.select2-choice .select2-chosen .user-option svg {
     width: 25px;
     height: 25px;
 }
-.select2-container.select-multiple.select-user li.select2-search-choice .user-option .user-label span {
+.select2-container.select-multiple.select-user li.select2-search-choice .user-option .user-label span.user-username {
     display: none;
 }
 

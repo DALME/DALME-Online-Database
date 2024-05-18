@@ -39,10 +39,12 @@ window.CustomUtils.userSelectState = {
     },
     togglePreview: () => {
       const store = window.CustomUtils.userSelectState.store;
-      const value = store.selectEl.select2("data");
-      store.photoChooser.querySelector(".chooser__image").src = value.item.avatar ? value.item.avatar : "#";
-      if (!store.photoChooser.classList.contains("blank") || value.item.avatar) {
-        store.photoChooser.classList.toggle("blank");
+      if (store.selectEl) {
+        const value = store.selectEl.select2("data");
+        store.photoChooser.querySelector(".chooser__image").src = value.item.avatar ? value.item.avatar : "#";
+        if (!store.photoChooser.classList.contains("blank") || value.item.avatar) {
+          store.photoChooser.classList.toggle("blank");
+        }
       }
     },
     toggleForm: () => {
@@ -70,11 +72,10 @@ window.CustomUtils.userSelectState = {
   initialFormatter: (el, callback) => {
     const store = window.CustomUtils.userSelectState.store;
     const id_list = store.getIdList(el.val());
-    console.log(id_list);
     if (id_list.length) {
       el.val(id_list);
       store.fetchResults(`${store.baseApiUrl}?id__in=${id_list}`, (results) => {
-        callback(el.multiple ? results : results[0]);
+        callback(el.data("multiple") !== "undefined" ? results : results[0]);
         store.togglePreview();
       });
     }
