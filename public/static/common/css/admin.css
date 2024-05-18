@@ -1,18 +1,22 @@
 :root.w-theme-light {
   --w-color-admin-panel-header: #007d7e12;
+  --w-color-admin-tile-icon: #4d407652;
 }
 :root.w-theme-dark {
   --w-color-admin-panel-header: #264b417d;
+  --w-color-admin-tile-icon: #00b0b152;
 }
 
 @media (prefers-color-scheme: light) {
   .w-theme-system {
     --w-color-admin-panel-header: #007d7e12;
+    --w-color-admin-tile-icon: #4d407652;
   }
 }
 @media (prefers-color-scheme: dark) {
   .w-theme-system {
     --w-color-admin-panel-header: #264b417d;
+    --w-color-admin-tile-icon: #00b0b152;
   }
 }
 
@@ -116,7 +120,7 @@ pre[class*=language-]:before {
 .homepage .w-summary .icon {
   font-size: 70px;
   margin-inline-end: 15px;
-  color: #0000002e;
+  color: var(--w-color-admin-tile-icon);
 }
 .homepage .w-summary .w-summary__list {
   justify-content: flex-start;
