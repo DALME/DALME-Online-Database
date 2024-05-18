@@ -9,7 +9,7 @@
   >
     <q-card class="login-modal">
       <q-card-section class="login-card-header">
-        <img class="dalme-logo-image" src="~assets/dalme_logo.svg" />
+        <img class="ida-logo-gif" src="~assets/ida_logo_animated.gif" />
       </q-card-section>
       <q-separator />
       <q-card-section class="login-card-body">
@@ -165,6 +165,7 @@ export default defineComponent({
 <style lang="scss">
 .login-modal {
   min-width: 400px;
+  box-shadow: 0px 0px 20px 3px #212f3a8c;
 }
 .dalme-logo-image {
   align-self: center;
@@ -175,6 +176,21 @@ export default defineComponent({
   position: relative;
   top: -10%;
 }
+.ida-logo-image {
+  align-self: center;
+  width: 100%;
+  filter: drop-shadow(1px 0px 1px white);
+  transform: rotate(339deg);
+  opacity: 0.5;
+  position: relative;
+  top: -30px;
+}
+.ida-logo-gif {
+  width: 120%;
+  position: absolute;
+  top: -30px;
+  left: -30px;
+}
 .login-card-header {
   display: flex;
   flex-direction: column;
@@ -183,7 +199,8 @@ export default defineComponent({
   text-align: center;
   height: 200px;
   background-color: #343e72;
-  background-image: linear-gradient(59deg, #343e72 54.62%, #1b1b1b);
+  background-image: linear-gradient(22deg, #343e72 34.62%, #151c3e);
+  overflow: hidden;
 }
 .login-card-logo {
   align-self: center;

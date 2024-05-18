@@ -186,6 +186,10 @@ pre {
   text-transform: uppercase;
 }
 
+.q-transparent {
+  opacity: 0;
+}
+
 .sticky-header {
   max-height: 800px;
   thead tr th {
@@ -489,9 +493,10 @@ pre {
   flex-shrink: 0 !important;
 }
 .frosted-background > .q-dialog__backdrop {
-  background-color: rgba(44, 66, 95, 0.4);
-  backdrop-filter: blur(2px) grayscale(70%);
+  background-color: rgba(112, 132, 160, 0.7);
+  backdrop-filter: blur(10px) grayscale(70%);
 }
+
 .greyscale-50 {
   filter: grayscale(0.5);
 }
