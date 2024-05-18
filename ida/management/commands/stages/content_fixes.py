@@ -91,8 +91,10 @@ class Stage(BaseStage):
         self.update_footnote_state()
         self.fix_biblio_page()
         self.migrate_people()
+        self.replace_about_people()
         self.fix_media_paths()
         self.process_images()
+        self.drop_restore_schema()
 
     @transaction.atomic
     def adjust_id_columns(self):
@@ -553,6 +555,61 @@ class Stage(BaseStage):
                         tm = TeamMember.objects.get(user=user)
                         tm.roles.add(current_role)
                         self.logger.info('Found duplicate record for %s.', name)
+
+    @transaction.atomic
+    def replace_about_people(self):
+        """Replace the About > People page with one that uses the new Team extension."""
+        people_page_data = {
+            'title': 'People',
+            'short_title': 'People',
+            'header_image_id': 11,
+            'slug': 'people',
+            'show_in_menus': True,
+            'body': [
+                {'id': 'eac3c1b6-6724-42af-a039-afef0ca8b880', 'type': 'heading', 'value': 'Project Team'},
+                {
+                    'id': '83f8d736-839d-407b-82ed-90e7ae981ccf',
+                    'type': 'team_list',
+                    'value': {
+                        'mode': 'members',
+                        'role': '',
+                        'order': 'name',
+                        'members': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+                    },
+                },
+                {'id': '61df150f-065e-4c33-b103-e5ae76991cc3', 'type': 'heading', 'value': 'Contributors'},
+                {
+                    'id': '447c0a2f-d127-4937-a72d-bb9644592883',
+                    'type': 'team_list',
+                    'value': {'mode': 'role', 'role': '3', 'order': 'name', 'members': []},
+                },
+                {'id': 'd91180b0-8a60-4c9b-8ed2-4b16fe840bec', 'type': 'heading', 'value': 'Advisory Board'},
+                {
+                    'id': 'c381034b-a89c-4df8-b578-40781dc24044',
+                    'type': 'text',
+                    'value': '<p data-block-key="khpxl">The members of the DALME board help convey news about the project to colleagues and students in the field and, in turn, bring potential contributors and resources to our attention.</p>',
+                },
+                {
+                    'id': '89294881-07a3-4582-8a86-2733be10b447',
+                    'type': 'team_list',
+                    'value': {'mode': 'role', 'role': '4', 'order': 'name', 'members': []},
+                },
+            ],
+        }
+
+        self.logger.info('Replacing About > People page...')
+        with schema_context('dalme'):
+            from wagtail.models import Page
+
+            from public.models import People
+
+            # delete existing People page
+            Page.objects.get(title='People').delete()
+
+            # create new one
+            about_page = Page.objects.get(title='About').specific
+            people_page = about_page.add_child(instance=People(**people_page_data))
+            people_page.save_revision().publish()
 
     @transaction.atomic
     def fix_media_paths(self):
