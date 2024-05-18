@@ -11,6 +11,7 @@ from functools import cached_property
 import markdown
 from bs4 import BeautifulSoup
 from django_tenants.utils import schema_context
+from psycopg import sql
 from wagtail.log_actions import log
 
 from django.apps import apps
@@ -472,9 +473,12 @@ class Stage(BaseStage):
                     return match.get()
             return None
 
-        with schema_context('dalme'):
-            from wagtail.models import Page
+        with connection.cursor() as cursor:
+            cursor.execute(sql.SQL('SELECT * FROM restore.public_flat WHERE page_ptr_id = 16;'))
+            rows = self.map_rows(cursor)
+            people_page = next(iter(rows))
 
+        with schema_context('dalme'):
             from public.extensions.images.models import BaseImage
             from public.extensions.team.models import TeamMember, TeamRole
 
@@ -499,55 +503,53 @@ class Stage(BaseStage):
             }
 
             self.logger.info('Converting people blocks to TeamMember entities')
-            people_page = Page.objects.get(title='People').specific
-            for block in people_page.body:
-                if block.block_type == 'subsection':
-                    block_value = block.block.get_prep_value(block.value)
+
+            for block in json.loads(people_page['body']):
+                if block.get('type') == 'subsection':
+                    block_value = block['value']
                     current_role = roles.get(block_value.get('subsection'))
+                elif block.get('type') == 'person':
+                    block_value = block['value']
+                    name = block_value.get('name')
+                    tm_object = {
+                        'name': name,
+                        'title': block_value.get('job'),
+                        'defaults': {
+                            'affiliation': block_value.get('institution'),
+                            'url': block_value.get('url'),
+                        },
+                    }
 
-                    for sub_block in block_value['body']:
-                        if sub_block.get('type') == 'person':
-                            sub_block_value = sub_block['value']
-                            name = sub_block_value.get('name')
-                            tm_object = {
-                                'name': name,
-                                'title': sub_block_value.get('job'),
-                                'defaults': {
-                                    'affiliation': sub_block_value.get('institution'),
-                                    'url': sub_block_value.get('url'),
-                                },
-                            }
+                    user = user_match(name)
+                    if user:
+                        tm_object['user'] = user
 
-                            user = user_match(name)
-                            if user:
-                                tm_object['user'] = user
+                    photo_id = block_value.get('photo')
+                    if photo_id:
+                        photo = BaseImage.objects.get(pk=photo_id)
+                        if user:
+                            wt_profile = user.wagtail_userprofile
+                            # django-tenants will try to add the tenant to the path
+                            # to prevent it, we override the "storage" attribute of
+                            # the field class with Django's default storage model
+                            wt_profile.avatar.storage = FileSystemStorage()
+                            wt_profile.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
 
-                            photo_id = sub_block_value.get('photo')
-                            if photo_id:
-                                photo = BaseImage.objects.get(pk=photo_id)
-                                if user:
-                                    wt_profile = user.wagtail_userprofile
-                                    # django-tenants will try to add the tenant to the path
-                                    # to prevent it, we override the "storage" attribute of
-                                    # the field class with Django's default storage model
-                                    wt_profile.avatar.storage = FileSystemStorage()
-                                    wt_profile.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
+                        else:
+                            tm_object['defaults']['photo'] = photo
 
-                                else:
-                                    tm_object['defaults']['photo'] = photo
+                    try:
+                        tm, created = TeamMember.objects.get_or_create(**tm_object)
+                        tm.roles.add(current_role)
+                        if user and user.id in [1, 5]:
+                            tm.roles.add(roles['PI'])
+                        action = 'wagtail.create' if created else 'wagtail.edit'
+                        log(instance=tm, action=action)
 
-                            try:
-                                tm, created = TeamMember.objects.get_or_create(**tm_object)
-                                tm.roles.add(current_role)
-                                if user and user.id in [1, 5]:
-                                    tm.roles.add(roles['PI'])
-                                action = 'wagtail.create' if created else 'wagtail.edit'
-                                log(instance=tm, action=action)
-
-                            except IntegrityError:
-                                tm = TeamMember.objects.get(user=user)
-                                tm.roles.add(current_role)
-                                self.logger.info('Found duplicate record for %s.', name)
+                    except IntegrityError:
+                        tm = TeamMember.objects.get(user=user)
+                        tm.roles.add(current_role)
+                        self.logger.info('Found duplicate record for %s.', name)
 
     @transaction.atomic
     def fix_media_paths(self):
