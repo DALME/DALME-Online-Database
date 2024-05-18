@@ -31,7 +31,6 @@ class Stage(BaseStage):
         self.transfer_wagtail_user_profiles()
         self.transfer_snippets()
         self.transfer_gradients()
-        self.drop_restore_schema()
 
     @transaction.atomic
     def clone_schema(self):
@@ -435,10 +434,3 @@ class Stage(BaseStage):
                 page = page.first()
                 page.gradient = gradient_obj
                 page.save(update_fields=['gradient'])
-
-    @transaction.atomic
-    def drop_restore_schema(self):
-        """Drop the restore schema."""
-        with connection.cursor() as cursor:
-            self.logger.info("Dropping the '%s' schema", SOURCE_SCHEMA)
-            cursor.execute('DROP SCHEMA restore CASCADE')

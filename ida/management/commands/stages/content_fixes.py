@@ -32,6 +32,9 @@ from .base import BaseStage
 
 REFERENCE_HREF = re.compile(r'(?:(?:http|https)://dalme.org)?/?/project/bibliography/#([A-Z0-9]{8})')
 
+SOURCE_SCHEMA = 'restore'
+CLONED_SCHEMA = 'cloned'
+
 REF_CITATIONS = {
     '6YDI5HL6': '(Smith, 2020)',
     'WJLVYXYP': '(Sibon, 2011)',
@@ -578,3 +581,10 @@ class Stage(BaseStage):
                         image.get_rendition('fill-100x100')
                 except:  # noqa: E722
                     pass
+
+    @transaction.atomic
+    def drop_restore_schema(self):
+        """Drop the restore schema."""
+        with connection.cursor() as cursor:
+            self.logger.info("Dropping the '%s' schema", SOURCE_SCHEMA)
+            cursor.execute('DROP SCHEMA restore CASCADE')
