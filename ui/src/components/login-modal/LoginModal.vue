@@ -9,7 +9,7 @@
   >
     <q-card class="login-modal">
       <q-card-section class="login-card-header">
-        <img class="ida-logo-gif" src="~assets/ida_logo_animated.gif" />
+        <img class="ida-logo-gif" src="~assets/ida_logo_anim.gif" />
       </q-card-section>
       <q-separator />
       <q-card-section class="login-card-body">
