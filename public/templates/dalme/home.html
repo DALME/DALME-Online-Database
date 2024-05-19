@@ -3,6 +3,7 @@
 
 {% block extra_styles %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/banners.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}" />
 {% endblock %}
 
 {% block header_extra %}
@@ -25,7 +26,7 @@
 {% endblock %}
 
 {% block main_column %}
-  {% include "public/includes/featured.html" %}
+  {% include "featured.html" %}
 
   <section class="mission u-flex">
     <h2 class="u-lozenge">DALME</h2>
