@@ -1,0 +1,48 @@
+form.contact-form {
+  border-top: 1px dotted #9c9c9c;
+  border-bottom: 1px dotted #9c9c9c;
+  flex-direction: column;
+  margin-top: 2rem;
+  padding: 1.5rem 1rem;
+}
+form.contact-form .sender > div {
+  flex: 50%;
+}
+form.contact-form .sender > div:first-child {
+  margin-right: 2rem;
+}
+form.contact-form textarea {
+  resize: vertical;
+}
+
+/* RECAPTCHA */
+.captcha-container {
+  display: flex;
+  border: 1px dotted #9e9d9d;
+  padding: .3rem;
+  border-radius: .3rem;
+  background-color: #f9f9f9;
+}
+.g-recaptcha {
+  position: relative;
+  width: 100%;
+  background: #f9f9f9;
+  overflow: hidden;
+}
+.g-recaptcha > * {
+  position: absolute;
+  right: -1px;
+  top: -1px;
+  margin: -20px -140px -27px -1px;
+}
+.g-recaptcha::after {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 150px;
+  top: 0;
+  bottom: 0;
+  background-color: #f9f9f9;
+  clear: both;
+}

@@ -1,0 +1,232 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+a {
+  color: #5e5e5e;
+  text-decoration: none;
+}
+a:hover {
+  color: #5e5e5e;
+  text-decoration: none;
+}
+ul,
+li {
+  list-style-type: none;
+}
+input,
+select {
+  background: #fff;
+}
+img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  margin: 0 auto;
+}
+input[type=search] {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Utilities */
+.u-flex {
+  display: flex;
+}
+.u-grid {
+  display: grid;
+}
+.u-none {
+  display: none;
+}
+.u-contents {
+  display: contents;
+}
+.u-type-sans {
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif !important;
+}
+.u-type-serif {
+  font-family: "Asul", "Times New Roman", serif;
+}
+.u-lozenge {
+  background: #02a1ff;
+  border-radius: 2rem;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  padding: 0.5rem 1.5rem;
+  text-transform: uppercase;
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.34);
+}
+a.u-lozenge:hover {
+  box-shadow: 0 3px 22px rgba(0, 0, 0, 0.64);
+}
+.u-button {
+  border: 1px solid #9c9c9c;
+  font-size: 12px;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  color: #6d6d6d !important;
+  border-radius: 3px;
+  display: block;
+  text-align: center;
+  cursor: pointer;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: auto;
+  margin-bottom: 15px;
+}
+.u-button:hover {
+  background-color: #e6ecf6;
+  color: #354d87 !important;
+  border-color: #354d87 !important;
+}
+.sidebar-heading {
+  border-bottom: 1px solid #aaa;
+  padding: 0 .5rem 0.1rem 1rem;
+}
+.u-small-caps-heading {
+  color: #636363;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  letter-spacing: 0.25rem;
+  margin: 0;
+  text-transform: uppercase;
+  margin-right: -0.25rem;
+}
+.u-bottom-to-top {
+  writing-mode: tb-rl;
+  transform: rotate(180deg);
+}
+.u-ellipsis {
+  color: #aaa;
+}
+
+i.active {
+  cursor: pointer;
+}
+i.inactive {
+  color: #aaa;
+}
+
+parsererror {
+  white-space: normal;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  border: none !important;
+  border-bottom: 1px dotted #ef8c83 !important;
+  border-top: 1px dotted #ef8c83 !important;
+  background-color: transparent !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+}
+parsererror h3 {
+  font-size: 16px !important;
+  color: #986561 !important;
+  margin-bottom: 0 !important;
+}
+parsererror div {
+  margin: .5rem .5rem;
+}
+
+
+.no-scroll-bar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scroll-bar::-webkit-scrollbar {
+  display: none;
+}
+
+
+.base-button,
+.base-button.focus,
+.base-button:focus {
+  border: 1px solid #aaa;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 5px;
+  color: #6b6b6b;
+  background-color: #fff;
+  line-height: 2;
+  box-shadow: none;
+  border-radius: .3rem;
+  text-transform: uppercase;
+}
+.base-button.large {
+  font-size: 12px;
+  padding: .2rem .5rem;
+}
+.base-button:not(:disabled):not(.disabled):hover,
+.base-button:not(:disabled):not(.disabled).active,
+.base-button:not(:disabled):not(.disabled):active,
+.show > .base-button.dropdown-toggle {
+  background-color: #e6ecf6;
+  color: #354d87 !important;
+  border-color: #354d87 !important;
+}
+
+.block-text ul,
+.block-text ol {
+  margin: 1rem 3rem;
+}
+.block-text ul li,
+.block-text ol li {
+  list-style-type: disc;
+  list-style-position: outside;
+  font-size: 1.1rem;
+  line-height: 2;
+}
+.block-text ul li {
+  list-style-type: disc;
+}
+.block-text ol li {
+  list-style-type: unset;
+}
+.block-text ul li:not(:last-of-type),
+.block-text ol li:not(:last-of-type) {
+  margin-bottom: 1rem;
+}
+
+.highlight {
+  background-color: #fff4bf;
+}
+a.anchor {
+  cursor: default;
+}
+a.anchor:hover {
+  border: none !important;
+}
+
+code {
+  padding: 2px 3px;
+  font-size: 87%;
+  margin: 0 2px;
+  background-color: rgba(27, 31, 35, 0.05);
+  font-family: Consolas, Menlo, Monaco, "Lucida Console", "Liberation Mono", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif;
+  border-radius: 3px;
+  color: #747474;
+  border: 1px solid #8080801a;
+  height: 22px;
+  line-height: 18px;
+  display: inline-flex;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 950px) {
+  .richtext-image.right {
+    float: right;
+    padding-left: 1rem;
+  }
+  .richtext-image.left {
+    float: left;
+    padding-right: 1rem;
+  }
+}

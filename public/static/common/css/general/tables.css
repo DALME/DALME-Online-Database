@@ -1,0 +1,45 @@
+.table-container {
+  padding: 1rem;
+}
+.u-table {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+}
+.u-table:not(.no-border),
+.u-table:not(.no-border) th,
+.u-table:not(.no-border) td {
+  border: 1px solid #aaa;
+}
+.u-table th {
+  font-size: 13px;
+}
+.u-table th,
+.u-table td {
+  text-align: left;
+  padding: 5px 20px;
+}
+.u-table th.right,
+.u-table td.right {
+  text-align: right;
+}
+.u-table th.center,
+.u-table td.center {
+  text-align: center;
+}
+.u-table caption {
+  font-size: 14px;
+  text-align: center;
+}
+.u-table + p {
+  margin-top: 1.5rem;
+}
+.u-table tr.divider {
+  border-bottom: 1px solid black;
+}
+.u-table tr.divider + tr td {
+  padding-top: 15px;
+}
+.u-table td.indented {
+  padding-left: 40px;
+}

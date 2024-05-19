@@ -1,15 +1,15 @@
 .chart-embed {
-    border: 1px solid #aaa;
-    padding: 1rem;
+  border: 1px solid #aaa;
+  padding: 1rem;
 }
 .chart-embed.full iframe {
-    margin: .5rem auto;
+  margin: .5rem auto;
 }
 .chart-embed.right {
-    float: right;
-    margin: 0.5rem 0 .5rem 1.4rem;
+  float: right;
+  margin: 0.5rem 0 .5rem 1.4rem;
 }
 .chart-embed.left {
-    float: left;
-    margin: .5rem 1.4rem .5rem 0;
+  float: left;
+  margin: .5rem 1.4rem .5rem 0;
 }

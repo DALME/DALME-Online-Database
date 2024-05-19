@@ -16,7 +16,6 @@
   width: 125px;
   min-width: 125px;
 }
-
 .gradient-cell {
   border: 1px solid var(--w-color-border-field-default);
   border-radius: 0.1875rem;

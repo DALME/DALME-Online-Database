@@ -1,25 +1,25 @@
 .document-block .field-row-panel .help {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 #panel-child-top-form-section,
 #panel-child-bottom-form-section {
-    margin-inline-start: 0;
+  margin-inline-start: 0;
 }
 .document-block #panel-child-top-form-section .w-field__wrapper,
-.document-block #panel-child-bottom-form-section .w-field__wrapper  {
-    margin-bottom: 0;
+.document-block #panel-child-bottom-form-section .w-field__wrapper {
+  margin-bottom: 0;
 }
 .document-block #panel-child-top-form-section .w-field__wrapper .w-field__wrapper,
-.document-block #panel-child-bottom-form-section .w-field__wrapper .w-field__wrapper  {
-    padding-bottom: 0;
+.document-block #panel-child-bottom-form-section .w-field__wrapper .w-field__wrapper {
+  padding-bottom: 0;
 }
 .document-block #panel-child-top-form-section .w-field__comment-button {
-    position: relative !important;
-    top: unset;
-    transform: translateX(-15px) !important;
-    padding: 0 20px 0 0;
-    height: 42px;
+  position: relative !important;
+  top: unset;
+  transform: translateX(-15px) !important;
+  padding: 0 20px 0 0;
+  height: 42px;
 }
 #body-1-value-type {
-    width: 100%;
+  width: 100%;
 }

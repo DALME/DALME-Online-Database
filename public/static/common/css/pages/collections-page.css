@@ -1,0 +1,79 @@
+main.collection.browser,
+main.collections.browser {
+  padding-top: 0;
+}
+main.collections section p,
+main.collection section p {
+  font-family: "PT Serif", "Times New Roman", serif;
+  padding: 0;
+}
+main.collections section h4,
+main.collection section h4 {
+  padding-top: 1rem;
+}
+.corpora-container {
+  flex-direction: column;
+  padding-top: 1rem;
+}
+.corpora-container h4 {
+  color: unset;
+  margin: 1rem 0;
+  padding-left: .5rem;
+  font-weight: 700;
+}
+.corpora-container > .corpus {
+  width: 100%;
+}
+.corpora-container > .corpus .rich-text {
+  font-family: "PT Serif", "Times New Roman", serif;
+}
+.corpora-container .collections-container {
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+.corpora-container .collections-container a {
+  color: #5e5e5e;
+  border-top: 1px dotted #636363;
+  flex-direction: column;
+  padding: .7rem .5rem;
+  flex-direction: row;
+  align-items: center;
+}
+.corpora-container .collections-container a:last-child {
+  border-bottom: 1px dotted #9c9c9c;
+}
+.corpora-container .collections-container a:hover {
+  background-color: #e6ecf6;
+  color: #354d87;
+  text-decoration: none;
+}
+.corpora-container .collections-container .count {
+  margin-left: auto;
+  font-size: 10pt;
+}
+.corpora-container .collections-container .title {
+  font-weight: 600;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  main.collection.browser,
+  main.collections.browser {
+    padding-top: 1rem;
+  }
+  main.collections.browser.horizontal-split {
+    overflow: unset;
+  }
+  .corpora-container .collections li {
+    flex-direction: row;
+  }
+  .corpora-container .collections .count {
+    margin: 0 0 0 auto;
+  }
+}
+
+@media only screen and (min-width: 950px) {
+  body.collection .collapsible {
+    padding: 1rem 4rem;
+  }
+}

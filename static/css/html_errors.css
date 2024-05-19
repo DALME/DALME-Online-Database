@@ -28,14 +28,12 @@
   --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
-
 html {
   font-family: sans-serif;
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -52,16 +50,17 @@ body {
   display: -ms-flexbox;
   display: flex;
 }
-
-*, ::after, ::before {
+*,
+::after,
+::before {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.container, .container-fluid {
+.container,
+.container-fluid {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
-
 .container-fluid {
   width: 100%;
   padding-right: 0.75rem;
@@ -75,25 +74,32 @@ body {
 .text-gray-500 {
   color: #b7b9cc !important;
 }
-.pt-5, .py-5 {
+.pt-5,
+.py-5 {
   padding-top: 3rem !important;
 }
-.mt-5, .my-5 {
+.mt-5,
+.my-5 {
   margin-top: 3rem !important;
 }
-.ml-auto, .mx-auto {
+.ml-auto,
+.mx-auto {
   margin-left: auto !important;
 }
-.mb-0, .my-0 {
+.mb-0,
+.my-0 {
   margin-bottom: 0 !important;
 }
-.mr-auto, .mx-auto {
+.mr-auto,
+.mx-auto {
   margin-right: auto !important;
 }
-.mb-1, .my-1 {
+.mb-1,
+.my-1 {
   margin-bottom: 0.25rem !important;
 }
-.mb-4, .my-4 {
+.mb-4,
+.my-4 {
   margin-bottom: 1.5rem !important;
 }
 .text-center {
@@ -106,7 +112,6 @@ p {
   margin-top: 0;
   margin-bottom: 1rem;
 }
-
 .error {
   color: #5a5c69;
   font-size: 5rem;
@@ -114,16 +119,13 @@ p {
   line-height: 1;
   width: 12.5rem;
 }
-
 .error_lead {
   font-size: 1.5rem;
   font-weight: 300;
 }
-
 .error_message {
   font-size: 1.25rem;
 }
-
 @-webkit-keyframes noise-anim {
   0% {
     clip: rect(89px, 9999px, 5px, 0);
@@ -189,7 +191,6 @@ p {
     clip: rect(96px, 9999px, 60px, 0);
   }
 }
-
 @keyframes noise-anim {
   0% {
     clip: rect(89px, 9999px, 5px, 0);
@@ -255,7 +256,6 @@ p {
     clip: rect(96px, 9999px, 60px, 0);
   }
 }
-
 .error:after {
   content: attr(data-text);
   position: absolute;
@@ -268,7 +268,6 @@ p {
   clip: rect(0, 900px, 0, 0);
   animation: noise-anim 2s infinite linear alternate-reverse;
 }
-
 @-webkit-keyframes noise-anim-2 {
   0% {
     clip: rect(50px, 9999px, 32px, 0);
@@ -334,7 +333,6 @@ p {
     clip: rect(49px, 9999px, 11px, 0);
   }
 }
-
 @keyframes noise-anim-2 {
   0% {
     clip: rect(50px, 9999px, 32px, 0);
@@ -400,7 +398,6 @@ p {
     clip: rect(49px, 9999px, 11px, 0);
   }
 }
-
 .error:before {
   content: attr(data-text);
   position: absolute;

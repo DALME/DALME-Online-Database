@@ -1,0 +1,9 @@
+nav.secondary.features-filter ul {
+  border-bottom: 1px dotted #9c9c9c;
+  margin-bottom: 1rem;
+}
+.features-filter h3 {
+  border-bottom: 1px dotted #9c9c9c;
+  padding: 0 0 0.5rem 0;
+  margin-bottom: 0.5rem;
+}

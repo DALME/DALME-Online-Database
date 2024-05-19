@@ -1,102 +1,101 @@
 .user-option {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    height: 40px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: 40px;
 }
 .user-option .avatar-bg,
 .user-option .user-placeholder {
-    width: 30px;
-    height: 30px;
-    margin-right: 10px;
-    margin-left: 5px;
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  margin-left: 5px;
 }
 .user-option .user-placeholder {
-    padding: 5px;
+  padding: 5px;
 }
 .user-option .user-label {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 .user-option .user-label span {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
 }
 .user-option .user-label span.user-username {
-    font-size: 12px;
-    font-weight: 300;
+  font-size: 12px;
+  font-weight: 300;
 }
 .user-option .user-label span.select2-match {
-    font-weight: 800;
+  font-weight: 800;
 }
 a.select2-choice .select2-chosen .user-option svg {
-    margin-left: 0;
+  margin-left: 0;
 }
 .select2-container a.select2-choice:not(.select2-default) {
-    padding: 0 .5rem !important;
+  padding: 0 .5rem !important;
 }
-.select2-container.select-multiple.select-user ul.select2-choices{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 5px;
+.select2-container.select-multiple.select-user ul.select2-choices {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 .select2-container.select-multiple.select-user li.select2-search-choice {
-    height: 30px;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    color: var(--w-color-text-context) !important;
-    background-image: none;
-    border: 1px solid var(--w-color-border-field-default);
-    box-shadow: none;
-    background-color: var(--w-color-surface-header);
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  color: var(--w-color-text-context) !important;
+  background-image: none;
+  border: 1px solid var(--w-color-border-field-default);
+  box-shadow: none;
+  background-color: var(--w-color-surface-header);
 }
 .select2-container.select-multiple.select-user li.select2-search-choice a.select2-search-choice-close {
-    position: relative;
-    top: unset;
-    bottom: unset;
-    right: unset;
-    left: unset;
-    margin-left: 8px;
-    margin-right: 8px;
-    top: 1px;
+  position: relative;
+  top: unset;
+  bottom: unset;
+  right: unset;
+  left: unset;
+  margin-left: 8px;
+  margin-right: 8px;
+  top: 1px;
 }
 .select2-container.select-multiple.select-user li.select2-search-choice .user-option {
-    height: 25px;
+  height: 25px;
 }
 .select2-container.select-multiple.select-user li.select2-search-choice .user-option .avatar-bg,
 .select2-container.select-multiple.select-user li.select2-search-choice .user-option .user-placeholder {
-    width: 25px;
-    height: 25px;
+  width: 25px;
+  height: 25px;
 }
 .select2-container.select-multiple.select-user li.select2-search-choice .user-option .user-label span.user-username {
-    display: none;
+  display: none;
 }
-
 #id_photo-chooser .chooser__title {
-    display: none;
+  display: none;
 }
 #id_photo-chooser .chooser__image {
-    height: auto;
-    max-height: 125px;
-    max-width: 165px;
-    width: auto;
+  height: auto;
+  max-height: 125px;
+  max-width: 165px;
+  width: auto;
 }
-#panel-child-general-roles_and_photo-content .w-field-row  .w-panel__wrapper:first-of-type .w-field__input,
-#panel-child-citation-panel-content .w-field-row .w-panel__wrapper:nth-of-type(2) .w-field__input  {
-    align-items: flex-start;
+#panel-child-general-roles_and_photo-content .w-field-row .w-panel__wrapper:first-of-type .w-field__input,
+#panel-child-citation-panel-content .w-field-row .w-panel__wrapper:nth-of-type(2) .w-field__input {
+  align-items: flex-start;
 }
 .select2-container.select2-allowclear .select2-choice abbr {
-    top: 8px;
-    right: 40px;
-    background-image: none !important;
-    font-size: 12px;
-    font-weight: 400;
+  top: 8px;
+  right: 40px;
+  background-image: none !important;
+  font-size: 12px;
+  font-weight: 400;
 }
 .select2-container.select2-allowclear .select2-choice abbr::before {
-    content: "\2715";
+  content: "\2715";
 }

@@ -1,0 +1,38 @@
+nav.features ul a,
+nav.features ul a:visited {
+  color: #636363;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: block;
+  border-bottom: 1px dotted #9c9c9c;
+  padding: 0.5rem;
+}
+nav.features ul a:hover {
+  background-color: #e6ecf6;
+  color: #354d87;
+  text-decoration: none;
+  border-bottom: 1px dotted #9c9c9c;
+}
+nav.features {
+  display: none;
+}
+nav.features,
+.record-detail {
+  padding-bottom: 1rem;
+}
+nav.features ul {
+  list-style-type: none;
+  margin: 0;
+}
+nav.features ul li {
+  white-space: nowrap;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #9c9c9c;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  nav.features {
+    display: block;
+  }
+}

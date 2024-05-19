@@ -1,0 +1,49 @@
+main section .subsection-container > .block-text > p {
+  padding: 0 .5rem;
+}
+.u-subsection {
+  margin-top: -1px;
+  border-bottom: 1px dotted #000;
+}
+.u-subsection[data-collapsed='true'] i {
+  background: #3a5d82;
+  color: white;
+}
+.u-subsection[data-collapsed='true'] h3::after,
+.u-subsection[data-collapsed='true'] h4::after {
+  content: '...';
+}
+.u-subsection h3 {
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  font-weight: 650;
+  letter-spacing: 0.1rem;
+  margin: 0.8rem 0 0.5rem 0;
+  color: #3a5d82;
+  z-index: -1;
+}
+.u-subsection h4 {
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.05rem;
+  margin: 0.8rem 0 0.5rem 0.3rem;
+  color: #3a5d82;
+  padding-top: 0 !important;
+  z-index: -1;
+}
+.u-subsection-end {
+  margin-bottom: 30px;
+}
+.u-subsection i {
+  display: flex;
+  margin-left: auto;
+  align-self: center;
+  border-radius: 20px;
+  height: 20px;
+  width: 20px;
+  align-items: center;
+  color: #d2e3f4;
+  border: 1px solid #ccdbea;
+  justify-content: center;
+}

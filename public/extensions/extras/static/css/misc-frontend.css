@@ -1,83 +1,79 @@
 .block-iframe {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 .block-iframe > iframe {
-    border: none;
-    height: 40rem;
-    width: 100%;
+  border: none;
+  height: 40rem;
+  width: 100%;
 }
-
 .block-embed {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 .block-embed > div {
-    text-align: center;
+  text-align: center;
 }
-
 .block-pullquote {
-    color: #636363;
-    padding: .5rem 0 2rem 0;
-    text-align: center;
-    font-family: "Lora", "Times New Roman", serif;
-    font-size: 18px;
-    width: 96%;
+  color: #636363;
+  padding: .5rem 0 2rem 0;
+  text-align: center;
+  font-family: "Lora", "Times New Roman", serif;
+  font-size: 18px;
+  width: 96%;
 }
 .object .block-pullquote {
-    border-bottom: 1px dotted #9c9c9c;
-    margin-bottom: 1.5rem;
-    width: 100%;
+  border-bottom: 1px dotted #9c9c9c;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 .block-pullquote p:first-of-type:before {
-    content: "\f10d";
-    font-family: "Font Awesome 5 Free";
-    font-size: 11px;
-    margin-right: .5rem;
-    color: #bbbbbb;
-    position: relative;
-    top: 5px;
+  content: "\f10d";
+  font-family: "Font Awesome 5 Free";
+  font-size: 11px;
+  margin-right: .5rem;
+  color: #bbbbbb;
+  position: relative;
+  top: 5px;
 }
 .block-pullquote p:last-of-type:after {
-    content: "\f10e";
-    font-family: "Font Awesome 5 Free";
-    font-size: 11px;
-    margin-left: .3rem;
-    color: #bbbbbb;
-    position: relative;
-    bottom: 5px;
+  content: "\f10e";
+  font-family: "Font Awesome 5 Free";
+  font-size: 11px;
+  margin-left: .3rem;
+  color: #bbbbbb;
+  position: relative;
+  bottom: 5px;
 }
 .block-pullquote p {
-    font-style: italic;
-    margin: 0;
-    line-height: 1.7;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.7;
 }
-
 .block-heading {
-    font-weight: 650;
-    letter-spacing: 0.1rem;
-    margin: 3rem 0 1rem 0;
-    text-transform: uppercase;
-    font-size: 1.2rem;
-    color: #3a5d82;
-    border-bottom: 1px dotted #000;
-    padding-bottom: 0.25rem;
+  font-weight: 650;
+  letter-spacing: 0.1rem;
+  margin: 3rem 0 1rem 0;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  color: #3a5d82;
+  border-bottom: 1px dotted #000;
+  padding-bottom: 0.25rem;
 }
-
 .block-text + .block-heading {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 .block-html {
-    text-align: center;
+  text-align: center;
 }
 .block-text {
-    font-family: "PT Serif", "Times New Roman", serif;
-    font-size: 1.2rem;
+  font-family: "PT Serif", "Times New Roman", serif;
+  font-size: 1.2rem;
 }
 .subsection-container + .block-text {
-    padding-top: 1rem;
+  padding-top: 1rem;
 }
 .content + .block-text {
-    background: green;
+  background: green;
 }
 .content > .block-text:first-child > p:first-child {
-    margin-block-end: 0;
+  margin-block-end: 0;
 }

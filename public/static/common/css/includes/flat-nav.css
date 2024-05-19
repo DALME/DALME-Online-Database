@@ -1,0 +1,30 @@
+nav.secondary {
+  width: 100%;
+}
+nav.secondary ul {
+  border-bottom: 1px solid #aaa;
+  flex-direction: column;
+  flex-wrap: wrap;
+  list-style-type: none;
+  margin-bottom: 1rem;
+}
+nav.secondary ul li {
+  color: #000;
+  flex: 1;
+  font-size: 1.1rem;
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+nav.secondary ul li a.active {
+  font-weight: 600;
+  border-bottom: 2px solid rgb(49, 162, 249);
+  cursor: default;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  nav.secondary ul {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}

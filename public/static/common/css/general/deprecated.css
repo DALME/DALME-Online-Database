@@ -1,0 +1,93 @@
+.register {
+  display: none;
+}
+.register > img {
+  height: auto;
+  width: 100%;
+}
+.register .a {
+  margin: 1em .3em 0 6em;
+  width: 150px;
+  border: 10px solid rgb(91, 160, 241);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+.register .b {
+  background: transparent;
+  box-shadow: 0 0 20px inset rgba(0, 0, 0, 0.5);
+}
+.register .c {
+  width: 150px;
+  position: relative;
+  top: -25px;
+  left: -30px;
+}
+
+
+/* FADING TEXT BOX*/
+.fading {
+  position: relative;
+  overflow: hidden !important;
+}
+.fading:after {
+  content: "";
+  text-align: right;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 70%;
+  height: 1.5em;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
+}
+
+/* signori? */
+.transcription-excerpt {
+  background: #fffffa;
+  border: 1px dotted #e0e087;
+  padding: 15px;
+  margin: 1.5rem 2rem;
+  text-align: left;
+}
+.transcription-excerpt.center {
+  text-align: center;
+}
+.transcription-excerpt.right {
+  text-align: right;
+}
+.transcription-excerpt .transcription {
+  font-family: "PT Serif", "Times New Roman", serif;
+  font-size: 16px;
+  color: #553010;
+}
+.transcription-excerpt .translation {
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  font-size: 14px;
+  color: #2c7b9d;
+  font-weight: 500;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e0e087;
+}
+.caption {
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+  color: #6b6b6b;
+  font-size: 12px;
+  text-align: center;
+}
+.transcription-excerpt + .caption {
+  margin-top: -1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+nav.browse {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  float: right;
+  text-transform: uppercase;
+}
+nav.browse a {
+  color: #fff;
+  font-size: 0.9rem;
+  padding: 0 1rem;
+}

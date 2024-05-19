@@ -1,103 +1,103 @@
 .select2-container ul.select2-choices,
 .select2-container a.select2-choice {
-    border: 1px solid var(--w-color-border-field-default);
-    color: var(--w-color-text-context) !important;
-    background-color: var(--w-color-surface-field);
-    background-image: none;
-    box-shadow: none !important;
-    font-size: 1.1875rem;
-    font-weight: 400;
-    border-radius: .3125rem;
-    max-width: 100%;
-    min-height: 2.625rem;
-    padding: 0 1.25rem;
-    padding-inline-end: 2.625rem;
+  border: 1px solid var(--w-color-border-field-default);
+  color: var(--w-color-text-context) !important;
+  background-color: var(--w-color-surface-field);
+  background-image: none;
+  box-shadow: none !important;
+  font-size: 1.1875rem;
+  font-weight: 400;
+  border-radius: .3125rem;
+  max-width: 100%;
+  min-height: 2.625rem;
+  padding: 0 1.25rem;
+  padding-inline-end: 2.625rem;
 }
 .select2-container ul.select2-choices:hover,
 .select2-container a.select2-choice:hover {
-    border-color: var(--w-color-border-field-hover);
+  border-color: var(--w-color-border-field-hover);
 }
 .select2-container ul.select2-choices:focus-within {
-    outline: 3px solid var(--w-color-focus) !important;
+  outline: 3px solid var(--w-color-focus) !important;
 }
 .select2-container.select2-dropdown-open:not(.select-multiple) a.select2-choice {
-    outline: 3px solid var(--w-color-focus) !important;
+  outline: 3px solid var(--w-color-focus) !important;
 }
 .select2-container ul.select2-choices {
-    line-height: 20px;
-    min-height: 42px;
-    padding: 5px 5px !important;
+  line-height: 20px;
+  min-height: 42px;
+  padding: 5px 5px !important;
 }
 .select2-container a.select2-choice {
-    line-height: 2.2;
-    height: 42px;
+  line-height: 2.2;
+  height: 42px;
 }
 .select2-container a.select2-choice .select2-arrow {
-    border-left: none;
-    background-image: none;
-    background-color: unset;
-    width: 42px;
+  border-left: none;
+  background-image: none;
+  background-color: unset;
+  width: 42px;
 }
 .select2-container a.select2-choice .select2-arrow b {
-    border: none;
-    left: unset;
-    margin: 0;
-    top: unset;
-    background-image: linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
-      linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background-position-x: calc(100% - 1.5rem), calc(100% - 1.125rem);
-    background-position-y: 1.125rem, 1.125rem;
-    background-repeat: no-repeat !important;
-    background-size: .375rem .375rem, .375rem .375rem !important;
+  border: none;
+  left: unset;
+  margin: 0;
+  top: unset;
+  background-image: linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
+    linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position-x: calc(100% - 1.5rem), calc(100% - 1.125rem);
+  background-position-y: 1.125rem, 1.125rem;
+  background-repeat: no-repeat !important;
+  background-size: .375rem .375rem, .375rem .375rem !important;
 }
 .select2-container.select2-dropdown-open a.select2-choice .select2-arrow b {
-    border: none;
-    background-image: linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
-        linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
-    background-position-x: calc(100% - 1.375rem), calc(100% - 1.125rem);
+  border: none;
+  background-image: linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
+    linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
+  background-position-x: calc(100% - 1.375rem), calc(100% - 1.125rem);
 }
 .select2-container li.select2-search-choice {
-    color: var(--w-color-text-context) !important;
+  color: var(--w-color-text-context) !important;
 }
 .select2-container.select-multiple li.select2-search-choice {
-    height: 21px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: var(--w-color-text-context) !important;
-    background-image: none;
-    border: 1px solid var(--w-color-border-field-default);
-    box-shadow: none;
-    background-color: var(--w-color-surface-header);
+  height: 21px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--w-color-text-context) !important;
+  background-image: none;
+  border: 1px solid var(--w-color-border-field-default);
+  box-shadow: none;
+  background-color: var(--w-color-surface-header);
 }
 .select2-container.select-multiple .select2-search-field input {
-    min-height: unset;
-    line-height: 20px;
-    margin-top: 0px !important;
-    width: auto !important;
+  min-height: unset;
+  line-height: 20px;
+  margin-top: 0px !important;
+  width: auto !important;
 }
 .select2-container.select-multiple .select2-search-field input:focus,
 .select2-container.select-multiple .select2-search-field input:focus-visible {
-    outline: 0 !important;
+  outline: 0 !important;
 }
 .select2-search input.select2-input:focus {
-    outline: 0 !important;
+  outline: 0 !important;
 }
 .select2-drop ul.select2-results li.select2-result {
-    border-bottom: 1px dotted var(--w-color-border-field-default);
+  border-bottom: 1px dotted var(--w-color-border-field-default);
 }
 .select2-dropdown-open.select2-drop-above .select2-choice,
 .select2-dropdown-open.select2-drop-above .select2-choices {
-    background-image: none;
-    border: 1px solid var(--w-color-border-field-default);
-    background-color: var(--w-color-surface-field);
-    border-top-color: transparent;
+  background-image: none;
+  border: 1px solid var(--w-color-border-field-default);
+  background-color: var(--w-color-surface-field);
+  border-top-color: transparent;
 }
 .select2-dropdown-open.select2-drop-above .select2-choice:focus-within,
 .select2-dropdown-open.select2-drop-above .select2-choices:focus-within {
-    outline: 3px solid var(--w-color-focus) !important;
+  outline: 3px solid var(--w-color-focus) !important;
 }

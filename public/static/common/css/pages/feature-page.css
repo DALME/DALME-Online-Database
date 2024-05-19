@@ -1,0 +1,29 @@
+.metadata {
+  color: #636363;
+  font-size: 1rem;
+  padding: 0 1rem 1rem 1rem;
+}
+.metadata > span:last-child {
+  margin-left: auto;
+}
+.feature.metadata {
+  color: #636363;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.feature.metadata a {
+  color: #084094;
+}
+.feature.metadata a:hover {
+  border-bottom: 1px dotted #084094;
+}
+body.essay .main-image {
+  align-self: center;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  .metadata {
+    padding: 0 3rem 1rem 3rem;
+  }
+}

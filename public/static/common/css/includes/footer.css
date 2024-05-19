@@ -1,0 +1,127 @@
+body footer {
+  align-items: center;
+  background: #333;
+  box-shadow: 0 0 10px #000;
+  color: #fff;
+  justify-content: space-between;
+  padding: 0;
+  z-index: 2;
+  height: 54px;
+}
+nav.footer {
+  display: flex;
+  padding-left: 20px;
+}
+nav.footer ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+nav.footer ul li {
+  display: inline-flex;
+  align-items: center;
+}
+nav.footer ul li a,
+nav.footer ul li .login-icon {
+  color: #ccc;
+  text-decoration: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+nav.footer ul li a:hover,
+nav.footer ul li .login-icon:hover {
+  color: #fff;
+}
+nav.footer ul li a {
+  display: none;
+}
+nav.footer ul li .login-icon {
+  display: inline;
+  font-size: 10px;
+  cursor: pointer;
+}
+.footer-button {
+  color: #5e5e5e;
+  display: inline;
+}
+.copyright {
+  font-size: 0.6rem;
+  padding: 0 1rem;
+  flex: 4 0 auto;
+  color: #ccc;
+  display: flex;
+  justify-content: center;
+}
+.modal-footer {
+  background-color: #f8f9fa;
+  justify-content: center;
+}
+.modal-footer > * {
+  margin: 0;
+}
+
+/* SOCIAL MEDIA BUTTONS */
+.social {
+  display: none;
+  background: #000;
+  color: #ccc;
+  align-items: center;
+  font-size: 1.7rem;
+  padding: 10px 50px;
+  white-space: nowrap;
+  gap: 10px;
+}
+.social > i:not(:first-child):not(:last-child) {
+  margin: 0 0.3rem;
+}
+.social i:hover,
+.social i:active {
+  color: #fff !important;
+}
+#share-button {
+  vertical-align: unset;
+  display: inline-flex;
+}
+#share-button i.share {
+  font-size: 1.7rem;
+  color: #5e5e5e;
+}
+#share-button a,
+#share-button a:active,
+#share-button a:focus {
+  padding: 0;
+  display: inline;
+  box-shadow: none;
+  background: none;
+}
+#share-button a:hover {
+  background: none;
+}
+
+/* Media queries */
+@media only screen and (min-width: 600px) {
+  .copyright {
+    font-size: 0.9rem;
+  }
+  .social {
+    display: flex !important;
+  }
+}
+
+@media only screen and (min-width: 950px) {
+  body footer {
+    padding: 0 4rem;
+  }
+  nav.footer ul li a {
+    display: block;
+  }
+  nav.footer ul li:not(:last-child)::after {
+    content: "\2022";
+    padding: 0 8px;
+  }
+  .social > i {
+    font-size: 1.5rem
+  }
+}

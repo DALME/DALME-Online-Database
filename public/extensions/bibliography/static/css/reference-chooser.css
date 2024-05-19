@@ -53,7 +53,7 @@
   border: none;
   background-image: linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
     linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
-    background-position-x: calc(100% - 1.375rem), calc(100% - 1.125rem);
+  background-position-x: calc(100% - 1.375rem), calc(100% - 1.125rem);
 }
 .select2-search input.select2-input:focus {
   outline: 0 !important;

@@ -6,7 +6,6 @@
   --w-color-admin-panel-header: #264b417d;
   --w-color-admin-tile-icon: #00b0b152;
 }
-
 @media (prefers-color-scheme: light) {
   .w-theme-system {
     --w-color-admin-panel-header: #007d7e12;
@@ -19,11 +18,9 @@
     --w-color-admin-tile-icon: #00b0b152;
   }
 }
-
 .Draftail-Editor .DraftEditor-root {
   font-family: "PT Serif", "Times New Roman", serif !important;
 }
-
 .base-modal-box {
   padding: 0 55px;
   display: flex;
@@ -33,18 +30,15 @@
   display: flex;
   justify-content: flex-end;
 }
-.base-modal-buttons .button+.button {
+.base-modal-buttons .button + .button {
   margin-inline-start: 5px;
 }
-
 .flex-grow {
   flex-grow: 1;
 }
-
 .u-none {
   display: none;
 }
-
 /* TABS */
 .w-tabs__wrapper {
   margin-left: 40px;
@@ -83,24 +77,21 @@
 .w-tabs__tab[aria-selected=true]:after {
   width: calc(100% + 2px);
 }
-.w-tabs__list>:not([hidden])~:not([hidden]) {
+.w-tabs__list > :not([hidden]) ~ :not([hidden]) {
   margin-inline-end: 0;
   margin-inline-start: 2px;
 }
 .w-tabs__tab:hover:after {
   width: calc(100% + 2px);
 }
-
 /* code block extension */
 .code-block textarea {
   font-size: 14px;
 }
-
 pre[class*=language-]:after,
 pre[class*=language-]:before {
   box-shadow: none !important;
 }
-
 /* Landing page */
 .homepage .w-header .row {
   padding-inline-start: 7rem;
@@ -142,15 +133,14 @@ pre[class*=language-]:before {
   font-weight: 800;
   line-height: .8;
 }
-
 /* General purpose adjustments to select2 */
 .select2-container ul.select2-choices,
 .select2-container a.select2-choice {
-    border: 1px solid var(--w-color-border-field-default);
-    color: var(--w-color-text-context) !important;
-    background-color: var(--w-color-surface-field);
-    background-image: none;
-    box-shadow: none !important;
+  border: 1px solid var(--w-color-border-field-default);
+  color: var(--w-color-text-context) !important;
+  background-color: var(--w-color-surface-field);
+  background-image: none;
+  box-shadow: none !important;
 }
 .select2-drop {
   background: var(--w-color-surface-field);
@@ -189,7 +179,6 @@ input[type=file]::file-selector-button {
   margin-bottom: 5px;
   margin-right: 10px;
 }
-
 .w-field__errors {
   display: flex;
   align-items: baseline;
@@ -219,7 +208,6 @@ input[type=file]::file-selector-button {
   margin-bottom: 20px;
   max-width: 300px;
 }
-
 /* help panels */
 div.struct-block > span > div.help {
   margin: 15px 0;
@@ -271,16 +259,13 @@ div.struct-block > span > div.help svg.icon-help {
   background-color: unset;
   padding: unset;
 }
-
 .image-chooser .chooser__image {
   max-height: 95px;
   max-width: 125px;
 }
-
 .listing tbody tr:first-child {
   border-top: none;
 }
-
 .field-row-panel .w-panel__wrapper {
   display: flex !important;
   flex-direction: column;
@@ -314,7 +299,6 @@ div.struct-block > span > div.help svg.icon-help {
 #id_gradient-chooser .chooser__title {
   display: none;
 }
-
 /* Temporary fixes for bugs */
 /* modals */
 .modal-dialog .modal-content {
@@ -393,7 +377,6 @@ div.struct-block > span > div.help svg.icon-help {
 .modal-dialog .modal-body nav.pagination {
   margin-bottom: 2em;
 }
-
 /* listing choosers */
 .listing.chooser td.title {
   min-height: 52px;
@@ -402,7 +385,6 @@ div.struct-block > span > div.help svg.icon-help {
 .listing.chooser .w-status.w-status--primary {
   text-wrap: nowrap;
 }
-
 /* tooltips */
 .Tooltip {
   display: flex;
@@ -425,7 +407,6 @@ div.struct-block > span > div.help svg.icon-help {
   white-space: nowrap !important;
   max-width: unset !important;
 }
-
 /* date range fields */
 .w-drilldown__contents .daterange_field {
   display: flex;
@@ -435,13 +416,11 @@ div.struct-block > span > div.help svg.icon-help {
 .w-drilldown__contents .daterange_field input:last-of-type {
   margin-top: 0;
 }
-
 /* other */
 .w-combobox,
 .w-combobox__optgroup {
   width: unset !important;
 }
-
 .w-field--date_field .w-field__comment-button,
 .w-field--date_time_field .w-field__comment-button,
 .w-field--time_field .w-field__comment-button {
@@ -452,14 +431,10 @@ div.struct-block > span > div.help svg.icon-help {
   font-size: 0.8rem;
   margin-right: 0.5em;
 } */
-
-
 /* table.listing tbody td {
   vertical-align: middle;
 } */
-
 /* OLDER DEFINITIONS */
-
 /* .p_date_scheduled {
   color: #ab803f;
   font-weight: 700;

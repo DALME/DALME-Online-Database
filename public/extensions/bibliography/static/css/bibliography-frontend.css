@@ -1,22 +1,2 @@
 @import "cite-button.css";
-
-.bibliography-container {
-    font-family: "PT Serif", "Times New Roman", serif;
-    font-size: 1.2rem;
-}
-.bibliography-container .csl-bib-body {
-    padding: .5rem .5rem 0 .5rem;
-}
-.bibliography-container .csl-entry {
-    overflow-wrap: anywhere;
-}
-.bibliography-container .csl-entry:not(:last-child) {
-    margin-bottom: 1rem;
-}
-.bibliography-container .csl-entry a {
-    color: inherit;
-}
-.bibliography-container .csl-entry a:hover {
-    border-bottom: 1px dotted #354d87;
-    color: #354d87;
-}
+@import "container-frontend.css";
