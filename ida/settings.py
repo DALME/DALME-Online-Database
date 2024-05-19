@@ -121,7 +121,6 @@ class Base(Configuration):
         'wagtail',
         'modelcluster',
         'taggit',
-        'wagtailmodelchooser',
         'wagtailfontawesomesvg',
         'wagtailcodeblock',
         'wagtail.contrib.typed_table_block',

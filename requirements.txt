@@ -40,6 +40,5 @@ urllib3==1.26.18 # has to remain at this version because of elasticsearch
 wagtail==6.1
 wagtailcodeblock==1.29.0.2
 wagtail-font-awesome-svg==1.0.1
-wagtail-modelchooser==4.0.1
 Wand===0.6.13
 Werkzeug==3.0.2
