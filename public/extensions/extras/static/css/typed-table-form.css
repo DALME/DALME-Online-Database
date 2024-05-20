@@ -1,0 +1,70 @@
+.typed-table-block .typed-table-block__wrapper table {
+  margin: 1.5rem 0 1rem 1.8rem;
+}
+.typed-table-block th input.column-heading,
+.typed-table-block td .w-field__wrapper .w-field__input input {
+  font-size: 14px;
+  line-height: 1;
+  min-height: 20px;
+}
+.typed-table-block .typed-table-block__wrapper th button.delete-column {
+  top: 7px
+}
+.typed-table-block td .image-chooser .chooser__title {
+  display: none;
+}
+.typed-table-block td .w-field__wrapper {
+  padding-bottom: 0;
+}
+.typed-table-block td .w-field__wrapper .w-field__input {
+  margin-top: 0;
+}
+.typed-table-block td.control-cell .button.text-replace.button--icon.button-small {
+  padding: 0;
+}
+.typed-table-block td .w-field--draftail_rich_text_area {
+  padding-inline-start: 0;
+  min-width: 500px;
+}
+.typed-table-block td .w-field--draftail_rich_text_area .Draftail-BlockToolbar {
+  display: none;
+}
+.typed-table-block .typed-table-block__wrapper tbody tr td:not(.control-cell) {
+  min-width: 10rem;
+}
+.typed-table-block .typed-table-block__wrapper .w-field--text_input {
+  min-width: 250px;
+}
+.typed-table-block .typed-table-block__wrapper .button.text-replace.button--icon:not(.delete-column, .delete-row) {
+  align-items: center;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--w-color-surface-page);
+  color: var(--w-color-surface-menus);
+  cursor: pointer;
+  display: grid;
+  height: 20px;
+  justify-content: center;
+  padding: 0;
+  width: 20px;
+}
+.typed-table-block .typed-table-block__wrapper .button.text-replace.button--icon:not(.delete-column, .delete-row):hover .icon {
+  background-color: var(--w-color-surface-menus);
+  color: white;
+}
+.typed-table-block .typed-table-block__wrapper .button.text-replace.button--icon:not(.delete-column, .delete-row) .icon {
+  border: 1px solid;
+  border-radius: 100%;
+  height: 10px;
+  padding: .125rem;
+  transition: transform .3s ease;
+  width: 10px;
+}
+.typed-table-block .typed-table-block__wrapper th button.append-column,
+.typed-table-block .typed-table-block__wrapper th button.prepend-column {
+  top: -1.6rem;
+}
+.typed-table-block .typed-table-block__wrapper tbody tr button.prepend-row,
+.typed-table-block .typed-table-block__wrapper tfoot tr button.prepend-row {
+  inset-inline-start: -1rem;
+}
