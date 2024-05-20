@@ -9,7 +9,12 @@
         <q-item dense class="no-shrink">
           <q-item-section avatar>
             <q-avatar size="40px" class="greyscale-50">
-              <img v-if="notNully(auth.user.avatar)" :src="auth.user.avatar" />
+              <q-img
+                v-if="notNully(auth.user.avatar)"
+                :src="auth.user.avatar"
+                fit="cover"
+                ratio="1"
+              />
               <q-icon v-else size="40px" name="mdi-account-circle" />
             </q-avatar>
           </q-item-section>

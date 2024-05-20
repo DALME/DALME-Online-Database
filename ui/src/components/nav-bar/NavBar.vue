@@ -109,7 +109,7 @@
 
       <q-btn dense round class="q-pr-none" @click="userDrawerOpen = !userDrawerOpen">
         <q-avatar v-if="notNully(auth.user.avatar)" size="34px">
-          <img :src="auth.user.avatar" />
+          <q-img :src="auth.user.avatar" fit="cover" ratio="1" />
         </q-avatar>
         <q-icon v-else name="mdi-account-circle" size="lg" color="blue-grey-5" />
       </q-btn>
