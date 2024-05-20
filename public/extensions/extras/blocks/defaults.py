@@ -42,6 +42,7 @@ DEFAULT_TABLE_OPTIONS = {
     ],
     'editor': 'text',
     'stretchH': 'all',
+    'language': 'en-US',
     'height': 108,
     'renderer': 'text',
     'autoColumnSize': False,
