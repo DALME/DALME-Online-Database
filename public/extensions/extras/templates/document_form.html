@@ -9,57 +9,30 @@
             </div>
         </span>
     {% endif %}
-
-    <section class="w-panel field-row-panel" id="panel-child-top-form-section" data-panel>
-        <!--div id="panel-child-top-form-content" class="w-panel__content"-->
-            <div class="w-field-row">
-                {% for child in children.values %}
-                    {% if child.block.name in "type,version,date"|make_list_csv %}
-                        <div class="w-panel__wrapper col4">
-                            {% if child.block.label %}
-                                <label class="w-field__label" {% if child.id_for_label %}for="{{ child.id_for_label }}"{% endif %}>{{ child.block.label }}{% if child.block.required %}<span class="w-required-mark">*</span>{% endif %}</label>
-                            {% endif %}
-                            <div class="w-field__wrapper" data-field-wrapper>
-                                <div id="w-field-{{ prefix }}-{{ child.block.name }}" class="w-field w-field--commentable" data-field data-contentpath="{{ child.block.name }}">
-                                    {{ child.render_form }}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        <!--/div-->
+    <section class="field-row-panel manual-form collapse-help" id="{{ prefix }}-general-form-section" data-panel>
+        <div class="w-field-row">
+            {% include 'field_include.html' with child=children.type col_class="col3" %}
+            {% include 'field_include.html' with child=children.version col_class="col3" %}
+            {% include 'field_include.html' with child=children.date col_class="col6" %}
+        </div>
     </section>
-
     {% for child in children.values %}
-        {% if child.block.name not in "type,version,date,document,page"|make_list_csv %}
-            <div id="w-field-{{ prefix }}-{{ child.block.name }}" class="w-field" data-field data-contentpath="{{ child.block.name }}">
-                {% if child.block.label %}
-                    <label class="w-field__label" {% if child.id_for_label %}for="{{ child.id_for_label }}"{% endif %}>{{ child.block.label }}{% if child.block.required %}<span class="w-required-mark">*</span>{% endif %}</label>
-                {% endif %}
-                {{ child.render_form }}
-            </div>
+        {% if child.block.name in "title,author,detail,abstract,url"|make_list_csv %}
+            <section
+                class="field-row-panel manual-form collapse-help{% if child.block.name == 'abstract' %} rich-text{% endif %}"
+                id="{{ prefix }}-{{ child.block.name }}-form-section"
+                data-panel
+            >
+                <div class="w-field-row">
+                    {% include 'field_include.html' with child=child col_class="col12" %}
+                </div>
+            </section>
         {% endif %}
     {% endfor %}
-
-    <section class="w-panel field-row-panel" id="panel-child-bottom-form-section" data-panel>
-        <!--div id="panel-child-bottom-form-content" class="w-panel__content"-->
-            <div class="w-field-row">
-                {% for child in children.values %}
-                    {% if child.block.name in "document,page"|make_list_csv %}
-                        <div class="w-panel__wrapper col6">
-                            {% if child.block.label %}
-                                <label class="w-field__label" {% if child.id_for_label %}for="{{ child.id_for_label }}"{% endif %}>{{ child.block.label }}{% if child.block.required %}<span class="w-required-mark">*</span>{% endif %}</label>
-                            {% endif %}
-                            <div class="w-field__wrapper" data-field-wrapper>
-                                <div id="w-field-{{ prefix }}-{{ child.block.name }}" class="w-field w-field--commentable" data-field data-contentpath="{{ child.block.name }}">
-                                    {{ child.render_form }}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        <!--/div-->
+    <section class="field-row-panel manual-form align-top collapse-help" id="{{ prefix }}-files-form-section" data-panel>
+        <div class="w-field-row">
+            {% include 'field_include.html' with child=children.document col_class="col6" %}
+            {% include 'field_include.html' with child=children.page col_class="col6" %}
+        </div>
     </section>
 </div>

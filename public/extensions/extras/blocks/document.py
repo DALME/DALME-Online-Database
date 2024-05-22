@@ -13,7 +13,7 @@ class DocumentBlock(blocks.StructBlock):
         ],
         help_text='Select type of document.',
     )
-    version = blocks.DecimalBlock(required=False, help_text='Version of the document, if applicable.')
+    version = blocks.DecimalBlock(required=False, help_text='Version, if applicable.')
     date = blocks.DateBlock(help_text='Date for this entry (e.g. creation, publication, etc.')
     title = blocks.CharBlock(help_text='Title for this entry.')
     author = blocks.CharBlock(help_text='Name of the author(s) for this entry.')

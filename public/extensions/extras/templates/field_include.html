@@ -1,0 +1,10 @@
+<div class="w-panel__wrapper {{ col_class }}">
+    {% if child.block.label %}
+        <label class="w-field__label" {% if child.id_for_label %}for="{{ child.id_for_label }}"{% endif %}>{{ child.block.label }}{% if child.block.required %}<span class="w-required-mark">*</span>{% endif %}</label>
+    {% endif %}
+    <div class="w-field__wrapper" data-field-wrapper>
+        <div id="w-field-{{ prefix }}-{{ child.block.name }}" class="w-field w-field--commentable" data-field data-contentpath="{{ child.block.name }}">
+            {{ child.render_form }}
+        </div>
+    </div>
+</div>

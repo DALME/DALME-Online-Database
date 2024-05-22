@@ -1,34 +1,18 @@
-.team-list-block .field-row-panel .help {
-  height: auto;
-  margin-bottom: 0;
-}
-.team-list-block #panel-child-top-form-content .w-field__wrapper {
-  margin-bottom: 0;
-}
-.team-list-block #panel-child-top-form-content .w-field__wrapper .w-field__wrapper {
-  padding-bottom: 0;
-}
-div[data-contentpath="role"] .w-field__comment-button {
-  position: relative !important;
-  top: unset;
-  transform: none !important;
-  padding: 0 20px 0 0;
-  height: 42px;
-}
 div[data-contentpath="role"] .w-field__input {
   display: flex;
 }
 div[data-contentpath="role"] .w-field__input select {
   height: 42px;
+  width: auto;
 }
 .list-by-role {
-  padding-left: 50px;
+  padding-left: 15px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 5px;
   flex-grow: 1;
-  justify-content: flex-end;
+  margin-right: 42px;
 }
 .list-by-role div:not(.role-list-empty) {
   background: var(--w-color-surface-page);

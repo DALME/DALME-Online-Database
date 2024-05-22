@@ -37,7 +37,10 @@
   flex-grow: 1;
 }
 .u-none {
-  display: none;
+  display: none !important;
+}
+.u-hide {
+  opacity: 0 !important;
 }
 /* TABS */
 .w-tabs__wrapper {
@@ -249,7 +252,7 @@ div.struct-block > span > div.help svg.icon-help {
   font-size: 14px;
 }
 .w-panel {
-  margin-bottom: 1rem;
+  margin-bottom: 1rem !important;
 }
 .w-panel--nested .w-panel__anchor {
   background-color: unset;
@@ -267,7 +270,7 @@ div.struct-block > span > div.help svg.icon-help {
   border-top: none;
 }
 .field-row-panel .w-panel__wrapper {
-  display: flex !important;
+  display: flex;
   flex-direction: column;
 }
 .field-row-panel .w-field__wrapper {
@@ -284,21 +287,57 @@ div.struct-block > span > div.help svg.icon-help {
   height: 37px;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 0;
+}
+.field-row-panel.collapse-help .help {
+  height: 19px;
 }
 .field-row-panel .w-field__input {
   display: flex;
   align-items: center;
   flex-grow: 1;
 }
+.field-row-panel.align-baseline .w-field__input {
+  align-items: baseline;
+}
+.field-row-panel.align-top .w-field__input {
+  align-items: flex-start;
+}
+.field-row-panel:not(.rich-text) .w-panel__wrapper:last-of-type .w-field__input {
+  margin-right: -42px;
+}
 .field-row-panel .w-field__comment-button {
   position: relative !important;
   top: unset;
-  transform: none !important;
+  transform: translateX(-100%);
+  margin-left: 15px;
+  padding: .8rem .5rem;
+}
+.image-chooser:not(.blank) ~ .w-field__comment-button {
+  transform: translate(-100%, -95%);
 }
 .field-row-panel.with-gradient .image-chooser .chooser__title,
 #id_gradient-chooser .chooser__title {
   display: none;
 }
+.w-field-row .w-field__wrapper .w-field__wrapper {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.w-field__input input[type=checkbox] {
+  margin-inline-end: 0;
+  top: 4px;
+}
+.w-field__input .Draftail-Editor__wrapper {
+  padding-top: 5px;
+}
+.field-row-panel .w-field--date_field input,
+.field-row-panel .w-field--date_time_field input,
+.field-row-panel .w-field--time_field input,
+.field-row-panel select {
+  width: 100%;
+}
+
 /* Temporary fixes for bugs */
 /* modals */
 .modal-dialog .modal-content {
