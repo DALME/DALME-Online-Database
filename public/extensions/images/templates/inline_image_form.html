@@ -1,0 +1,37 @@
+{% load wagtailadmin_tags %}
+
+<div class="{{ classname }}">
+    {% if help_text %}
+        <span>
+            <div class="help">
+                {% icon name="help" classname="default" %}
+                {{ help_text }}
+            </div>
+        </span>
+    {% endif %}
+    <section class="field-row-panel manual-form collapse-help align-baseline" id="{{ prefix }}-image-form-section" data-panel>
+        <div class="w-field-row">
+            {% include 'field_include.html' with child=children.image col_class="col4" %}
+            {% include 'field_include.html' with child=children.image_id col_class="col3" %}
+            {% include 'field_include.html' with child=children.show_caption col_class="col2" %}
+            {% include 'field_include.html' with child=children.use_file_caption col_class="col3" %}
+        </div>
+    </section>
+    <section class="field-row-panel manual-form rich-text" id="{{ prefix }}-caption-form-section" data-panel>
+        <div class="w-field-row">
+            {% include 'field_include.html' with child=children.caption col_class="col12" %}
+        </div>
+    </section>
+    <section class="field-row-panel manual-form" id="{{ prefix }}-display-form-section" data-panel>
+        <div class="w-field-row">
+            {% include 'field_include.html' with child=children.alignment col_class="col5" %}
+            {% include 'field_include.html' with child=children.resize_rule col_class="col7" %}
+        </div>
+    </section>
+    <section class="field-row-panel manual-form" id="{{ prefix }}-para-form-section" data-panel>
+        <div class="w-field-row">
+            {% include 'field_include.html' with child=children.dimensions col_class="col3" %}
+            {% include 'field_include.html' with child=children.parameters col_class="col9" %}
+        </div>
+    </section>
+</div>

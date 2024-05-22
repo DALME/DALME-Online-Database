@@ -26,9 +26,24 @@
 }
 .inline-image.right {
   float: right;
-  margin: 0.5rem 0 .5rem 1.4rem;
+  margin: 0.5rem 0 0.5rem 1.4rem;
 }
 .inline-image.left {
   float: left;
-  margin: .5rem 1.4rem .5rem 0;
+  margin: 0.5rem 1.4rem 0.5rem 0;
+}
+.inline-image.centre {
+  margin: 0.5rem auto 1.5rem auto;
+}
+.main-image {
+  flex-direction: column;
+}
+.main-image .caption {
+  color: #aaa;
+  margin: 3px auto 20px auto;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  max-width: 75%;
 }

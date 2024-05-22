@@ -9,7 +9,7 @@ from wagtailcodeblock.blocks import CodeBlock
 
 from public.extensions.bibliography.blocks import BibliographyChooserBlock
 from public.extensions.footnotes.blocks import FootnotesPlaceMarker
-from public.extensions.images.blocks import InlineImageBlock, MainImageBlock
+from public.extensions.images.blocks import InlineImageBlock
 from public.extensions.images.blocks.carousel import CarouselBlock
 
 from .chart_embed import ChartEmbedBlock
@@ -69,7 +69,6 @@ BASE_BLOCKS = [
     ('heading', blocks.CharBlock()),
     ('html', blocks.RawHTMLBlock()),
     ('inline_image', InlineImageBlock()),
-    ('main_image', MainImageBlock()),
     ('page', blocks.PageChooserBlock()),
     ('pullquote', blocks.RichTextBlock(icon='openquote')),
     ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS, icon='table-cells')),
