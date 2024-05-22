@@ -3,14 +3,11 @@ class TeamListBlockDefinition extends window.wagtailStreamField.blocks.StructBlo
         const block = super.render(placeholder, prefix, initialState, initialError);
         const modeSelect = document.getElementById(`${prefix}-mode`);
         const roleSelect = document.getElementById(`${prefix}-role`);
-        const membersSelect = document.getElementById(`${prefix}-members`);
 
         const fields = {
-          role: document.getElementById(`w-field-${prefix}-role`),
-          members: document.getElementById(`w-field-${prefix}-members`),
+          role: document.getElementById(`w-field-${prefix}-role`).closest("section"),
+          members: document.getElementById(`w-field-${prefix}-members`).closest("section"),
         }
-
-        window.test = membersSelect;
 
         const listByRole = document.createElement("div");
         listByRole.classList.add("list-by-role");
