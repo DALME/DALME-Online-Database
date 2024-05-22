@@ -88,12 +88,15 @@ h4.featured-group-key {
   main.essay > article {
     flex-direction: row;
   }
-  .features-back {
-    display: block;
-  }
   main.object .content,
   main.inventory > .content,
   main.essay > .content {
     padding: 0 3rem 4rem 3rem;
+  }
+  .features-back {
+    display: block;
+  }
+  .featured-group {
+    flex-direction: row;
   }
 }
