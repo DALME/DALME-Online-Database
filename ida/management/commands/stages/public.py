@@ -1,5 +1,6 @@
 """Migrate public CMS data."""
 
+import io
 import json
 
 from django_tenants.utils import schema_context
@@ -7,7 +8,10 @@ from psycopg import sql
 from wagtail.log_actions import log
 
 from django.apps import apps
+from django.core.files import File
+from django.core.files.storage import FileSystemStorage
 from django.db import connection, transaction
+from django.db.utils import IntegrityError
 
 from .base import BaseStage
 
@@ -28,9 +32,13 @@ class Stage(BaseStage):
         self.drop_cloned_schema()
         self.migrate_wagtail_tables()
         self.migrate_public_tables()
+        self.migrate_content_tables()
+        self.create_footnotes()
         self.transfer_wagtail_user_profiles()
         self.transfer_snippets()
         self.transfer_gradients()
+        self.migrate_people()
+        self.drop_restore_schema()
 
     @transaction.atomic
     def clone_schema(self):
@@ -82,7 +90,7 @@ class Stage(BaseStage):
             'wagtailcore_workflowtask',
         ]
         no_bulk = ['wagtailcore_groupapprovaltask']
-        skip = ['wagtailcore_uploadedfile']
+        skip = ['wagtailcore_uploadedfile', 'wagtailcore_revision']
 
         # delete existing records
         with connection.cursor() as cursor:
@@ -128,6 +136,7 @@ class Stage(BaseStage):
                                 if json_fields:
                                     for field in json_fields:
                                         row[field] = json.loads(row[field])
+
                                 if use_bulk:
                                     objs.append(target_model(**row))
                                 else:
@@ -144,28 +153,21 @@ class Stage(BaseStage):
         # because all page types are subclassed from the wagtail Page model which we already
         # populated
         models = [
-            ('dalme', 'publicimages', 'baseimage'),
-            ('dalme', 'publicimages', 'customrendition'),
-            ('dalme', 'wagtaildocs', 'document'),
-            ('dalme', 'public', 'home'),
-            ('dalme', 'public', 'section'),
-            ('dalme', 'public', 'flat'),
-            ('dalme', 'public', 'features'),
-            ('dalme', 'public', 'bibliography'),
-            ('dalme', 'public', 'collections'),
-            ('dalme', 'public', 'collection'),
-            ('dalme', 'publicrecords', 'corpus'),
-            ('dalme', 'publicrecords', 'corpus_collections'),
-            ('dalme', 'public', 'essay'),
-            ('dalme', 'public', 'featuredinventory'),
-            ('dalme', 'public', 'featuredobject'),
+            ('publicimages', 'baseimage'),
+            ('publicimages', 'customrendition'),
+            ('wagtaildocs', 'document'),
+            ('public', 'home'),
+            ('public', 'section'),
+            ('public', 'bibliography'),
+            ('publicrecords', 'corpus'),
+            ('publicrecords', 'corpus_collections'),
         ]
 
         banners_raw = None
         sponsors_raw = None
 
         self.logger.info('Processing additional models')
-        for schema, app, model_name in models:
+        for app, model_name in models:
             model = apps.get_model(app_label=app, model_name=model_name)
             with connection.cursor() as cursor:
                 self.logger.info('Copying "%s"', f'{app}_{model_name}')
@@ -195,7 +197,7 @@ class Stage(BaseStage):
                         columns.append('collapsed')
                         values = values + ',False'
 
-                    sql = f"INSERT INTO {schema}.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
 
         if banners_raw:
@@ -233,6 +235,104 @@ class Stage(BaseStage):
                         new_sponsor = Sponsor.objects.create(name=name, url=url, logo_id=value['logo'])
 
                         log(instance=new_sponsor, action='wagtail.create')
+
+    @transaction.atomic
+    def migrate_content_tables(self):
+        """Migrate Public/CMS tables with content that needs to be changed."""
+        # these are tables with streamfields where content needs to be converted
+        # between new and old formats, e.g. footnotes, references, people/team members
+        # main/inline images, etc.
+
+        models = [
+            ('public', 'flat'),
+            ('public', 'features'),
+            ('public', 'collections'),
+            ('public', 'collection'),
+            ('public', 'essay'),
+            ('public', 'featuredinventory'),
+            ('public', 'featuredobject'),
+            ('wagtailcore', 'revision'),
+        ]
+
+        self.logger.info('Processing models requiring content conversions')
+        for app, model_name in models:
+            is_rev = model_name == 'revision'
+
+            with schema_context('dalme'):
+                target = apps.get_model(app_label=app, model_name=model_name)
+                target_fields = self.get_fields_by_type(target, ['JSONField', 'RichTextField'], as_map=True)
+
+            with connection.cursor() as cursor:
+                source = f'{app}_{model_name}'
+                self.logger.info('Copying "%s"', source)
+                cursor.execute(f'SELECT * FROM restore.{source};')
+                rows = self.map_rows(cursor)
+
+                # for field_name in ['content_type_id', 'base_content_type_id']:
+                #     if row.get(field_name):
+                #         new_ct = self.map_content_type(row[field_name], id_only=True)
+                #         row[field_name] = new_ct
+
+                #         if model_name == 'revision' and field_name == 'content_type_id':
+                #             content = json.loads(row['content'])
+                #             content['content_type'] = new_ct
+                #             row['content'] = json.dumps(content)
+
+                # if row.get('permission_id'):
+                #     row['permission_id'] = self.map_permissions(row['permission_id'])
+
+                for row in rows:
+                    columns = []
+                    values = ''
+                    page_id = row.get('page_ptr_id')
+
+                    for field_name in ['content_type_id', 'base_content_type_id']:
+                        if row.get(field_name):
+                            new_ct = self.map_content_type(row[field_name], id_only=True)
+                            row[field_name] = new_ct
+
+                            if is_rev and field_name == 'content_type_id':
+                                content = json.loads(row['content'])
+                                content['content_type'] = new_ct
+                                row['content'] = json.dumps(content)
+
+                    for idx, (name, value) in enumerate(row.items()):
+                        columns.append(f'{name}')
+
+                        if name == 'permission_id':
+                            value = self.map_permissions(value)  # noqa: PLW2901
+
+                        if name in target_fields:
+                            value = self.process_content_field(value, target_fields[name], page_id, is_rev)  # noqa: PLW2901
+
+                        # the value of certain field types has to be converted to account
+                        # for differences in the way Django sets up certain fields depending
+                        # on database backend. E.g. certain fields that are setup as varchar in MySQL
+                        # are setup as jsonb in Postgres.
+                        values += f'{self.clean_db_value(value, target._meta.get_field(name).get_internal_type())}'  # noqa: SLF001
+
+                        if idx < len(row) - 1:
+                            values += ', '
+
+                    sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    cursor.execute(sql)
+
+    @transaction.atomic
+    def create_footnotes(self):
+        """Create footnote entities extracted in previous stage."""
+        if self.FOOTNOTES:
+            with schema_context('dalme'):
+                from wagtail.models import Page
+
+                from public.extensions.footnotes.models import Footnote
+
+                fn_objects = []
+                for record in self.FOOTNOTES:
+                    page = Page.objects.get(pk=record.pop('page_id'))
+                    record['page'] = page
+                    fn_objects.append(Footnote(**record))
+
+                Footnote.objects.bulk_create(fn_objects)
 
     @transaction.atomic
     def transfer_wagtail_user_profiles(self):
@@ -434,3 +534,90 @@ class Stage(BaseStage):
                 page = page.first()
                 page.gradient = gradient_obj
                 page.save(update_fields=['gradient'])
+
+    @transaction.atomic
+    def migrate_people(self):
+        """Convert people blocks to TeamMember entities."""
+        with connection.cursor() as cursor:
+            cursor.execute(sql.SQL('SELECT * FROM restore.public_flat WHERE page_ptr_id = 16;'))
+            rows = self.map_rows(cursor)
+            people_page = next(iter(rows))
+
+        with schema_context('dalme'):
+            from public.extensions.images.models import BaseImage
+            from public.extensions.team.models import TeamMember, TeamRole
+
+            self.logger.info('Creating TeamRole records...')
+            roles = {
+                'PI': TeamRole.objects.create(
+                    role='PI',
+                    description='DALME Principal Investigator.',
+                ),
+                'Project Team': TeamRole.objects.create(
+                    role='Core',
+                    description='Member of the core project team.',
+                ),
+                'Contributors': TeamRole.objects.create(
+                    role='Contributor',
+                    description='Occasional contributor to the project.',
+                ),
+                'Advisory Board': TeamRole.objects.create(
+                    role='Board',
+                    description='Member of the DALME Advisory Board.',
+                ),
+            }
+
+            self.logger.info('Converting people blocks to TeamMember entities')
+            for block in json.loads(people_page['body']):
+                if block.get('type') == 'subsection':
+                    block_value = block['value']
+                    current_role = roles.get(block_value.get('subsection'))
+                elif block.get('type') == 'person':
+                    block_value = block['value']
+                    name = block_value.get('name')
+                    tm_object = {
+                        'name': name,
+                        'title': block_value.get('job'),
+                        'defaults': {
+                            'affiliation': block_value.get('institution'),
+                            'url': block_value.get('url'),
+                        },
+                    }
+
+                    user = self.user_match(name)
+                    if user:
+                        tm_object['user'] = user
+
+                    photo_id = block_value.get('photo')
+                    if photo_id:
+                        photo = BaseImage.objects.get(pk=photo_id)
+                        if user:
+                            wt_profile = user.wagtail_userprofile
+                            # django-tenants will try to add the tenant to the path
+                            # to prevent it, we override the "storage" attribute of
+                            # the field class with Django's default storage model
+                            wt_profile.avatar.storage = FileSystemStorage()
+                            wt_profile.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
+
+                        else:
+                            tm_object['defaults']['photo'] = photo
+
+                    try:
+                        tm, created = TeamMember.objects.get_or_create(**tm_object)
+                        tm.roles.add(current_role)
+                        if user and user.id in [1, 5]:
+                            tm.roles.add(roles['PI'])
+                        action = 'wagtail.create' if created else 'wagtail.edit'
+                        log(instance=tm, action=action)
+
+                    except IntegrityError:
+                        tm = TeamMember.objects.get(user=user)
+                        tm.roles.add(current_role)
+                        self.logger.info('Found duplicate record for %s.', name)
+
+    @transaction.atomic
+    def drop_restore_schema(self):
+        """Drop the restore schema."""
+        with connection.cursor() as cursor:
+            self.logger.info("Dropping the '%s' schema", SOURCE_SCHEMA)
+            cursor.execute('DROP SCHEMA restore CASCADE')
