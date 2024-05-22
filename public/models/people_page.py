@@ -15,7 +15,7 @@ from public.extensions.extras.blocks.defaults import DEFAULT_TABLE_OPTIONS
 from public.extensions.extras.blocks.document import DocumentBlock
 from public.extensions.extras.blocks.subsection import SubsectionBlock
 from public.extensions.extras.blocks.text_expandable import TextExpandableBlock
-from public.extensions.images.blocks import InlineImageBlock, MainImageBlock
+from public.extensions.images.blocks import InlineImageBlock
 from public.extensions.team.blocks import TeamListBlock
 from public.extensions.team.models import TeamMember
 from public.models.base_page import BasePage
@@ -24,7 +24,6 @@ BLOCK_SET = [
     ('document', DocumentBlock()),
     ('heading', blocks.CharBlock()),
     ('inline_image', InlineImageBlock()),
-    ('main_image', MainImageBlock()),
     ('page', blocks.PageChooserBlock()),
     ('pullquote', blocks.RichTextBlock(icon='openquote')),
     ('subsection', SubsectionBlock()),
