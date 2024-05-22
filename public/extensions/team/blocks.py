@@ -74,7 +74,6 @@ class TeamListBlock(blocks.StructBlock):
         label = 'Team List'
         icon = 'address-card'
         template = 'team_list_block.html'
-        help_text = 'A list of team members to display.'
         form_classname = 'struct-block team-list-block'
         form_template = 'team_list_form.html'
 
@@ -95,7 +94,7 @@ class TeamListBlockAdapter(StructBlockAdapter):
     def media(self):
         structblock_media = super().media
         return forms.Media(
-            js=[*structblock_media._js, 'js/team-list-block.js'],  # noqa: SLF001
+            js=[*structblock_media._js, 'js/team-list-form.js'],  # noqa: SLF001
             css={'all': ['css/team-list-form.css']},
         )
 
