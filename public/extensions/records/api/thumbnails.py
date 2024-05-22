@@ -10,6 +10,8 @@ from ida.models.resourcespace import rs_resource
 class ThumbnailsAPI(View):
     """API endpoint for returning thumbnails."""
 
+    model = rs_resource
+
     @classmethod
     def get_urlpatterns(cls):
         return [path('', cls.as_view(), name='thumbnails')]

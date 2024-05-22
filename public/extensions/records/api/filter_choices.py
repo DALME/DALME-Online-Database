@@ -12,6 +12,8 @@ from public.models import Collection
 class FilterChoices(View):
     """API endpoint for returning filter options."""
 
+    model = Collection
+
     @classmethod
     def get_urlpatterns(cls):
         return [path('', cls.as_view(), name='choices')]
