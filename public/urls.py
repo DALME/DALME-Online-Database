@@ -12,6 +12,7 @@ from django.urls import include, path, reverse
 
 from public.extensions.bibliography.urls import urlpatterns as biblio_urls
 from public.extensions.footnotes.urls import urlpatterns as footnote_urls
+from public.extensions.images.api import PublicImageAPIViewSet
 from public.extensions.records.urls import api_router
 from public.extensions.records.urls import urlpatterns as record_urls
 from public.extensions.team.api import TeamAPIViewSet, UserAPIViewSet
@@ -31,6 +32,7 @@ def to_ida_logout(_request):
 
 api_router.register_endpoint('team', TeamAPIViewSet)
 api_router.register_endpoint('user', UserAPIViewSet)
+api_router.register_endpoint('images', PublicImageAPIViewSet)
 
 cmsurls = [
     *biblio_urls,
