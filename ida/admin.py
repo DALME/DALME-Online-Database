@@ -82,9 +82,3 @@ class UserAdmin(admin.ModelAdmin):
     """User admin."""
 
     list_display = ('id', 'username', 'full_name', 'email')
-
-    def full_name(self, user):
-        """Join over the profile to get the user's full_name."""
-        return user.profile.full_name
-
-    full_name.admin_order_field = 'profile__full_name'

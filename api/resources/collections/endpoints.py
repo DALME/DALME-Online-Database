@@ -36,9 +36,9 @@ class Collections(IDABaseViewSet):
         'use_as_workset',
         'is_published',
         'owner',
-        'owner__profile__full_name',
+        'owner__full_name',
     ]
-    search_fields = ['name', 'owner__profile__full_name']
+    search_fields = ['name', 'owner__full_name']
     ordering_fields = ['name', 'is_published', 'owner', 'owner__first_name', 'member_count']
     ordering_aggregates = {
         'member_count': {

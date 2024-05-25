@@ -20,7 +20,7 @@ class UserFilter(filters.FilterSet):
             'email',
             'is_staff',
             'is_active',
-            'wagtail_userprofile__profile__full_name',
+            'full_name',
             'groups',
         ]
 

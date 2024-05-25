@@ -11,7 +11,20 @@ from django.db import connection, models
 from django.dispatch import receiver
 from django.utils import timezone
 
-from .models import Page, PageNode, PublicRegister, Record, Tenant, Transcription, Workflow, WorkLog, rs_resource
+from .models import (
+    Page,
+    PageNode,
+    Preference,
+    PreferenceKey,
+    PublicRegister,
+    Record,
+    Tenant,
+    Transcription,
+    User,
+    Workflow,
+    WorkLog,
+    rs_resource,
+)
 
 models.signals.post_save.disconnect(post_save_signal_handler, sender=Record)
 models.signals.post_delete.connect(post_delete_signal_handler, sender=Record)
@@ -116,3 +129,11 @@ def workflow_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
             models.signals.post_save.send(sender=Record, instance=instance.source, created=False)
         else:
             WorkLog.objects.update_or_create(source=instance, event='Record created', timestamp=instance.last_modified)
+
+
+@receiver(models.signals.post_save, sender=PreferenceKey)
+def preference_key_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
+    """Run after save method on PreferenceKey objects to add new pref to users."""
+    if created:
+        preferences = [Preference(user=i, key=instance, data=instance.default) for i in User.objects.all()]
+        Preference.objects.bulk_create(preferences)

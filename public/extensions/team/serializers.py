@@ -21,8 +21,8 @@ class TeamMemberSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """User serializer."""
 
-    name = serializers.CharField(max_length=255, source='wagtail_userprofile.profile.full_name', required=False)
-    avatar = serializers.CharField(max_length=255, source='wagtail_userprofile.profile.profile_image', required=False)
+    name = serializers.CharField(max_length=255, source='full_name', required=False)
+    avatar = serializers.CharField(max_length=255, source='avatar_url', required=False)
 
     class Meta:
         model = auth.get_user_model()

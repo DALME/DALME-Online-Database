@@ -32,6 +32,7 @@ from .options_list import OptionsList, OptionsValue
 from .page import Page
 from .permission import Permission
 from .place import Place
+from .preference import Preference, PreferenceKey
 from .project import Project
 from .public_register import PublicRegister
 from .publication import Publication
@@ -55,7 +56,7 @@ from .tenant_scoped import ScopedBase
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
-from .user import Profile, User
+from .user import User
 from .wordform import Wordform
 from .workflow import Workflow, WorkLog
 from .zotero_collection import ZoteroCollection
@@ -99,7 +100,8 @@ __all__ = [
     'Permission',
     'Person',
     'Place',
-    'Profile',
+    'Preference',
+    'PreferenceKey',
     'Project',
     'PublicRegister',
     'Publication',

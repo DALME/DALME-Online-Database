@@ -47,7 +47,7 @@ class FeaturedPage(BasePage, CitableMixin):
     def author(self):
         if self.alternate_author:
             return self.alternate_author
-        return self.owner.wagtail_userprofile.profile.full_name
+        return self.owner.full_name
 
     @property
     def scheduled_publication(self):

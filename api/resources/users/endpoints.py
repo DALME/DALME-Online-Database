@@ -29,12 +29,12 @@ class Users(IDABaseViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
-    search_fields = ['username', 'email', 'profile__full_name', 'first_name', 'last_name']
+    search_fields = ['username', 'email', 'full_name', 'first_name', 'last_name']
     ordering_fields = [
         'id',
         'username',
         'email',
-        'profile__full_name',
+        'full_name',
         'last_login',
         'date_joined',
         'is_staff',

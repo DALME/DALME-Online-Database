@@ -39,7 +39,7 @@ def get_citation_data(context):  # noqa: C901, PLR0912, PLR0915
 
     editor_names = []
     for editor in settings.editors.all():
-        coins_list.append(('rft.au', editor.wagtail_userprofile.profile.full_name))
+        coins_list.append(('rft.au', editor.full_name))
         editor_names.append(
             {
                 'family': editor.last_name,
@@ -119,12 +119,12 @@ def get_citation_data(context):  # noqa: C901, PLR0912, PLR0915
             coins_list += [
                 ('rft.atitle', page.title),
                 ('rft.identifier', page.get_full_url(context['request'])),
-                ('rft.au', page.record_collection.owner.wagtail_userprofile.profile.full_name),
+                ('rft.au', page.record_collection.owner.full_name),
             ]
 
             citation.update(
                 {
-                    'author': [{'literal': page.record_collection.owner.wagtail_userprofile.profile.full_name}],
+                    'author': [{'literal': page.record_collection.owner.full_name}],
                     'issued': {'date-parts': [[published.year]]},
                     'title': page.title,
                     'URL': page.get_full_url(context['request']),

@@ -27,7 +27,7 @@ class TeamMemberFilter(django_filters.FilterSet):
 
 
 class UserFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(field_name='wagtail_userprofile__profile__full_name', lookup_expr='icontains')
+    name = django_filters.CharFilter(field_name='full_name', lookup_expr='icontains')
     id__in = IdInFilter(field_name='id', lookup_expr='in')
 
     order_by = 'name'

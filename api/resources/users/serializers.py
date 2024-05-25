@@ -7,15 +7,36 @@ from django.contrib.auth import get_user_model
 
 from api.dynamic_serializer import DynamicSerializer
 from api.resources.groups import GroupSerializer
+from ida.models.preference import DATA_TYPES, Preference
+
+
+class PreferenceSerializer(serializers.ModelSerializer):
+    """Serializes user preference data."""
+
+    name = serializers.CharField(max_length=55, source='key.name')
+    label = serializers.CharField(max_length=255, source='key.label')
+    description = serializers.CharField(source='key.description')
+    data_type = serializers.ChoiceField(DATA_TYPES, source='key.data_type')
+    group = serializers.CharField(max_length=55, source='key.group')
+
+    class Meta:
+        model = Preference
+        fields = [
+            'name',
+            'label',
+            'description',
+            'data_type',
+            'group',
+            'value',
+        ]
 
 
 class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     """Serializes user and profile data."""
 
-    full_name = serializers.CharField(max_length=255, source='wagtail_userprofile.profile.full_name', required=False)
     groups = GroupSerializer(many=True, field_set='attribute', required=False)
-    avatar = serializers.URLField(max_length=255, source='wagtail_userprofile.profile.profile_image', required=False)
-    preferences = serializers.JSONField(source='wagtail_userprofile.profile.preferences', required=False)
+    avatar = serializers.URLField(max_length=255, source='avatar_url', required=False)
+    preferences = PreferenceSerializer(many=True, required=False)
 
     class Meta:
         model = get_user_model()

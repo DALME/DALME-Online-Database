@@ -18,8 +18,7 @@ class Session(viewsets.ViewSet):
     def retrieve(self, request, pk=None):  # noqa: ARG002
         """Return session."""
         if request.user.is_authenticated:
-            # TODO: Fix profile and add full_name here...
-            owner = UserSerializer(request.user, fields=['username', 'id'])
+            owner = UserSerializer(request.user, fields=['username', 'full_name', 'id'])
             is_admin = any(group.name == 'Administrators' for group in request.user.groups_scoped)
             data = owner.data
             data['is_admin'] = is_admin
