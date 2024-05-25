@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { timeStampSchema, preferenceSchema, groupSchema } from "@/schemas";
+import { timeStampSchema, preferenceListSchema, groupSchema } from "@/schemas";
 
 export const userSchema = yup.object().shape({
   id: yup.number().required(),
@@ -15,7 +15,7 @@ export const userSchema = yup.object().shape({
   lastLogin: timeStampSchema.nullable(),
   groups: yup.array().of(groupSchema).default(null).nullable(),
   avatar: yup.string().default(null).nullable(),
-  preferences: preferenceSchema.nullable(),
+  preferences: preferenceListSchema.nullable(),
 });
 
 export const userListSchema = yup.array().of(userSchema);
@@ -29,19 +29,11 @@ export const userAttributeSchema = yup.object().shape({
 });
 
 export const usersAsOptionsSchema = yup.array().of(
-  yup
-    .object()
-    .shape({
-      label: yup.string().required(),
-      value: yup.string().required(),
-      caption: yup.string().required(),
-    })
-    .transform((value) => ({
-      // TODO: Only necessary because jhrr doesn't have a user.profile.
-      label: value.fullName || `${value.firstName} ${value.lastName}`,
-      value: value.id,
-      caption: value.username,
-    })),
+  yup.object().shape({
+    label: yup.string().required(),
+    value: yup.string().required(),
+    caption: yup.string().required(),
+  }),
 );
 
 export const userLoginSchema = yup.object().shape({
@@ -51,6 +43,6 @@ export const userLoginSchema = yup.object().shape({
   email: yup.string().email().required(),
   avatar: yup.string().default(null).nullable(),
   isAdmin: yup.boolean().required(),
-  preferences: preferenceSchema.nullable(),
+  preferences: preferenceListSchema.nullable(),
   groups: yup.array().required(),
 });
