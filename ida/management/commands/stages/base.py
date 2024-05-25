@@ -451,7 +451,7 @@ class BaseStage(abc.ABC):
 
     def user_match(self, name):
         name = USER_NAME_CONCORDANCE.get(name, name)
-        match = User.objects.filter(wagtail_userprofile__profile__full_name=name)
+        match = User.objects.filter(full_name=name)
         if match.exists():
             if match.count() != 1:
                 self.logger.info('Name %s matches multiple users.', name)

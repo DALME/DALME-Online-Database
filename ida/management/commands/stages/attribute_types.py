@@ -745,7 +745,7 @@ class Stage(BaseStage):
                     'model': 'User',
                     'filters': {'is_active': True},
                     'concordance': {
-                        'label': 'profile.full_name',
+                        'label': 'full_name',
                         'value': 'id',
                         'detail': 'username',
                     },
@@ -760,7 +760,7 @@ class Stage(BaseStage):
                     'model': 'User',
                     'filters': {'is_active': True},
                     'concordance': {
-                        'label': 'profile.full_name',
+                        'label': 'full_name',
                         'value': 'id',
                         'detail': 'username',
                     },
