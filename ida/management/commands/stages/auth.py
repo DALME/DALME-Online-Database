@@ -1,9 +1,11 @@
 """Migrate auth data."""
 
+from wagtail.users.models import UserProfile
+
 from django.contrib.auth.models import Group
 from django.db import connection, transaction
 
-from ida.models import GroupProperties, Profile, Tenant, User
+from ida.models import GroupProperties, Tenant, User
 
 from .base import BaseStage
 
@@ -35,19 +37,14 @@ class Stage(BaseStage):
         if User.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating users')
+                profiles = cursor.execute('SELECT id, full_name, user_id FROM restore.core_profile;')
+                profiles = {i['user_id']: i for i in self.map_rows(cursor)}
                 users = cursor.execute('SELECT * FROM restore.auth_user;')
                 users = self.map_rows(cursor)
-                user_objs = [User(**row) for row in users]
-                User.objects.bulk_create(user_objs)
+                for user in users:
+                    user['full_name'] = profiles.get(user['id'], {}).get('full_name', None)
+                    User.objects.create(**user)
                 self.logger.info('Created %s User instances', User.objects.count())
-
-                self.logger.info('Migrating user profiles')
-                profiles = cursor.execute('SELECT id, full_name, user_id FROM restore.core_profile;')
-                profiles = self.map_rows(cursor)
-                # Can't bulk create a multi-table inherited model
-                for row in profiles:
-                    Profile.objects.create(**row)
-                self.logger.info('Created %s Profile instances', Profile.objects.count())
         else:
             self.logger.info('User data already exists')
 
@@ -150,9 +147,9 @@ class Stage(BaseStage):
 
     @transaction.atomic
     def ensure_user_profile(self):
-        """Make sure all users have a profile record."""
+        """Make sure all users have a wagtail profile record."""
         self.logger.info('Ensuring all users have a user profile')
-        objs = User.objects.filter(wagtail_userprofile__profile__isnull=True)
+        objs = User.objects.filter(wagtail_userprofile__isnull=True)
         for obj in objs:
-            Profile.objects.create(user=obj, full_name=f'{obj.first_name} {obj.last_name}')
-        self.logger.info('Linked %s Profile instances', len(objs))
+            UserProfile.objects.create(user=obj)
+        self.logger.info('Linked %s profile instances', len(objs))
