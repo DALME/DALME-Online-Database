@@ -428,7 +428,7 @@ class BaseStage(abc.ABC):
     def process_content_field(self, field_value, field_type, page_id, is_rev):
         if field_type == 'JSONField':
             field_value_json = json.loads(field_value)
-            content = field_value_json['body'] if is_rev else field_value_json
+            content = json.loads(field_value_json['body']) if is_rev else field_value_json
             new_content = self.parse_streamfield(content, page_id, is_rev=is_rev)
 
             if is_rev:

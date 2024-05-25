@@ -267,24 +267,10 @@ class Stage(BaseStage):
                 self.logger.info('Copying "%s"', source)
                 cursor.execute(f'SELECT * FROM restore.{source};')
                 rows = self.map_rows(cursor)
-
-                # for field_name in ['content_type_id', 'base_content_type_id']:
-                #     if row.get(field_name):
-                #         new_ct = self.map_content_type(row[field_name], id_only=True)
-                #         row[field_name] = new_ct
-
-                #         if model_name == 'revision' and field_name == 'content_type_id':
-                #             content = json.loads(row['content'])
-                #             content['content_type'] = new_ct
-                #             row['content'] = json.dumps(content)
-
-                # if row.get('permission_id'):
-                #     row['permission_id'] = self.map_permissions(row['permission_id'])
-
                 for row in rows:
                     columns = []
                     values = ''
-                    page_id = row.get('page_ptr_id')
+                    page_id = row.get('object_id') if is_rev else row.get('page_ptr_id')
 
                     for field_name in ['content_type_id', 'base_content_type_id']:
                         if row.get(field_name):
