@@ -5,12 +5,12 @@ import lxml.etree as et
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAUuid, get_current_username
+from ida.models.templates import TrackedMixin, UuidMixin, get_current_username
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Transcription(IDAUuid):
+class Transcription(UuidMixin, TrackedMixin):
     """Stores information about transcriptions."""
 
     transcription = models.TextField(blank=True)

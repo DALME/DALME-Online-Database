@@ -11,12 +11,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAUuid
+from .templates import TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Attribute(IDAUuid):
+class Attribute(UuidMixin, TrackedMixin):
     """Stores attribute data."""
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)

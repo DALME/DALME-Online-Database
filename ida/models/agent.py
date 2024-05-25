@@ -5,12 +5,12 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAUuid
+from ida.models.templates import TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Agent(IDAUuid):
+class Agent(UuidMixin, TrackedMixin):
     """Stores information about agents."""
 
     PERSON = 1

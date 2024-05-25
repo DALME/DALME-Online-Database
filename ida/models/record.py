@@ -8,12 +8,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q, options
 
-from ida.models.templates import IDAIntid, IDAOwned, IDAUuid
+from ida.models.templates import IntIdMixin, OwnedMixin, TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class RecordGroup(IDAUuid, IDAOwned):
+class RecordGroup(UuidMixin, TrackedMixin, OwnedMixin):
     """Stores information about archival units."""
 
     name = models.CharField(max_length=255)
@@ -45,7 +45,7 @@ class RecordGroup(IDAUuid, IDAOwned):
         return self.children.count()
 
 
-class Record(index.Indexed, IDAUuid, IDAOwned):
+class Record(index.Indexed, UuidMixin, TrackedMixin, OwnedMixin):
     """Stores information about records."""
 
     name = models.CharField(max_length=255)
@@ -183,7 +183,7 @@ class Record(index.Indexed, IDAUuid, IDAOwned):
         return (editors, corrections, contributors)
 
 
-class PageNode(IDAIntid):
+class PageNode(IntIdMixin, TrackedMixin):
     """Links records, pages, and transcriptions."""
 
     record = models.ForeignKey(

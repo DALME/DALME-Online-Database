@@ -12,12 +12,12 @@ from django.db.models import options
 
 from ida.models import AttributeType
 from ida.models.resourcespace import rs_api_query
-from ida.models.templates import IDAUuid
+from ida.models.templates import TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Page(IDAUuid):
+class Page(UuidMixin, TrackedMixin):
     """Stores page information."""
 
     name = models.CharField(max_length=55)

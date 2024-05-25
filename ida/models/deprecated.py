@@ -1,11 +1,11 @@
 """Deprecated model definitions remain here to ease migration."""
 
-from ida.models.templates import IDAIntid
+from ida.models.templates import IntIdMixin, TrackedMixin
 
 
-class Source(IDAIntid):
+class Source(IntIdMixin, TrackedMixin):
     pass
 
 
-class Set(IDAIntid):
+class Set(IntIdMixin, TrackedMixin):
     pass

@@ -7,13 +7,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDABasic, IDAOwned, IDAUuid
+from ida.models.templates import OwnedMixin, TrackedMixin, UuidMixin
 from ida.models.tenant_scoped import ScopedBase
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Collection(ScopedBase, IDAUuid, IDAOwned):
+class Collection(ScopedBase, UuidMixin, TrackedMixin, OwnedMixin):
     """Stores collection information."""
 
     name = models.CharField(max_length=255)
@@ -94,7 +94,7 @@ class Collection(ScopedBase, IDAUuid, IDAOwned):
         return None
 
 
-class CollectionMembership(ScopedBase, IDABasic):
+class CollectionMembership(ScopedBase, TrackedMixin):
     """Links collections and members."""
 
     collection = models.ForeignKey('ida.Collection', on_delete=models.CASCADE, related_name='members')

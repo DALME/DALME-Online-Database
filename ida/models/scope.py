@@ -3,12 +3,12 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAIntid, IDAUuid
+from ida.models.templates import IntIdMixin, TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class ScopeType(IDAIntid):
+class ScopeType(IntIdMixin, TrackedMixin):
     """Stores scope type definitions."""
 
     name = models.CharField(max_length=255)
@@ -23,7 +23,7 @@ class ScopeType(IDAIntid):
         return self.name
 
 
-class Scope(IDAUuid):
+class Scope(UuidMixin, TrackedMixin):
     """Stores information about scopes."""
 
     scope_type = models.ForeignKey(

@@ -5,12 +5,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAUuid
+from ida.models.templates import TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class EntityPhrase(IDAUuid):
+class EntityPhrase(UuidMixin, TrackedMixin):
     """Stores entity-phrase information."""
 
     transcription = models.ForeignKey(

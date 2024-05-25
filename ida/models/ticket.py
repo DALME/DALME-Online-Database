@@ -6,12 +6,12 @@ from django.db import models
 from django.db.models import options
 from django.urls import reverse
 
-from ida.models.templates import IDAIntid
+from ida.models.templates import IntIdMixin, TrackedMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Ticket(IDAIntid):
+class Ticket(IntIdMixin, TrackedMixin):
     """Stores information about tickets."""
 
     OPEN = 0

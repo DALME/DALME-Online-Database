@@ -4,12 +4,12 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAUuid
+from ida.models.templates import TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Object(IDAUuid):
+class Object(UuidMixin, TrackedMixin):
     """Stores object information."""
 
     concept = models.ForeignKey('ida.Concept', db_index=True, on_delete=models.CASCADE)
@@ -17,7 +17,7 @@ class Object(IDAUuid):
     tags = GenericRelation('ida.Tag')
 
 
-class ObjectAttribute(IDAUuid):
+class ObjectAttribute(UuidMixin, TrackedMixin):
     """Stores attribute concepts for objects."""
 
     obj = models.ForeignKey('ida.Object', db_index=True, on_delete=models.CASCADE)

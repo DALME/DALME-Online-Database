@@ -3,12 +3,12 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAIntid
+from ida.models.templates import IntIdMixin, TrackedMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class CountryReference(IDAIntid):
+class CountryReference(IntIdMixin, TrackedMixin):
     """Stores country information."""
 
     name = models.CharField(max_length=255, unique=True)

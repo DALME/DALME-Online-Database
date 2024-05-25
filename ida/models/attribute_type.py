@@ -2,10 +2,10 @@
 
 from django.db import models
 
-from ida.models.templates import IDAIntid
+from ida.models.templates import IntIdMixin, TrackedMixin
 
 
-class AttributeType(IDAIntid):
+class AttributeType(IntIdMixin, TrackedMixin):
     """Stores attribute definitions."""
 
     DATA_TYPES = (

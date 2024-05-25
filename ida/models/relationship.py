@@ -7,12 +7,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAIntid, IDAUuid
+from ida.models.templates import IntIdMixin, TrackedMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class RelationshipType(IDAIntid):
+class RelationshipType(IntIdMixin, TrackedMixin):
     """Stores relationship type definitions."""
 
     name = models.CharField(max_length=255)
@@ -28,7 +28,7 @@ class RelationshipType(IDAIntid):
         return self.name
 
 
-class Relationship(IDAUuid):
+class Relationship(UuidMixin, TrackedMixin):
     """Stores information about relationships between resources."""
 
     source = GenericForeignKey('source_content_type', 'source_object_id')

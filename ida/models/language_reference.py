@@ -4,12 +4,12 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IDAIntid
+from ida.models.templates import IntIdMixin, TrackedMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class LanguageReference(IDAIntid):
+class LanguageReference(IntIdMixin, TrackedMixin):
     """Stores information about languages and dialects."""
 
     glottocode = models.CharField(max_length=25, unique=True)

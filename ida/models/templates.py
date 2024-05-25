@@ -19,7 +19,7 @@ def get_current_username():
     return get_current_user().username
 
 
-class IDABasic(models.Model):
+class TrackedMixin(models.Model):
     """Model template with timestamps, but no pre-defined ID or Owner."""
 
     creation_user = models.ForeignKey(
@@ -48,7 +48,7 @@ class IDABasic(models.Model):
         return self.__class__.__name__
 
 
-class IDAUuid(IDABasic):
+class UuidMixin(models.Model):
     """Model template with a unique ID assigned by `uuid.uuid4`, resulting in a long, random identifier."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
@@ -57,7 +57,7 @@ class IDAUuid(IDABasic):
         abstract = True
 
 
-class IDAIntid(IDABasic):
+class IntIdMixin(models.Model):
     """Model template with a unique ID assigned as a sequential integer."""
 
     id = models.AutoField(primary_key=True, unique=True, db_index=True)
@@ -66,7 +66,7 @@ class IDAIntid(IDABasic):
         abstract = True
 
 
-class IDAOwned(IDABasic):
+class OwnedMixin(models.Model):
     """Model template with an owner field."""
 
     owner = models.ForeignKey(
