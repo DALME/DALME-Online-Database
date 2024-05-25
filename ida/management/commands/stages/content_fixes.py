@@ -9,6 +9,7 @@ from django.apps import apps
 from django.db import connection, transaction
 
 from ida.models import (
+    PreferenceKey,
     Project,
     Tenant,
     ZoteroCollection,
@@ -32,6 +33,7 @@ class Stage(BaseStage):
         self.replace_about_people()
         self.fix_media_paths()
         self.process_images()
+        self.add_default_preferences()
 
     @transaction.atomic
     def adjust_id_columns(self):
@@ -126,47 +128,6 @@ class Stage(BaseStage):
             zotero_api_key=os.environ['ZOTERO_API_KEY_GP'],
             tenant=tenant,
         )
-
-    # @transaction.atomic
-    # def content_conversions(self):
-    #     """Convert content between old and new formats (footnotes, references, people/team members)."""
-    #     targets = {
-    #         'public': [
-    #             'collection',
-    #             'collections',
-    #             'essay',
-    #             'featuredinventory',
-    #             'featuredobject',
-    #             'features',
-    #             'flat',
-    #         ],
-    #         'wagtailcore': ['revision'],
-    #     }
-
-    #     self.logger.info('Performing content entity conversions...')
-    #     for app_label, models in targets.items():
-    #         for model_name in models:
-    #             qualified_name = f'{app_label}_{model_name}'
-    #             self.logger.info('Processing "%s"', qualified_name)
-    #             with schema_context('dalme'):
-    #                 model = apps.get_model(app_label=app_label, model_name=model_name)
-    #                 target_fields = self.get_fields_by_type(model, ['JSONField', 'RichTextField'], as_map=True)
-    #                 self.logger.info(
-    #                     'Targetting: %s JSONField | %s Other',
-    #                     len([f for f in target_fields if f[1] == 'JSONField']),
-    #                     len([f for f in target_fields if f[1] != 'JSONField']),
-    #                 )
-    #                 for instance in model.objects.all():
-    #                     updated_fields = []
-    #                     for field_name, field_type in target_fields:
-    #                         field_value = getattr(instance, field_name, None)
-    #                         if field_value:
-    #                             updated_fields.append(field_name)
-    #                             setattr(
-    #                                 instance, field_name, self.process_content_field(field_value, field_type, instance)
-    #                             )
-
-    #                     instance.save(update_fields=updated_fields)
 
     @transaction.atomic
     def update_footnote_state(self):
@@ -291,3 +252,91 @@ class Stage(BaseStage):
                         image.get_rendition('fill-100x100')
                 except:  # noqa: E722
                     pass
+
+    @transaction.atomic
+    def add_default_preferences(self):
+        """Create default user preferences."""
+        default_preferences = [
+            {
+                'name': 'tooltipsOn',
+                'label': 'Show Tooltips',
+                'description': 'Turn UI tooltips on or off.',
+                'data_type': 'bool',
+                'group': 'IDA',
+                'default': 'True',
+            },
+            {
+                'name': 'sidebarCollapsed',
+                'label': 'Collapse sidebar',
+                'description': 'Collapse or expand the menu sidebar',
+                'data_type': 'bool',
+                'group': 'IDA',
+                'default': 'False',
+            },
+            {
+                'name': 'font_size',
+                'label': 'Font size',
+                'description': 'Size of the font in points.',
+                'data_type': 'int',
+                'group': 'Record Editor',
+                'default': '14',
+            },
+            {
+                'name': 'highlight_word',
+                'label': 'Highlight words',
+                'description': 'Highlight all instances of a word when selected.',
+                'data_type': 'bool',
+                'group': 'Record Editor',
+                'default': 'True',
+            },
+            {
+                'name': 'show_guides',
+                'label': 'Guides',
+                'description': 'Show/hide margin guides.',
+                'data_type': 'bool',
+                'group': 'Record Editor',
+                'default': 'True',
+            },
+            {
+                'name': 'show_gutter',
+                'label': 'Gutter',
+                'description': 'Show/hide the page gutter.',
+                'data_type': 'bool',
+                'group': 'Record Editor',
+                'default': 'True',
+            },
+            {
+                'name': 'show_invisibles',
+                'label': 'Invisible characters',
+                'description': 'Show/hide invisible characters.',
+                'data_type': 'bool',
+                'group': 'Record Editor',
+                'default': 'False',
+            },
+            {
+                'name': 'show_lineNumbers',
+                'label': 'Line numbers',
+                'description': 'Show/hide line numbers.',
+                'data_type': 'bool',
+                'group': 'Record Editor',
+                'default': 'True',
+            },
+            {
+                'name': 'soft_wrap',
+                'label': 'Soft wrap',
+                'description': 'Turn text soft wrapping on/off.',
+                'data_type': 'bool',
+                'group': 'Record Editor',
+                'default': 'True',
+            },
+            {
+                'name': 'theme',
+                'label': 'Theme',
+                'description': 'Change syntax colouring theme.',
+                'data_type': 'str',
+                'group': 'Record Editor',
+                'default': 'Chrome',
+            },
+        ]
+        for pref_obj in default_preferences:
+            PreferenceKey.objects.create(**pref_obj)
