@@ -3,7 +3,6 @@
 <footer class="u-flex" id="footer-app">
     <nav class="footer">
       <ul>
-        <li>{{ show_login }}</li>
         {% if links %}
               {% for link in links %}
                 <li><a href="{% pageurl link.page %}">{{ link.label }}</a></li>
