@@ -131,9 +131,13 @@ class Stage(BaseStage):
     def scope_dalme_members(self):
         """Register existing DALME users with the DALME tenant."""
         self.logger.info('Scoping users to the DALME tenant')
+        additional = [5]  # user ids to include individually
         dalme = Tenant.objects.get(name='DALME')
         non_members = User.objects.filter(groups__name='Pharmacopeias')
         members = User.objects.exclude(id__in=non_members.values_list('id', flat=True))
+        dalme.members.add(*members)
+        # add additional
+        members = User.objects.filter(id__in=additional)
         dalme.members.add(*members)
 
     @transaction.atomic
