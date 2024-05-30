@@ -57,7 +57,6 @@ RUN apt-get update && \
 COPY --from=hashicorp/terraform:1.8.3 /bin/terraform /usr/local/bin/terraform
 COPY --from=iamlive /usr/local/iamlive /usr/local/bin/iamlive
 COPY --from=terragrunt /usr/local/terragrunt /usr/local/bin/terragrunt
-COPY --from=ghcr.io/terramate-io/terramate:0.8.4 /usr/local/bin/terramate /usr/local/bin/terramate
 COPY --from=tfdocs /usr/local/terraform-docs /usr/local/bin/terraform-docs
 COPY --from=tfupdate /usr/local/tfupdate /usr/local/bin/tfupdate
 COPY --from=aquasec/tfsec-ci:latest /usr/bin/tfsec /usr/local/bin/tfsec
