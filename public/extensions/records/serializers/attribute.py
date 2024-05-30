@@ -17,9 +17,4 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Transform outgoing data."""
-        # label = instance.attribute_type.short_name
-        # if instance.attribute_type.data_type == 'TXT':
-        #     return {label: instance.value_txt}
-        # else:
-        #     return {label: str(instance)}
         return {instance.name: str(instance.value)}
