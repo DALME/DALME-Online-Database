@@ -265,7 +265,7 @@ class BaseStage(abc.ABC):
                     citation = REF_CITATIONS[ref_id]
                 except KeyError:
                     citation = ''
-                    self.logger.info('Reference id: %s not in citation list!', ref_id)
+                    self.logger.error('Reference id: %s not in citation list!', ref_id)  # noqa: TRY400
                 ref['data-id'] = ref_id
                 ref['data-reference'] = citation  # TODO: figure out a better way to get the citation!
                 ref['linktype'] = 'reference'
@@ -333,7 +333,7 @@ class BaseStage(abc.ABC):
                     search_obj = SavedSearch.objects.get(pk=ss['id'])
                     ss['data-saved-search'] = search_obj.name
                 except:  # noqa: E722
-                    self.logger.info('Failed to migrate saved search entity in page %s', page_id)
+                    self.logger.error('Failed to migrate saved search entity in page %s', page_id)  # noqa: TRY400
 
         return ''.join(str(b) for b in soup.body.findChildren(recursive=False))
 
@@ -384,7 +384,7 @@ class BaseStage(abc.ABC):
                     if isinstance(block['value'], dict):
                         block['value']['use_file_caption'] = not block['value'].get('show_caption')
                     else:
-                        self.logger.info('Found inline image with int value: %s', block['value'])
+                        self.logger.error('Found inline image with int value: %s', block['value'])
 
                 elif block.get('type') == 'main_image':
                     block['type'] = 'inline_image'
@@ -454,7 +454,7 @@ class BaseStage(abc.ABC):
         match = User.objects.filter(full_name=name)
         if match.exists():
             if match.count() != 1:
-                self.logger.info('Name %s matches multiple users.', name)
+                self.logger.error('Name %s matches multiple users.', name)
             else:
                 return match.get()
         return None

@@ -157,7 +157,7 @@ class Stage(BaseStage):
     @transaction.atomic
     def fix_biblio_page(self):
         """Fix collection block references in bibliography page."""
-        self.logger.info('Fix collection block references in bibliography page')
+        self.logger.info('Fixing collection block references in bibliography page')
         with schema_context('dalme'):
             from public.models import Bibliography
 

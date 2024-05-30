@@ -51,7 +51,7 @@ class Stage(BaseStage):
                 Headword.objects.bulk_create(objs)
                 self.logger.info('Created %s Headword instances', Headword.objects.count())
         else:
-            self.logger.info('Headword data already exists')
+            self.logger.warning('Headword data already exists')
 
     @transaction.atomic
     def migrate_object(self):
@@ -65,7 +65,7 @@ class Stage(BaseStage):
                 Object.objects.bulk_create(objs)
                 self.logger.info('Created %s Object instances', Object.objects.count())
         else:
-            self.logger.info('Object data already exists')
+            self.logger.warning('Object data already exists')
 
     @transaction.atomic
     def migrate_rights_policy(self):
@@ -79,7 +79,7 @@ class Stage(BaseStage):
                 RightsPolicy.objects.bulk_create(objs)
                 self.logger.info('Created %s RightsPolicy instances', RightsPolicy.objects.count())
         else:
-            self.logger.info('RightsPolicy data already exists')
+            self.logger.warning('RightsPolicy data already exists')
 
     @transaction.atomic
     def migrate_scope(self):
@@ -93,7 +93,7 @@ class Stage(BaseStage):
                 Scope.objects.bulk_create(objs)
                 self.logger.info('Created %s Scope instances', Scope.objects.count())
         else:
-            self.logger.info('Scope data already exists')
+            self.logger.warning('Scope data already exists')
 
     @transaction.atomic
     def migrate_locale_reference(self):
@@ -107,7 +107,7 @@ class Stage(BaseStage):
                 LocaleReference.objects.bulk_create(objs)
                 self.logger.info('Created %s LocaleReference instances', LocaleReference.objects.count())
         else:
-            self.logger.info('LocaleReference data already exists')
+            self.logger.warning('LocaleReference data already exists')
 
     @transaction.atomic
     def migrate_wordform(self):
@@ -127,7 +127,7 @@ class Stage(BaseStage):
                 Wordform.objects.bulk_create(objs)
                 self.logger.info('Created %s Wordform instances', Wordform.objects.count())
         else:
-            self.logger.info('Wordform data already exists')
+            self.logger.warning('Wordform data already exists')
 
     @transaction.atomic
     def migrate_entity_phrase(self):
@@ -165,7 +165,7 @@ class Stage(BaseStage):
                 EntityPhrase.objects.bulk_create(objs)
                 self.logger.info('Created %s EntityPhrase instances', EntityPhrase.objects.count())
         else:
-            self.logger.info('EntityPhrase data already exists')
+            self.logger.warning('EntityPhrase data already exists')
 
     @transaction.atomic
     def migrate_ticket(self):
@@ -190,4 +190,4 @@ class Stage(BaseStage):
 
                 self.logger.info('Created %s Ticket instances', Ticket.objects.count())
         else:
-            self.logger.info('Ticket data already exists')
+            self.logger.warning('Ticket data already exists')

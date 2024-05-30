@@ -56,7 +56,7 @@ class Stage(BaseStage):
                 Page.objects.bulk_create(objs)
                 self.logger.info('Created %s Page instances', Page.objects.count())
         else:
-            self.logger.info('Page data already exists')
+            self.logger.warning('Page data already exists')
 
     @transaction.atomic
     def migrate_concept(self):
@@ -70,7 +70,7 @@ class Stage(BaseStage):
                 Concept.objects.bulk_create(objs)
                 self.logger.info('Created %s Concept instances', Concept.objects.count())
         else:
-            self.logger.info('Concept data already exists')
+            self.logger.warning('Concept data already exists')
 
     @transaction.atomic
     def migrate_transcription(self):
@@ -92,7 +92,7 @@ class Stage(BaseStage):
                 Transcription.objects.bulk_create(objs)
                 self.logger.info('Created %s Transcription instances', Transcription.objects.count())
         else:
-            self.logger.info('Transcription data already exists')
+            self.logger.warning('Transcription data already exists')
 
     @transaction.atomic
     def migrate_agent(self):
@@ -108,7 +108,7 @@ class Stage(BaseStage):
                 for row in rows:
                     user_id = row['user_id']
                     if user_id in seen:
-                        self.logger.info('Skipping Agent duplicate for user_id: %s', user_id)
+                        self.logger.warning('Skipping Agent duplicate for user_id: %s', user_id)
                         continue
 
                     if user_id is not None:
@@ -133,7 +133,7 @@ class Stage(BaseStage):
                 self.logger.info('Created %s Organization instances', Organization.objects.count())
 
         else:
-            self.logger.info('Agent data already exists')
+            self.logger.warning('Agent data already exists')
 
     # These core models also need to be scoped to the DALME tenant so we
     # can do that as we proceed.
@@ -158,7 +158,7 @@ class Stage(BaseStage):
                 Attachment.objects.bulk_create(objs)
                 self.logger.info('Created %s Attachment instances', Attachment.objects.count())
         else:
-            self.logger.info('Attachment data already exists')
+            self.logger.warning('Attachment data already exists')
 
     @transaction.atomic
     def migrate_saved_search(self):
@@ -182,7 +182,7 @@ class Stage(BaseStage):
                     SavedSearch.objects.create(**row)
                 self.logger.info('Created %s SavedSearch instances', SavedSearch.objects.count())
         else:
-            self.logger.info('SavedSearch data already exists')
+            self.logger.warning('SavedSearch data already exists')
 
     @transaction.atomic
     def migrate_tasklist(self):
@@ -202,7 +202,7 @@ class Stage(BaseStage):
                 TaskList.objects.bulk_create(objs)
                 self.logger.info('Created %s TaskList instances', TaskList.objects.count())
         else:
-            self.logger.info('TaskList data already exists')
+            self.logger.warning('TaskList data already exists')
 
     @transaction.atomic
     def migrate_attribute_reference(self):
@@ -216,7 +216,7 @@ class Stage(BaseStage):
                 AttributeReference.objects.bulk_create(objs)
                 self.logger.info('Created %s AttributeReference instances', AttributeReference.objects.count())
         else:
-            self.logger.info('AttributeReference data already exists')
+            self.logger.warning('AttributeReference data already exists')
 
     @transaction.atomic
     def migrate_country_reference(self):
@@ -230,7 +230,7 @@ class Stage(BaseStage):
                 CountryReference.objects.bulk_create(objs)
                 self.logger.info('Created %s CountryReference instances', CountryReference.objects.count())
         else:
-            self.logger.info('CountryReference data already exists')
+            self.logger.warning('CountryReference data already exists')
 
     @transaction.atomic
     def migrate_language_reference(self):
@@ -255,4 +255,4 @@ class Stage(BaseStage):
                 LanguageReference.objects.bulk_create(objs)
                 self.logger.info('Created %s LanguageReference instances', LanguageReference.objects.count())
         else:
-            self.logger.info('LanguageReference data already exists')
+            self.logger.warning('LanguageReference data already exists')

@@ -46,7 +46,7 @@ class Stage(BaseStage):
                     User.objects.create(**user)
                 self.logger.info('Created %s User instances', User.objects.count())
         else:
-            self.logger.info('User data already exists')
+            self.logger.warning('User data already exists')
 
     @transaction.atomic
     def migrate_groups(self):
@@ -70,7 +70,7 @@ class Stage(BaseStage):
                 GroupProperties.objects.bulk_create(group_property_objs)
                 self.logger.info('Created %s GroupProperties instances', GroupProperties.objects.count())
         else:
-            self.logger.info('Group data already exists')
+            self.logger.warning('Group data already exists')
 
     @transaction.atomic
     def migrate_user_groups_relation(self):
@@ -156,4 +156,4 @@ class Stage(BaseStage):
         objs = User.objects.filter(wagtail_userprofile__isnull=True)
         for obj in objs:
             UserProfile.objects.create(user=obj)
-        self.logger.info('Linked %s profile instances', len(objs))
+        self.logger.debug('Linked %s profile instances', len(objs))

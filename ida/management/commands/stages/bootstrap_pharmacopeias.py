@@ -102,7 +102,7 @@ class Stage(BaseStage):
             if (env := os.environ.get('ENV')) == 'production':
                 self.logger.info('This command should never be run in production')
             elif env == 'staging' and Home.objects.exists():
-                self.logger.info('Skipping site generation as the CMS tree already exists')
+                self.logger.warning('Skipping site generation as the CMS tree already exists')
             else:
                 self.create_gradient_records()
                 self.create_default_settings()

@@ -510,10 +510,10 @@ class Stage(BaseStage):
                 page = target_model.objects.filter(title=page_title) if page_title else target_model.objects.all()
 
                 if not page.exists():
-                    self.logger.info('ERROR processing "%s": page does not exist.', entry['description'])
+                    self.logger.error('ERROR processing "%s": page does not exist.', entry['description'])
                     continue
                 if page.count() > 1:
-                    self.logger.info('ERROR processing "%s": query returns multiple pages.', entry['description'])
+                    self.logger.error('ERROR processing "%s": query returns multiple pages.', entry['description'])
                     continue
 
                 # add gradient reference
@@ -599,7 +599,7 @@ class Stage(BaseStage):
                     except IntegrityError:
                         tm = TeamMember.objects.get(user=user)
                         tm.roles.add(current_role)
-                        self.logger.info('Found duplicate record for %s.', name)
+                        self.logger.error('Found duplicate record for %s.', name)  # noqa: TRY400
 
     @transaction.atomic
     def drop_restore_schema(self):

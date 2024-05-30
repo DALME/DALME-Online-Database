@@ -30,7 +30,7 @@ class Stage(BaseStage):
                 ObjectAttribute.objects.bulk_create(objs)
                 self.logger.info('Created %s ObjectAttribute instances', ObjectAttribute.objects.count())
         else:
-            self.logger.info('ObjectAttribute data already exists')
+            self.logger.warning('ObjectAttribute data already exists')
 
     @transaction.atomic
     def migrate_token(self):
@@ -51,4 +51,4 @@ class Stage(BaseStage):
                 Token.objects.bulk_create(objs)
                 self.logger.info('Created %s Token instances', Token.objects.count())
         else:
-            self.logger.info('Token data already exists')
+            self.logger.warning('Token data already exists')
