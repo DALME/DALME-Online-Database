@@ -27,7 +27,7 @@ export const attributeSchema = yup.object().shape({
           return yup.boolean();
         case "DATE":
           return attributeDateSchema;
-        case "DEC":
+        case "FLOAT":
           return yup.number();
         case "FKEY":
           return yup.object();
@@ -366,10 +366,9 @@ export const attributeTypeSchema = yup
             booleanType ||
             {
               DATE: "Date",
-              DEC: "Decimal",
+              FLOAT: "Floating Point",
               INT: "Number",
               STR: "String",
-              TXT: "Text",
               JSON: "Data",
               "FK-INT": "Options",
               "FK-UUID": "Options",
