@@ -9,6 +9,8 @@ loaded. So just put this at the top-level so it's clean and ready for use.
 
 import contextvars
 
+from django_currentuser.middleware import get_current_user
+
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 
@@ -41,3 +43,8 @@ def get_current_tenant():
     from ida.middleware import TENANT
 
     return TENANT
+
+
+def get_current_username():
+    """Return current user's name."""
+    return get_current_user().username
