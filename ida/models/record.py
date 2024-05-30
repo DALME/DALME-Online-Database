@@ -6,14 +6,34 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import Q, options
+from django.db.models import Case, Exists, ExpressionWrapper, Manager, OuterRef, Q, Subquery, When, options
+from django.utils.functional import cached_property
 
-from ida.models.templates import IntIdMixin, OwnedMixin, TrackedMixin, UuidMixin
+from ida.models.attribute import Attribute
+from ida.models.utils import (
+    AttributeField,
+    AttributeMixin,
+    CommentMixin,
+    OwnedMixin,
+    PermissionsMixin,
+    RelationshipMixin,
+    TaggingMixin,
+    TrackingMixin,
+    UuidMixin,
+)
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class RecordGroup(UuidMixin, TrackedMixin, OwnedMixin):
+class RecordGroup(
+    UuidMixin,
+    TrackingMixin,
+    OwnedMixin,
+    AttributeMixin,
+    CommentMixin,
+    PermissionsMixin,
+    TaggingMixin,
+):
     """Stores information about archival units."""
 
     name = models.CharField(max_length=255)
@@ -21,31 +41,48 @@ class RecordGroup(UuidMixin, TrackedMixin, OwnedMixin):
     parent = GenericForeignKey('parent_type', 'parent_id')
     parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     parent_id = models.CharField(max_length=36, db_index=True, null=True)
-    attributes = GenericRelation('ida.Attribute', related_query_name='record_group')
     children = GenericRelation('ida.Record', related_query_name='record_group')
-    permissions = GenericRelation('ida.Permission', related_query_name='record_group')
-    tags = GenericRelation('ida.Tag')
-    comments = GenericRelation('ida.Comment')
 
-    @property
-    def comment_count(self):
-        """Return count of comments."""
-        return self.comments.count()
-
-    @property
+    @cached_property
     def is_private(self):
         """Return boolean indicating whether the record is private."""
         if self.permissions.filter(is_default=True).exists():
             return not getattr(self.permissions.filter(is_default=True).first(), 'can_view', True)
         return False
 
-    @property
+    @cached_property
     def no_records(self):
         """Return count of records associated with record, if any."""
         return self.children.count()
 
 
-class Record(index.Indexed, UuidMixin, TrackedMixin, OwnedMixin):
+class RecordManager(Manager):
+    def include_attrs(self, *args):
+        qs = self.get_queryset()
+        for attr in args:
+            attr_sq = Attribute.objects.filter(ida_record_related=OuterRef('pk'), attribute_type__name=attr)
+            qs = qs.annotate(
+                **{
+                    attr: ExpressionWrapper(
+                        Case(When(Exists(attr_sq), then=Subquery(attr_sq.values_list('value', flat=True)[:1]))),
+                        output_field=AttributeField(),
+                    )
+                }
+            )
+        return qs
+
+
+class Record(
+    index.Indexed,
+    UuidMixin,
+    TrackingMixin,
+    OwnedMixin,
+    AttributeMixin,
+    CommentMixin,
+    PermissionsMixin,
+    RelationshipMixin,
+    TaggingMixin,
+):
     """Stores information about records."""
 
     name = models.CharField(max_length=255)
@@ -53,24 +90,16 @@ class Record(index.Indexed, UuidMixin, TrackedMixin, OwnedMixin):
     parent = GenericForeignKey('parent_type', 'parent_id')
     parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     parent_id = models.CharField(max_length=36, db_index=True, null=True)
-    attributes = GenericRelation('ida.Attribute', related_query_name='record')
     pages = models.ManyToManyField('ida.Page', db_index=True, through='ida.PageNode')
-    tags = GenericRelation('ida.Tag')
-    comments = GenericRelation('ida.Comment')
     collections = GenericRelation('ida.CollectionMembership', related_query_name='record')
-    permissions = GenericRelation('ida.Permission', related_query_name='record')
-    relationships_as_source = GenericRelation(
-        'ida.Relationship',
-        content_type_field='source_content_type',
-        object_id_field='source_object_id',
-    )
-    relationships_as_target = GenericRelation(
-        'ida.Relationship',
-        content_type_field='target_content_type',
-        object_id_field='target_object_id',
-    )
 
     search_fields = [index.FilterField('name')]
+
+    objects = RecordManager()
+
+    class Meta:
+        base_manager_name = 'objects'
+        default_manager_name = 'objects'
 
     def __str__(self):
         return self.name
@@ -79,7 +108,7 @@ class Record(index.Indexed, UuidMixin, TrackedMixin, OwnedMixin):
         """Return absolute url for record."""
         return f'{settings.BASE_URL}/api/records/{self.pk}/'
 
-    @property
+    @cached_property
     def is_published(self):
         """Return boolean indicating whether the record has been published."""
         try:
@@ -87,12 +116,17 @@ class Record(index.Indexed, UuidMixin, TrackedMixin, OwnedMixin):
         except self._meta.get_field('workflow').related_model.DoesNotExist:
             return False
 
-    @property
-    def comment_count(self):
-        """Return count of comments."""
-        return self.comments.count()
+    # @cached_property
+    # def date(self):
+    #     dates = self.attributes.filter(name__in=['date', 'start_date', 'end_date'])
+    #     return dates.first().value if dates.exists() else None
 
-    @property
+    # @cached_property
+    # def record_type(self):
+    #     rt = self.attributes.filter(name='record_type')
+    #     return rt.first().value if rt.exists() else 'unclear'
+
+    @cached_property
     def is_private(self):
         """Return boolean indicating whether the record is private."""
         if self.permissions.filter(is_default=True).exists():
@@ -116,33 +150,29 @@ class Record(index.Indexed, UuidMixin, TrackedMixin, OwnedMixin):
         """Return list of places associated with the record, if any."""
         return self.get_related_resources(115)
 
-    def objects(self):
-        """Return list of objects associated with the record, if any."""
-        return self.get_related_resources(118)
-
-    @property
+    @cached_property
     def has_images(self):
         """Return boolean indicating whether the record has associated images."""
         return self.pages.exclude(dam_id__isnull=True).exists()
 
-    @property
+    @cached_property
     def no_images(self):
         """Return count of images associated with the record, if any."""
         return self.pages.exclude(dam_id__isnull=True).count() if self.has_images else 0
 
-    @property
+    @cached_property
     def has_transcriptions(self):
         """Return boolean indicating whether the record has associated transcriptions."""
         return self.pagenodes.all().select_related('transcription').exists()
 
-    @property
+    @cached_property
     def no_transcriptions(self):
         """Return count of transcriptions associated with the record, if any."""
         return len(
             [t for t in self.pagenodes.all() if t.transcription is not None and t.transcription.count_transcription]
         )
 
-    @property
+    @cached_property
     def no_folios(self):
         """Return count of folios associated with the record, if any."""
         return self.pages.all().count() if self.pages.all().exists() else 0
@@ -183,7 +213,7 @@ class Record(index.Indexed, UuidMixin, TrackedMixin, OwnedMixin):
         return (editors, corrections, contributors)
 
 
-class PageNode(IntIdMixin, TrackedMixin):
+class PageNode(TrackingMixin):
     """Links records, pages, and transcriptions."""
 
     record = models.ForeignKey(

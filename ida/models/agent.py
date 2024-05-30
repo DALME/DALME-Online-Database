@@ -1,16 +1,31 @@
 """Agent-related models."""
 
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import TrackedMixin, UuidMixin
+from ida.models.utils import (
+    AttestationMixin,
+    AttributeMixin,
+    CommentMixin,
+    RelationshipMixin,
+    TaggingMixin,
+    TrackingMixin,
+    UuidMixin,
+)
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Agent(UuidMixin, TrackedMixin):
+class Agent(
+    UuidMixin,
+    TrackingMixin,
+    AttributeMixin,
+    CommentMixin,
+    TaggingMixin,
+    RelationshipMixin,
+    AttestationMixin,
+):
     """Stores information about agents."""
 
     PERSON = 1
@@ -22,20 +37,6 @@ class Agent(UuidMixin, TrackedMixin):
 
     name = models.CharField(max_length=255)
     agent_type = models.IntegerField(choices=AGENT_TYPES)
-    attributes = GenericRelation('ida.Attribute')
-    instances = GenericRelation('ida.EntityPhrase')
-    comments = GenericRelation('ida.Comment')
-    tags = GenericRelation('ida.Tag')
-    relationships_as_source = GenericRelation(
-        'ida.Relationship',
-        content_type_field='source_content_type',
-        object_id_field='source_object_id',
-    )
-    relationships_as_target = GenericRelation(
-        'ida.Relationship',
-        content_type_field='target_content_type',
-        object_id_field='target_object_id',
-    )
 
 
 class Organization(Agent):

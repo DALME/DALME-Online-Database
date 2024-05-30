@@ -5,26 +5,19 @@ import json
 from django.conf import settings
 from django.db import models
 
-from .templates import TrackedMixin, UuidMixin
-
-DATA_TYPES = (
-    ('bool', 'Boolean'),
-    ('int', 'Integer'),
-    ('json', 'JSON'),
-    ('str', 'String'),
-)
+from ida.models.utils import BASE_DATA_TYPES, TrackingMixin, UuidMixin
 
 
-class PreferenceKey(TrackedMixin, UuidMixin):
+class PreferenceKey(TrackingMixin, UuidMixin):
     name = models.CharField(max_length=55, unique=True)
     label = models.CharField(max_length=255)
     description = models.TextField()
-    data_type = models.CharField(choices=DATA_TYPES, max_length=4)
+    data_type = models.CharField(choices=BASE_DATA_TYPES, max_length=15)
     group = models.CharField(max_length=55)
     default = models.TextField()
 
 
-class Preference(TrackedMixin):
+class Preference(TrackingMixin):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='preferences')
     key = models.ForeignKey(PreferenceKey, on_delete=models.CASCADE)
     data = models.TextField()
@@ -36,11 +29,11 @@ class Preference(TrackedMixin):
     @property
     def value(self):
         match self.key.data_type:
-            case 'bool':
+            case 'BOOL':
                 return self.data == 'True'
-            case 'int':
+            case 'INT':
                 return int(self.data)
-            case 'json':
+            case 'JSON':
                 return json.loads(self.data)
             case _:
                 return self.data

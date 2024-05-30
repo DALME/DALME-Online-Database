@@ -2,23 +2,11 @@
 
 from django.db import models
 
-from ida.models.templates import IntIdMixin, TrackedMixin
+from ida.models.utils import DATA_TYPES, TrackingMixin
 
 
-class AttributeType(IntIdMixin, TrackedMixin):
+class AttributeType(TrackingMixin):
     """Stores attribute definitions."""
-
-    DATA_TYPES = (
-        ('BOOL', 'BOOL (boolean)'),
-        ('DATE', 'DATE (date)'),
-        ('DEC', 'DEC (decimal)'),
-        ('FKEY', 'FKEY (foreign key)'),
-        ('INT', 'INT (integer)'),
-        ('JSON', 'JSON (data)'),
-        ('RREL', 'RREL (reverse relation)'),
-        ('STR', 'STR (string)'),
-        ('TXT', 'TXT (text)'),
-    )
 
     name = models.CharField(max_length=55, unique=True)
     label = models.CharField(max_length=255)

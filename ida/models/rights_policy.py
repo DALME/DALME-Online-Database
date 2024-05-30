@@ -1,15 +1,14 @@
 """Rights policy model."""
 
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import TrackedMixin, UuidMixin
+from ida.models.utils import CommentMixin, TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class RightsPolicy(UuidMixin, TrackedMixin):
+class RightsPolicy(UuidMixin, TrackingMixin, CommentMixin):
     """Stores information about rights concerning archival images."""
 
     COPYRIGHTED = 1
@@ -34,7 +33,6 @@ class RightsPolicy(UuidMixin, TrackedMixin):
     notice_display = models.BooleanField(default=False)
     public_display = models.BooleanField(default=True)
     attachments = models.ForeignKey('ida.Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-    comments = GenericRelation('ida.Comment')
 
     class Meta:
         ordering = ['name']

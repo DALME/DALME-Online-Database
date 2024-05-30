@@ -6,25 +6,23 @@ import requests
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
 from ida.models import AttributeType
 from ida.models.resourcespace import rs_api_query
-from ida.models.templates import TrackedMixin, UuidMixin
+from ida.models.utils import TaggingMixin, TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Page(UuidMixin, TrackedMixin):
+class Page(UuidMixin, TrackingMixin, TaggingMixin):
     """Stores page information."""
 
     name = models.CharField(max_length=55)
     dam_id = models.IntegerField(db_index=True, null=True)
     order = models.IntegerField(db_index=True)
     canvas = models.TextField(blank=True, null=True)
-    tags = GenericRelation('ida.Tag')
 
     class Meta:
         ordering = ['order']

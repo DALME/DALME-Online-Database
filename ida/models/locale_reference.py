@@ -1,15 +1,14 @@
 """Locale reference model."""
 
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IntIdMixin, TrackedMixin
+from ida.models.utils import TrackingMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class LocaleReference(IntIdMixin, TrackedMixin):
+class LocaleReference(TrackingMixin):
     """Stores information about geographic locales."""
 
     name = models.CharField(max_length=255)
@@ -17,12 +16,6 @@ class LocaleReference(IntIdMixin, TrackedMixin):
     country = models.ForeignKey('ida.CountryReference', on_delete=models.SET_NULL, null=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
-    as_attribute_value = GenericRelation(
-        'ida.AttributeValueFkey',
-        content_type_field='target_content_type',
-        object_id_field='target_id',
-        related_query_name='locale',
-    )
 
     class Meta:
         ordering = ['country', 'name']

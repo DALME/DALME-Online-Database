@@ -1,16 +1,16 @@
 """Entity phrase model."""
 
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import TrackedMixin, UuidMixin
+from ida.models.utils import AttributeMixin, TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class EntityPhrase(UuidMixin, TrackedMixin):
+class EntityPhrase(UuidMixin, TrackingMixin, AttributeMixin):
     """Stores entity-phrase information."""
 
     transcription = models.ForeignKey(
@@ -23,4 +23,3 @@ class EntityPhrase(UuidMixin, TrackedMixin):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.UUIDField(null=True, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    attributes = GenericRelation('ida.Attribute')

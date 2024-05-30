@@ -3,13 +3,12 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IntIdMixin, TrackedMixin
-from ida.models.tenant_scoped import ScopedBase
+from ida.models.utils import ScopedBase, TrackingMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class OptionsList(IntIdMixin, TrackedMixin):
+class OptionsList(TrackingMixin):
     """Stores lists of attribute value options. Payload format as follows.
 
     `db_records`: {
@@ -40,7 +39,7 @@ class OptionsList(IntIdMixin, TrackedMixin):
     description = models.TextField()
 
 
-class OptionsValue(ScopedBase, TrackedMixin):
+class OptionsValue(ScopedBase, TrackingMixin):
     """Stores tenanted static lists of values."""
 
     op_list = models.ForeignKey(OptionsList, on_delete=models.CASCADE, related_name='values')

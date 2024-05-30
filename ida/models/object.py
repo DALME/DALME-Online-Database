@@ -1,23 +1,20 @@
 """Objects model."""
 
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import TrackedMixin, UuidMixin
+from ida.models.utils import AttestationMixin, TaggingMixin, TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Object(UuidMixin, TrackedMixin):
+class Object(UuidMixin, TrackingMixin, AttestationMixin, TaggingMixin):
     """Stores object information."""
 
     concept = models.ForeignKey('ida.Concept', db_index=True, on_delete=models.CASCADE)
-    instances = GenericRelation('ida.EntityPhrase')
-    tags = GenericRelation('ida.Tag')
 
 
-class ObjectAttribute(UuidMixin, TrackedMixin):
+class ObjectAttribute(UuidMixin, TrackingMixin):
     """Stores attribute concepts for objects."""
 
     obj = models.ForeignKey('ida.Object', db_index=True, on_delete=models.CASCADE)

@@ -5,12 +5,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import TrackedMixin, UuidMixin
+from ida.models.utils import TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Permission(UuidMixin, TrackedMixin):
+class Permission(UuidMixin, TrackingMixin):
     """Stores object-level permissions information."""
 
     principal = GenericForeignKey('principal_type', 'principal_id')

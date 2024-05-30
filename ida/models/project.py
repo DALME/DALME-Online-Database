@@ -3,13 +3,13 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IntIdMixin, TrackedMixin
 from ida.models.tenant import Tenant
+from ida.models.utils import TrackingMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Project(IntIdMixin, TrackedMixin):
+class Project(TrackingMixin):
     """Stores information about projects."""
 
     name = models.CharField(max_length=55)

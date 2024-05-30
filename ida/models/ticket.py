@@ -1,17 +1,16 @@
 """Ticket model."""
 
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 from django.urls import reverse
 
-from ida.models.templates import IntIdMixin, TrackedMixin
+from ida.models.utils import CommentMixin, TaggingMixin, TrackingMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Ticket(IntIdMixin, TrackedMixin):
+class Ticket(TrackingMixin, CommentMixin, TaggingMixin):
     """Stores information about tickets."""
 
     OPEN = 0
@@ -35,8 +34,6 @@ class Ticket(IntIdMixin, TrackedMixin):
     )
     closing_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     closing_date = models.DateTimeField(null=True, blank=True)
-    tags = GenericRelation('ida.Tag')
-    comments = GenericRelation('ida.Comment')
 
     class Meta:
         ordering = ['status', 'creation_timestamp']
@@ -47,8 +44,3 @@ class Ticket(IntIdMixin, TrackedMixin):
     def get_absolute_url(self):
         """Return absolute url for instance."""
         return reverse('ticket_detail', kwargs={'pk': self.pk})
-
-    @property
-    def comment_count(self):
-        """Return count of comments."""
-        return self.comments.count()

@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import IntIdMixin, TrackedMixin
+from ida.models.utils import TrackingMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
@@ -30,7 +30,7 @@ class ContentTypeExtended(ContentType):
         ordering = ['id']
 
 
-class ContentAttributes(IntIdMixin, TrackedMixin):
+class ContentAttributes(TrackingMixin):
     """Links attribute types with content types and stores related metadata."""
 
     content_type = models.ForeignKey(

@@ -1,20 +1,22 @@
 """Publication model."""
 
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import TrackedMixin, UuidMixin
+from ida.models.utils import (
+    AttributeMixin,
+    CommentMixin,
+    PermissionsMixin,
+    TaggingMixin,
+    TrackingMixin,
+    UuidMixin,
+)
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Publication(UuidMixin, TrackedMixin):
+class Publication(UuidMixin, TrackingMixin, AttributeMixin, CommentMixin, PermissionsMixin, TaggingMixin):
     """Stores information about publications."""
 
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
-    attributes = GenericRelation('ida.Attribute', related_query_name='publications')
-    permissions = GenericRelation('ida.Permission', related_query_name='publication')
-    tags = GenericRelation('ida.Tag')
-    comments = GenericRelation('ida.Comment')

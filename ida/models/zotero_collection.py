@@ -3,10 +3,12 @@
 from django.db import models
 from django.db.models import options
 
+from ida.models.utils import TrackingMixin
+
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class ZoteroCollection(models.Model):
+class ZoteroCollection(TrackingMixin):
     """Stores information about Zotero collections associated with a project."""
 
     id = models.CharField(primary_key=True, max_length=25, help_text='Zotero ID of the collection.')

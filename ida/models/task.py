@@ -6,19 +6,17 @@ from datetime import datetime
 from django_currentuser.middleware import get_current_user
 
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 from django.urls import reverse
 from django.utils import timezone
 
-from ida.models.templates import IntIdMixin, OwnedMixin, TrackedMixin
-from ida.models.tenant_scoped import ScopedBase
+from ida.models.utils import CommentMixin, OwnedMixin, PermissionsMixin, ScopedBase, TrackingMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Task(ScopedBase, IntIdMixin, TrackedMixin):
+class Task(ScopedBase, TrackingMixin, CommentMixin):
     """Stores information about tasks."""
 
     title = models.CharField(max_length=140)
@@ -29,7 +27,6 @@ class Task(ScopedBase, IntIdMixin, TrackedMixin):
     completed = models.BooleanField(default=False)
     completed_date = models.DateTimeField(blank=True, null=True)
     url = models.CharField(max_length=255, blank=True)
-    comments = GenericRelation('ida.Comment', related_query_name='tasks')
     completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -45,11 +42,6 @@ class Task(ScopedBase, IntIdMixin, TrackedMixin):
 
     def __str__(self):
         return self.title
-
-    @property
-    def comment_count(self):
-        """Return count of comments."""
-        return self.comments.count()
 
     @property
     def overdue(self):
@@ -72,7 +64,7 @@ class Task(ScopedBase, IntIdMixin, TrackedMixin):
         super().save(*args, **kwargs)
 
 
-class TaskList(ScopedBase, IntIdMixin, TrackedMixin, OwnedMixin):
+class TaskList(ScopedBase, TrackingMixin, OwnedMixin, PermissionsMixin):
     """Stores information about task lists."""
 
     name = models.CharField(max_length=60)
@@ -85,7 +77,6 @@ class TaskList(ScopedBase, IntIdMixin, TrackedMixin, OwnedMixin):
         limit_choices_to={'properties__type': 3},
         null=True,
     )
-    permissions = GenericRelation('ida.Permission', related_query_name='tasklist')
 
     class Meta:
         ordering = ['name']

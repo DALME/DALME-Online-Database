@@ -2,18 +2,25 @@
 
 from collections import Counter
 
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import OwnedMixin, TrackedMixin, UuidMixin
-from ida.models.tenant_scoped import ScopedBase
+from ida.models.utils import (
+    AttributeMixin,
+    CommentMixin,
+    OwnedMixin,
+    PermissionsMixin,
+    ScopedBase,
+    TrackingMixin,
+    UuidMixin,
+)
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Collection(ScopedBase, UuidMixin, TrackedMixin, OwnedMixin):
+class Collection(ScopedBase, UuidMixin, TrackingMixin, OwnedMixin, AttributeMixin, CommentMixin, PermissionsMixin):
     """Stores collection information."""
 
     name = models.CharField(max_length=255)
@@ -26,17 +33,9 @@ class Collection(ScopedBase, UuidMixin, TrackedMixin, OwnedMixin):
         limit_choices_to={'properties__type': 3},
         null=True,
     )
-    attributes = GenericRelation('ida.Attribute', related_query_name='collection')
-    permissions = GenericRelation('ida.Permission', related_query_name='collection')
-    comments = GenericRelation('ida.Comment')
 
     def __str__(self):
         return self.name
-
-    @property
-    def comment_count(self):
-        """Return count of comments."""
-        return self.comments.count()
 
     @property
     def is_private(self):
@@ -59,19 +58,20 @@ class Collection(ScopedBase, UuidMixin, TrackedMixin, OwnedMixin):
     def get_languages(self, published=False):
         """Return a list of languages represented in the collection (if all members are records)."""
         if self.membership_type() == 'record':
-            query = models.Q(record__attributes__attribute_type=15)
+            query = models.Q(record__attributes__attribute_type__name='language')
 
             if published:
                 query.add(models.Q(record__workflow__is_public=True), models.Q.AND)
 
-            return list(
-                self.members.filter(query)
-                .distinct()
-                .order_by('record__attributes__attributevaluefkey__language__name')
-                .values_list(
-                    'record__attributes__attributevaluefkey__language__name',
-                    'record__attributes__attributevaluefkey__language__id',
-                ),
+            return sorted(
+                [
+                    (i.name, i.id)
+                    for i in self.members.filter(query)
+                    .distinct()
+                    .order_by('record__attributes__value__name')
+                    .values_list('record__attributes__value', flat=True)
+                ],
+                key=lambda x: x[0],
             )
 
         return None
@@ -79,22 +79,20 @@ class Collection(ScopedBase, UuidMixin, TrackedMixin, OwnedMixin):
     def get_time_coverage(self, published=False):
         """Return a list of years and counts represented in the collection (if all members are records)."""
         if self.membership_type() == 'record':
-            query = models.Q(record__attributes__attribute_type__in=[19, 25, 26])
+            query = models.Q(record__attributes__attribute_type__name__in=['date', 'end_date', 'start_date'])
 
             if published:
                 query.add(models.Q(record__workflow__is_public=True), models.Q.AND)
 
-            years = (
-                self.members.filter(query)
-                .order_by('record__attributes__attributevaluedate__year')
-                .values_list('record__attributes__attributevaluedate__year', flat=True)
+            years = sorted(
+                [i.year for i in self.members.filter(query).values_list('record__attributes__value', flat=True)]
             )
 
             return dict(Counter(years))
         return None
 
 
-class CollectionMembership(ScopedBase, TrackedMixin):
+class CollectionMembership(ScopedBase, TrackingMixin):
     """Links collections and members."""
 
     collection = models.ForeignKey('ida.Collection', on_delete=models.CASCADE, related_name='members')

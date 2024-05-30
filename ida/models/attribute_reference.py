@@ -3,12 +3,12 @@
 from django.db import models
 from django.db.models import options
 
-from .templates import TrackedMixin, UuidMixin
+from ida.models.utils import TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class AttributeReference(UuidMixin, TrackedMixin):
+class AttributeReference(UuidMixin, TrackingMixin):
     """Stores information about the provenance of attribute definitions."""
 
     name = models.CharField(max_length=255)

@@ -3,17 +3,7 @@
 from .agent import Agent, Organization, Person
 from .application import Application
 from .attachment import Attachment
-from .attribute import (
-    Attribute,
-    AttributeValueBool,
-    AttributeValueDate,
-    AttributeValueDec,
-    AttributeValueFkey,
-    AttributeValueInt,
-    AttributeValueJson,
-    AttributeValueStr,
-    AttributeValueTxt,
-)
+from .attribute import Attribute
 from .attribute_reference import AttributeReference
 from .attribute_type import AttributeType
 from .collection import Collection, CollectionMembership
@@ -52,7 +42,6 @@ from .scope import Scope, ScopeType
 from .tag import Tag
 from .task import Task, TaskList
 from .tenant import Domain, Tenant
-from .tenant_scoped import ScopedBase
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
@@ -68,14 +57,6 @@ __all__ = [
     'Attribute',
     'AttributeReference',
     'AttributeType',
-    'AttributeValueBool',
-    'AttributeValueDate',
-    'AttributeValueDec',
-    'AttributeValueFkey',
-    'AttributeValueInt',
-    'AttributeValueJson',
-    'AttributeValueStr',
-    'AttributeValueTxt',
     'Collection',
     'CollectionMembership',
     'Comment',
@@ -118,7 +99,6 @@ __all__ = [
     'rs_user',
     'SavedSearch',
     'Scope',
-    'ScopedBase',
     'ScopeType',
     'Tag',
     'Task',
