@@ -5,9 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
 from ida.models import (
+    Attribute,
     AttributeType,
-    AttributeValueJson,
-    AttributeValueTxt,
     Collection,
     CollectionMembership,
     Permission,
@@ -112,7 +111,7 @@ class Stage(BaseStage):
                     Collection.objects.create(**row)
 
                     if description:
-                        AttributeValueTxt.objects.create(
+                        Attribute.objects.create(
                             content_type=collection_ct,
                             object_id=row_id,
                             attribute_type=AttributeType.objects.get(name='description'),
@@ -122,7 +121,7 @@ class Stage(BaseStage):
                         )
 
                     if stat_title is not None and stat_text is not None:
-                        AttributeValueJson.objects.create(
+                        Attribute.objects.create(
                             content_type=collection_ct,
                             object_id=row_id,
                             attribute_type=AttributeType.objects.get(name='collection_metadata'),
@@ -138,7 +137,7 @@ class Stage(BaseStage):
                     if set_type == WORKSET_TYPE:
                         workset_progress = [str(member['object_id']) for member in members if member['workset_done']]
 
-                        AttributeValueJson.objects.create(
+                        Attribute.objects.create(
                             content_type=collection_ct,
                             object_id=row_id,
                             attribute_type=AttributeType.objects.get(name='workset_progress'),
@@ -190,4 +189,4 @@ class Stage(BaseStage):
 
             self.logger.info('Created %s Collection instances', Collection.objects.count())
         else:
-            self.logger.info('Collection data already exists')
+            self.logger.warning('Collection data already exists')

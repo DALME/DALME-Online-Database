@@ -6,7 +6,6 @@ from django.db import connection, transaction
 from ida.models import (
     Attribute,
     AttributeType,
-    AttributeValueBool,
     Organization,
     PageNode,
     Permission,
@@ -134,7 +133,7 @@ class Stage(BaseStage):
                                 modification_user=user_obj,
                             )
 
-                        AttributeValueBool.objects.create(
+                        Attribute.objects.create(
                             content_type=record_ct,
                             object_id=record_id,
                             attribute_type=has_inv_type,
@@ -190,7 +189,7 @@ class Stage(BaseStage):
 
             self.logger.info('Created %s Record instances', rec_count)
         else:
-            self.logger.info('Record data already exists')
+            self.logger.warning('Record data already exists')
 
     @transaction.atomic
     def migrate_page_nodes(self):
@@ -209,7 +208,7 @@ class Stage(BaseStage):
                 PageNode.objects.bulk_create(objs)
                 self.logger.info('Created %s node instances', PageNode.objects.count())
         else:
-            self.logger.info('PageNode data already exists')
+            self.logger.warning('PageNode data already exists')
 
     @transaction.atomic
     def migrate_worklog(self):
@@ -229,7 +228,7 @@ class Stage(BaseStage):
                 WorkLog.objects.bulk_create(objs)
                 self.logger.info('Created %s WorkLog instances', WorkLog.objects.count())
         else:
-            self.logger.info('WorkLog data already exists')
+            self.logger.warning('WorkLog data already exists')
 
     @transaction.atomic
     def migrate_workflow(self):
@@ -249,4 +248,4 @@ class Stage(BaseStage):
                 Workflow.objects.bulk_create(objs)
                 self.logger.info('Created %s Workflow instances', Workflow.objects.count())
         else:
-            self.logger.info('Workflow data already exists')
+            self.logger.warning('Workflow data already exists')

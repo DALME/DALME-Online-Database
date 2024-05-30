@@ -436,13 +436,19 @@ class Stage(BaseStage):
                         row['data_type'] = 'INT'
                     elif short_name in TO_RREL:
                         row['data_type'] = 'RREL'
+                    elif row['data_type'] == 'TXT':
+                        row['data_type'] = 'STR'
+                    elif row['data_type'] == 'DEC':
+                        row['data_type'] = 'FLOAT'
+                    elif row['data_type'] in ['FK-UUID', 'FK-INT']:
+                        row['data_type'] = 'FKEY'
 
                     objs.append(AttributeType(**row))
 
                 AttributeType.objects.bulk_create(objs)
                 self.logger.info('Created %s AttributeType instances', AttributeType.objects.count())
         else:
-            self.logger.info('AttributeType data already exists')
+            self.logger.warning('AttributeType data already exists')
 
     @transaction.atomic
     def migrate_contenttype_extended(self):
@@ -486,7 +492,7 @@ class Stage(BaseStage):
 
             self.logger.info('Created %s ContentTypeExtended instances', ContentTypeExtended.objects.count())
         else:
-            self.logger.info('ContentTypeExtended data already exists')
+            self.logger.warning('ContentTypeExtended data already exists')
 
     @transaction.atomic
     def migrate_options_list(self):
@@ -812,4 +818,4 @@ class Stage(BaseStage):
 
             self.logger.info('Created %s OptionsList instances', OptionsList.objects.count())
         else:
-            self.logger.info('OptionsList data already exists')
+            self.logger.warning('OptionsList data already exists')

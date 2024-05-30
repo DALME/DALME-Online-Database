@@ -6,8 +6,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
 from ida.models import (
+    Attribute,
     AttributeType,
-    AttributeValueFkey,
     Comment,
     LocaleReference,
     Location,
@@ -57,7 +57,6 @@ class Stage(BaseStage):
                 rows = self.map_rows(cursor)
 
                 locale_at_id = AttributeType.objects.get(name='locale').id
-                locale_ct = ContentType.objects.get_for_model(LocaleReference)
                 location_ct = ContentType.objects.get_for_model(Location)
 
                 for idx, row in enumerate(rows):  # noqa: B007
@@ -68,12 +67,12 @@ class Stage(BaseStage):
                         creation_timestamp=row['creation_timestamp'],
                         modification_timestamp=row['modification_timestamp'],
                     )
-                    AttributeValueFkey.objects.create(
+
+                    Attribute.objects.create(
                         object_id=obj.id,
                         attribute_type_id=locale_at_id,
-                        target_content_type=locale_ct,
                         content_type=location_ct,
-                        target_id=row['locale_id'],
+                        value=LocaleReference.objects.get(pk=int(row['locale_id'])),
                         creation_user_id=row['creation_user_id'],
                         modification_user_id=row['modification_user_id'],
                         creation_timestamp=row['creation_timestamp'],
@@ -81,10 +80,10 @@ class Stage(BaseStage):
                     )
 
                 self.logger.info('Created %s Location instances', idx + 1)
-                self.logger.info('Created %s AttributeValueFkey instances', idx + 1)
+                self.logger.info('Created %s Attribute instances', idx + 1)
 
         else:
-            self.logger.info('Location data already exists')
+            self.logger.warning('Location data already exists')
 
     @transaction.atomic
     def migrate_place(self):
@@ -105,7 +104,7 @@ class Stage(BaseStage):
                 Place.objects.bulk_create(objs)
                 self.logger.info('Created %s Place instances', Place.objects.count())
         else:
-            self.logger.info('Place data already exists')
+            self.logger.warning('Place data already exists')
 
     @transaction.atomic
     def migrate_credit_support_records(self):
@@ -188,7 +187,7 @@ class Stage(BaseStage):
             self.logger.info('Created %s ScopeType instances', ScopeType.objects.count())
             self.logger.info('Created %s Scope instances', Scope.objects.count())
         else:
-            self.logger.info('Credit support data already exists')
+            self.logger.warning('Credit support data already exists')
 
     @transaction.atomic
     def migrate_record_credits(self):
@@ -236,7 +235,7 @@ class Stage(BaseStage):
 
                 self.logger.info('Created %s Relationship instances', Relationship.objects.count())
         else:
-            self.logger.info('Source credit relationship data already exists')
+            self.logger.warning('Source credit relationship data already exists')
 
     @transaction.atomic
     def migrate_tag(self):
@@ -269,7 +268,7 @@ class Stage(BaseStage):
                 Tag.objects.bulk_create(objs)
                 self.logger.info('Created %s Tag instances', Tag.objects.count())
         else:
-            self.logger.info('Tag data already exists')
+            self.logger.warning('Tag data already exists')
 
     @transaction.atomic
     def migrate_comment(self):
@@ -293,7 +292,7 @@ class Stage(BaseStage):
                 Comment.objects.bulk_create(objs)
                 self.logger.info('Created %s Comment instances', Comment.objects.count())
         else:
-            self.logger.info('Comment data already exists')
+            self.logger.warning('Comment data already exists')
 
     @transaction.atomic
     def migrate_public_register(self):
@@ -315,7 +314,7 @@ class Stage(BaseStage):
                 PublicRegister.objects.bulk_create(objs)
                 self.logger.info('Created %s PublicRegister instances', PublicRegister.objects.count())
         else:
-            self.logger.info('PublicRegister data already exists')
+            self.logger.warning('PublicRegister data already exists')
 
     @transaction.atomic
     def migrate_task(self):
@@ -369,4 +368,4 @@ class Stage(BaseStage):
 
                 self.logger.info('Created %s Task instances', Task.objects.count())
         else:
-            self.logger.info('Task data already exists')
+            self.logger.warning('Task data already exists')
