@@ -52,8 +52,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     bash \
     procps \
-    git \
-    ssh-client && \
+    git && \
     apt-get clean
 COPY --from=hashicorp/terraform:1.8.3 /bin/terraform /usr/local/bin/terraform
 COPY --from=iamlive /usr/local/iamlive /usr/local/bin/iamlive

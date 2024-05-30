@@ -136,7 +136,6 @@ services:
       dockerfile: ./config/docker/Dockerfile.deploy
     volumes:
       - ./tf:/opt/tf
-      - ./.git:/opt/tf/.git:ro
       - ~/.aws:/root/.aws:rw
       - ~/.iamlive:/root/.iamlive:rw
       - ~/.terraform.d:/root/.terraform.d:rw

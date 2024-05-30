@@ -5,8 +5,7 @@ JUMP_HOST := $(PROJECT)-asg-jump-host-$(ENVIRONMENT)
 REGION := eu-west-2
 TF_LOG := WARN
 TF_PROVIDER := "~> 5.0"
-TF_MODULES := /opt/tf/modules
-PARALLEL := 5
+TF_MODULES := modules
 
 CLUSTER := $(PROJECT)-ecs-cluster-$(ENVIRONMENT)
 SERVICE := $(PROJECT)-ecs-service-$(ENVIRONMENT)
@@ -25,7 +24,7 @@ _deploy.docs:
 			--recursive \
 			--recursive-path $$dir \
 			--output-file README.md \
-			$(TF_MODULES); \
+			/opt/tf/$(TF_MODULES); \
 	done
 .PHONY: _deploy.docs
 
@@ -90,34 +89,33 @@ _deploy.validate:
 
 ### PUBLIC INTERFACE ###
 deploy.apply:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.apply module=ecs)
+else
 	docker compose run --rm \
 		-e IAMLIVE=$(IAMLIVE) \
 		$(PROJECT).deploy \
-		terramate run \
-		--changed \
-		-- \
 		terragrunt apply \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.apply
 
 deploy.destroy: _deploy.confirm.destroy
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.destroy module=ecs)
+else
 	docker compose run --rm \
 		$(PROJECT).deploy \
-		terramate run \
-		--changed \
-		-- \
 		terragrunt destroy \
-		--terragrunt-log-level $(TF_LOG) \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-ignore-external-dependencies \
+		--terragrunt-log-level $(TF_LOG) \
 		--terragrunt-non-interactive
+endif
 .PHONY: deploy.destroy
-
-deploy.diffs:
-	docker compose run --rm \
-		$(PROJECT).deploy \
-		terramate list \
-		--changed
-.PHONT: deploy.diffs
 
 deploy.ecs:
 	docker compose run --rm \
@@ -126,33 +124,40 @@ deploy.ecs:
 		--timeout -1
 .PHONY: deploy.ecs
 
-# deploy.graph:
-# 	docker compose run -T --rm \
-# 		$(PROJECT).deploy \
-# 		terragrunt graph-dependencies \
-# 		--terragrunt-working-dir environments/$(ENVIRONMENT) \
-# 		--terragrunt-log-level $(TF_LOG)
-# .PHONY: deploy.graph
+deploy.graph:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		terragrunt graph-dependencies \
+		--terragrunt-working-dir environments/$(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.graph
 
 deploy.init: _deploy.ensure.cache
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.init module=vpc)
+else
 	docker compose run --rm \
 		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(PROJECT).deploy \
-		terramate run \
-		-- \
 		terragrunt init \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.init
 
 deploy.init.upgrade: _deploy.ensure.cache
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.init.upgrade module=vpc)
+else
 	docker compose run --rm \
 		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(PROJECT).deploy \
-		terramate run \
-		--parallel $(PARALLEL) \
-		-- \
 		terragrunt init -upgrade \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.init.upgrade
 
 deploy.lint: _deploy.format _deploy.validate \
@@ -160,14 +165,17 @@ deploy.lint: _deploy.format _deploy.validate \
 .PHONY: deploy.lint
 
 deploy.plan:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.plan module=ecs)
+else
 	docker compose run --rm \
 		-e IAMLIVE=$(IAMLIVE) \
 		$(PROJECT).deploy \
-		terramate run \
-		--parallel $(PARALLEL) \
-		-- \
 		terragrunt plan \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.plan
 
 deploy.shell:
@@ -176,34 +184,34 @@ deploy.shell:
 		bash
 .PHONY: deploy.shell
 
-# deploy.state.ls:
-# ifndef module
-# 	$(error Supply module for operation. \
-# 		Usage: make deploy.state.ls module=ecs)
-# else
-# 	docker compose run --rm \
-# 		$(PROJECT).deploy \
-# 		terragrunt state list \
-# 		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-# 		--terragrunt-log-level $(TF_LOG)
-# endif
-# .PHONY: deploy.state.ls
+deploy.state.ls:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.state.ls module=ecs)
+else
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt state list \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.state.ls
 
-# deploy.state.rm:
-# ifndef resource
-# 	$(error Supply exact state resources to delete. \
-# 		Usage: make deploy.state.rm \
-# 		resource='aws_ecs_task_definition.example' \
-# 		module=ecs)
-# else
-# 	docker compose run --rm \
-# 		$(PROJECT).deploy \
-# 		terragrunt state rm \
-# 		$(resource) \
-# 		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-# 		--terragrunt-log-level $(TF_LOG)
-# endif
-# .PHONY: deploy.state.rm
+deploy.state.rm:
+ifndef resource
+	$(error Supply exact state resources to delete. \
+		Usage: make deploy.state.rm \
+		resource='aws_ecs_task_definition.example' \
+		module=ecs)
+else
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt state rm \
+		$(resource) \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.state.rm
 
 deploy.ssh:
 	$(CONFIG)/scripts/aws.ec2.ssh.sh \
@@ -227,7 +235,6 @@ deploy.update: _deploy.update.provider _deploy.update.module
 
 deploy.help:
 	@echo "  deploy.apply           provision a single module"
-	@echo "  deploy.diffs           show which terraform modules have unapplied changes."
 	@echo "  deploy.ecs             update the ecs service/task"
 	@echo "  deploy.destroy         delete a single module"
 	@echo "  deploy.init            initialize a single resource module"
