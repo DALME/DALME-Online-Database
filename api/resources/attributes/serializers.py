@@ -138,13 +138,13 @@ class AttributeSerializer(DynamicSerializer, WritableNestedModelSerializer):
                 self.fields['value'] = serializers.BooleanField()
             elif data_type == 'DATE':
                 self.fields['value'] = AttributeDateSerializer()
-            elif data_type == 'DEC':
-                self.fields['value'] = serializers.DecimalField(max_digits=None, decimal_places=2)
+            elif data_type == 'FLOAT':
+                self.fields['value'] = serializers.FloatField()
             elif data_type == 'INT':
                 self.fields['value'] = serializers.IntegerField()
             elif data_type == 'JSON':
                 self.fields['value'] = serializers.JSONField()
-            elif data_type in ['STR', 'TXT']:
+            elif data_type == 'STR':
                 self.fields['value'] = serializers.CharField()
             elif data_type == 'FKEY':
                 model_name = self.instance.value._meta.model.__name__  # noqa: SLF001

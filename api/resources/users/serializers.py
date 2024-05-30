@@ -7,7 +7,8 @@ from django.contrib.auth import get_user_model
 
 from api.dynamic_serializer import DynamicSerializer
 from api.resources.groups import GroupSerializer
-from ida.models.preference import DATA_TYPES, Preference
+from ida.models.preference import Preference
+from ida.models.utils import BASE_DATA_TYPES
 
 
 class PreferenceSerializer(serializers.ModelSerializer):
@@ -16,7 +17,7 @@ class PreferenceSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=55, source='key.name')
     label = serializers.CharField(max_length=255, source='key.label')
     description = serializers.CharField(source='key.description')
-    data_type = serializers.ChoiceField(DATA_TYPES, source='key.data_type')
+    data_type = serializers.ChoiceField(BASE_DATA_TYPES, source='key.data_type')
     group = serializers.CharField(max_length=55, source='key.group')
 
     class Meta:
