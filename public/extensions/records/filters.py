@@ -4,7 +4,7 @@ import django_filters
 
 from django.db.models import OuterRef, Q, Subquery
 
-from ida.models import Attribute, LocaleReference, Record
+from ida.models import Attribute, Record
 from public.extensions.records.models import Corpus
 from public.models import Collection
 
@@ -30,14 +30,12 @@ def map_record_types():
     # in. See the `filter_type` method below.
 
     return {
-        str(idx): attr['attributevaluestr__value']
+        str(idx): attr
         for idx, attr in enumerate(
-            Attribute.objects.filter(
-                attribute_type__name='record_type',
-                object_id__in=Record.objects.filter(workflow__is_public=True).values('id'),
-            )
-            .values('attributevaluestr__value')
-            .distinct(),
+            Record.objects.include_attrs('record_type')
+            .filter(record_type__isnull=False, workflow__is_public=True)
+            .values_list('record_type', flat=True)
+            .distinct()
         )
     }
 
@@ -56,20 +54,16 @@ def record_type_choices():
 
 
 def locale_choices():
-    locales = [
-        int(i)
-        for i in Attribute.objects.filter(
-            attribute_type=36,
-            record__workflow__is_public=True,
-        )
-        .values_list(
-            'attributevaluefkey__locale__id',
-            flat=True,
-        )
-        .distinct()
-    ]
-
-    return [(i.id, i.name) for i in LocaleReference.objects.filter(id__in=locales).order_by('name')]
+    return sorted(
+        [
+            (i.id, i.name)
+            for i in Record.objects.include_attrs('locale')
+            .filter(locale__isnull=False, workflow__is_public=True)
+            .values_list('locale', flat=True)
+            .distinct()
+        ],
+        key=lambda x: x[1],
+    )
 
 
 class RecordOrderingFilter(django_filters.OrderingFilter):
@@ -93,22 +87,17 @@ class RecordOrderingFilter(django_filters.OrderingFilter):
     @staticmethod
     def annotate_dates(qs):
         dates = Attribute.objects.filter(
-            Q(records=OuterRef('pk'), attribute_type__name='date')
-            | Q(records=OuterRef('pk'), attribute_type__name='start_date')
-            | Q(records=OuterRef('pk'), attribute_type__name='end_date'),
+            Q(records=OuterRef('pk'), name='date')
+            | Q(records=OuterRef('pk'), name='start_date')
+            | Q(records=OuterRef('pk'), name='end_date'),
         )
-        qs = qs.annotate(record_date=Subquery(dates.values('attributevaluedate__year')[:1]))
+        qs = qs.annotate(record_date=Subquery(dates.values('value__year')[:1]))
         return qs.distinct()
 
     @staticmethod
     def annotate_record_type(qs):
-        record_types = Attribute.objects.filter(
-            records=OuterRef('pk'),
-            attribute_type__name='record_type',
-        )
-        return qs.annotate(
-            record_type=Subquery(record_types.values('attributevaluestr__value')[:1]),
-        ).distinct()
+        record_types = Attribute.objects.filter(records=OuterRef('pk'), name='record_type')
+        return qs.annotate(record_type=Subquery(record_types.values('value')[:1])).distinct()
 
     def filter(self, qs, value):
         qs = super().filter(qs, value=[])
@@ -204,20 +193,16 @@ class RecordFilter(django_filters.FilterSet):
                 record_types.append(type_map[idx])
             except KeyError:
                 continue
-        return queryset.filter(
-            attributes__attributevaluestr__value__in=record_types,
-        )
+        return queryset.filter(attributes__value__in=record_types)
 
     def filter_date_range(self, queryset, name, value):  # noqa: ARG002
-        queryset = queryset.filter(
-            attributes__attribute_type__id__in=[19, 25, 26],
-        ).distinct()
+        queryset = queryset.filter(attributes__name__in=['date', 'start_date', 'end_date']).distinct()
 
         after, before = value
         if after:
-            queryset = queryset.filter(attributes__attributevaluedate__year__gte=after)
+            queryset = queryset.filter(attributes__value__year__gte=after)
         if before:
-            queryset = queryset.filter(attributes__attributevaluedate__year__lte=before)
+            queryset = queryset.filter(attributes__value__year__lte=before)
 
         return queryset
 
@@ -248,4 +233,4 @@ class RecordFilter(django_filters.FilterSet):
         return queryset.exclude(folios__transcription__isnull=value)
 
     def filter_locale(self, queryset, name, value):  # noqa: ARG002
-        return queryset.filter(attributes__attribute_type=36, attributes__attributevaluefkey__locale__id=str(value))
+        return queryset.filter(attributes__name='locale', attributes__value__id=str(value))
