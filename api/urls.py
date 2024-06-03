@@ -39,6 +39,7 @@ router.register(r'workflow', resources.Workflows, basename='workflow')
 
 # public endpoints
 router.register(r'public/records', resources.PublicRecords, basename='public_records')
+router.register(r'public/attribute_types', resources.PublicAttributeTypes, basename='public_attribute_types')
 
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='api_endpoint')),
