@@ -2,7 +2,14 @@
 
 from .agents import Agents, AgentSerializer
 from .attachments import Attachments, AttachmentSerializer
-from .attributes import Attributes, AttributeSerializer, AttributeTypes, AttributeTypeSerializer, ContentTypes
+from .attributes import (
+    Attributes,
+    AttributeSerializer,
+    AttributeTypes,
+    AttributeTypeSerializer,
+    ContentTypes,
+    PublicAttributeTypes,
+)
 from .collections import Collections, CollectionSerializer
 from .comments import Comments, CommentSerializer
 from .countries import Countries, CountryReferenceSerializer
@@ -16,7 +23,7 @@ from .locations import Locations, LocationSerializer
 from .pages import Pages, PageSerializer
 from .ping import Ping
 from .places import Places, PlaceSerializer
-from .records import Records, RecordSerializer
+from .records import PublicRecords, Records, RecordSerializer, RecordTypeSerializer
 from .rights import Rights, RightsPolicySerializer
 from .session import Session
 from .tasks import TaskLists, TaskListSerializer, Tasks, TaskSerializer
@@ -60,9 +67,12 @@ __all__ = [
     'Ping',
     'PlaceSerializer',
     'Places',
+    'PublicRecords',
+    'PublicAttributeTypes',
     'RSCollectionsSerializer',
     'RSImageSerializer',
     'RecordSerializer',
+    'RecordTypeSerializer',
     'Records',
     'Rights',
     'RightsPolicySerializer',

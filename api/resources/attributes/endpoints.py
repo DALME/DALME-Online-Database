@@ -6,10 +6,9 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from stringcase import snakecase
 
-from django.apps import apps
 from django.db.models import Q
 
-from api.access_policies import BaseAccessPolicy, GeneralAccessPolicy
+from api.access_policies import BaseAccessPolicy, GeneralAccessPolicy, PublicAccessPolicy
 from api.base_viewset import IDABaseViewSet
 from ida.models import Attribute, AttributeType, ContentAttributes, ContentTypeExtended
 
@@ -19,7 +18,6 @@ from .serializers import (
     AttributeTypeSerializer,
     ContentAttributesSerializer,
     ContentTypeSerializer,
-    OptionsSerializer,
 )
 
 
@@ -27,6 +25,12 @@ class AttributeAccessPolicy(BaseAccessPolicy):
     """Access policies for record attributes."""
 
     id = 'attributes-policy'
+
+
+class AttributeTypesAccessPolicy(BaseAccessPolicy):
+    """Access policies for attribute types."""
+
+    id = 'attribute-types-policy'
 
 
 class ContentTypes(IDABaseViewSet):
@@ -43,11 +47,11 @@ class ContentTypes(IDABaseViewSet):
 class AttributeTypes(IDABaseViewSet):
     """API endpoint for managing attribute types."""
 
-    permission_classes = [GeneralAccessPolicy]
+    permission_classes = [AttributeTypesAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope]
-
     queryset = AttributeType.objects.all()
     serializer_class = AttributeTypeSerializer
+    is_public = False
 
     def get_queryset(self, *args, **kwargs):
         """Return filtered querysets."""
@@ -69,13 +73,41 @@ class AttributeTypes(IDABaseViewSet):
             return ContentAttributesSerializer
         return super().get_serializer_class()
 
+    def get_object(self):
+        """Return the object the view is displaying when requested by either id or name."""
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        if lookup_url_kwarg in self.kwargs:
+            lookup_value = self.kwargs[lookup_url_kwarg]
+            if not str(lookup_value).isdigit():
+                filter_kwargs = {'name': lookup_value}
+                queryset = AttributeType.objects.all()
+                obj = get_object_or_404(queryset, **filter_kwargs)
+                self.check_object_permissions(self.request, obj)
+                return obj
+        return super().get_object()
+
+    @action(detail=True, methods=['get'])
+    def options(self, request, *args, **kwargs):  # noqa: ARG002
+        """Return options for attribute type."""
+        atype = self.get_object()
+        options = atype.options.get_values(public=self.is_public)
+        if options is not None:
+            return Response(options, 201)
+        return Response({'error': 'No options could be retrieved.'}, 400)
+
+
+class PublicAttributeTypes(AttributeTypes):
+    """Public API endpoint for managing attribute types."""
+
+    permission_classes = [PublicAccessPolicy]
+    is_public = True
+
 
 class Attributes(IDABaseViewSet):
     """API endpoint for managing attributes and options."""
 
     permission_classes = [AttributeAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope]
-
     queryset = Attribute.objects.all().order_by('attribute_type')
     serializer_class = AttributeSerializer
 
@@ -94,33 +126,8 @@ class Attributes(IDABaseViewSet):
     @action(detail=True, methods=['get'])
     def options(self, request, *args, **kwargs):  # noqa: ARG002
         """Return options for attribute."""
-        options = self.get_options(self.get_object())
+        attribute = self.get_object()
+        options = attribute.get_options()
         if options is not None:
             return Response(options, 201)
         return Response({'error': 'No options could be retrieved.'}, 400)
-
-    @staticmethod
-    def get_options(attribute):
-        """Return list of options for an attribute."""
-        options = attribute.get_options()
-        try:
-            if options.type == 'db_records':
-                model = apps.get_model(options.payload.get('app'), options.payload.get('model'))
-                filters = options.payload.get('filters')
-                queryset = model.objects.filter(**filters) if filters else model.objects.all()
-                serializer = OptionsSerializer(queryset, many=True, concordance=options.payload.get('concordance'))
-                return serializer.data
-
-            if options.type == 'field_choices':
-                model = apps.get_model(options.payload.get('app'), options.payload.get('model'))
-                choices = getattr(model, options.payload.get('choices'))
-                data = [{'label': i[1], 'value': i[0]} for i in choices]
-                serializer = OptionsSerializer(data, many=True)
-                return serializer.data
-
-            if options.type == 'static_list':
-                serializer = OptionsSerializer(options.payload, many=True)
-                return serializer.data
-
-        except AttributeError:
-            return None
