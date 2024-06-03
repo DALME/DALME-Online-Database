@@ -108,7 +108,8 @@ class rs_resource(models.Model):  # noqa: N801
         return self.ref
 
     def get_image_url(self, size='scr'):
-        """Return url of image."""
+        """Return image url(s)."""
+        multiple = ',' in size
         query_params = {
             'param1': '!list' + str(self.ref),
             'param5': '1',
@@ -116,6 +117,8 @@ class rs_resource(models.Model):  # noqa: N801
         }
         response = rs_api_query(**query_params)
         data = json.loads(response.text)
+        if multiple:
+            return {s.strip(): data[0][f'url_{s.strip()}'] for s in size.split(',')}
         return data[0][f'url_{size}']
 
 
