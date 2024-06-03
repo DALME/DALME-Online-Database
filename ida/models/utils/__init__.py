@@ -6,8 +6,9 @@ with system data models as well as other reusable utilities.
 """
 
 from .attestation_mixin import AttestationMixin
-from .attribute_field import AttributeField
-from .attribute_mixin import AttributeMixin
+
+# from .attribute_field import AttributeField
+# from .attribute_mixin import AttributeMixin
 from .comment_mixin import CommentMixin
 from .historical_date import HistoricalDate
 from .owned_mixin import OwnedMixin

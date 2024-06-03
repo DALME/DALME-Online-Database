@@ -5,7 +5,7 @@ from django.db.models import options
 
 from ida.models.utils import TrackingMixin
 
-options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
 class CountryReference(TrackingMixin):
@@ -18,6 +18,7 @@ class CountryReference(TrackingMixin):
 
     class Meta:
         ordering = ['name']
+        attribute_matching_fields = ['name']
 
     def __str__(self):
         return self.name

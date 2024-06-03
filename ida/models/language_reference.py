@@ -5,7 +5,7 @@ from django.db.models import options
 
 from ida.models.utils import TrackingMixin
 
-options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
 class LanguageReference(TrackingMixin):
@@ -25,6 +25,7 @@ class LanguageReference(TrackingMixin):
 
     class Meta:
         ordering = ['name']
+        attribute_matching_fields = ['name', 'parent']
 
     def __str__(self):
         return self.name

@@ -5,7 +5,7 @@ from django.db.models import options
 
 from ida.models.utils import TrackingMixin
 
-options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
 class LocaleReference(TrackingMixin):
@@ -20,9 +20,14 @@ class LocaleReference(TrackingMixin):
     class Meta:
         ordering = ['country', 'name']
         unique_together = ('name', 'administrative_region')
+        attribute_matching_fields = ['name', 'administrative_region', 'country']
 
     def __str__(self):
         return f'{self.name}, {self.administrative_region}, {self.country!s}'
+
+    @property
+    def detail(self):
+        return f'{self.administrative_region}, {self.country!s}'
 
     def get_url(self):
         """Return url for instance."""

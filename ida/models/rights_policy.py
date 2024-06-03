@@ -5,7 +5,7 @@ from django.db.models import options
 
 from ida.models.utils import CommentMixin, TrackingMixin, UuidMixin
 
-options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
 class RightsPolicy(UuidMixin, TrackingMixin, CommentMixin):
@@ -36,6 +36,7 @@ class RightsPolicy(UuidMixin, TrackingMixin, CommentMixin):
 
     class Meta:
         ordering = ['name']
+        attribute_matching_fields = ['name', 'rights', 'licence']
 
     def __str__(self):
         return self.name

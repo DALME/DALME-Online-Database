@@ -9,13 +9,16 @@ from django.urls import reverse
 from ida.context import get_current_tenant
 from ida.models.preference import Preference, PreferenceKey
 
-options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
 class User(AbstractUser):
     """Override the default auth User model."""
 
     full_name = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        attribute_matching_fields = ['username', 'full_name']
 
     @property
     def groups_scoped(self):

@@ -6,15 +6,15 @@ from django.db.models import options
 
 from ida.models.utils import (
     AttestationMixin,
-    AttributeMixin,
     CommentMixin,
     RelationshipMixin,
     TaggingMixin,
     TrackingMixin,
     UuidMixin,
 )
+from ida.models.utils.attribute_mixin import AttributeMixin
 
-options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
 class Agent(
@@ -45,6 +45,9 @@ class Organization(Agent):
     short_name = models.CharField(max_length=55)
     location = models.ForeignKey('ida.Location', on_delete=models.PROTECT, null=True)
 
+    class Meta:
+        attribute_matching_fields = ['name', 'label']
+
 
 class Person(Agent):
     """Stores information about people."""
@@ -55,6 +58,9 @@ class Person(Agent):
         related_name='person_record',
         null=True,
     )
+
+    class Meta:
+        attribute_matching_fields = ['name', 'user']
 
     def __str__(self):
         return self.name

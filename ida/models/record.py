@@ -6,13 +6,10 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import Case, Exists, ExpressionWrapper, Manager, OuterRef, Q, Subquery, When, options
+from django.db.models import Q, options
 from django.utils.functional import cached_property
 
-from ida.models.attribute import Attribute
 from ida.models.utils import (
-    AttributeField,
-    AttributeMixin,
     CommentMixin,
     OwnedMixin,
     PermissionsMixin,
@@ -22,8 +19,9 @@ from ida.models.utils import (
     TrackingMixin,
     UuidMixin,
 )
+from ida.models.utils.attribute_mixin import AttributeMixin
 
-options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
 class RecordGroup(
@@ -57,20 +55,20 @@ class RecordGroup(
         return self.children.count()
 
 
-class RecordManager(Manager):
-    def include_attrs(self, *args):
-        qs = self.get_queryset()
-        for attr in args:
-            attr_sq = Attribute.objects.filter(ida_record_related=OuterRef('pk'), attribute_type__name=attr)
-            qs = qs.annotate(
-                **{
-                    attr: ExpressionWrapper(
-                        Case(When(Exists(attr_sq), then=Subquery(attr_sq.values_list('value', flat=True)[:1]))),
-                        output_field=AttributeField(),
-                    )
-                }
-            )
-        return qs
+# class RecordManager(models.Manager):
+#     def include_attrs(self, *args):
+#         qs = self.get_queryset()
+#         for attr in args:
+#             attr_sq = Attribute.objects.filter(ida_record_related=OuterRef('pk'), attribute_type__name=attr)
+#             qs = qs.annotate(
+#                 **{
+#                     attr: ExpressionWrapper(
+#                         Case(When(Exists(attr_sq), then=Subquery(attr_sq.values_list('value', flat=True)[:1]))),
+#                         output_field=AttributeField(),
+#                     )
+#                 }
+#             )
+#         return qs
 
 
 class Record(
@@ -96,7 +94,7 @@ class Record(
 
     search_fields = [index.FilterField('name')]
 
-    objects = RecordManager()
+    # objects = RecordManager()
 
     class Meta:
         base_manager_name = 'objects'
