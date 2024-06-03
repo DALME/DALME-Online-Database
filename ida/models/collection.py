@@ -93,6 +93,15 @@ class Collection(ScopedBase, UuidMixin, TrackingMixin, OwnedMixin, AttributeMixi
         return None
 
 
+class CollectionMembershipManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.annotate(
+            col_id=models.F('collection__id'),
+            col_name=models.F('collection__name'),
+        )
+
+
 class CollectionMembership(ScopedBase, TrackingMixin):
     """Links collections and members."""
 
@@ -101,6 +110,8 @@ class CollectionMembership(ScopedBase, TrackingMixin):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=36, db_index=True)
     order = models.IntegerField(null=True)
+
+    objects = CollectionMembershipManager()
 
     class Meta:
         unique_together = ('content_type', 'object_id', 'collection')
