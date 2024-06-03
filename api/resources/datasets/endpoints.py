@@ -5,14 +5,8 @@ from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from api.access_policies import BaseAccessPolicy
+from api.access_policies import PublicAccessPolicy
 from ida.models import Record
-
-
-class PublicAccessPolicy(BaseAccessPolicy):
-    """Access policies for public site."""
-
-    id = 'public-policy'
 
 
 class Datasets(viewsets.GenericViewSet):
