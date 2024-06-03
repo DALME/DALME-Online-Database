@@ -1,5 +1,6 @@
 """Migrate the attribute types."""
 
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
@@ -166,6 +167,7 @@ CT_DATA = {
             'name',
             'description',
             'is_public',
+            'is_corpus',
             'owner',
             'permissions',
             'comments',
@@ -306,6 +308,7 @@ TO_FKEY = [
     'modification_username',
     'type',
     'same_as',
+    'record_type',
 ]
 
 TO_BOOL = [
@@ -378,6 +381,41 @@ TO_LOCAL = [
     'member_count',
 ]
 
+NEW_TYPES = [
+    {
+        'name': 'collection_metadata',
+        'label': 'Collection metadata',
+        'description': 'A series of key-value pairs defining metadata values associated with a collection.',
+        'data_type': 'JSON',
+        'is_local': False,
+        'source': 'DALME',
+    },
+    {
+        'name': 'workset_progress',
+        'label': 'Workset Progress Tracking',
+        'description': 'Data attribute for tracking progress in a workset-type collection.',
+        'data_type': 'JSON',
+        'source': 'DALME',
+        'is_local': False,
+    },
+    {
+        'name': 'corpus',
+        'label': 'Corpus',
+        'description': 'A cohesive collection of texts or documents collated according to subject-specific criteria.',
+        'data_type': 'FKEY',
+        'source': 'DALME',
+        'is_local': False,
+    },
+    {
+        'name': 'collection',
+        'label': 'Collection',
+        'description': 'A group of resources.',
+        'data_type': 'FKEY',
+        'source': 'DALME',
+        'is_local': False,
+    },
+]
+
 
 class Stage(BaseStage):
     """Data migration for attributes types."""
@@ -389,6 +427,7 @@ class Stage(BaseStage):
         """Execute the stage."""
         self.update_attribute_types_sequence()
         self.migrate_attribute_types()
+        self.create_new_attribute_types()
         self.migrate_contenttype_extended()
 
     @transaction.atomic
@@ -446,6 +485,23 @@ class Stage(BaseStage):
                 self.logger.info('Created %s AttributeType instances', AttributeType.objects.count())
         else:
             self.logger.warning('AttributeType data already exists')
+
+    @transaction.atomic
+    def create_new_attribute_types(self):
+        """Create new attribute types."""
+        User = get_user_model()  # noqa: N806
+        user_obj = User.objects.get(pk=1)
+
+        self.logger.info('Creating new attribute types...')
+        for new_type in NEW_TYPES:
+            if AttributeType.objects.filter(name=new_type['name']).exists():
+                self.logger.warning('Attribute type "%s" already exists.', new_type['name'])
+            else:
+                AttributeType.objects.create(
+                    **new_type,
+                    creation_user=user_obj,
+                    modification_user=user_obj,
+                )
 
     @transaction.atomic
     def migrate_contenttype_extended(self):
