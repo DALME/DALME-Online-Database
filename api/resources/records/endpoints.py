@@ -3,17 +3,20 @@
 import json
 import pathlib
 
+from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.conf import settings
 
-from api.access_policies import RecordAccessPolicy
+from api.access_policies import PublicAccessPolicy, RecordAccessPolicy
 from api.base_viewset import IDABaseViewSet
+from api.paginators import IDAPageNumberPagination
+from ida.filters import RecordFilter
 from ida.models import Record
 
-from .filters import RecordFilter
 from .serializers import RecordSerializer
 
 with pathlib.Path('static/snippets/iiif_manifest.json').open() as fp:
@@ -76,15 +79,27 @@ class Records(IDABaseViewSet):
             if self.options_view
             else Record.objects.prefetch_related(
                 'parent',
-                'attributes__attributevaluebool',
-                'attributes__attributevaluedate',
-                'attributes__attributevaluedec',
-                'attributes__attributevaluefkey__value',
-                'attributes__attributevalueint',
-                'attributes__attributevaluejson',
-                'attributes__attributevaluetxt',
-                'attributes__attributevaluestr',
+                'attributes',
                 'pages',
                 'tags',
             )
         )
+
+
+class PublicRecords(Records):
+    """API endpoint for managing records for frontend apps."""
+
+    permission_classes = [PublicAccessPolicy]
+    pagination_class = IDAPageNumberPagination
+    renderer_classes = [CamelCaseJSONRenderer]
+    authentication_classes = [SessionAuthentication]
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        kwargs['field_set'] = ['public', 'images'] if self.request.GET.get('thumbs') else 'public'
+        return serializer_class(*args, **kwargs)
+
+    def get_queryset(self, *args, **kwargs):  # noqa: ARG002
+        """Return filtered queryset."""
+        return Record.objects.include_attrs('description', 'record_type', 'date').filter(workflow__is_public=True)

@@ -210,3 +210,9 @@ class SessionAccessPolicy(BaseAccessPolicy):
     """Access policies for Session endpoint."""
 
     id = 'session-policy'
+
+
+class PublicAccessPolicy(BaseAccessPolicy):
+    """Access policies for public site."""
+
+    id = 'public-policy'

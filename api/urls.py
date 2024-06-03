@@ -37,6 +37,9 @@ router.register(r'transcriptions', resources.Transcriptions, basename='transcrip
 router.register(r'users', resources.Users, basename='users')
 router.register(r'workflow', resources.Workflows, basename='workflow')
 
+# public endpoints
+router.register(r'public/records', resources.PublicRecords, basename='public_records')
+
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='api_endpoint')),
     path('csrf/', csrf),

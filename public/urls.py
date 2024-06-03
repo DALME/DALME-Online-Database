@@ -1,6 +1,7 @@
 """Define cms/public URLs for the IDA."""
 
 from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.api.v2.router import WagtailAPIRouter
 from wagtail.documents import urls as wagtaildocs_urls
 
 from django.conf import settings
@@ -13,7 +14,6 @@ from django.urls import include, path, reverse
 from public.extensions.bibliography.urls import urlpatterns as biblio_urls
 from public.extensions.footnotes.urls import urlpatterns as footnote_urls
 from public.extensions.images.api import PublicImageAPIViewSet
-from public.extensions.records.urls import api_router
 from public.extensions.records.urls import urlpatterns as record_urls
 from public.extensions.team.api import TeamAPIViewSet, UserAPIViewSet
 
@@ -29,6 +29,8 @@ def to_ida_logout(_request):
     """Redirect request to logout page."""
     return redirect(settings.LOGOUT_URL)
 
+
+api_router = WagtailAPIRouter('wagtailapi')
 
 api_router.register_endpoint('team', TeamAPIViewSet)
 api_router.register_endpoint('user', UserAPIViewSet)
