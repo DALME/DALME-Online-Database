@@ -17,7 +17,7 @@ from .base import BaseStage
 class Stage(BaseStage):
     """Data migration for attributes."""
 
-    name = '06 Attributes'
+    name = '07 Attributes'
 
     @transaction.atomic
     def apply(self):

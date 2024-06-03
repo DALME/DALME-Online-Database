@@ -89,7 +89,7 @@ ABOUT_FLAT_DATA = [
 class Stage(BaseStage):
     """Bootstraps pharmacopeias site."""
 
-    name = '12 Bootstrapping pharmacopeias public site'
+    name = '13 Bootstrapping pharmacopeias public site'
 
     @transaction.atomic
     def apply(self):

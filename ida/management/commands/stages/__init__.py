@@ -1,5 +1,6 @@
 """Interface for the migrate_data management command."""
 
+from .attribute_options import Stage as AttributeOptionsStage
 from .attribute_types import Stage as AttributeTypesStage
 from .attributes import Stage as AttributesStage
 from .auth import Stage as AuthStage
@@ -14,6 +15,7 @@ from .rank_2 import Stage as RankTwoStage
 from .records import Stage as RecordsStage
 
 __all__ = [
+    'AttributeOptionsStage',
     'AttributeTypesStage',
     'AttributesStage',
     'AuthStage',

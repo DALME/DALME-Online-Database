@@ -49,7 +49,7 @@ NON_RECORD_IDS = [ARCHIVE_TYPE_ID, RECORD_GROUP_TYPE_ID, *PUBLICATION_TYPE_IDS]
 class Stage(BaseStage):
     """Data migration for records."""
 
-    name = '07 Records'
+    name = '08 Records'
 
     @transaction.atomic
     def apply(self):

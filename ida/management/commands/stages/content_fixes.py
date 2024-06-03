@@ -21,7 +21,7 @@ from .base import BaseStage
 class Stage(BaseStage):
     """Fixes after finishing all data migrations."""
 
-    name = '11 Content fixes'
+    name = '12 Content fixes'
 
     @transaction.atomic
     def apply(self):

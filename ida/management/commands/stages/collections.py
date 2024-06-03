@@ -23,7 +23,7 @@ WORKSET_TYPE = 4
 class Stage(BaseStage):
     """Data migration for collections."""
 
-    name = '08 Collections'
+    name = '09 Collections'
 
     @transaction.atomic
     def apply(self):

@@ -29,7 +29,7 @@ from .base import BaseStage
 class Stage(BaseStage):
     """Data migration for leftover models."""
 
-    name = '09 Finalize'
+    name = '10 Finalize'
 
     @transaction.atomic
     def apply(self):

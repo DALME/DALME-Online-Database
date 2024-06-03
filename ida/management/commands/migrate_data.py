@@ -13,6 +13,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
 from .stages import (
+    AttributeOptionsStage,
     AttributesStage,
     AttributeTypesStage,
     AuthStage,
@@ -35,6 +36,7 @@ STAGES = [
     RankOneStage,
     RankTwoStage,
     AttributeTypesStage,
+    AttributeOptionsStage,
     AttributesStage,
     RecordsStage,
     CollectionsStage,
