@@ -11,6 +11,7 @@ from .attestation_mixin import AttestationMixin
 # from .attribute_mixin import AttributeMixin
 from .comment_mixin import CommentMixin
 from .historical_date import HistoricalDate
+from .options_serializer import OptionsSerializer
 from .owned_mixin import OwnedMixin
 from .permissions_mixin import PermissionsMixin
 from .relationship_mixin import RelationshipMixin
@@ -46,6 +47,7 @@ __all__ = [
     'CommentMixin',
     'DATA_TYPES',
     'HistoricalDate',
+    'OptionsSerializer',
     'OwnedMixin',
     'PermissionsMixin',
     'RelationshipMixin',

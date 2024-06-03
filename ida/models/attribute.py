@@ -50,10 +50,6 @@ class Attribute(UuidMixin, TrackingMixin):
 
     def get_options(self):
         """Return options for attribute."""
-        qs = self.attribute_type.content_types.filter(content_type=self.content_type.extended.id)
-        if qs.exists():
-            override_options = qs.first().override_options
-        else:
-            qs = self.attribute_type.content_types.filter(content_type=self.content_object.type.id)
-            override_options = qs.first().override_options if qs.exists() else None
+        qs = self.attribute_type.contenttypes.filter(content_type=self.content_type.id)
+        override_options = qs.first().override_options if qs.exists() else None
         return override_options if override_options else self.attribute_type.options
