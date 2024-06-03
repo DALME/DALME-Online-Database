@@ -1,5 +1,5 @@
 {% extends "public/layouts/single_column.html" %}
-{% load get_breadcrumbs_nav static %}
+{% load get_breadcrumbs_nav settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; Record Browser{% endblock %}
 
@@ -61,6 +61,7 @@
                   class="mb-2"
                   :options="choices.corpusChoices"
                   @change="setCorpus"
+                  text-field="label"
                   v-model="corpus">
                 </b-form-select>
                 <div
@@ -75,6 +76,7 @@
                   class="mb-2"
                   :options="choices.collectionChoices"
                   @input="setCollection"
+                  text-field="label"
                   v-model="collection">
                 </b-form-select>
                 <div
@@ -89,6 +91,7 @@
                   class="mb-2"
                   :options="choices.recordTypeChoices"
                   @input="setrecordType"
+                  text-field="label"
                   v-model="recordType">
                 </b-form-select>
                 <div
@@ -103,6 +106,7 @@
                   class="mb-3"
                   :options="choices.localeChoices"
                   @input="setLocale"
+                  text-field="label"
                   v-model="locale">
                 </b-form-select>
                 <div
@@ -196,11 +200,11 @@
             <div class="grid-row-wrapper compact u-contents">
               <span class="inventory-field name">
                 <a :href="recordUrl(record)">
-                  ${record.name}<span class="short-name"> ${record.shortName}</span>
+                  ${cleanName(record.name)}<span class="short-name"> ${cleanName(record.shortName)}</span>
                 </a>
               </span>
               <span class="inventory-field record-type">${record.recordType}</span>
-              <span class="inventory-field date">${record.date}</span>
+              <span class="inventory-field date">${getDate(record)}</span>
               <span class="inventory-field icons">
                 <i
                   class="fas fa-book-open fa-sm ml-auto"
@@ -224,15 +228,15 @@
                 </div>
                 <div class="u-flex inventory-details">
                   <div class="u-flex mb-1">
-                    <span class="name">${record.name}</span>
-                    <span class="short-name ml-auto">${record.shortName}</span>
+                    <span class="name">${cleanName(record.name)}</span>
+                    <span class="short-name ml-auto">${cleanName(record.shortName)}</span>
                   </div>
                   <div class="u-flex">
                     <div class="mr-auto">
                       ${componentInstance.truncate(record.description)}
                     </div>
                     <div class="u-flex inventory-metadata flex-column">
-                      <span class="city">${record.date}</span>
+                      <span class="city">${getDate(record)}</span>
                       <span class="folios" v-if="record.noFolios > 1">${record.noFolios} Folios</span>
                       <span class="folios" v-else>${record.noFolios} Folio</span>
                     </div>
@@ -267,7 +271,7 @@
                     class="inventory-detail u-flex"
                     :href="recordUrl(record)">
                       <div class="u-flex top">
-                        <p>${record.name}</p>
+                        <p>${cleanName(record.name)}</p>
                         <div class="u-flex icons">
                           <div class="u-flex first">
                             <i class="fas fa-book-open"></i>
@@ -301,8 +305,8 @@
                       </div>
 
                       <div class="u-flex bottom">
-                        <span class="short-name">${record.shortName}</span>
-                        <span class="city">${record.date}</span>
+                        <span class="short-name">${cleanName(record.shortName)}</span>
+                        <span class="city">${getDate(record)}</span>
                       </div>
                   </a>
                 </div>
@@ -351,7 +355,7 @@
       el: '#app',
       delimiters: ['${', '}'],
       created() {
-        this.fetchChoices();
+        this.loadChoices();
         if (!new URLSearchParams(window.location.search).keys().length) {
           this.fetchData();
         }
@@ -365,7 +369,6 @@
       data: {
         fetching: false,
         records: null,
-        thumbnails: {},
         next: null,
         previous: null,
         count: null,
@@ -380,7 +383,11 @@
         showFilters: false,
         corpus: '',
         mode: '{{ browse_mode }}',
-        thumbSize: '{{ browse_mode }}' == 'detail' ? 'scr' : 'thm',
+        thumbSizeOptions: {
+          compact: null,
+          detail: 'scr',
+          wide: 'thm',
+        },
         collection: '',
         recordType: '',
         date: [1200, 1500],
@@ -393,11 +400,10 @@
         choices: {},
         windowWidth: window.innerWidth,
         hasThumb: false,
-        session_data: null
+        session_data: null,
+        api_url: '{% settings_val 'API_URL' %}/public',
       },
       watch: {
-        records: 'fetchThumbnails',
-        thumbSize: 'fetchThumbnails',
         collection: 'updateCollection',
         search: _.debounce(function() {
           this.filterData('search', this.search)
@@ -435,13 +441,7 @@
           ].some(value => value);
         },
         endpoint() {
-          return '/api/public/records';
-        },
-        choicesEndpoint() {
-          return '/api/public/choices/';
-        },
-        thumbnailEndpoint() {
-          return '/api/public/thumbnails';
+          return this.thumbSize ? `${this.api_url}/records/?thumbs=1&` : `${this.api_url}/records/?`;
         },
         spinner() {
           return (this.records === null) || this.fetching == true;
@@ -458,6 +458,9 @@
             return ''
           }
         },
+        thumbSize() {
+          return this.thumbSizeOptions[this.mode];
+        },
         currentParams() {
           return new URLSearchParams(window.location.search);
         },
@@ -471,17 +474,21 @@
             : null;
         },
         collectionName() {
-          return this.choices.collectionChoices.find(x => x.value === this.collection).text || null;
+          return this.choices.collectionChoices.find(x => x.value === this.collection).label || null;
         },
         collectionSlug() {
           return this.collectionName.replace(/\s+/g, '-').toLowerCase() || null;
         }
       },
       methods: {
+        getDate(record) {
+          return record.date ? record.date.text : "N/A";
+        },
+        cleanName(name) {
+          return name.includes("(") ? name.split("(")[0] : name;
+        },
         recordThumbStyle(record) {
-          const thumbnail = Object.keys(this.thumbnails).length
-            ? this.thumbnails[record.id]
-            : null;
+          const thumbnail = record.imageUrls ? record.imageUrls[this.thumbSize] : null;
           if (thumbnail) {
             return {
               'background-image': `url("${thumbnail}")`,
@@ -500,7 +507,7 @@
           }
         },
         truncate(str, max = 25) {
-          if (typeof str != 'undefined') {
+          if (str && typeof str != 'undefined') {
             const array = str.trim().split(' ');
             const ellipsis = array.length > max ? ' ...' : '';
             return array.slice(0, max).join(' ') + ellipsis;
@@ -508,14 +515,13 @@
             return 'N/A'
           }
         },
-        setMode(e) {
+        async setMode(e) {
           let mode = e.currentTarget.id;
           window.CustomUtils.updateSession({ 'public-browse-mode': mode });
-          let target_size = mode == 'detail' ? 'scr' : 'thm';
-          this.mode = mode;
-          if (mode == 'detail' && target_size != this.thumbSize) {
-            this.thumbSize = target_size;
+          if (this.mode == 'compact' && mode != this.mode) {
+            await this.fetchData();
           }
+          this.mode = mode;
           // this.$forceUpdate();
         },
         setCorpus() {
@@ -575,29 +581,60 @@
           this.currentParams.forEach((val, key) => {
             const camelized = key.replace(/(_\w)/g, k => k[1].toUpperCase());
             if (['collection', 'corpus', 'record_type', 'locale'].includes(key)) {
-              val = this.choices[`${camelized}Choices`]
+              if (Object.keys(this.choices).length) {
+                val = this.choices[`${camelized}Choices`]
                 .filter(item => {
                   return key === 'record_type' ? item.value == val : item.value === parseInt(val);
                 });
+              }
             }
             return params[camelized] = typeof val === 'object' ? val[0]['value'] : val['value'];
           });
           return params;
         },
+        async loadChoices() {
+          await this.fetchChoices();
+          const params = this.destructureParams();
+          for (const [key, value] of Object.entries(params)) {
+            this[key] = value;
+          }
+        },
         fetchChoices() {
-          fetch(this.choicesEndpoint)
-            .then(response => response.json())
-            .then(data => {
-              this.choices = data;
-              const params = this.destructureParams();
-              for (let [key, value] of Object.entries(params)) {
-                this[key] = value;
-              }
-            });
+          const choiceLists = {
+            collectionChoices: {
+              endpoint: `${this.api_url}/attribute_types/collection/options/`,
+              placeholder: "Filter by collection",
+            },
+            corpusChoices: {
+              endpoint: `${this.api_url}/attribute_types/corpus/options/`,
+              placeholder: "Filter by corpus",
+            },
+            localeChoices: {
+              endpoint: `${this.api_url}/attribute_types/locale/options/`,
+              placeholder: "Filter by locale",
+            },
+            recordTypeChoices: {
+              endpoint: `${this.api_url}/attribute_types/record_type/options/`,
+              placeholder: "Filter by record type",
+            },
+          };
+          for (const listName in choiceLists) {
+            fetch(choiceLists[listName].endpoint)
+              .then(response => response.json())
+              .then(data => {
+                let choices = data;
+                if (data.length && data[0].hasOwnProperty('group')) {
+                  const grouped = Object.groupBy(data, ({ group }) => group);
+                  choices = Object.keys(grouped).map(k => ({ label: k, options: grouped[k]}));
+                }
+                choices.unshift({ value: '', label: choiceLists[listName].placeholder, disabled: true });
+                this.choices[listName] = choices;
+              })
+          }
         },
         fetchData(url = null) {
           this.fetching = true;
-          fetch(url || `${this.endpoint}/?${this.currentParams.toString()}`)
+          fetch(url || `${this.endpoint}${this.currentParams.toString()}`)
             .then(response => response.json())
             .then(data => {
               this.records = data.results;
@@ -614,20 +651,6 @@
               this.fetching = false;
               // this.updateCollection();
             });
-        },
-        async fetchThumbnails() {
-          const records = this.records.filter(record =>
-            record.imageRef !== null // && !(record.id in this.thumbnails)
-          );
-          await Promise.all(records.map(record => {
-            fetch(`${this.thumbnailEndpoint}/?image_ref=${record.imageRef}&size=${this.thumbSize}`)
-              .then(response => response.json())
-              .then(data => {
-                this.thumbnails[record.id] = data.image_url;
-                // Not ideal.
-                this.$forceUpdate();
-              })
-            }));
         },
         setParam(key, value) {
           let params = this.currentParams;
@@ -653,7 +676,7 @@
         filterData(key, value) {
           if (typeof value !== 'undefined') {
             const params = this.setParam(key, value).toString();
-            this.fetchData(`${this.endpoint}/?${params}`);
+            this.fetchData(`${this.endpoint}${params}`);
             this.updateURL(params);
           }
         },
@@ -663,20 +686,20 @@
         handlePreviousPage() {
           if (this.previous) {
             const params = this.setParam('page', this.previous).toString();
-            this.fetchData(`${this.endpoint}/?${params}`);
+            this.fetchData(`${this.endpoint}${params}`);
             this.updateURL(params);
           }
         },
         handleNextPage() {
           if (this.next) {
             const params = this.setParam('page', this.next).toString();
-            this.fetchData(`${this.endpoint}/?${params}`);
+            this.fetchData(`${this.endpoint}${params}`);
             this.updateURL(params);
           }
         },
         handlePage(page) {
           const params = this.setParam('page', page).toString();
-          this.fetchData(`${this.endpoint}/?${params}`);
+          this.fetchData(`${this.endpoint}${params}`);
           this.updateURL(params);
         },
         updateCollection() {
