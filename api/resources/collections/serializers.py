@@ -76,6 +76,7 @@ class CollectionSerializer(DynamicSerializer):
             'name',
             'attributes',
             'use_as_workset',
+            'is_corpus',
             'is_published',
             'is_private',
             'owner',

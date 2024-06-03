@@ -25,6 +25,7 @@ class Collection(ScopedBase, UuidMixin, TrackingMixin, OwnedMixin, AttributeMixi
 
     name = models.CharField(max_length=255)
     use_as_workset = models.BooleanField(default=False)
+    is_corpus = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
     team_link = models.ForeignKey(
         'auth.Group',

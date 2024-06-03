@@ -34,6 +34,7 @@ class Collections(IDABaseViewSet):
         'id',
         'name',
         'use_as_workset',
+        'is_corpus',
         'is_published',
         'owner',
         'owner__full_name',
