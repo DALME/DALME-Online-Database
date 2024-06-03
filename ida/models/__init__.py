@@ -26,7 +26,7 @@ from .preference import Preference, PreferenceKey
 from .project import Project
 from .public_register import PublicRegister
 from .publication import Publication
-from .record import PageNode, Record, RecordGroup
+from .record import PageNode, Record, RecordGroup, RecordType
 from .relationship import Relationship, RelationshipType
 from .resourcespace import (
     rs_collection,
@@ -88,6 +88,7 @@ __all__ = [
     'Publication',
     'Record',
     'RecordGroup',
+    'RecordType',
     'Relationship',
     'RelationshipType',
     'RightsPolicy',

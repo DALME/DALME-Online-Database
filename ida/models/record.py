@@ -17,6 +17,7 @@ from ida.models.utils import (
     OwnedMixin,
     PermissionsMixin,
     RelationshipMixin,
+    ScopedBase,
     TaggingMixin,
     TrackingMixin,
     UuidMixin,
@@ -211,6 +212,40 @@ class Record(
             except:  # noqa: E722
                 pass
         return (editors, corrections, contributors)
+
+
+class RecordType(ScopedBase, TrackingMixin):
+    """Defines record types (tenanted)."""
+
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='subtypes',
+    )
+    description = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(name='unique_name_parent', fields=['name', 'parent'])]
+        attribute_matching_fields = ['name', 'label']
+
+    def __str__(self):
+        return self.label
+
+    @property
+    def label(self):
+        if self.parent:
+            return f'{self.parent.name}-{self.name}'
+        return self.name
+
+    @property
+    def group(self):
+        if self.parent:
+            return self.parent.name
+        if self.subtypes.exists():
+            return self.name
+        return 'Other'
 
 
 class PageNode(TrackingMixin):
