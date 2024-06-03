@@ -8,10 +8,55 @@ from django.apps import apps
 # from django.contrib.auth import get_user_model
 from django.db import connection, transaction
 
-from ida.models import Attribute, AttributeType, ContentAttributes
+from ida.models import Attribute, AttributeType, ContentAttributes, RecordType
 from ida.models.utils import HistoricalDate
 
 from .base import BaseStage
+
+RECORD_TYPE_COVERSIONS = {
+    'Account Book-Other': 'Account Book',
+    'Liquidation of guardianship': 'Guardianship-Liquidation',
+    'Failed Seizure': 'Seizure-Failed',
+    'Testamentary execution': 'Testament-Execution',
+    'Object List-Fictional': 'Fictional object list',
+    'unclear': 'Unclear',
+    'Dowry': 'Inventory-Dowry',
+}
+
+ATYPES_KEEP = [
+    'title',
+    'language_gc',
+    'creation_user',
+    'modification_user',
+    'author',
+    'dam_user',
+    'dam_id',
+    'order',
+    'ref',
+    'creation_date',
+    'file_size',
+    'source',
+    'data_type',
+    'same_as',
+    'options_list',
+    'status',
+    'result',
+    'date_done',
+    'subject',
+    'file',
+    'parents',
+    'help_flag',
+    'last_modified',
+    'last_user',
+    'activity',
+    'endpoint',
+    'progress',
+    'is_published',
+    'collection_metadata',
+    'workset_progress',
+    'corpus',
+    'collection',
+]
 
 
 class Stage(BaseStage):
@@ -26,7 +71,7 @@ class Stage(BaseStage):
         self.remove_unused_attribute_types()
 
     @transaction.atomic
-    def migrate_attributes(self):
+    def migrate_attributes(self):  # noqa: C901, PLR0915
         """Copy object attribute data.
 
         https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0009_data_m_attributes.py#L5
@@ -46,6 +91,10 @@ class Stage(BaseStage):
 
             with connection.cursor() as cursor:
                 self.logger.info('Migrating attributes')
+
+                # ids to manage exceptions:
+                record_type_atype = AttributeType.objects.get(name='record_type')
+
                 cursor.execute(
                     'SELECT attr.*, at.data_type FROM restore.core_attribute attr INNER JOIN restore.core_attribute_type at ON attr.attribute_type = at.id;'
                 )
@@ -79,7 +128,32 @@ class Stage(BaseStage):
                         'modification_timestamp': row['modification_timestamp'],
                     }
 
-                    if dtype == 'DATE':
+                    # handle exceptions first, then process by data type
+                    if attribute_type_id == record_type_atype.id:
+                        label = RECORD_TYPE_COVERSIONS.get(value_str, value_str)
+                        parent, name = label.split('-') if '-' in label else (None, None)
+
+                        try:
+                            if name and parent:
+                                rt_obj = RecordType.objects.get(name=name, parent__name=parent)
+                            else:
+                                rt_obj = RecordType.objects.get(name=label, parent__isnull=True)
+
+                        except RecordType.DoesNotExist:
+                            rt_obj = None
+                            self.logger.error('Failed to match record type: %s', value_str)  # noqa: TRY400
+
+                        except RecordType.MultipleObjectsReturned:
+                            rt_obj = None
+                            self.logger.error('Found multiple record types for: %s', value_str)  # noqa: TRY400
+
+                        if rt_obj:
+                            payload['value'] = rt_obj
+                            dtype = 'FKEY'  # Update so the stats counter works correctly below.
+                        else:
+                            continue
+
+                    elif dtype == 'DATE':
                         payload['value'] = HistoricalDate(
                             {
                                 'day': value_date_d,
@@ -133,31 +207,20 @@ class Stage(BaseStage):
         """
         self.logger.info('Cleaning up unused attribute types')
 
-        ct_count = ContentAttributes.objects.count()
-        att_count = Attribute.objects.count()
-
-        self.logger.debug('%s attribute types are currently in use per CT count', ct_count)
-        self.logger.debug('%s attribute types are currently in use per ATT count', att_count)
-
         used_types_ct = {ct[0] for ct in ContentAttributes.objects.values_list('attribute_type__id')}
         used_types_att = {att[0] for att in Attribute.objects.values_list('attribute_type__id')}
-        diff = used_types_ct.difference(used_types_att)
 
-        if len(diff) > 0:
-            self.logger.debug(
-                'The extra attribute types are: %s',
-                ', '.join([a[0] for a in AttributeType.objects.filter(id__in=diff).values_list('name')]),
-            )
+        self.logger.debug('%s attribute types are currently in use per CT count', len(used_types_ct))
+        self.logger.debug('%s attribute types are currently in use per ATT count', len(used_types_att))
 
         count = 0
         removed = []
         used_types = used_types_ct.union(used_types_att)
 
         for atype in AttributeType.objects.exclude(is_local=True, data_type='RREL'):
-            if atype.id not in used_types:
+            if atype.id not in used_types and atype.name not in ATYPES_KEEP:
                 removed.append(atype.name)
                 atype.delete()
                 count += 1
 
-        self.logger.debug('Removed attribute types: %s', ', '.join(removed))
-        self.logger.info('%s attribute types removed in total', count)
+        self.logger.info('Removed %s unused attribute types.', count)
