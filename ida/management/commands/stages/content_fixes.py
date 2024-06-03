@@ -6,9 +6,13 @@ from django_tenants.utils import schema_context
 from wagtail.log_actions import log
 
 from django.apps import apps
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
 from ida.models import (
+    Collection,
+    CollectionMembership,
     PreferenceKey,
     Project,
     Tenant,
@@ -34,6 +38,7 @@ class Stage(BaseStage):
         self.fix_media_paths()
         self.process_images()
         self.add_default_preferences()
+        self.migrate_corpora()
 
     @transaction.atomic
     def adjust_id_columns(self):
@@ -338,5 +343,40 @@ class Stage(BaseStage):
                 'default': 'Chrome',
             },
         ]
+
+        self.logger.info('Creating default preferences...')
         for pref_obj in default_preferences:
             PreferenceKey.objects.create(**pref_obj)
+
+    @transaction.atomic
+    def migrate_corpora(self):
+        """Migrate corpora from Wagtail to IDA."""
+        self.logger.info('Migrating corpora...')
+
+        tenant = Tenant.objects.get(name='DALME')
+
+        with schema_context('dalme'):
+            from public.extensions.records.models import Corpus
+
+            User = get_user_model()  # noqa: N806
+            user_obj = User.objects.get(pk=1)
+            col_ct = ContentType.objects.get_for_model(Collection)
+            corpora = Corpus.objects.all()
+
+            for corpus in corpora:
+                new_col = Collection.objects.create(
+                    name=corpus.title,
+                    is_corpus=True,
+                    is_published=True,
+                    tenant_id=tenant.id,
+                )
+
+                for member in corpus.collections.all():
+                    CollectionMembership.objects.create(
+                        collection_id=new_col.id,
+                        content_type=col_ct,
+                        object_id=member.record_collection_id,
+                        tenant_id=tenant.id,
+                        creation_user=user_obj,
+                        modification_user=user_obj,
+                    )
