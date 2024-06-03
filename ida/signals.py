@@ -46,7 +46,7 @@ def record_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
         # Create workflow record if this is a new source.
         if created:
             wf = Workflow(
-                source=instance,
+                record=instance,
                 last_modified=timezone.now(),
                 last_user=get_current_user(),
             )
@@ -126,9 +126,9 @@ def workflow_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
     """Run after save method on Workflow objects."""
     if not os.environ.get('DATA_MIGRATION'):
         if not created:
-            models.signals.post_save.send(sender=Record, instance=instance.source, created=False)
+            models.signals.post_save.send(sender=Record, instance=instance.record, created=False)
         else:
-            WorkLog.objects.update_or_create(source=instance, event='Record created', timestamp=instance.last_modified)
+            WorkLog.objects.update_or_create(record=instance, event='Record created', timestamp=instance.last_modified)
 
 
 @receiver(models.signals.post_save, sender=PreferenceKey)
