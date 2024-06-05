@@ -21,24 +21,6 @@ export VENV_BIN := $(abspath ${VENV})/bin
 -include Makefiles/Makefile.ui
 -include Makefiles/Makefile.web
 
-_confirm:
-	@echo "DESTRUCTIVE OPERATION - Are you sure? [y/N] " && \
-		read ans && [ $${ans:-N} = y ]
-.PHONY: _confirm
-
-### PUBLIC INTERFACE ###
-dev: infra.start infra.log
-.PHONY: dev
-
-init: _infra.oidc.key _infra.env _web.init _ui.init _infra.hooks.install _infra.build
-.PHONY: init
-
-sync: web.sync ui.sync docs.sync infra.hooks.update
-.PHONY: sync
-
-test: web.test # ui.test
-.PHONY: test
-
 help:
 	@echo "usage: make [option]"
 	@echo "Makefile for running development tasks. Requires gmake."
@@ -56,3 +38,21 @@ help:
 	@$(MAKE) ui.help
 	@$(MAKE) web.help
 .PHONY: help
+
+dev: infra.start infra.log
+.PHONY: dev
+
+init: _infra.oidc.key _infra.env _web.init _ui.init _infra.hooks.install _infra.build
+.PHONY: init
+
+sync: web.sync ui.sync docs.sync infra.hooks.update
+.PHONY: sync
+
+test: web.test # ui.test
+.PHONY: test
+
+### Private (non-interface) targets.
+_confirm:
+	@echo "DESTRUCTIVE OPERATION - Are you sure? [y/N] " && \
+		read ans && [ $${ans:-N} = y ]
+.PHONY: _confirm

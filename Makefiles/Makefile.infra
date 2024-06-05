@@ -1,6 +1,51 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 
+infra.help:
+	@echo "  infra.bootstrap        ready the development environment"
+	@echo "  infra.log              tail the container logs"
+	@echo "  infra.rebuild          rebuild the containers"
+	@echo "  infra.start            spin up the container network"
+	@echo "  infra.stop             stop the container network"
+	@echo ""
+.PHONY: infra.help
+
+infra.bootstrap:
+ifndef dump
+	$(error No local dump specified to restore. \
+		Usage: make bootstrap dump='dalme-20231025-T1698276955.dump')
+else
+	@$(MAKE) db.migrate
+	@$(MAKE) web.manage args='ensure_tenants'
+	@$(MAKE) db.load dump='$(dump)'
+	@$(MAKE) -e web.migrate_data
+	@$(MAKE) web.manage args='ensure_oauth'
+	@$(MAKE) web.manage args='tenant_command update_index --schema=dalme'
+	@$(MAKE) web.collectstatic
+endif
+.PHONY: infra.bootstrap
+
+infra.hooks.update:
+	$(VENV_BIN)/pre-commit autoupdate
+.PHONY: infra.hooks.update
+
+infra.log:
+	docker compose logs --follow
+.PHONY: infra.log
+
+infra.rebuild:
+	docker compose up -d --build --force-recreate
+.PHONY: infra.rebuild
+
+infra.start:
+	docker compose up -d
+.PHONY: infra.start
+
+infra.stop:
+	docker compose stop
+.PHONY: infra.stop
+
+### Private (non-interface) targets.
 _infra.build:
 	docker compose up -d --build
 .PHONY: _infra.build
@@ -46,48 +91,3 @@ _infra.pyenv.install:
 _infra.pyenv.warn:
 	$(error 'ERROR: Install pyenv')
 .PHONY: _infra.pyenv.warn
-
-### PUBLIC INTERFACE ###
-infra.bootstrap:
-ifndef dump
-	$(error No local dump specified to restore. \
-		Usage: make bootstrap dump='dalme-20231025-T1698276955.dump')
-else
-	@$(MAKE) db.migrate
-	@$(MAKE) web.manage args='ensure_tenants'
-	@$(MAKE) db.load dump='$(dump)'
-	@$(MAKE) -e web.migrate_data
-	@$(MAKE) web.manage args='ensure_oauth'
-	@$(MAKE) web.manage args='tenant_command update_index --schema=dalme'
-	@$(MAKE) web.collectstatic
-endif
-.PHONY: infra.bootstrap
-
-infra.hooks.update:
-	$(VENV_BIN)/pre-commit autoupdate
-.PHONY: infra.hooks.update
-
-infra.log:
-	docker compose logs --follow
-.PHONY: infra.log
-
-infra.rebuild:
-	docker compose up -d --build --force-recreate
-.PHONY: infra.rebuild
-
-infra.start:
-	docker compose up -d
-.PHONY: infra.start
-
-infra.stop:
-	docker compose stop
-.PHONY: infra.stop
-
-infra.help:
-	@echo "  infra.bootstrap        ready the development environment"
-	@echo "  infra.log              tail the container logs"
-	@echo "  infra.rebuild          rebuild the containers"
-	@echo "  infra.start            spin up the container network"
-	@echo "  infra.stop             stop the container network"
-	@echo ""
-.PHONY: infra.help

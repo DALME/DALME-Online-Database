@@ -3,24 +3,21 @@
 RESOLVER := /etc/resolver/localhost
 TENANTS = dalme pharmacopeias
 
-_web.build:
-	 docker compose up -d --no-deps --build $(PROJECT).web
-.PHONY: _web.build
+web.help:
+	@echo "  web.collectstatic      bundle static files for all apps and tenants"
+	@echo "  web.manage             call django management commands"
+	@echo "  web.open               view the site in your browser"
+	@echo "  web.python             shell into python on the web container"
+	@echo "  web.shell              shell into the web container"
+	@echo "  web.sync               install the web requirements and rebuild the service"
+	@echo "  web.test               run the web test suite in full"
+	@echo "  web.test.i             run only the web integration tests"
+	@echo "  web.test.p             run only the web property tests"
+	@echo "  web.test.u             run only the web unit tests"
+	@echo "  web.test.watch         re-run the test suite on code changes"
+	@echo ""
+.PHONY: web.help
 
-_web.dns:
-	sudo mkdir -p /etc/resolver
-	[ -L $(RESOLVER) ] || sudo ln -s $(CONFIG)/localhost $(RESOLVER)
-.PHONY: _web.dns
-
-_web.init: _web.install _web.dns
-.PHONY: _web.init
-
-_web.install:
-	$(VENV_BIN)/python3 -m \
-		pip install -r $(ROOT)/requirements-dev.txt
-.PHONY: _web.install
-
-### PUBLIC INTERFACE ###
 web.collectstatic:
 	docker compose exec \
 		$(PROJECT).web \
@@ -118,17 +115,20 @@ web.test.watch:
 		ptw . $(args)
 .PHONY: web.test.watch
 
-web.help:
-	@echo "  web.collectstatic      bundle static files for all apps and tenants"
-	@echo "  web.manage             call django management commands"
-	@echo "  web.open               view the site in your browser"
-	@echo "  web.python             shell into python on the web container"
-	@echo "  web.shell              shell into the web container"
-	@echo "  web.sync               install the web requirements and rebuild the service"
-	@echo "  web.test               run the web test suite in full"
-	@echo "  web.test.i             run only the web integration tests"
-	@echo "  web.test.p             run only the web property tests"
-	@echo "  web.test.u             run only the web unit tests"
-	@echo "  web.test.watch         re-run the test suite on code changes"
-	@echo ""
-.PHONY: web.help
+### Private (non-interface) targets.
+_web.build:
+	 docker compose up -d --no-deps --build $(PROJECT).web
+.PHONY: _web.build
+
+_web.dns:
+	sudo mkdir -p /etc/resolver
+	[ -L $(RESOLVER) ] || sudo ln -s $(CONFIG)/localhost $(RESOLVER)
+.PHONY: _web.dns
+
+_web.init: _web.install _web.dns
+.PHONY: _web.init
+
+_web.install:
+	$(VENV_BIN)/python3 -m \
+		pip install -r $(ROOT)/requirements-dev.txt
+.PHONY: _web.install

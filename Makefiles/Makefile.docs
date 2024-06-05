@@ -1,20 +1,14 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 
-_docs.build:
-	docker compose up -d --no-deps --build $(PROJECT).docs
-.PHONY: _docs.build
+docs.help:
+	@echo "  docs.render            output the documentation as html"
+	@echo "  docs.shell             shell into the docs container"
+	@echo "  docs.sync              compile the docs requirements file and rebuild the service"
+	@echo "  docs.write             run the documentation live-reload server"
+	@echo ""
+.PHONY: docs.help
 
-_docs.clean:
-	docker compose run --rm -T \
-		$(PROJECT).docs \
-		rm -rf /opt/docs/_build
-.PHONY: _docs.clean
-
-_docs.init: _docs.build
-.PHONY: _docs.init
-
-### PUBLIC INTERFACE ###
 docs.render: _docs.clean
 	docker compose run --rm -T \
 		$(PROJECT).docs \
@@ -34,10 +28,16 @@ docs.write:
 	open http://localhost:8002
 .PHONY: docs.write
 
-docs.help:
-	@echo "  docs.render            output the documentation as html"
-	@echo "  docs.shell             shell into the docs container"
-	@echo "  docs.sync              compile the docs requirements file and rebuild the service"
-	@echo "  docs.write             run the documentation live-reload server"
-	@echo ""
-.PHONY: docs.help
+### Private (non-interface) targets.
+_docs.build:
+	docker compose up -d --no-deps --build $(PROJECT).docs
+.PHONY: _docs.build
+
+_docs.clean:
+	docker compose run --rm -T \
+		$(PROJECT).docs \
+		rm -rf /opt/docs/_build
+.PHONY: _docs.clean
+
+_docs.init: _docs.build
+.PHONY: _docs.init

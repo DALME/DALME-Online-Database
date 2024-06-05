@@ -4,16 +4,22 @@ DB_VOLUME := pgdata
 DUMPS := /opt/db/dumps
 RESTORE_SCHEMA := restore
 
-_db.create_restore_schema:
-	docker compose exec \
-		$(PROJECT).db \
-		psql -wx \
-		--dbname $(PROJECT) \
-		--username $(PROJECT) \
-		-c 'CREATE SCHEMA IF NOT EXISTS $(RESTORE_SCHEMA)'
-.PHONY: _db.create_restore_schema
+db.help:
+	@echo "  db.drop                drop the db volume"
+	@echo "  db.dump                dump the dev database to sql (data only, no schema)"
+	@echo "  db.load                restore a local sql dump"
+	@echo "  db.migrations.empty    generate an empty database revision"
+	@echo "  db.migrations.make     generate a database revision"
+	@echo "  db.migrations.merge    merge database revisions"
+	@echo "  db.migrations.show     show database revision state"
+	@echo "  db.migrate             apply all upgrades to the database schema"
+	@echo "  db.migrate.fake        run faked migrations"
+	@echo "  db.migrate.revert      revert migrations for an app"
+	@echo "  db.psql                shell into psql on the service"
+	@echo "  db.shell               shell into the db container"
+	@echo ""
+.PHONY: db.help
 
-### PUBLIC INTERFACE ###
 # TODO: The db volume prefix comes automatically from the **project directory**
 # so eventually this will probably need to become ida_$(DB_VOLUME).
 db.drop: _confirm
@@ -108,18 +114,12 @@ db.shell:
 		bash
 .PHONY: db.shell
 
-db.help:
-	@echo "  db.drop                drop the db volume"
-	@echo "  db.dump                dump the dev database to sql (data only, no schema)"
-	@echo "  db.load                restore a local sql dump"
-	@echo "  db.migrations.empty    generate an empty database revision"
-	@echo "  db.migrations.make     generate a database revision"
-	@echo "  db.migrations.merge    merge database revisions"
-	@echo "  db.migrations.show     show database revision state"
-	@echo "  db.migrate             apply all upgrades to the database schema"
-	@echo "  db.migrate.fake        run faked migrations"
-	@echo "  db.migrate.revert      revert migrations for an app"
-	@echo "  db.psql                shell into psql on the service"
-	@echo "  db.shell               shell into the db container"
-	@echo ""
-.PHONY: db.help
+### Private (non-interface) targets.
+_db.create_restore_schema:
+	docker compose exec \
+		$(PROJECT).db \
+		psql -wx \
+		--dbname $(PROJECT) \
+		--username $(PROJECT) \
+		-c 'CREATE SCHEMA IF NOT EXISTS $(RESTORE_SCHEMA)'
+.PHONY: _db.create_restore_schema
