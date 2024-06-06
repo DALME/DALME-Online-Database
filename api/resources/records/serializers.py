@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from api.dynamic_serializer import DynamicSerializer
 from api.resources.attributes import AttributeSerializer
+from api.resources.languages import LanguageReferenceSerializer
+from api.resources.locales import LocaleReferenceSerializer
 from api.resources.pages import PageSerializer
 from api.resources.users import UserSerializer
 from api.resources.workflows import WorkflowSerializer
@@ -73,7 +75,7 @@ class RecordTypeSerializer(DynamicSerializer):
 
 
 class RecordAttributeCollectionSerializer(serializers.ModelSerializer):
-    """Serializer collections as attributes of records."""
+    """Serializes collections as attributes of records."""
 
     id = serializers.ReadOnlyField(source='col_id')
     name = serializers.ReadOnlyField(source='col_name')
@@ -97,7 +99,13 @@ class RecordSerializer(DynamicSerializer):
     # annotated fields
     description = serializers.ReadOnlyField()
     record_type = RecordTypeSerializer()
-    date = serializers.ReadOnlyField()
+    locale = LocaleReferenceSerializer()
+    language = LanguageReferenceSerializer()
+    # method fields
+    credit_line = serializers.SerializerMethodField()
+    credits = serializers.SerializerMethodField()
+    source = serializers.SerializerMethodField()
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = Record
@@ -125,6 +133,11 @@ class RecordSerializer(DynamicSerializer):
             'record_type',
             'date',
             'collections',
+            'locale',
+            'language',
+            'credit_line',
+            'credits',
+            'source',
         ]
         default_exclude = [
             'has_images',
@@ -135,6 +148,11 @@ class RecordSerializer(DynamicSerializer):
             'record_type',
             'date',
             'collections',
+            'locale',
+            'language',
+            'credit_line',
+            'credits',
+            'source',
         ]
         field_sets = {
             'attribute': [
@@ -166,6 +184,13 @@ class RecordSerializer(DynamicSerializer):
                 'record_type',
                 'date',
             ],
+            'public_detail': [
+                'locale',
+                'language',
+                'credit_line',
+                'credits',
+                'source',
+            ],
             'images': ['image_urls'],
         }
 
@@ -173,5 +198,17 @@ class RecordSerializer(DynamicSerializer):
         try:
             img_id = obj.pages.exclude(dam_id__isnull=True).first().dam_id
             return rs_resource.objects.get(ref=img_id).get_image_url('scr,thm')
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, AttributeError):
             return None
+
+    def get_credit_line(self, obj):
+        return obj.get_credit_line()
+
+    def get_credits(self, obj):
+        return obj.get_credits()
+
+    def get_source(self, obj):
+        return obj.get_source()
+
+    def get_date(self, obj):
+        return obj.get_date()
