@@ -4,6 +4,7 @@ main section .subsection-container > .block-text > p {
 .u-subsection {
   margin-top: -1px;
   border-bottom: 1px dotted #000;
+  margin-bottom: 1.5rem;
 }
 .u-subsection[data-collapsed='true'] i {
   background: #3a5d82;
@@ -46,4 +47,8 @@ main section .subsection-container > .block-text > p {
   color: #d2e3f4;
   border: 1px solid #ccdbea;
   justify-content: center;
+}
+
+.u-subsection + * {
+  margin-top: 0;
 }
