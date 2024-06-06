@@ -56,22 +56,6 @@ class RecordGroup(
         return self.children.count()
 
 
-# class RecordManager(models.Manager):
-#     def include_attrs(self, *args):
-#         qs = self.get_queryset()
-#         for attr in args:
-#             attr_sq = Attribute.objects.filter(ida_record_related=OuterRef('pk'), attribute_type__name=attr)
-#             qs = qs.annotate(
-#                 **{
-#                     attr: ExpressionWrapper(
-#                         Case(When(Exists(attr_sq), then=Subquery(attr_sq.values_list('value', flat=True)[:1]))),
-#                         output_field=AttributeField(),
-#                     )
-#                 }
-#             )
-#         return qs
-
-
 class Record(
     index.Indexed,
     UuidMixin,
@@ -94,8 +78,6 @@ class Record(
     collections = GenericRelation('ida.CollectionMembership', related_query_name='record')
 
     search_fields = [index.FilterField('name')]
-
-    # objects = RecordManager()
 
     class Meta:
         base_manager_name = 'objects'
