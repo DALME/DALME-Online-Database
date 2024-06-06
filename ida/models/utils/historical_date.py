@@ -5,7 +5,189 @@ import datetime
 import json
 import math
 
+import pandas as pd
 from dateutil import parser
+
+from django.utils.functional import cached_property
+
+
+class HistoricalDateRange(dict):
+    """Class for managing date ranges throughout the app, even if ambiguous or incomplete.
+
+    Like, HistoricalDate, the class subclasses 'dict' to make the object directly serializable
+    by the default encoder.
+
+    HistoricalDateRange takes two arguments, a 'start_date' and an 'end_date', both of which have
+    to be instances of 'HistoricalDate'.
+
+    The 'format' method takes up to three arguments:
+        - separator: a string used to separate start and end dates, e.g. '-' or ' to '
+        - start_date_format: a string with codes following the 1989C standard (same as strftime),
+            if no other argument is provided, the same string is used to format the end date
+        - end_date_format: same as above for the end date.
+    """
+
+    def __new__(cls, start_date, end_date):
+        """Return a HistoricalDate instance if both dates are identical."""
+        if isinstance(start_date, HistoricalDate) and isinstance(end_date, HistoricalDate) and start_date == end_date:
+            return start_date
+        return super().__new__(cls, start_date, end_date)
+
+    def __init__(self, start_date, end_date):
+        if not start_date or not end_date:
+            message = 'Both a start date and an end date must be supplied.'
+            raise ValueError(message)
+
+        for date in [start_date, end_date]:
+            if not isinstance(date, HistoricalDate):
+                message = "The dates supplied must be instances of 'HistoricalDate'."
+                raise TypeError(message)
+
+        if start_date == end_date:
+            self.value = start_date
+
+        if start_date > end_date:
+            self.start = end_date
+            self.end = start_date
+        else:
+            self.start = start_date
+            self.end = end_date
+
+        self.text = self.get_range_string()
+        self.is_range = True
+        self.is_valid = self.start.is_valid and self.end.is_valid
+        dict.__init__(self, **self.serialize())
+
+    def __str__(self):
+        return self.get_range_string()
+
+    def __dict__(self):
+        return self.serialize()
+
+    def __hash__(self):
+        return hash(
+            self.start.is_bce,
+            self.start.day,
+            self.start.month,
+            self.start.year,
+            self.start.text,
+            self.end.is_bce,
+            self.end.day,
+            self.end.month,
+            self.end.year,
+            self.end.text,
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
+            return NotImplemented
+        if isinstance(other, HistoricalDate):
+            return False
+        return self.start == other.start and self.end == other.end
+
+    def __lt__(self, other):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
+            return NotImplemented
+        if isinstance(other, HistoricalDate):
+            return self.start.get_as_months() < other.get_as_months()
+        return self.start.get_as_months() < other.start.get_as_months()
+
+    def __le__(self, other):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
+            return NotImplemented
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __ne__(self, other):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
+            return NotImplemented
+        return not self.__eq__(other)
+
+    def __gt__(self, other):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
+            return NotImplemented
+        if isinstance(other, HistoricalDate):
+            return self.end.get_as_months() < other.get_as_months()
+        return self.end.get_as_months() < other.end.get_as_months()
+
+    def __ge__(self, other):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
+            return NotImplemented
+        return self.__gt__(other) or self.__eq__(other)
+
+    def __contains__(self, item):
+        if not isinstance(item, (HistoricalDate | HistoricalDateRange)):
+            return NotImplemented
+        if isinstance(item, HistoricalDateRange):
+            return item.start >= self.start and item.end <= self.end
+        return self.start <= item <= self.end
+
+    @cached_property
+    def is_bce(self):
+        """Return boolean indicating whether the range is outside the CE."""
+        return self.start.is_bce and self.end.is_bce
+
+    @property
+    def day(self):
+        """Return a string with a range of days (mostly for compatibility with HistoricalDate)."""
+        return [self.start.day, self.end.day]
+
+    @property
+    def month(self):
+        """Return a string with a range of months (mostly for compatibility with HistoricalDate)."""
+        return [self.start.month, self.end.month]
+
+    @property
+    def year(self):
+        """Return a range of years if both dates have them, otherwise a string."""
+        return [
+            self.start.get_era(add_year=True) if self.start.is_bce else self.start.year,
+            self.end.get_era(add_year=True) if self.end.is_bce else self.end.year,
+        ]
+
+    @cached_property
+    def date(self):
+        """Return a pandas date_range object if both dates are complete."""
+        if self.start.date and self.end.date:
+            return pd.date_range(start=self.start.date, end=self.end.date)
+        return None
+
+    def serialize(self):
+        """Return a JSON-serialized version of the date range."""
+        return {
+            'is_range': True,
+            'start': self.start.serialize(),
+            'end': self.end.serialize(),
+            'text': self.text,
+        }
+
+    def get_range_string(self):
+        """Return date range as a string."""
+        days = [i if i else '?' for i in self.day]
+        months = list(set(self.month))
+        years = list(set(self.year))
+        if len(years) == 1:
+            if len(months) == 1:
+                return f'{days[0]} to {days[1]}-{calendar.month_abbr[months[0]]}-{years[0]}'
+            return (
+                f'{days[0]}-{calendar.month_abbr[months[0]]} to {days[1]}-{calendar.month_abbr[months[1]]}-{years[0]}'
+            )
+        return f'{self.start} to {self.end}'
+
+    def format(self, separator, start_date_format, end_date_format=None):
+        """Return the date range as a formatted string."""
+        for arg in [separator, start_date_format]:
+            if not arg or not isinstance(arg, str):
+                message = (
+                    'The "format" method takes a string with a separator, a second format string with codes'
+                    ' following the 1989C standard (strftime), and an optional third format string. If both format'
+                    ' strings are provided, the first one is used for the start date and the second for the end date.'
+                )
+                raise ValueError(message)
+
+        if not end_date_format:
+            end_date_format = start_date_format
+
+        return f'{self.start.format(start_date_format)}{separator}{self.end.format(end_date_format)}'
 
 
 class HistoricalDate(dict):
@@ -48,6 +230,8 @@ class HistoricalDate(dict):
             message = 'The "is_bce" argument must be a boolean.'
             raise TypeError(message)
 
+        self.is_range = False  # for compatibility with HistoricalDateRange
+        self.is_uncertain = False
         self.is_bce = is_bce
         self.day = None
         self.month = None
@@ -78,8 +262,8 @@ class HistoricalDate(dict):
                 raise ValueError(message)
 
             self.year = self.get_as_int(data[0], 'year')
-            self.month = self.get_as_int(data[0], 'month')
-            self.day = self.get_as_int(data[0], 'day')
+            self.month = self.get_as_int(data[1], 'month')
+            self.day = self.get_as_int(data[2], 'day')
 
         elif isinstance(data, dict):
             self.day, self.month, self.year, self.date, self.text = self.dict_to_date(data)
@@ -102,9 +286,14 @@ class HistoricalDate(dict):
     def __dict__(self):
         return self.serialize()
 
+    def __hash__(self):
+        return hash(self.is_bce, self.day, self.month, self.year, self.text)
+
     def __eq__(self, other):
-        if not isinstance(other, HistoricalDate):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
             return NotImplemented
+        if isinstance(other, HistoricalDateRange):
+            return False
         if (self.date and other.date) and not (self.is_bce or other.is_bce):
             return self.date == other.date
         return (
@@ -115,31 +304,35 @@ class HistoricalDate(dict):
         )
 
     def __lt__(self, other):
-        if not isinstance(other, HistoricalDate):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
             return NotImplemented
+        if isinstance(other, HistoricalDateRange):
+            return self.get_as_months() < other.start.get_as_months()
         if (self.date and other.date) and not (self.is_bce or other.is_bce):
             return self.date < other.date
         return self.get_as_months() < other.get_as_months()
 
     def __le__(self, other):
-        if not isinstance(other, HistoricalDate):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
             return NotImplemented
         return self.__lt__(other) or self.__eq__(other)
 
     def __ne__(self, other):
-        if not isinstance(other, HistoricalDate):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
             return NotImplemented
         return not self.__eq__(other)
 
     def __gt__(self, other):
-        if not isinstance(other, HistoricalDate):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
             return NotImplemented
+        if isinstance(other, HistoricalDateRange):
+            return self.get_as_months() < other.end.get_as_months()
         if (self.date and other.date) and not (self.is_bce or other.is_bce):
             return self.date > other.date
         return self.get_as_months() > other.get_as_months()
 
     def __ge__(self, other):
-        if not isinstance(other, HistoricalDate):
+        if not isinstance(other, (HistoricalDate | HistoricalDateRange)):
             return NotImplemented
         return self.__gt__(other) or self.__eq__(other)
 
@@ -169,13 +362,21 @@ class HistoricalDate(dict):
         return (day, month, year, date, text)
 
     def get_era(self, use_ad=False, add_year=False):
-        if self.is_bce:
-            result = f'{self.year} ' if add_year else ''
-            return f'{result}{"BC" if use_ad else "BCE"}'
-        result = 'AD ' if use_ad else ''
         if add_year:
-            result += str(self.year)
-        return result if use_ad else f'{result}{" " if add_year else ""}CE'
+            if not self.year:
+                return None
+
+            templates = {  # order: is_bce, use_ad
+                (True, True): '{} BC',
+                (True, False): '{} BCE',
+                (False, True): 'AD {}',
+                (False, False): '{} CE',
+            }
+            return templates.get((self.is_bce, use_ad)).format(self.year)
+
+        if self.is_bce:
+            return 'BC' if use_ad else 'BCE'
+        return 'AD' if use_ad else 'CE'
 
     def get_date_string(self):
         """Return date string."""
@@ -184,11 +385,11 @@ class HistoricalDate(dict):
             return f'{string} BCE' if self.is_bce else string
 
         if self.month is not None and self.year is not None:
-            string = f'{calendar.month_abbr[self.month]} {self.year}'
+            string = f'{calendar.month_abbr[self.month]}/{self.year}'
             return f'{string} BCE' if self.is_bce else string
 
         if self.day is not None and self.month is not None:
-            return f'{self.day} {calendar.month_abbr[self.month]}'
+            return f'{self.day}/{calendar.month_abbr[self.month]}'
 
         if self.year is not None:
             return f'{self.year} BCE' if self.is_bce else str(self.year)
@@ -201,6 +402,7 @@ class HistoricalDate(dict):
     def serialize(self):
         """Return a JSON-serialized version of the date."""
         return {
+            'is_range': False,
             'day': self.day,
             'month': self.month,
             'year': self.year,
