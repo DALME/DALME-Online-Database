@@ -4,9 +4,6 @@ import django_filters as filters
 
 from ida.models import AttributeType, Collection, Record
 
-# from public.models import Collection
-from .utils import BaseAttributeFilter
-
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 
 
@@ -26,7 +23,7 @@ def locale_choices():
     return AttributeType.objects.get(name='locale').options.get_values(serialize=False)
 
 
-class RecordFilter(BaseAttributeFilter):
+class RecordFilter(filters.FilterSet):
     wf_status = filters.NumberFilter(field_name='workflow__wf_status', lookup_expr='iexact')
     wf_stage = filters.NumberFilter(field_name='workflow__stage', lookup_expr='iexact')
     help_flag = filters.BooleanFilter(field_name='workflow__help_flag')
