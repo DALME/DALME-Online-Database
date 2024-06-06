@@ -11,6 +11,7 @@ from django.utils.functional import cached_property
 
 from ida.models.utils import (
     CommentMixin,
+    HistoricalDateRange,
     OwnedMixin,
     PermissionsMixin,
     RelationshipMixin,
@@ -115,15 +116,18 @@ class Record(
         except self._meta.get_field('workflow').related_model.DoesNotExist:
             return False
 
-    # @cached_property
-    # def date(self):
-    #     dates = self.attributes.filter(name__in=['date', 'start_date', 'end_date'])
-    #     return dates.first().value if dates.exists() else None
-
-    # @cached_property
-    # def record_type(self):
-    #     rt = self.attributes.filter(name='record_type')
-    #     return rt.first().value if rt.exists() else 'unclear'
+    def get_date(self):
+        df = ['date', 'start_date', 'end_date']
+        dates = {
+            i['name']: i['value'] for i in self.attributes.filter(attribute_type__name__in=df).values('name', 'value')
+        }
+        if not any(dates.get(i) for i in df):
+            return None
+        if dates.get('date'):
+            return dates['date']
+        if dates.get('start_date') and dates.get('end_date'):
+            return HistoricalDateRange(dates['start_date'], dates['end_date'])
+        return next(dates.get(i) for i in df if i)
 
     @cached_property
     def is_private(self):
