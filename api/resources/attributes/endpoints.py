@@ -124,13 +124,22 @@ class Attributes(IDABaseViewSet):
             return obj
         return super().get_object()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['get'])
     def options(self, request, *args, **kwargs):  # noqa: ARG002
-        """Return options for attribute."""
-        attribute = self.get_object()
-        options = attribute.get_options()
-        if options is not None:
-            return Response(options, 201)
+        """Return options for list of attributes."""
+        if request.GET.get('names') is not None:
+            names = request.GET['names'].split(',')
+            options = {}
+            for name in names:
+                try:
+                    atype = AttributeType.objects.get(name=name)
+                    options[name] = atype.options.get_values(public=self.is_public)
+                except AttributeType.DoesNotExist:
+                    options[name] = 'Attribute Type does not exist.'
+                except AttributeError:
+                    options[name] = 'No options could be retrieved.'
+            if options:
+                return Response(options, 201)
         return Response({'error': 'No options could be retrieved.'}, 400)
 
 
