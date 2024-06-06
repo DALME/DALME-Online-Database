@@ -8,7 +8,8 @@ from rest_framework.response import Response
 
 from api.access_policies import BaseAccessPolicy
 from api.base_viewset import IDABaseViewSet
-from api.resources.records import RecordFilter, RecordSerializer
+from api.resources.records import RecordSerializer
+from ida.filters import RecordFilter
 from ida.models import Collection, CollectionMembership, Record
 
 from .filters import CollectionFilter
