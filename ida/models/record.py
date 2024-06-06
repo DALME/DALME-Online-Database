@@ -19,6 +19,9 @@ from ida.models.utils import (
     TaggingMixin,
     TrackingMixin,
     UuidMixin,
+    format_credit_line,
+    format_credits,
+    format_source,
 )
 from ida.models.utils.attribute_mixin import AttributeMixin
 
@@ -157,14 +160,14 @@ class Record(
             [t for t in self.pagenodes.all() if t.transcription is not None and t.transcription.count_transcription]
         )
 
-    @cached_property
+    @property
     def no_folios(self):
         """Return count of folios associated with the record, if any."""
-        return self.pages.all().count() if self.pages.all().exists() else 0
+        return self.pages.count() if self.pages.exists() else 0
 
     def get_purl(self):
         """Return the record's permanent url."""
-        return f'{settings.BASE_URL}/purl/{self.id}/' if self.workflow.is_public else None
+        return f'{settings.BASE_URL}/purl/{self.id}/' if self.is_published else None
 
     def get_credit_data(self):
         """Return credit data for record as list of dicts."""
@@ -182,20 +185,20 @@ class Record(
 
     def get_credits(self):
         """Return credits for the record, if applicable."""
-        try:
-            c_data = self.get_credit_data()
-            editors = [i['name'] for i in c_data if i['credit'] == 'editor']
-            corrections = [i['name'] for i in c_data if i['credit'] == 'corrections']
-            contributors = [i['name'] for i in c_data if i['credit'] == 'contributor']
-        except:  # noqa: E722
-            editors, corrections, contributors = [], [], []
+        return format_credits(self)
 
-        if not editors:
-            try:  # noqa: SIM105
-                editors = [self.owner.agent.first().standard_name]
-            except:  # noqa: E722
-                pass
-        return (editors, corrections, contributors)
+    def get_credit_line(self):
+        """Return standard credit line for the record, if applicable."""
+        return format_credit_line(self)
+
+    def get_source(self):
+        """Return source information for the record."""
+        return format_source(self)
+
+    def get_named_persons(self):
+        """Return a list of persons named in the record."""
+        # TODO: fix named_persons attribute
+        return
 
 
 class RecordType(ScopedBase, TrackingMixin):

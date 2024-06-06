@@ -6,14 +6,12 @@ with system data models as well as other reusable utilities.
 """
 
 from .attestation_mixin import AttestationMixin
-
-# from .attribute_field import AttributeField
-# from .attribute_mixin import AttributeMixin
 from .comment_mixin import CommentMixin
-from .historical_date import HistoricalDate
+from .historical_date import HistoricalDate, HistoricalDateRange
 from .options_serializer import OptionsSerializer
 from .owned_mixin import OwnedMixin
 from .permissions_mixin import PermissionsMixin
+from .record_helpers import format_credit_line, format_credits, format_source
 from .relationship_mixin import RelationshipMixin
 from .tagging_mixin import TaggingMixin
 from .tenant_scoped_mixin import ScopedBase
@@ -46,7 +44,11 @@ __all__ = [
     'BASE_DATA_TYPES',
     'CommentMixin',
     'DATA_TYPES',
+    'format_credit_line',
+    'format_credits',
+    'format_source',
     'HistoricalDate',
+    'HistoricalDateRange',
     'OptionsSerializer',
     'OwnedMixin',
     'PermissionsMixin',
