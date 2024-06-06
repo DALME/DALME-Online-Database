@@ -1,5 +1,3 @@
-{% load get_credit_line %}
-
 <div class="description">
   {% if data.description %}
     {{ data.description }}
@@ -9,26 +7,57 @@
 </div>
 <hr/>
 <ul class="u-flex u-type-sans">
-  <li><span>Record type:</span> {{ data.record_type }}</li>
-  <li><span>Date:</span> {{ data.full_date }}</li>
+  {% if data.record_type.label %}
+    <li>
+      <span>Record type:</span> {{ data.record_type.label }}
+    </li>
+  {% endif %}
+  {% if data.date %}
+    <li>
+      <span>Date:</span> {{ data.date }}
+    </li>
+  {% endif %}
   {% if data.locale %}
-  <li><span>Locale:</span> {{ data.locale }}</li>
+    <li>
+      <span>Locale:</span> {{ data.locale.name }} ({{ data.locale.administrative_region }}, {{ data.locale.country.name }})
+    </li>
   {% endif %}
   {% if data.language %}
-  <li><span>Language(s):</span> {{ data.language }}</li>
+    <li>
+      <span>Language(s):</span> {{ data.language.name }}
+    </li>
   {% endif %}
   {% if data.named_persons %}
-  <li><span>Named person(s):</span> {{ data.named_persons }}</li>
+    <li>
+      <span>Named person(s):</span> {{ data.named_persons }}
+    </li>
   {% endif %}
-  {% if data.archival_location %}
-  <li><span>{% if data.parent_type == 'register' %}Archival location:{% else %}Edition:{% endif %}</span> {{ data.archival_location|safe }}</li>
+  {% if data.source %}
+    <li>
+    {% if data.source.type == 'register' %}
+      <span>Archival location:</span>
+      {% if data.source.url %}
+        <a href="{{ data.source.url }}" target="_blank">{{ data.source.name }}</a>{% if data.source.loc %}, {{ data.source.loc }}{% endif %}
+      {% else %}
+        {{ data.source.name }}{% if data.source.loc %}, {{ data.source.loc }}{% endif %}
+      {% endif %}
+    {% else %}
+      <span>Edition:</span>
+      {% if data.source.zotero_key %}
+        <a href="/project/bibliography/#{{ data.source.zotero_key }}">{{ data.source.name }}</a>
+      {% else %}
+        {{ data.source.name }}
+      {% endif %}
+    {% endif %}
+    </li>
   {% endif %}
   {% with data.folios|length as count %}
-    <li><span>Extent:</span> {{ count }} Folio{% if count > 1 %}s{% endif %}{% if data.format_info %} ({{ data.format_info }}){% endif %}</li>
+    <li>
+      <span>Extent:</span> {{ count }} Folio{% if count > 1 %}s{% endif %}{% if data.format_info %} ({{ data.format_info }}){% endif %}
+    </li>
   {% endwith %}
 </ul>
 <hr/>
 <div class="u-type-sans mt-2 credits">
-  {% get_credit_line as credit_line %}
-  {{ credit_line }}
+  {{ data.credit_line }}
 </div>

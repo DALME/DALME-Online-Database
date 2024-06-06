@@ -12,7 +12,7 @@
         </li>
             {% if page|classname == 'Collection' %}
                 <li>
-                  <a href="{% pageurl page %}records/?collection={{ page.pk }}">Browse Collection</a>
+                  <a href="{% pageurl page %}records/?collection={{ page.record_collection.id }}">Browse Collection</a>
                 </li>
             {% else %}
                 <li>

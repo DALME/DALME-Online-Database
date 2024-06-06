@@ -12,10 +12,10 @@
             <span>| {{ record_data.date }}</span>
           {% endif %}
           {% if record_data.language %}
-            <span>| {{ record_data.language }}</span>
+            <span>| {{ record_data.language.name }}</span>
           {% endif %}
           {% if record_data.locale %}
-            <span>| {{ record_data.locale }}</span>
+            <span>| {{ record_data.locale.name }} ({{ record_data.locale.administrative_region }}, {{ record_data.locale.country.name }})</span>
           {% endif %}
         </a>
       </div>

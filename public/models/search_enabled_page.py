@@ -15,7 +15,6 @@ from django.utils import timezone
 from ida.forms import SearchForm
 from ida.models import Record, SavedSearch
 from ida.utils import Search, SearchContext, formset_factory
-from public.extensions.records.serializers import RecordSerializer
 from public.models.base_page import BasePage
 from public.models.settings import Settings
 
@@ -130,7 +129,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
     @path('records/<uuid:pk>/', name='record')
     @path('records/<uuid:pk>/<str:folio>/', name='record_folio')
     def record(self, request, pk, folio=None, scoped=True):  # noqa: ARG002
-        qs = Record.objects.filter(pk=pk)
+        qs = Record.objects.include_attrs('record_type', 'description', 'locale', 'language', 'date').filter(pk=pk)
         if not qs.exists():
             raise Http404
 
@@ -166,7 +165,10 @@ class SearchEnabled(RoutablePageMixin, BasePage):
         if request.META.get('HTTP_REFERER') and 'search' in request.META.get('HTTP_REFERER'):
             from_search = True
 
-        data = RecordSerializer(record).data
+        # import serializer here to avoid exception if api is not yet loaded
+        from api.resources.records.serializers import RecordSerializer
+
+        data = RecordSerializer(record, field_set=['public', 'public_detail']).data
         purl = f'{settings.BASE_URL}/purl/{record.id}/' if as_preview else record.get_purl()
 
         context.update(

@@ -203,7 +203,7 @@
                   ${cleanName(record.name)}<span class="short-name"> ${cleanName(record.shortName)}</span>
                 </a>
               </span>
-              <span class="inventory-field record-type">${record.recordType}</span>
+              <span class="inventory-field record-type">${record.recordType.label}</span>
               <span class="inventory-field date">${getDate(record)}</span>
               <span class="inventory-field icons">
                 <i
@@ -355,13 +355,30 @@
       el: '#app',
       delimiters: ['${', '}'],
       created() {
-        this.loadChoices();
-        if (!new URLSearchParams(window.location.search).keys().length) {
-          this.fetchData();
-        }
-        this.setInitialSortOrder(new URLSearchParams(window.location.search).get('order_by', null));
-        window.componentInstance = this;
-        window.addEventListener('resize', this.onResize);
+        fetch(`${this.api_url}/attributes/options/?names=record_type,collection,corpus,locale`)
+          .then(response => response.json())
+          .then(data => {
+            for (const key in this.choiceLists) {
+              let choices = data[key];
+              if (choices.length && choices[0].hasOwnProperty('group')) {
+                const grouped = Object.groupBy(choices, ({ group }) => group);
+                choices = Object.keys(grouped).map(k => ({ label: k, options: grouped[k]}));
+              }
+              choices.unshift({ value: '', label: this.choiceLists[key].placeholder, disabled: true });
+              this.choices[this.choiceLists[key].propName] = choices;
+            }
+            const params = this.destructureParams();
+            for (const [key, value] of Object.entries(params)) {
+              this[key] = value;
+            }
+            if (!Array.from(this.currentParams.keys()).length) {
+              this.fetchData();
+            }
+            this.setInitialSortOrder(new URLSearchParams(window.location.search).get('order_by', null));
+            window.componentInstance = this;
+            window.addEventListener('resize', this.onResize);
+
+          })
       },
       components: {
         'vue-slider': window['vue-slider-component'],
@@ -399,9 +416,14 @@
         dateOrder: null,
         choices: {},
         windowWidth: window.innerWidth,
-        hasThumb: false,
         session_data: null,
         api_url: '{% settings_val 'API_URL' %}/public',
+        choiceLists: {
+          collection: { propName: 'collectionChoices', placeholder: "Filter by collection" },
+          corpus: { propName: 'corpusChoices', placeholder: "Filter by corpus" },
+          locale: { propName: 'localeChoices', placeholder: "Filter by locale" },
+          recordType: { propName: 'recordTypeChoices', placeholder: "Filter by record type" },
+        },
       },
       watch: {
         collection: 'updateCollection',
@@ -422,6 +444,9 @@
       computed: {
         showModes() {
           return this.windowWidth >= 950;
+        },
+        hasThumbs() {
+          return "imageUrls" in this.records[0];
         },
         dateMin() {
           return 1200;
@@ -474,7 +499,11 @@
             : null;
         },
         collectionName() {
-          return this.choices.collectionChoices.find(x => x.value === this.collection).label || null;
+          if ("collectionChoices" in this.choices) {
+            return this.choices.collectionChoices.find(x => x.value === this.collection).label || null;
+          } else {
+            return null;
+          }
         },
         collectionSlug() {
           return this.collectionName.replace(/\s+/g, '-').toLowerCase() || null;
@@ -482,7 +511,7 @@
       },
       methods: {
         getDate(record) {
-          return record.date ? record.date.text : "N/A";
+          return record.date ? record.date.text : "—";
         },
         cleanName(name) {
           return name.includes("(") ? name.split("(")[0] : name;
@@ -516,13 +545,16 @@
           }
         },
         async setMode(e) {
-          let mode = e.currentTarget.id;
-          window.CustomUtils.updateSession({ 'public-browse-mode': mode });
-          if (this.mode == 'compact' && mode != this.mode) {
-            await this.fetchData();
+          const mode = e.currentTarget.id;
+          if (this.mode !== mode) {
+            window.CustomUtils.updateSession({ 'public-browse-mode': mode });
+            if (!this.hasThumbs) {
+              await this.fetchData(`${this.api_url}/records/?thumbs=1&${this.currentParams.toString()}`);
+              this.mode = mode;
+            } else {
+              this.mode = mode;
+            }
           }
-          this.mode = mode;
-          // this.$forceUpdate();
         },
         setCorpus() {
           const value = this.corpus ? this.corpus : '';
@@ -584,53 +616,13 @@
               if (Object.keys(this.choices).length) {
                 val = this.choices[`${camelized}Choices`]
                 .filter(item => {
-                  return key === 'record_type' ? item.value == val : item.value === parseInt(val);
+                  return ['record_type', 'collection'].includes(key) ? item.value == val : item.value === parseInt(val);
                 });
               }
             }
             return params[camelized] = typeof val === 'object' ? val[0]['value'] : val['value'];
           });
           return params;
-        },
-        async loadChoices() {
-          await this.fetchChoices();
-          const params = this.destructureParams();
-          for (const [key, value] of Object.entries(params)) {
-            this[key] = value;
-          }
-        },
-        fetchChoices() {
-          const choiceLists = {
-            collectionChoices: {
-              endpoint: `${this.api_url}/attribute_types/collection/options/`,
-              placeholder: "Filter by collection",
-            },
-            corpusChoices: {
-              endpoint: `${this.api_url}/attribute_types/corpus/options/`,
-              placeholder: "Filter by corpus",
-            },
-            localeChoices: {
-              endpoint: `${this.api_url}/attribute_types/locale/options/`,
-              placeholder: "Filter by locale",
-            },
-            recordTypeChoices: {
-              endpoint: `${this.api_url}/attribute_types/record_type/options/`,
-              placeholder: "Filter by record type",
-            },
-          };
-          for (const listName in choiceLists) {
-            fetch(choiceLists[listName].endpoint)
-              .then(response => response.json())
-              .then(data => {
-                let choices = data;
-                if (data.length && data[0].hasOwnProperty('group')) {
-                  const grouped = Object.groupBy(data, ({ group }) => group);
-                  choices = Object.keys(grouped).map(k => ({ label: k, options: grouped[k]}));
-                }
-                choices.unshift({ value: '', label: choiceLists[listName].placeholder, disabled: true });
-                this.choices[listName] = choices;
-              })
-          }
         },
         fetchData(url = null) {
           this.fetching = true;
@@ -649,7 +641,6 @@
               this.showFirst = !data.pageNumbers.includes(1);
               this.showLast = !data.pageNumbers.includes(data.totalPages);
               this.fetching = false;
-              // this.updateCollection();
             });
         },
         setParam(key, value) {

@@ -1,5 +1,5 @@
 {% extends "public/layouts/single_column.html" %}
-{% load get_citation_data static %}
+{% load get_citation_data settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; {{ title }}{% endblock %}
 
@@ -126,7 +126,7 @@
             triggers="manual">
             Citation panel.
           </b-popover>
-          {% include "public/includes/cite_popup.html" %}
+          {% include "cite_popup.html" %}
         </div>
         <li
           id="help_toggle"
@@ -390,6 +390,7 @@
           headerHeight: 93,
           windowWidth: window.innerWidth,
           transcriptionWidth: 0,
+          api_url: '{% settings_val 'API_URL' %}/public',
         },
         watch: {
           folioIndex: "switchFolio",
