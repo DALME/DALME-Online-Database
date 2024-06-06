@@ -8,6 +8,7 @@ from .attributes import (
     AttributeTypes,
     AttributeTypeSerializer,
     ContentTypes,
+    PublicAttributes,
     PublicAttributeTypes,
 )
 from .collections import Collections, CollectionSerializer
@@ -69,6 +70,7 @@ __all__ = [
     'Places',
     'PublicRecords',
     'PublicAttributeTypes',
+    'PublicAttributes',
     'RSCollectionsSerializer',
     'RSImageSerializer',
     'RecordSerializer',

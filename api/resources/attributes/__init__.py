@@ -1,6 +1,6 @@
 """Interface for the api.resources.attributes module."""
 
-from .endpoints import Attributes, AttributeTypes, ContentTypes, PublicAttributeTypes
+from .endpoints import Attributes, AttributeTypes, ContentTypes, PublicAttributes, PublicAttributeTypes
 from .serializers import AttributeSerializer, AttributeTypeSerializer
 
 __all__ = [
@@ -10,4 +10,5 @@ __all__ = [
     'Attributes',
     'ContentTypes',
     'PublicAttributeTypes',
+    'PublicAttributes',
 ]

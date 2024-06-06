@@ -110,6 +110,7 @@ class Attributes(IDABaseViewSet):
     oauth_permission_classes = [TokenHasReadWriteScope]
     queryset = Attribute.objects.all().order_by('attribute_type')
     serializer_class = AttributeSerializer
+    is_public = False
 
     def get_object(self):
         """Return the object the view is displaying."""
@@ -131,3 +132,10 @@ class Attributes(IDABaseViewSet):
         if options is not None:
             return Response(options, 201)
         return Response({'error': 'No options could be retrieved.'}, 400)
+
+
+class PublicAttributes(Attributes):
+    """Public API endpoint for managing attributes and options."""
+
+    permission_classes = [PublicAccessPolicy]
+    is_public = True
