@@ -63,13 +63,13 @@ class RecordFilter(filters.FilterSet):
         ]
 
     def __init__(self, *args, **kwargs):
-        self.annotated = False
         super().__init__(*args, **kwargs)
+        self.queryset = Record.att_objects.all()
         for definition in self.filters.values():
             definition.field.label_suffix = ''
 
     def filter_type(self, queryset, name, value):  # noqa: ARG002
-        return queryset.include_attrs('record_type').filter(record_type__id__in=value)
+        return queryset.filter(record_type__id__in=value)
 
     def filter_date_range(self, queryset, name, value):  # noqa: ARG002
         queryset = queryset.filter(attributes__name__in=['date', 'start_date', 'end_date']).distinct()
@@ -101,4 +101,4 @@ class RecordFilter(filters.FilterSet):
         return queryset.exclude(folios__transcription__isnull=value)
 
     def filter_locale(self, queryset, name, value):  # noqa: ARG002
-        return queryset.include_attrs('locale').filter(locale__id=value)
+        return queryset.filter(locale__id=value)

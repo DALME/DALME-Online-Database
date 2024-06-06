@@ -69,22 +69,6 @@ class Records(IDABaseViewSet):
         except Exception as e:  # noqa: BLE001
             return Response(str(e), 400)
 
-    def get_queryset(self, *args, **kwargs):  # noqa: ARG002
-        """Return filtered queryset."""
-        # access_policy = self.permission_classes[0]
-        # queryset = access_policy.scope_queryset(self.request, self.queryset)
-        # return queryset if self.options_view else queryset.prefetch_related('attributes')
-        return (
-            self.queryset
-            if self.options_view
-            else Record.objects.prefetch_related(
-                'parent',
-                'attributes',
-                'pages',
-                'tags',
-            )
-        )
-
 
 class PublicRecords(Records):
     """API endpoint for managing records for frontend apps."""
@@ -100,6 +84,7 @@ class PublicRecords(Records):
         kwargs['field_set'] = ['public', 'images'] if self.request.GET.get('thumbs') else 'public'
         return serializer_class(*args, **kwargs)
 
-    def get_queryset(self, *args, **kwargs):  # noqa: ARG002
+    def get_queryset(self, *args, **kwargs):
         """Return filtered queryset."""
-        return Record.objects.include_attrs('description', 'record_type', 'date').filter(workflow__is_public=True)
+        qs = super().get_queryset(*args, **kwargs)
+        return qs.filter(workflow__is_public=True)
