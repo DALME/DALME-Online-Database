@@ -29,7 +29,7 @@ class Records(IDABaseViewSet):
     permission_classes = [RecordAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope]
 
-    queryset = Record.objects.all()
+    queryset = Record.att_objects.all()
     serializer_class = RecordSerializer
     filterset_class = RecordFilter
     search_fields = ['name', 'short_name']
@@ -73,6 +73,7 @@ class Records(IDABaseViewSet):
 class PublicRecords(Records):
     """API endpoint for managing records for frontend apps."""
 
+    queryset = Record.att_objects.filter(workflow__is_public=True)
     permission_classes = [PublicAccessPolicy]
     pagination_class = IDAPageNumberPagination
     renderer_classes = [CamelCaseJSONRenderer]
@@ -83,8 +84,3 @@ class PublicRecords(Records):
         kwargs.setdefault('context', self.get_serializer_context())
         kwargs['field_set'] = ['public', 'images'] if self.request.GET.get('thumbs') else 'public'
         return serializer_class(*args, **kwargs)
-
-    def get_queryset(self, *args, **kwargs):
-        """Return filtered queryset."""
-        qs = super().get_queryset(*args, **kwargs)
-        return qs.filter(workflow__is_public=True)

@@ -64,7 +64,6 @@ class RecordFilter(filters.FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.queryset = Record.att_objects.all()
         for definition in self.filters.values():
             definition.field.label_suffix = ''
 
