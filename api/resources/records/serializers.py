@@ -3,6 +3,7 @@
 from rest_framework import serializers
 
 from api.dynamic_serializer import DynamicSerializer
+from api.resources.agents import AgentSerializer
 from api.resources.attributes import AttributeSerializer
 from api.resources.languages import LanguageReferenceSerializer
 from api.resources.locales import LocaleReferenceSerializer
@@ -102,6 +103,7 @@ class RecordSerializer(DynamicSerializer):
     locale = LocaleReferenceSerializer()
     language = LanguageReferenceSerializer()
     # method fields
+    agents = AgentSerializer(many=True, required=False)
     credit_line = serializers.SerializerMethodField()
     credits = serializers.SerializerMethodField()
     source = serializers.SerializerMethodField()
@@ -138,6 +140,7 @@ class RecordSerializer(DynamicSerializer):
             'credit_line',
             'credits',
             'source',
+            'agents',
         ]
         default_exclude = [
             'has_images',
@@ -153,6 +156,7 @@ class RecordSerializer(DynamicSerializer):
             'credit_line',
             'credits',
             'source',
+            # 'agents',
         ]
         field_sets = {
             'attribute': [
@@ -190,6 +194,7 @@ class RecordSerializer(DynamicSerializer):
                 'credit_line',
                 'credits',
                 'source',
+                'agents',
             ],
             'images': ['image_urls'],
         }
