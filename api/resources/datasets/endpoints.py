@@ -28,36 +28,37 @@ class Datasets(viewsets.GenericViewSet):
 
     def explore_map(self):
         """Return data for 'Explore' map in public site."""
-        records = Record.objects.filter(workflow__is_public=True).prefetch_related(
-            'attributes',
-            'collections',
-            'collections__collection',
+        records = (
+            Record.objects.include_attrs('locale')
+            .filter(workflow__is_public=True)
+            .prefetch_related(
+                'attributes',
+                'collections',
+                'collections__collection',
+            )
         )
         place_data = {}
         for record in records:
-            years = list(
-                record.attributes.filter(attribute_type__in=[19, 26]).values_list(
-                    'attributevaluedate__year',
-                    flat=True,
-                ),
-            )
+            date = record.get_date()
+            years = date.year if date else []
+            years = years if isinstance(years, list) else [years]
             collections = [c.collection.name for c in record.collections.filter(collection__is_published=True)]
-            locales = record.attributes.filter(attribute_type=36)
-            if locales.exists():
+            if record.locale:
+                locales = record.locale if isinstance(record.locale, list) else [record.locale]
                 for loc in locales:
-                    if loc.value.name in place_data:
-                        place_data[loc.value.name]['count'] += 1
-                        place_data[loc.value.name]['coverage'] += years
-                        place_data[loc.value.name]['collections'] += collections
+                    if loc.name in place_data:
+                        place_data[loc.name]['count'] += 1
+                        place_data[loc.name]['coverage'] += years
+                        place_data[loc.name]['collections'] += collections
                     else:
-                        place_data[loc.value.name] = {
-                            'locale_id': loc.value.id,
+                        place_data[loc.name] = {
+                            'locale_id': loc.id,
                             'count': 1,
-                            'administrative_region': loc.value.administrative_region,
-                            'country': loc.value.country.name,
-                            'latitude': loc.value.latitude,
-                            'longitude': loc.value.longitude,
-                            'coverage': years,
+                            'administrative_region': loc.administrative_region,
+                            'country': loc.country.name,
+                            'latitude': loc.latitude,
+                            'longitude': loc.longitude,
+                            'coverage': years if years else [],
                             'collections': collections,
                         }
 
