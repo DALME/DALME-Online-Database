@@ -122,21 +122,26 @@ class Record(
         return False
 
     def get_related_resources(self, content_type):
-        """Return list of resources of type:content_type associated with the record, if any."""
-        res_list = []
-        for page in self.pagenodes.all().select_related('transcription'):
-            if page.transcription:
-                res_list.append(page.transcription.entity_phrases.filter(content_type=content_type))
-
-        return list(res_list[0].union(*res_list[1:])) if len(res_list) > 0 else None
+        """Return list of resources of type__in=[content_type] associated with the record, if any."""
+        if not isinstance(content_type, list):
+            content_type = [content_type]
+        results = [
+            i.transcription.entity_phrases.filter(content_type__in=content_type)
+            for i in self.pagenodes.filter(transcription__isnull=False)
+        ]
+        if len(results):
+            return [i.content_object for i in list(results[0].union(*results[1:]))]
+        return None
 
     def agents(self):
         """Return list of agents associated with the record, if any."""
-        return self.get_related_resources(104)
+        return self.get_related_resources(
+            [ContentType.objects.get(model='person'), ContentType.objects.get(model='organization')]
+        )
 
     def places(self):
         """Return list of places associated with the record, if any."""
-        return self.get_related_resources(115)
+        return self.get_related_resources([ContentType.objects.get(model='place')])
 
     @cached_property
     def has_images(self):
@@ -149,18 +154,18 @@ class Record(
         return self.pages.exclude(dam_id__isnull=True).count() if self.has_images else 0
 
     @cached_property
-    def has_transcriptions(self):
-        """Return boolean indicating whether the record has associated transcriptions."""
-        return self.pagenodes.all().select_related('transcription').exists()
-
-    @cached_property
     def no_transcriptions(self):
         """Return count of transcriptions associated with the record, if any."""
         return len(
             [t for t in self.pagenodes.all() if t.transcription is not None and t.transcription.count_transcription]
         )
 
-    @property
+    @cached_property
+    def has_transcriptions(self):
+        """Return boolean indicating whether the record has associated transcriptions."""
+        return self.no_transcriptions > 0
+
+    @cached_property
     def no_folios(self):
         """Return count of folios associated with the record, if any."""
         return self.pages.count() if self.pages.exists() else 0
@@ -194,11 +199,6 @@ class Record(
     def get_source(self):
         """Return source information for the record."""
         return format_source(self)
-
-    def get_named_persons(self):
-        """Return a list of persons named in the record."""
-        # TODO: fix named_persons attribute
-        return
 
 
 class RecordType(ScopedBase, TrackingMixin):
