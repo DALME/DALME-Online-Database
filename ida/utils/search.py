@@ -397,29 +397,24 @@ class SearchContext:
 
     def language(self):
         """Return languages as options."""
-        filter_options = {'attribute_type': 15}
+        filter_options = {'attribute_type__name': 'language'}
         if self.public:
-            filter_options.update({'record__workflow__is_public': True})
+            filter_options.update({'ida_record_related__workflow__is_public': True})
 
         return [
             {'value': i, 'text': i}
             for i in Attribute.objects.filter(**filter_options)
             .distinct()
-            .order_by('attributevaluefkey__language__name')
-            .values_list('attributevaluefkey__language__name', flat=True)
+            .order_by('value__name')
+            .values_list('value__name', flat=True)
         ]
 
     def record_type(self):
         """Return record types as options."""
-        filter_options = {'attribute_type': 28}
+        filter_options = {'attribute_type__name': 'record_type'}
 
         if self.public:
-            filter_options.update({'record__workflow__is_public': True})
+            filter_options.update({'ida_record_related__workflow__is_public': True})
 
-        return [
-            {'value': i, 'text': i}
-            for i in Attribute.objects.filter(**filter_options)
-            .order_by('attributevaluestr__value')
-            .values_list('attributevaluestr__value', flat=True)
-            .distinct()
-        ]
+        qs = Attribute.objects.filter(**filter_options).order_by('value__parent__name', 'value__name').distinct()
+        return [{'value': i.id, 'text': i.label} for i in qs]
