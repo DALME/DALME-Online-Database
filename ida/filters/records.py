@@ -2,6 +2,7 @@
 
 import django_filters as filters
 
+from ida.forms import RecordFilterForm
 from ida.models import AttributeType, Collection, Record
 
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
@@ -50,7 +51,7 @@ class RecordFilter(filters.FilterSet):
 
     class Meta:
         model = Record
-        # form = RecordFilterForm
+        form = RecordFilterForm
         fields = [
             'name',
             'record_type',
@@ -71,13 +72,13 @@ class RecordFilter(filters.FilterSet):
         return queryset.filter(record_type__id__in=value)
 
     def filter_date_range(self, queryset, name, value):  # noqa: ARG002
-        queryset = queryset.filter(attributes__name__in=['date', 'start_date', 'end_date']).distinct()
+        queryset = queryset.filter(attributes__attribute_type__name__in=['date', 'start_date', 'end_date']).distinct()
 
         after, before = value
         if after:
-            queryset = queryset.filter(attributes__value__year__gte=after)
+            queryset = queryset.filter(attributes__value__year__gte=int(after))
         if before:
-            queryset = queryset.filter(attributes__value__year__lte=before)
+            queryset = queryset.filter(attributes__value__year__lte=int(before))
 
         return queryset
 
