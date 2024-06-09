@@ -22,7 +22,7 @@ class JoinField(fields.DEDField, dsl_Join):
         kwargs['relations'] = {'PublicRecord': 'PublicFolio'} if public else {'FullRecord': 'FullFolio'}
         super().__init__(*args, **kwargs)
 
-    def get_value_from_instance(self, instance):
+    def get_value_from_instance(self, instance, field_value_to_ignore=None):  # noqa: ARG002
         """Return value depending on instance type."""
         if not instance:
             return None
@@ -130,9 +130,9 @@ class PublicRecord(PublicRecordBase):
 
     def prepare_collections(self, instance):
         """Prepare collection for indexing."""
-        cols = instance.collections.filter(is_published=True)
+        cols = instance.collections.filter(collection__is_published=True)
         if cols.exists():
-            return [{'name': i.collection_id.name} for i in cols]
+            return [{'name': i.collection.name} for i in cols]
         return [{'name': 'none'}]
 
     def prepare_credits(self, instance):
@@ -141,10 +141,12 @@ class PublicRecord(PublicRecordBase):
 
     def prepare_geo_location(self, instance):
         """Prepare document location info for indexing."""
-        locales = instance.attributes.filter(attribute_type=36)
+        locales = instance.attributes.filter(attribute_type__name='locale')
         if locales.exists():
             locale = locales.first()
-            return f'{locale.value.latitude},{locale.value.longitude}'
+            if locale.value.latitude and locale.value.longitude:
+                return f'{locale.value.latitude},{locale.value.longitude}'
+            return None
         return None
 
 
@@ -179,7 +181,7 @@ class PublicFolio(PublicRecordBase):
 
     def prepare_transcription(self, instance):
         """Prepare folio transcription for indexing."""
-        with suppress(ObjectDoesNotExist):
+        with suppress(ObjectDoesNotExist, AttributeError):
             return instance.transcription.text_blob
 
 
