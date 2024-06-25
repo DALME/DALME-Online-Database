@@ -19,7 +19,7 @@ more general category. If we squint, we can imagine fairly easily how
 authentication can be modelled within an authorization domain. That is to say,
 authentication is that subset of authorization that deals with the secure and
 correct identification of some given **identity** (an actor, which is just
-another resource) and so permitting further authorization patterns to be
+another resource) and in doing so permits further authorization patterns to be
 granted to that identity and the universe of resources it owns or controls,
 once it has been confirmed as that owning identity.
 
@@ -38,10 +38,10 @@ Another more significant difference is that authentication generally only needs
 to happen once (within a given timeframe) whereas we find authorization
 dispersed throughout all levels of our application architecture, invoked at
 various different moments. For example, at the db level where it might
-constrain filtering, at the API level where it might guard access to resources,
-within the groups and permissions controlling a CMS, and so on. This makes
-implementing good authorization patterns a much more complex and ongoing task
-over the long term.
+constrain the filtering of rows, at the API level where it might guard access
+to resources, within the groups and permissions controlling a CMS, and so on.
+This makes implementing good authorization patterns a much more complex and
+ongoing task when taken over the long term.
 
 ## Sessions & Tokens
 
