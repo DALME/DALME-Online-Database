@@ -4,12 +4,12 @@ from rest_framework import serializers
 
 
 class DynamicSerializer(serializers.ModelSerializer):
-    """A serializer that takes an additional `fields` argument that indicates which fields should be included."""
+    """A serializer that takes an additional `fields` or 'field_set' keyword argument to indicate which fields should be included."""
 
     def __init__(self, *args, **kwargs):
         if 'fields' in kwargs and 'field_set' in kwargs:
             msg = '`fields` and `field_set` cannot be used concurrently.'
-            raise AssertionError(msg)
+            raise ValueError(msg)
 
         fields = kwargs.pop('fields', None)
         field_set = kwargs.pop('field_set', None)
@@ -17,7 +17,10 @@ class DynamicSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
         if field_set is not None:
-            assert hasattr(self.Meta, 'field_sets'), 'Use of `field_set` requires `field_sets` dictionary in `Meta`.'
+            if not hasattr(self.Meta, 'field_sets'):
+                msg = 'Use of `field_set` requires `field_sets` dictionary in `Meta`.'
+                raise ValueError(msg)
+
             if isinstance(field_set, (list | tuple)):
                 fields = [f for i in field_set for f in self.Meta.field_sets.get(i)]
             else:
