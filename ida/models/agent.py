@@ -4,15 +4,12 @@ from django.conf import settings
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import (
-    AttestationMixin,
-    CommentMixin,
-    RelationshipMixin,
-    TaggingMixin,
-    TrackingMixin,
-    UuidMixin,
-)
-from ida.models.utils.attribute_mixin import AttributeMixin
+from ida.models.abstract import TrackingMixin, UuidMixin
+from ida.models.attribute import AttributeMixin
+from ida.models.comment import CommentMixin
+from ida.models.entity import AttestationMixin
+from ida.models.relationship import RelationshipMixin
+from ida.models.tag import TagMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
@@ -22,7 +19,7 @@ class Agent(
     TrackingMixin,
     AttributeMixin,
     CommentMixin,
-    TaggingMixin,
+    TagMixin,
     RelationshipMixin,
     AttestationMixin,
 ):

@@ -7,20 +7,24 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import (
-    CommentMixin,
-    OwnedMixin,
-    PermissionsMixin,
-    ScopedBase,
-    TrackingMixin,
-    UuidMixin,
-)
-from ida.models.utils.attribute_mixin import AttributeMixin
+from ida.models.abstract import OwnedMixin, TrackingMixin, UuidMixin
+from ida.models.attribute import AttributeMixin
+from ida.models.comment import CommentMixin
+from ida.models.permission import PermissionMixin
+from ida.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Collection(ScopedBase, UuidMixin, TrackingMixin, OwnedMixin, AttributeMixin, CommentMixin, PermissionsMixin):
+class Collection(
+    TenantMixin,
+    UuidMixin,
+    TrackingMixin,
+    OwnedMixin,
+    AttributeMixin,
+    CommentMixin,
+    PermissionMixin,
+):
     """Stores collection information."""
 
     name = models.CharField(max_length=255)
@@ -102,7 +106,7 @@ class CollectionMembershipManager(models.Manager):
         )
 
 
-class CollectionMembership(ScopedBase, TrackingMixin):
+class CollectionMembership(TenantMixin, TrackingMixin):
     """Links collections and members."""
 
     collection = models.ForeignKey('ida.Collection', on_delete=models.CASCADE, related_name='members')

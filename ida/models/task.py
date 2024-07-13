@@ -11,12 +11,15 @@ from django.db.models import options
 from django.urls import reverse
 from django.utils import timezone
 
-from ida.models.utils import CommentMixin, OwnedMixin, PermissionsMixin, ScopedBase, TrackingMixin
+from ida.models.abstract import OwnedMixin, TrackingMixin
+from ida.models.comment import CommentMixin
+from ida.models.permission import PermissionMixin
+from ida.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Task(ScopedBase, TrackingMixin, CommentMixin):
+class Task(TenantMixin, TrackingMixin, CommentMixin):
     """Stores information about tasks."""
 
     title = models.CharField(max_length=140)
@@ -64,7 +67,7 @@ class Task(ScopedBase, TrackingMixin, CommentMixin):
         super().save(*args, **kwargs)
 
 
-class TaskList(ScopedBase, TrackingMixin, OwnedMixin, PermissionsMixin):
+class TaskList(TenantMixin, TrackingMixin, OwnedMixin, PermissionMixin):
     """Stores information about task lists."""
 
     name = models.CharField(max_length=60)

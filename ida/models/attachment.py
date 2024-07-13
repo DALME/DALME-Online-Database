@@ -6,12 +6,13 @@ import pathlib
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import OwnedMixin, ScopedBase, TrackingMixin, UuidMixin
+from ida.models.abstract import OwnedMixin, TrackingMixin, UuidMixin
+from ida.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Attachment(ScopedBase, UuidMixin, TrackingMixin, OwnedMixin):
+class Attachment(TenantMixin, UuidMixin, TrackingMixin, OwnedMixin):
     """Stores attachment information."""
 
     filefield = models.FileField(upload_to='attachments/%Y/%m/', max_length=255)

@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import options
 
 from ida.context import get_current_username
-from ida.models.utils import TrackingMixin, UuidMixin
+from ida.models.abstract import TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

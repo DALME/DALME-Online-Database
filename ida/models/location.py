@@ -3,13 +3,15 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import CommentMixin, TaggingMixin, TrackingMixin, UuidMixin
-from ida.models.utils.attribute_mixin import AttributeMixin
+from ida.models.abstract import TrackingMixin, UuidMixin
+from ida.models.attribute import AttributeMixin
+from ida.models.comment import CommentMixin
+from ida.models.tag import TagMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Location(UuidMixin, TrackingMixin, AttributeMixin, CommentMixin, TaggingMixin):
+class Location(UuidMixin, TrackingMixin, AttributeMixin, CommentMixin, TagMixin):
     """Stores location information."""
 
     ADDRESS = 1
@@ -24,3 +26,5 @@ class Location(UuidMixin, TrackingMixin, AttributeMixin, CommentMixin, TaggingMi
     )
 
     location_type = models.IntegerField(choices=LOCATION_TYPES)
+
+    objects = models.Manager()

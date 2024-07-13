@@ -3,12 +3,13 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import OwnedMixin, ScopedBase, TrackingMixin, UuidMixin
+from ida.models.abstract import OwnedMixin, TrackingMixin, UuidMixin
+from ida.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class SavedSearch(ScopedBase, UuidMixin, TrackingMixin, OwnedMixin):
+class SavedSearch(TenantMixin, UuidMixin, TrackingMixin, OwnedMixin):
     """Stores saved searches."""
 
     name = models.CharField(max_length=255)

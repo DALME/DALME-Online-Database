@@ -3,22 +3,20 @@
 from .agent import Agent, Organization, Person
 from .application import Application
 from .attachment import Attachment
-from .attribute import Attribute
-from .attribute_reference import AttributeReference
-from .attribute_type import AttributeType
+from .attribute import Attribute, AttributeReference, AttributeType
 from .collection import Collection, CollectionMembership
 from .comment import Comment
 from .concept import Concept
 from .content import ContentAttributes, ContentTypeExtended
 from .country_reference import CountryReference
-from .entity_phrase import EntityPhrase
+from .entity import EntityPhrase
 from .group import GroupProperties
 from .headword import Headword
 from .language_reference import LanguageReference
 from .locale_reference import LocaleReference
 from .location import Location
 from .object import Object, ObjectAttribute
-from .options_list import OptionsList, OptionsValue
+from .option import OptionsList, OptionsValue
 from .page import Page
 from .permission import Permission
 from .place import Place

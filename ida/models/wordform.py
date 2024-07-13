@@ -3,12 +3,13 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import TaggingMixin, TrackingMixin, UuidMixin
+from ida.models.abstract import TrackingMixin, UuidMixin
+from ida.models.tag import TagMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Wordform(UuidMixin, TrackingMixin, TaggingMixin):
+class Wordform(UuidMixin, TrackingMixin, TagMixin):
     """Stores information about word forms."""
 
     normalized_form = models.CharField(max_length=55)

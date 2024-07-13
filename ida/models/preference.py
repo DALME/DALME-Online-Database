@@ -5,7 +5,7 @@ import json
 from django.conf import settings
 from django.db import models
 
-from ida.models.utils import BASE_DATA_TYPES, TrackingMixin, UuidMixin
+from ida.models.abstract import BASE_DATA_TYPES, TrackingMixin, UuidMixin
 
 
 class PreferenceKey(TrackingMixin, UuidMixin):

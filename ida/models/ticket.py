@@ -5,12 +5,14 @@ from django.db import models
 from django.db.models import options
 from django.urls import reverse
 
-from ida.models.utils import CommentMixin, TaggingMixin, TrackingMixin
+from ida.models.abstract import TrackingMixin
+from ida.models.comment import CommentMixin
+from ida.models.tag import TagMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Ticket(TrackingMixin, CommentMixin, TaggingMixin):
+class Ticket(TrackingMixin, CommentMixin, TagMixin):
     """Stores information about tickets."""
 
     OPEN = 0

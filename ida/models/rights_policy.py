@@ -3,7 +3,8 @@
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import CommentMixin, TrackingMixin, UuidMixin
+from ida.models.abstract import TrackingMixin, UuidMixin
+from ida.models.comment import CommentMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
