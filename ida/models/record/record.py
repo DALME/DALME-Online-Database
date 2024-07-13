@@ -9,21 +9,16 @@ from django.db import models
 from django.db.models import Q, options
 from django.utils.functional import cached_property
 
-from ida.models.utils import (
-    CommentMixin,
-    HistoricalDateRange,
-    OwnedMixin,
-    PermissionsMixin,
-    RelationshipMixin,
-    ScopedBase,
-    TaggingMixin,
-    TrackingMixin,
-    UuidMixin,
-    format_credit_line,
-    format_credits,
-    format_source,
-)
-from ida.models.utils.attribute_mixin import AttributeMixin
+from ida.models.abstract import OwnedMixin, TrackingMixin, UuidMixin
+from ida.models.attribute.attribute_mixin import AttributeMixin
+from ida.models.comment import CommentMixin
+from ida.models.permission import PermissionMixin
+from ida.models.relationship import RelationshipMixin
+from ida.models.tag import TagMixin
+from ida.models.tenant import TenantMixin
+from ida.utils.historical_date import HistoricalDateRange
+
+from .record_helpers import format_credit_line, format_credits, format_source
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
@@ -34,8 +29,8 @@ class RecordGroup(
     OwnedMixin,
     AttributeMixin,
     CommentMixin,
-    PermissionsMixin,
-    TaggingMixin,
+    PermissionMixin,
+    TagMixin,
 ):
     """Stores information about archival units."""
 
@@ -66,9 +61,9 @@ class Record(
     OwnedMixin,
     AttributeMixin,
     CommentMixin,
-    PermissionsMixin,
+    PermissionMixin,
     RelationshipMixin,
-    TaggingMixin,
+    TagMixin,
 ):
     """Stores information about records."""
 
@@ -81,10 +76,6 @@ class Record(
     collections = GenericRelation('ida.CollectionMembership', related_query_name='record')
 
     search_fields = [index.FilterField('name')]
-
-    class Meta:
-        base_manager_name = 'objects'
-        default_manager_name = 'objects'
 
     def __str__(self):
         return self.name
@@ -201,7 +192,7 @@ class Record(
         return format_source(self)
 
 
-class RecordType(ScopedBase, TrackingMixin):
+class RecordType(TenantMixin, TrackingMixin):
     """Defines record types (tenanted)."""
 
     name = models.CharField(max_length=255)

@@ -4,7 +4,10 @@ from django.apps import apps
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import OptionsSerializer, ScopedBase, TrackingMixin
+from ida.models.abstract import TrackingMixin
+from ida.models.tenant import TenantMixin
+
+from .options_serializer import OptionsSerializer
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
@@ -72,7 +75,7 @@ class OptionsList(TrackingMixin):
         return [(getattr(i, value_name), getattr(i, label_name)) for i in data]
 
 
-class OptionsValue(ScopedBase, TrackingMixin):
+class OptionsValue(TenantMixin, TrackingMixin):
     """Stores tenanted static lists of values."""
 
     op_list = models.ForeignKey(OptionsList, on_delete=models.CASCADE, related_name='values')

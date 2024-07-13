@@ -7,12 +7,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import ScopedBase, TrackingMixin
+from ida.models.abstract import TrackingMixin
+from ida.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Comment(ScopedBase, TrackingMixin):
+class Comment(TenantMixin, TrackingMixin):
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=55, db_index=True)

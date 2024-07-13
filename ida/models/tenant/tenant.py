@@ -5,7 +5,7 @@ from django_tenants.models import DomainMixin, TenantMixin
 from django.conf import settings
 from django.db import models
 
-from ida.models.utils import TrackingMixin
+from ida.models.abstract import TrackingMixin
 
 
 class Tenant(TrackingMixin, TenantMixin):

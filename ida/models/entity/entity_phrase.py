@@ -5,8 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import TrackingMixin, UuidMixin
-from ida.models.utils.attribute_mixin import AttributeMixin
+from ida.models.abstract import TrackingMixin, UuidMixin
+from ida.models.attribute import AttributeMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

@@ -5,12 +5,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.utils import ScopedBase, TrackingMixin, UuidMixin
+from ida.models.abstract import TrackingMixin, UuidMixin
+from ida.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Tag(ScopedBase, UuidMixin, TrackingMixin):
+class Tag(TenantMixin, UuidMixin, TrackingMixin):
     """Store tag information."""
 
     WORKFLOW = 'WF'  # type of tags used to keep track of general workflow
