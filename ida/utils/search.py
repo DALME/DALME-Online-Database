@@ -14,7 +14,6 @@ from django.utils.functional import cached_property
 
 from ida.documents import FullRecord, PublicRecord
 from ida.forms import SearchForm
-from ida.models import Attribute, Collection
 
 
 class Search:
@@ -385,6 +384,8 @@ class SearchContext:
 
     def collections(self):
         """Return collections as options."""
+        from ida.models import Collection
+
         filter_options = {}
 
         if self.public:
@@ -397,6 +398,8 @@ class SearchContext:
 
     def language(self):
         """Return languages as options."""
+        from ida.models import Attribute
+
         filter_options = {'attribute_type__name': 'language'}
         if self.public:
             filter_options.update({'ida_record_related__workflow__is_public': True})
@@ -411,6 +414,8 @@ class SearchContext:
 
     def record_type(self):
         """Return record types as options."""
+        from ida.models import Attribute
+
         filter_options = {'attribute_type__name': 'record_type'}
 
         if self.public:

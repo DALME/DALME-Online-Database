@@ -9,7 +9,7 @@ from django.apps import apps
 from django.db import connection, transaction
 
 from ida.models import Attribute, AttributeType, ContentAttributes, RecordType
-from ida.models.utils import HistoricalDate
+from ida.utils.historical_date import HistoricalDate
 
 from .base import BaseStage
 

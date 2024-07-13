@@ -7,8 +7,8 @@ from django.contrib.auth import get_user_model
 
 from api.dynamic_serializer import DynamicSerializer
 from api.resources.groups import GroupSerializer
+from ida.models.abstract import BASE_DATA_TYPES
 from ida.models.preference import Preference
-from ida.models.utils import BASE_DATA_TYPES
 
 
 class PreferenceSerializer(serializers.ModelSerializer):
