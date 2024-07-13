@@ -24,6 +24,35 @@ def locale_choices():
     return AttributeType.objects.get(name='locale').options.get_values(serialize=False)
 
 
+class RecordOrderingFilter(filters.OrderingFilter):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.extra['choices'] += [
+            ('name', 'Name'),
+            ('-name', 'Name (descending)'),
+            ('record_type', 'Type'),
+            ('-record_type', 'Type (descending)'),
+            ('date', 'Date'),
+            ('-date', 'Date (descending)'),
+            ('short_name', 'Short name'),
+            ('-short_name', 'Short name (descending)'),
+        ]
+
+    @staticmethod
+    def get_value(field, value):
+        if not value:
+            return None
+        return next((v for v in value if v and v.endswith(field)), None)
+
+    def filter(self, qs, value):
+        if value:
+            for field in value:
+                field = f'{field}__year' if field.endswith('date') else field  # noqa: PLW2901
+                field = f'{field}__name' if field.endswith('record_type') else field  # noqa: PLW2901
+                return qs.order_by(field)
+        return qs.order_by('name')
+
+
 class RecordFilter(filters.FilterSet):
     wf_status = filters.NumberFilter(field_name='workflow__wf_status', lookup_expr='iexact')
     wf_stage = filters.NumberFilter(field_name='workflow__stage', lookup_expr='iexact')
@@ -47,7 +76,7 @@ class RecordFilter(filters.FilterSet):
     )
     locale = filters.ChoiceFilter(label='Locale', choices=locale_choices, method='filter_locale')
 
-    # order_by = RecordOrderingFilter()
+    order_by = RecordOrderingFilter()
 
     class Meta:
         model = Record
@@ -61,6 +90,7 @@ class RecordFilter(filters.FilterSet):
             'has_transcription',
             'has_image',
             'locale',
+            'order_by',
         ]
 
     def __init__(self, *args, **kwargs):
