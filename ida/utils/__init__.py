@@ -2,6 +2,7 @@
 
 from .database_router import ModelDatabaseRouter
 from .domain_middleware import SubdomainRedirectMiddleware
+from .historical_date import HistoricalDate, HistoricalDateRange
 from .paginated_formsets import formset_factory
 from .search import Search, SearchContext
 
@@ -12,4 +13,6 @@ __all__ = [
     'SubdomainRedirectMiddleware',
     'TENANT',
     'formset_factory',
+    'HistoricalDate',
+    'HistoricalDateRange',
 ]

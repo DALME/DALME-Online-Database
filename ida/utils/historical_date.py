@@ -355,7 +355,7 @@ class HistoricalDate(dict):
                 date = datetime.date(date_obj.year, date_obj.month, date_obj.day)
             except parser.ParserError as e:
                 date = None
-                if not all(self.day, self.month, self.year):
+                if not all([self.day, self.month, self.year]):
                     message = 'The "date" value could not be parsed into a valid date.'
                     raise ValueError(message) from e
 
