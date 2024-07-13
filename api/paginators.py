@@ -42,20 +42,6 @@ class IDALimitOffsetPagination(LimitOffsetPagination):
 
     def get_paginated_response(self, data_object):
         """Return paginated response object."""
-        # try:
-        #     data, queryset, instance = data_object
-        # except ValueError:
-        #     data, queryset, instance = data_object, None, None
-
-        # if not isinstance(data, list):
-        #     data = [data]
-
-        # response_obj = [
-        #     ('count', self.count),
-        #     ('filtered', self.filtered_count),
-        #     ('data', data),
-        # ]
-
         response_obj = [
             ('count', self.count),
             ('filtered', self.filtered_count),
@@ -65,9 +51,6 @@ class IDALimitOffsetPagination(LimitOffsetPagination):
         if self.context:
             for key, value in self.context.items():
                 response_obj.append((key, value))
-
-        # if self.request.GET.get('meta') is not None and instance is not None:
-        #     response_obj.append(('meta', instance.get_metadata(queryset)))
 
         return Response(OrderedDict(response_obj))
 
