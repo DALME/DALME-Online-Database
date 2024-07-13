@@ -15,6 +15,7 @@ import os
 from django.db import models
 
 from ida.context import get_current_tenant
+from ida.models.abstract.custom_manager import CustomManager, CustomQuerySet
 
 
 class TenantMixin(models.Model):
@@ -26,6 +27,9 @@ class TenantMixin(models.Model):
         null=False,
     )
 
+    objects = CustomManager.from_queryset(CustomQuerySet)()
+    unscoped = models.Manager()  # noqa: DJ012
+
     class Meta:
         abstract = True
 
@@ -34,3 +38,7 @@ class TenantMixin(models.Model):
         if not hasattr(self, 'tenant') and not os.environ.get('DATA_MIGRATION'):
             self.tenant = get_current_tenant()
         super().save(*args, **kwargs)
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.is_tenanted = True
