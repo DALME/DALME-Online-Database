@@ -25,6 +25,7 @@ geopy==2.4.1
 gunicorn==22.0.0
 lxml==5.2.1
 mysqlclient==2.1.1
+numpy==1.26.4
 opencv-python-headless==4.9.0.80
 pandas==2.2.2
 passlib==1.7.4
