@@ -3,13 +3,13 @@
 from maintenance_mode import urls as maintenance_mode_urls
 from oauth2_provider import urls
 from oauth2_provider import views as oauth2_views
-from wagtail import views
 
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, re_path
+from django.views.generic import TemplateView
 
 from api import urls as api_urls
 from ida import auth
@@ -26,12 +26,12 @@ auth_urls = [
 ]
 
 urlpatterns = [
+    re_path(r'', TemplateView.as_view(template_name='home.html')),
     re_path(r'^admin/', admin.site.urls),
     re_path(r'^maintenance-mode/', include(maintenance_mode_urls)),
     re_path(r'^api/oauth/', include((auth_urls, 'ida'), namespace='oauth2_provider')),
     re_path(r'^api/', include(api_urls)),
     re_path(r'^purl/', include(purl_urls)),
-    re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve'),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 

@@ -9,6 +9,8 @@ from django.core.management import call_command
 
 from ida.management.commands.ensure_oauth import Command as EnsureOAuth
 
+EXPECTED_TENANTS = ['ida', 'dalme', 'pharmacopeias']
+
 
 @mock.patch('ida.management.commands.ensure_oauth.io.StringIO')
 @mock.patch('ida.management.commands.ensure_oauth.call_command')
@@ -34,8 +36,10 @@ def test_ensure_oauth_create_appliaction_some_failure(mock_logger, mock_applicat
             client_secret='django-insecure-development-environment-oauth-client-secret',
             algorithm='RS256',
             name='IDA',
-            redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://pharmacopeias.localhost:8000/api/oauth/authorize/callback/',
-            post_logout_redirect_uris='http://dalme.localhost:8000/ http://pharmacopeias.localhost:8000/',
+            redirect_uris=' '.join(
+                f'http://{tenant}.localhost:8000/api/oauth/authorize/callback/' for tenant in EXPECTED_TENANTS
+            ),
+            post_logout_redirect_uris=' '.join(f'http://{tenant}.localhost:8000/' for tenant in EXPECTED_TENANTS),
             skip_authorization=True,
         )
     ]
@@ -71,12 +75,16 @@ def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, m
             client_secret='django-insecure-development-environment-oauth-client-secret',
             algorithm='RS256',
             name='IDA',
-            redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://pharmacopeias.localhost:8000/api/oauth/authorize/callback/',
-            post_logout_redirect_uris='http://dalme.localhost:8000/ http://pharmacopeias.localhost:8000/',
+            redirect_uris=' '.join(
+                f'http://{tenant}.localhost:8000/api/oauth/authorize/callback/' for tenant in EXPECTED_TENANTS
+            ),
+            post_logout_redirect_uris=' '.join(f'http://{tenant}.localhost:8000/' for tenant in EXPECTED_TENANTS),
             skip_authorization=True,
         )
     ]
-    assert mock_oauth_application.allowed_origins == 'http://dalme.localhost:8000 http://pharmacopeias.localhost:8000'
+    assert mock_oauth_application.allowed_origins == ' '.join(
+        f'http://{tenant}.localhost:8000' for tenant in EXPECTED_TENANTS
+    )
     assert mock_oauth_application.mock_calls == [
         mock.call.save(),
     ]

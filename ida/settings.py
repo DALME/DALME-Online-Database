@@ -15,7 +15,7 @@ import structlog
 from configurations import Configuration, pristinemethod
 
 
-class TenantTypes(enum.Enum):
+class TenantTypes(str, enum.Enum):
     """Enumerate the possible tenant types."""
 
     PUBLIC = 'public'
@@ -198,7 +198,7 @@ class Base(Configuration):
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
                 'DIRS': [
                     (self.BASE_DIR / 'templates').as_posix(),
-                    (self.BASE_DIR / 'public/templates/public').as_posix(),
+                    (self.BASE_DIR / 'public' / 'templates').as_posix(),
                 ],
                 'OPTIONS': {
                     'context_processors': [
@@ -223,7 +223,8 @@ class Base(Configuration):
     @property
     def MULTITENANT_TEMPLATE_DIRS(self):
         return [
-            (self.BASE_DIR / 'public/templates/%s').as_posix(),
+            f'{self.BASE_DIR}/tenants/%s/templates',
+            (self.BASE_DIR / 'public' / 'templates' / 'tenants' / '%s').as_posix(),
         ]
 
     DATABASE_ROUTERS = [

@@ -33,6 +33,7 @@ def test_middleware(mock_conn, mock_domain, rf):
     request = rf.get('/', headers={'HOST': 'dalme.localhost'})
     mock_domain_obj = mock.MagicMock(spec=Domain)
     mock_tenant = mock.MagicMock(spec=Tenant)
+    mock_tenant.get_tenant_type.return_value = 'public'
     mock_domain_obj.tenant = mock_tenant
     mock_domain.objects.select_related.return_value.get.return_value = mock_domain_obj
 
