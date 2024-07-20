@@ -15,6 +15,13 @@ import structlog
 from configurations import Configuration, pristinemethod
 
 
+class TenantTypes(enum.Enum):
+    """Enumerate the possible tenant types."""
+
+    PUBLIC = 'public'
+    PROJECT = 'project'
+
+
 @dataclasses.dataclass
 class TENANT:
     """Structure for defining application tenants."""
@@ -22,6 +29,8 @@ class TENANT:
     domain: str
     name: str
     schema_name: str
+    is_primary: bool
+    tenant_type: TenantTypes
 
     def __iter__(self):
         """Allow destructuring assignment."""
@@ -31,19 +40,17 @@ class TENANT:
 class Base(Configuration):
     """Common, inherited settings."""
 
-    @classmethod
-    def setup(cls):
-        """Override settings setup hook."""
-        super().setup()
-        cls.INSTALLED_APPS = [
-            *cls.SHARED_APPS,
-            *[app for app in cls.TENANT_APPS if app not in cls.SHARED_APPS],
-        ]
-
     IS_DEV = os.environ['ENV'] in {'development', 'ci'}
 
     BASE_DIR = Path(__file__).resolve().parent.parent
     PROJECT_ROOT = BASE_DIR / 'ida'
+
+    DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+    AUTH_USER_MODEL = 'ida.User'
+    TENANT_MODEL = 'ida.Tenant'
+    TENANT_DOMAIN_MODEL = 'ida.Domain'
+    HAS_MULTI_TYPE_TENANTS = True
+    MULTI_TYPE_DATABASE_FIELD = 'tenant_type'
 
     LANGUAGES = [('en', 'English'), ('fr', 'French')]
     LANGUAGE_CODE = 'en'
@@ -51,7 +58,6 @@ class Base(Configuration):
     LOGIN_URL = '/db/'
     LOGOUT_REDIRECT_URL = '/'
     LOGOUT_URL = '/db/?logout=true'
-    ROOT_URLCONF = 'ida.urls'
     TIME_ZONE = 'America/New_York'
     USE_I18N = True
     USE_L10N = True
@@ -80,60 +86,90 @@ class Base(Configuration):
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
-    SHARED_APPS = [
-        'django_tenants',
-        'ida',  # App containing the Tenant model.
-        'django.contrib.contenttypes',
-        # NOTE: The above must be present for django-tenants to function.
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
+    SHARED_TENANT_APPS = [
         'django.contrib.sites',
-        'django_elasticsearch_dsl',
-        'rest_framework',
-        'django_filters',
-        'maintenance_mode',
-        'django_recaptcha',
         'corsheaders',
+        'django_elasticsearch_dsl',
+        'django_filters',
+        'django_recaptcha',
+        'maintenance_mode',
         'oauth2_provider',
+        'rest_framework',
+        # IDA apps.
         'api',
         'purl',
-        'wagtail.users',
     ]
-    TENANT_APPS = [
-        'django_filters',
+    PROJECT_TENANT_APPS = [
+        'modelcluster',
+        'public',
+        'public.extensions.banners',
+        'public.extensions.bibliography',
+        'public.extensions.extras',
+        'public.extensions.footnotes',
+        'public.extensions.gradients',
+        'public.extensions.images',
+        'public.extensions.records',
+        'public.extensions.team',
+        'taggit',
+        'wagtail',
+        'wagtail.admin',
+        'wagtail.api.v2',
         'wagtail.contrib.forms',
         'wagtail.contrib.redirects',
         'wagtail.contrib.routable_page',
+        'wagtail.contrib.settings',
         'wagtail.contrib.styleguide',
         'wagtail.contrib.table_block',
-        'wagtail.contrib.settings',
-        'wagtail.embeds',
-        'wagtail.sites',
-        'wagtail.snippets',
+        'wagtail.contrib.typed_table_block',
         'wagtail.documents',
+        'wagtail.embeds',
         'wagtail.images',
         'wagtail.search',
-        'wagtail.admin',
-        'wagtail.api.v2',
-        'wagtail',
-        'modelcluster',
-        'taggit',
-        'wagtailfontawesomesvg',
+        'wagtail.sites',
+        'wagtail.snippets',
+        'wagtail.users',
         'wagtailcodeblock',
-        'wagtail.contrib.typed_table_block',
-        'public.extensions.images',
-        'public.extensions.bibliography',
-        'public.extensions.footnotes',
-        'public.extensions.gradients',
-        'public.extensions.banners',
-        'public.extensions.records',
-        'public.extensions.extras',
-        'public.extensions.team',
-        'public',
+        'wagtailfontawesomesvg',
     ]
+
+    # https://django-tenants.readthedocs.io/en/latest/use.html#multi-types-tenants
+    TENANT_TYPES = {
+        'public': {
+            'APPS': [
+                'ida',
+                'django.contrib.contenttypes',
+                'django.contrib.auth',
+                'django.contrib.admin',
+                'django.contrib.sessions',
+                'django.contrib.messages',
+                'django.contrib.staticfiles',
+                *SHARED_TENANT_APPS,
+            ],
+            'URLCONF': 'ida.urls',
+        },
+        'project': {
+            'APPS': [
+                'django.contrib.contenttypes',
+                'django.contrib.auth',
+                'django.contrib.admin',
+                'django.contrib.sessions',
+                'django.contrib.messages',
+                *PROJECT_TENANT_APPS,
+            ],
+            'URLCONF': 'ida.urls_tenant',
+        },
+    }
+    ROOT_URLCONF = ''  # Don't change this! Multi-type tenants relies on it.
+
+    def INSTALLED_APPS(self):
+        installed_apps = ['django_tenants']
+        for schema in self.TENANT_TYPES:
+            installed_apps += [app for app in self.TENANT_TYPES[schema]['APPS'] if app not in installed_apps]
+
+        extra_apps = ['django_extensions'] if self.IS_DEV else ['storages']
+        installed_apps += [app for app in extra_apps if app not in installed_apps]
+
+        return installed_apps
 
     MIDDLEWARE = [
         'ida.middleware.HealthCheckMiddleware',
@@ -156,7 +192,7 @@ class Base(Configuration):
     ]
 
     @property
-    def TEMPLATES(self):  # noqa: N802
+    def TEMPLATES(self):
         return [
             {
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -185,7 +221,7 @@ class Base(Configuration):
         ]
 
     @property
-    def MULTITENANT_TEMPLATE_DIRS(self):  # noqa: N802
+    def MULTITENANT_TEMPLATE_DIRS(self):
         return [
             (self.BASE_DIR / 'public/templates/%s').as_posix(),
         ]
@@ -194,10 +230,6 @@ class Base(Configuration):
         'ida.utils.ModelDatabaseRouter',
         'django_tenants.routers.TenantSyncRouter',
     ]
-    DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-    AUTH_USER_MODEL = 'ida.User'
-    TENANT_DOMAIN_MODEL = 'ida.Domain'
-    TENANT_MODEL = 'ida.Tenant'
 
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOGGING = {
@@ -283,11 +315,11 @@ class Base(Configuration):
     OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get('OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', 3600 * 24 * 14)  # 14 days
 
     @property
-    def OAUTH_CLIENT_ID(self):  # noqa: N802
+    def OAUTH_CLIENT_ID(self):
         return os.environ['OAUTH_CLIENT_ID']
 
     @property
-    def OAUTH_CLIENT_SECRET(self):  # noqa: N802
+    def OAUTH_CLIENT_SECRET(self):
         return os.environ['OAUTH_CLIENT_SECRET']
 
     REST_FRAMEWORK = {
@@ -326,21 +358,19 @@ class Base(Configuration):
     WAGTAILIMAGES_IMAGE_MODEL = 'publicimages.BaseImage'
     WAGTAILIMAGES_FEATURE_DETECTION_ENABLED = True
 
-    # reference urls
-    BASE_URL = 'http://dalme.localhost:8000'
-    # should be: (after we figure out ida domain)
-    # BASE_URL = 'http://ida.localhost:8000' if IS_DEV else 'https://documentaryarchaeology.net'
+    @property
+    def API_URL(self):
+        return f'{self.BASE_URL}/api'
 
-    API_URL = f'{BASE_URL}/api'
     DAM_URL = 'https://dam.dalme.org'
     URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
     URL_PORT = ':8000' if IS_DEV else ''
 
-    # list of settings values to make available in templates
+    # List of settings values to make available in templates.
     INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'API_URL', 'DAM_URL', 'PUBLIC_URL', 'WAGTAILADMIN_BASE_URL']
 
     @pristinemethod
-    def TENANTS(self):  # noqa: N802
+    def TENANTS(self):
         """Enumerate registered app tenants.
 
         This is just reference data that is used to setup and migrate the
@@ -386,28 +416,36 @@ class Base(Configuration):
 class Development(Base, Configuration):
     """Development settings."""
 
-    @classmethod
-    def setup(cls):
-        super().setup()
-        cls.INSTALLED_APPS += ['django_extensions']
-
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
+    BASE_URL = 'http://ida.localhost:8000'
 
     _TENANTS = {
+        'IDA': {
+            'domain': 'ida.localhost',
+            'name': 'IDA',
+            'schema_name': 'public',
+            'is_primary': True,
+            'tenant_type': TenantTypes.PUBLIC,
+        },
         'DALME': {
             'domain': 'dalme.localhost',
             'name': 'DALME',
             'schema_name': 'dalme',
+            'is_primary': False,
+            'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.localhost',
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
+            'is_primary': False,
+            'tenant_type': TenantTypes.PROJECT,
         },
     }
 
     ALLOWED_HOSTS = [
+        'ida.localhost',
         'dalme.localhost',
         'pharmacopeias.localhost',
     ]
@@ -435,11 +473,11 @@ class Development(Base, Configuration):
     SECRET_KEY = 'django-development-environment-insecure-secret-key'
 
     @property
-    def MEDIA_ROOT(self):  # noqa: N802
+    def MEDIA_ROOT(self):
         return (self.BASE_DIR / 'www' / 'media').as_posix()
 
     @property
-    def STATIC_ROOT(self):  # noqa: N802
+    def STATIC_ROOT(self):
         return (self.BASE_DIR / 'www' / 'static').as_posix()
 
     DATABASES = {
@@ -468,7 +506,7 @@ class Development(Base, Configuration):
     DAM_API_KEY = os.environ.get('DAM_API_KEY')
 
     @property
-    def OAUTH2_PROVIDER(self):  # noqa: N802
+    def OAUTH2_PROVIDER(self):
         """Configure OAuth and OIDC."""
         with open(os.environ['OIDC_RSA_PRIVATE_KEY']) as f:
             return {
@@ -533,10 +571,6 @@ class Development(Base, Configuration):
 class CI(Development, Configuration):
     """Continuous integration pipeline settings."""
 
-    @classmethod
-    def setup(cls):
-        super().setup()
-
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
 
@@ -547,7 +581,6 @@ class Production(Base, Configuration):
     @classmethod
     def setup(cls):
         super().setup()
-        cls.INSTALLED_APPS += ['storages']
         cls.LOGGING['root']['handlers'] = ['flat_line']
 
     DEBUG = False
@@ -560,27 +593,31 @@ class Production(Base, Configuration):
     # thrown at deploy time if I've forgotten to set a value in the environment
     # instead having to trace some runtime error much further down the line.
     @property
-    def ALLOWED_HOSTS(self):  # noqa: N802
+    def BASE_URL(self):
+        return os.environ['DOMAIN']
+
+    @property
+    def ALLOWED_HOSTS(self):
         return json.loads(os.environ['ALLOWED_HOSTS'])
 
     @property
-    def AWS_S3_CUSTOM_DOMAIN(self):  # noqa: N802
+    def AWS_S3_CUSTOM_DOMAIN(self):
         return f'{self.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
     @property
-    def AWS_STORAGE_BUCKET_NAME(self):  # noqa: N802
+    def AWS_STORAGE_BUCKET_NAME(self):
         return os.environ['AWS_STORAGE_BUCKET_NAME']
 
     @property
-    def CORS_ALLOWED_ORIGINS(self):  # noqa: N802
+    def CORS_ALLOWED_ORIGINS(self):
         return [f'https://{domain}' for domain in self.TENANT_DOMAINS]
 
     @property
-    def CSRF_TRUSTED_ORIGINS(self):  # noqa: N802
+    def CSRF_TRUSTED_ORIGINS(self):
         return [f'https://{domain}' for domain in self.TENANT_DOMAINS]
 
     @property
-    def DATABASES(self):  # noqa: N802
+    def DATABASES(self):
         return {
             'default': {
                 'ENGINE': 'django_tenants.postgresql_backend',
@@ -601,7 +638,7 @@ class Production(Base, Configuration):
         }
 
     @property
-    def ELASTICSEARCH_DSL(self):  # noqa: N802
+    def ELASTICSEARCH_DSL(self):
         return {
             'default': {
                 'host': os.environ['ELASTICSEARCH_ENDPOINT'],
@@ -618,7 +655,7 @@ class Production(Base, Configuration):
         }
 
     @property
-    def OAUTH2_PROVIDER(self):  # noqa: N802
+    def OAUTH2_PROVIDER(self):
         """Configure OAuth and OIDC."""
         return {
             'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
@@ -637,27 +674,27 @@ class Production(Base, Configuration):
         }
 
     @property
-    def RECAPTCHA_PUBLIC_KEY(self):  # noqa: N802
+    def RECAPTCHA_PUBLIC_KEY(self):
         return os.environ.get('RECAPTCHA_PUBLIC_KEY', '')
 
     @property
-    def RECAPTCHA_PRIVATE_KEY(self):  # noqa: N802
+    def RECAPTCHA_PRIVATE_KEY(self):
         return os.environ.get('RECAPTCHA_PRIVATE_KEY', '')
 
     @property
-    def SECRET_KEY(self):  # noqa: N802
+    def SECRET_KEY(self):
         return os.environ['DJANGO_SECRET_KEY']
 
     @property
-    def MEDIA_URL(self):  # noqa: N802
+    def MEDIA_URL(self):
         return f'https://{self.AWS_S3_CUSTOM_DOMAIN}/{self.MEDIA_LOCATION}/'
 
     @property
-    def STATIC_URL(self):  # noqa: N802
+    def STATIC_URL(self):
         return f'https://{self.AWS_S3_CUSTOM_DOMAIN}/{self.STATIC_LOCATION}/'
 
     @property
-    def TENANT_DOMAINS(self):  # noqa: N802
+    def TENANT_DOMAINS(self):
         return json.loads(os.environ['TENANT_DOMAINS'])
 
     CSRF_COOKIE_SECURE = True
@@ -704,19 +741,26 @@ class Production(Base, Configuration):
 class Staging(Production, Configuration):
     """Staging settings."""
 
-    @classmethod
-    def setup(cls):
-        super().setup()
-
     _TENANTS = {
+        'IDA': {
+            'domain': 'ida.ocp.systems',
+            'name': 'IDA',
+            'schema_name': None,
+            'is_primary': True,
+            'tenant_type': 'public',
+        },
         'DALME': {
             'domain': 'dalme.ocp.systems',
             'name': 'DALME',
             'schema_name': 'dalme',
+            'is_primary': False,
+            'tenant_type': 'project',
         },
         'PHARMACOPEIAS': {
             'domain': 'globalpharmacopeias.ocp.systems',
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
+            'is_primary': False,
+            'tenant_type': 'project',
         },
     }

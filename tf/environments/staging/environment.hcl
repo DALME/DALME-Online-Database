@@ -35,6 +35,7 @@ locals {
   # Tenant domain data
   domain = "ida.ocp.systems"
   tenant_domains = [
+    "ida.ocp.systems",
     "dalme.ocp.systems",
     "globalpharmacopeias.ocp.systems",
   ]

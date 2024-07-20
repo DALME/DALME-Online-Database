@@ -1,5 +1,6 @@
-"""URLS for the IDA public site."""
+"""URLS for the IDA's tenanted projects."""
 
+# import urllib
 from maintenance_mode import urls as maintenance_mode_urls
 from oauth2_provider import urls
 from oauth2_provider import views as oauth2_views
@@ -13,6 +14,7 @@ from django.urls import include, re_path
 
 from api import urls as api_urls
 from ida import auth
+from public.urls import urlpatterns as public_urls
 from purl import urls as purl_urls
 
 auth_urls = [
@@ -29,6 +31,7 @@ urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
     re_path(r'^maintenance-mode/', include(maintenance_mode_urls)),
     re_path(r'^api/oauth/', include((auth_urls, 'ida'), namespace='oauth2_provider')),
+    *public_urls,
     re_path(r'^api/', include(api_urls)),
     re_path(r'^purl/', include(purl_urls)),
     re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve'),

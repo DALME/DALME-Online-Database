@@ -20,16 +20,17 @@ class Command(BaseCommand):
         """Create application tenant records."""
         tenants = settings.TENANTS()
         for tenant in tenants:
-            domain, name, schema_name = tenant.value
+            domain, name, schema_name, is_primary, tenant_type = tenant.value
             if not Tenant.objects.filter(name=name).exists():
                 tenant_obj = Tenant.objects.create(
                     name=name,
                     schema_name=schema_name,
+                    tenant_type=tenant_type.value,
                 )
                 domain_obj = Domain.objects.create(
                     domain=domain,
                     tenant=tenant_obj,
-                    is_primary=False,
+                    is_primary=is_primary,
                 )
                 logger.info(
                     'Tenant created',

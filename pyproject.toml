@@ -100,6 +100,7 @@ select = [
 unfixable = ["F841"]
 
 [tool.ruff.lint.per-file-ignores]
+"settings.py" = ["N802"]
 "*migrations*" = ["ARG001", "D100"]
 "tests/*" = ["B018", "INP001"]
 
