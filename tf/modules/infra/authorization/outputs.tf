@@ -1,1 +1,1 @@
-// Outputs for the authorization module.
+# Outputs for the authorization module.

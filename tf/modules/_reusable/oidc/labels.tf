@@ -6,7 +6,9 @@ module "oidc" {
 
   namespace   = var.namespace
   environment = var.environment
-  name        = "oidc"
+  name        = "oidc-provider"
+
+  labels_as_tags = ["name"]
 }
 
 module "oidc_role" {

@@ -411,7 +411,7 @@ data "aws_iam_policy_document" "gha_oidc_policy_two" {
       "secretsmanager:TagResource",
     ]
     resources = [
-      "arn:aws:secretsmanager:${var.aws_region}:${var.aws_account}:secret:${var.project}-*-secret-*-${var.environment}-*",
+      "arn:aws:secretsmanager:${var.aws_region}:${var.aws_account}:secret:${var.namespace}-*-secret-*-${var.environment}-*",
     ]
   }
 
@@ -506,7 +506,7 @@ resource "aws_iam_policy" "gha_oidc_policy_one" {
   name   = module.oidc_policy_one.id
   policy = data.aws_iam_policy_document.gha_oidc_policy_one.json
 
-  tags = module.oidc_policy.tags
+  tags = module.oidc_policy_one.tags
 }
 
 resource "aws_iam_policy" "gha_oidc_policy_two" {
