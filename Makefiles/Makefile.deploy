@@ -2,7 +2,7 @@
 # vi: set ft=make :
 IAMLIVE := true
 JUMP_HOST := $(PROJECT)-asg-jump-host-$(ENVIRONMENT)
-REGION := eu-west-2
+REGION := us-east-1
 TF_LOG := WARN
 TF_PROVIDER := "~> 5.0"
 TF_MODULES := modules
