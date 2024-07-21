@@ -19,6 +19,7 @@
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_oidc"></a> [oidc](#module\_oidc) | ../..//_reusable/oidc/ | n/a |
+| <a name="module_oidc_policy"></a> [oidc\_policy](#module\_oidc\_policy) | cloudposse/label/null | 0.25.0 |
 | <a name="module_oidc_policy_one"></a> [oidc\_policy\_one](#module\_oidc\_policy\_one) | cloudposse/label/null | 0.25.0 |
 | <a name="module_oidc_policy_two"></a> [oidc\_policy\_two](#module\_oidc\_policy\_two) | cloudposse/label/null | 0.25.0 |
 
