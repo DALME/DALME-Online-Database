@@ -4,6 +4,8 @@ from rest_framework import routers
 
 from django.urls import include, path
 
+from ida.auth import urls as auth_urls
+
 from . import resources
 from .csrf import csrf
 
@@ -42,8 +44,10 @@ router.register(r'public/records', resources.PublicRecords, basename='public_rec
 router.register(r'public/attribute_types', resources.PublicAttributeTypes, basename='public_attribute_types')
 router.register(r'public/attributes', resources.PublicAttributes, basename='public_attributes')
 
+
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='api_endpoint')),
     path('csrf/', csrf),
+    path('oauth/', include((auth_urls, 'api'), namespace='oauth2_provider')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

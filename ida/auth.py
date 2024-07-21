@@ -1,7 +1,15 @@
-"""API endpoints for managing authentication and authorization."""
+"""Resources and endpoints for OAuth 2.0 spec authentication.
+
+Other than the OAuth Application model that is defined alongside the other
+models in this layer, this module represents a full OAuth 2.0 flow with the
+PKCE extension.
+
+"""
 
 import json
 
+from oauth2_provider import urls as oauth2_urls
+from oauth2_provider import views as oauth2_views
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from oauth2_provider.views import TokenView
 from rest_framework import permissions, serializers, status, views
@@ -9,6 +17,7 @@ from rest_framework.response import Response
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
+from django.urls import re_path
 
 from api.access_policies import BaseAccessPolicy
 from api.resources.groups import GroupSerializer
@@ -142,3 +151,14 @@ class OAuthToken(TokenView):
             )
 
         return response
+
+
+urls = [
+    re_path(r'^authorize/$', oauth2_views.AuthorizationView.as_view(), name='authorize'),
+    re_path(r'^authorize/callback/$', AuthorizationCode.as_view(), name='authorization-code'),
+    re_path(r'^login/$', Login.as_view(), name='login'),
+    re_path(r'^token/$', OAuthToken.as_view(), name='token'),
+    re_path(r'^revoke-token/$', oauth2_views.RevokeTokenView.as_view(), name='revoke-token'),
+    re_path(r'^introspect/$', oauth2_views.IntrospectTokenView.as_view(), name='introspect'),
+    *oauth2_urls.management_urlpatterns + oauth2_urls.oidc_urlpatterns,
+]
