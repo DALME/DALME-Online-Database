@@ -116,7 +116,7 @@ resource "aws_security_group_rule" "jump_host_egress_https" {
 # new server (maybe in a different AZ if necessary) if an existing host (or AZ)
 # has become unavailable.
 resource "aws_autoscaling_group" "jump_host" {
-  name_prefix      = module.network_jh_label.name
+  name_prefix      = module.network_jh_asg_label.name
   max_size         = 1
   min_size         = 1
   desired_capacity = 1
@@ -140,23 +140,7 @@ resource "aws_autoscaling_group" "jump_host" {
     strategy = "Rolling"
   }
 
-  tag {
-    key                 = "Name"
-    value               = module.network_jh_label.name
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Environment"
-    value               = var.environment
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Namespace"
-    value               = var.namespace
-    propagate_at_launch = true
-  }
+  tags = module.network_jh_asg_label.tags_as_list_of_maps
 
   lifecycle {
     create_before_destroy = true

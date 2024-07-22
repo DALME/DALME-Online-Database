@@ -19,7 +19,7 @@ Virtual Private Network
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_jump_host"></a> [jump\_host](#module\_jump\_host) | ..//ec2-instance/ | n/a |
-| <a name="module_network_jh_label"></a> [network\_jh\_label](#module\_network\_jh\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_network_jh_asg_label"></a> [network\_jh\_asg\_label](#module\_network\_jh\_asg\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_network_jh_policy_label"></a> [network\_jh\_policy\_label](#module\_network\_jh\_policy\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_network_jh_profile_label"></a> [network\_jh\_profile\_label](#module\_network\_jh\_profile\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_network_jh_role_label"></a> [network\_jh\_role\_label](#module\_network\_jh\_role\_label) | cloudposse/label/null | 0.25.0 |

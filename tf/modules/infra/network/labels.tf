@@ -11,11 +11,15 @@ module "network_label" {
   labels_as_tags = ["name"]
 }
 
-module "network_jh_label" {
+module "network_jh_asg_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["jump-host", "asg"]
+
+  additional_tag_map = {
+    propagate_at_launch = true
+  }
 
   context = module.network_label.context
 }
