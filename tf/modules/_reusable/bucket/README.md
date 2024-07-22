@@ -34,15 +34,13 @@ No resources.
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether deletion protection is active on the bucket. | `bool` | n/a | yes |
 | <a name="input_ignore_public_acls"></a> [ignore\_public\_acls](#input\_ignore\_public\_acls) | Switch to ignore public ACLs for this bucket. | `bool` | `true` | no |
-| <a name="input_key"></a> [key](#input\_key) | The project-service key. | `string` | n/a | yes |
 | <a name="input_lifecycle_rule"></a> [lifecycle\_rule](#input\_lifecycle\_rule) | List of maps defining bucket lifecycle managment. | `any` | `[]` | no |
 | <a name="input_logging"></a> [logging](#input\_logging) | A map containing log configuration for bucket access. | `any` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the bucket. Will be augmented with namespace data. | `string` | n/a | yes |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_object_ownership"></a> [object\_ownership](#input\_object\_ownership) | Controls the ownership mode of the objects uploaded to your bucket. | `string` | `"BucketOwnerEnforced"` | no |
-| <a name="input_project"></a> [project](#input\_project) | The project key. | `string` | n/a | yes |
 | <a name="input_restrict_public_buckets"></a> [restrict\_public\_buckets](#input\_restrict\_public\_buckets) | Switch to restrict public bucket policies for this bucket. | `bool` | `true` | no |
 | <a name="input_server_side_encryption_configuration"></a> [server\_side\_encryption\_configuration](#input\_server\_side\_encryption\_configuration) | Map configuring server-side encryption configuration for the bucket. | `any` | `{}` | no |
-| <a name="input_service"></a> [service](#input\_service) | The service key. | `string` | n/a | yes |
 | <a name="input_versioning"></a> [versioning](#input\_versioning) | A map configuring bucket versioning. | `map(string)` | `{}` | no |
 | <a name="input_website"></a> [website](#input\_website) | Map containing static website hosting configuration. | `any` | `{}` | no |
 

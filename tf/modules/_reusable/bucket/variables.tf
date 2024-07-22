@@ -57,11 +57,6 @@ variable "lifecycle_rule" {
   default     = []
 }
 
-variable "key" {
-  description = "The project-service key."
-  type        = string
-}
-
 variable "logging" {
   description = "A map containing log configuration for bucket access."
   type        = any
@@ -73,15 +68,15 @@ variable "name" {
   type        = string
 }
 
+variable "namespace" {
+  description = "The project namespace."
+  type        = string
+}
+
 variable "object_ownership" {
   description = "Controls the ownership mode of the objects uploaded to your bucket."
   type        = string
   default     = "BucketOwnerEnforced"
-}
-
-variable "project" {
-  description = "The project key."
-  type        = string
 }
 
 variable "restrict_public_buckets" {
@@ -94,11 +89,6 @@ variable "server_side_encryption_configuration" {
   description = "Map configuring server-side encryption configuration for the bucket."
   type        = any
   default     = {}
-}
-
-variable "service" {
-  description = "The service key."
-  type        = string
 }
 
 variable "website" {
