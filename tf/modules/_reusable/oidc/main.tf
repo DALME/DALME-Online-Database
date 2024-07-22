@@ -4,10 +4,6 @@ locals {
   url = "https://token.actions.githubusercontent.com"
 }
 
-data "tls_certificate" "github" {
-  url = local.url
-}
-
 locals {
   thumbprint = data.tls_certificate.github.certificates[0].sha1_fingerprint
 }
@@ -17,5 +13,5 @@ resource "aws_iam_openid_connect_provider" "github" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [local.thumbprint]
 
-  tags = module.oidc.tags
+  tags = module.oidc_label.tags
 }

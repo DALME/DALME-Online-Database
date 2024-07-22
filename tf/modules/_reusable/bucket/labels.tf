@@ -1,6 +1,6 @@
 # Labels for the bucket module.
 
-module "labels" {
+module "bucket_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 

@@ -34,8 +34,8 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  name               = module.oidc_role.id
+  name               = module.oidc_role_label.id
   assume_role_policy = data.aws_iam_policy_document.this.json
 
-  tags = module.oidc_role.tags
+  tags = module.oidc_role_label.tags
 }

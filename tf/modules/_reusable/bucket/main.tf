@@ -15,7 +15,7 @@ module "this" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket                               = module.labels.id
+  bucket                               = module.bucket_label.id
   acl                                  = var.acl
   block_public_acls                    = var.block_public_acls
   block_public_policy                  = var.block_public_policy
@@ -31,5 +31,5 @@ module "this" {
   versioning                           = var.versioning
   website                              = var.website
 
-  tags = module.labels.tags
+  tags = module.bucket_label.tags
 }

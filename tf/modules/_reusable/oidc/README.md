@@ -22,8 +22,8 @@ Deploy a Github Actions OIDC provider to your environment.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_oidc"></a> [oidc](#module\_oidc) | cloudposse/label/null | 0.25.0 |
-| <a name="module_oidc_role"></a> [oidc\_role](#module\_oidc\_role) | cloudposse/label/null | 0.25.0 |
+| <a name="module_oidc_label"></a> [oidc\_label](#module\_oidc\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_oidc_role_label"></a> [oidc\_role\_label](#module\_oidc\_role\_label) | cloudposse/label/null | 0.25.0 |
 
 ## Resources
 
