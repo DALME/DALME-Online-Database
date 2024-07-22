@@ -1,14 +1,14 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 IAMLIVE := true
-JUMP_HOST := $(PROJECT)-asg-jump-host-$(ENVIRONMENT)
 REGION := us-east-1
 TF_LOG := WARN
-TF_PROVIDER := "~> 5.0"
 TF_MODULES := modules
+TF_PROVIDER := "~> 5.0"
 
-CLUSTER := $(PROJECT)-ecs-cluster-$(ENVIRONMENT)
-SERVICE := $(PROJECT)-ecs-service-$(ENVIRONMENT)
+JUMP_HOST := $(PROJECT)-$(ENVIRONMENT)-asg-jump-host
+CLUSTER := $(PROJECT)-$(ENVIRONMENT)-ecs-cluster
+SERVICE := $(PROJECT)-$(ENVIRONMENT)-ecs-service
 
 deploy.help:
 	@echo "  deploy.apply           provision a single module"
