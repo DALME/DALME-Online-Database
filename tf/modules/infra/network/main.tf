@@ -1,7 +1,7 @@
 # Entrypoint for the network module.
 
 module "vpc_flow_logs" {
-  source = "..//bucket/"
+  source = "../..//_reusable/bucket/"
 
   acl                      = "log-delivery-write"
   aws_account              = var.aws_account
@@ -51,7 +51,7 @@ module "vpc_flow_logs" {
 }
 
 module "vpc" {
-  source = "..//vpc/"
+  source = "../..//_reusable/vpc/"
 
   az_count               = var.az_count
   cidr                   = var.cidr
@@ -63,7 +63,7 @@ module "vpc" {
 }
 
 module "session_manager" {
-  source = "..//ssm/"
+  source = "../..//_reusable/ssm/"
 
   aws_account   = var.aws_account
   environment   = var.environment
@@ -83,12 +83,13 @@ locals {
 }
 
 module "jump_host" {
-  source = "..//ec2-instance/"
+  source = "../..//_reusable/ec2-instance/"
 
   environment               = var.environment
   iam_instance_profile_name = aws_iam_instance_profile.jump_host_profile.name
   instance_type             = "t3.nano"
   metadata_options          = local.metadata_options
+  name                      = "jump-host"
   namespace                 = var.namespace
   network_interfaces        = local.network_interfaces
   vpc_id                    = module.vpc.vpc_id
@@ -140,7 +141,23 @@ resource "aws_autoscaling_group" "jump_host" {
     strategy = "Rolling"
   }
 
-  tags = module.network_jh_asg_label.tags_as_list_of_maps
+  tag {
+    key                 = "Namespace"
+    value               = module.network_jh_asg_label.namespace
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Environment"
+    value               = module.network_jh_asg_label.environment
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Name"
+    value               = module.network_jh_asg_label.name
+    propagate_at_launch = true
+  }
 
   lifecycle {
     create_before_destroy = true

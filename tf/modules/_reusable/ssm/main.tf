@@ -6,7 +6,7 @@ resource "aws_kms_key" "ssm_key" {
   deletion_window_in_days = 10
   enable_key_rotation     = true
 
-  tags = module.ssm_kms_key_label.tags
+  tags = module.ssm_kms_label.tags
 }
 
 module "ssm_logs" {

@@ -11,11 +11,11 @@ module "ssm_label" {
   labels_as_tags = ["namespace", "environment", "name"]
 }
 
-module "ssm_label" {
+module "ssm_kms_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["kms", "key"]
 
-  context = module.ssm_label.tags
+  context = module.ssm_label.context
 }

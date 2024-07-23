@@ -28,7 +28,7 @@ resource "aws_subnet" "private" {
   cidr_block        = cidrsubnet(aws_vpc.this.cidr_block, 8, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
-  tags = module.vpc_label_subnet_private.tags
+  tags = module.vpc_subnet_private_label.tags
 }
 
 resource "aws_subnet" "public" {
@@ -37,7 +37,7 @@ resource "aws_subnet" "public" {
   cidr_block        = cidrsubnet(aws_vpc.this.cidr_block, 8, var.az_count + count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
-  tags = module.vpc_label_subnet_public.tags
+  tags = module.vpc_subnet_public_label.tags
 }
 
 resource "aws_nat_gateway" "this" {

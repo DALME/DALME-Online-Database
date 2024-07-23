@@ -18,6 +18,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_ssm_kms_label"></a> [ssm\_kms\_label](#module\_ssm\_kms\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ssm_label"></a> [ssm\_label](#module\_ssm\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ssm_logs"></a> [ssm\_logs](#module\_ssm\_logs) | ..//bucket/ | n/a |
 

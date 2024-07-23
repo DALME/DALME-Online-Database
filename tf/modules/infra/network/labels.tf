@@ -17,10 +17,6 @@ module "network_jh_asg_label" {
 
   attributes = ["jump-host", "asg"]
 
-  additional_tag_map = {
-    propagate_at_launch = true
-  }
-
   context = module.network_label.context
 }
 

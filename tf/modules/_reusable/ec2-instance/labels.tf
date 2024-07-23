@@ -16,4 +16,6 @@ module "ec2_label_sg" {
   version = "0.25.0"
 
   attributes = ["sg"]
+
+  context = module.ec2_label.context
 }
