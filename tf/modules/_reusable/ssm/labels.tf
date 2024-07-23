@@ -15,7 +15,8 @@ module "ssm_kms_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes = ["kms", "key"]
+  name       = "kms"
+  attributes = ["key", "ssm"]
 
   context = module.ssm_label.context
 }
