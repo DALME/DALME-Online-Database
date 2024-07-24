@@ -58,6 +58,7 @@
 | <a name="input_log_destination"></a> [log\_destination](#input\_log\_destination) | Optional ARN of a resource to receive VPC flow logs. | `string` | `null` | no |
 | <a name="input_log_destination_type"></a> [log\_destination\_type](#input\_log\_destination\_type) | The type of the logging destination. | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
+| <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 
 ## Outputs
 

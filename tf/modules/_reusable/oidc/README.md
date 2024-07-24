@@ -43,6 +43,7 @@ Deploy a Github Actions OIDC provider to your environment.
 | <a name="input_gha_oidc_role_name"></a> [gha\_oidc\_role\_name](#input\_gha\_oidc\_role\_name) | Name of the github action OIDC role. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_oidc_allowed"></a> [oidc\_allowed](#input\_oidc\_allowed) | Github org/repos/branches allowed to assume to OIDC role. | `list(map(string))` | n/a | yes |
+| <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 
 ## Outputs
 

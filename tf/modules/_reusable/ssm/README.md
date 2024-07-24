@@ -37,6 +37,7 @@
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether deletion protection is active on the bucket. | `bool` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
+| <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 
 ## Outputs
 

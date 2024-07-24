@@ -36,3 +36,9 @@ variable "namespace" {
   description = "The project namespace."
   type        = string
 }
+
+variable "service" {
+  description = "An optional service namespace."
+  type        = string
+  default     = null
+}

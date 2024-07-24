@@ -41,6 +41,7 @@ No resources.
 | <a name="input_object_ownership"></a> [object\_ownership](#input\_object\_ownership) | Controls the ownership mode of the objects uploaded to your bucket. | `string` | `"BucketOwnerEnforced"` | no |
 | <a name="input_restrict_public_buckets"></a> [restrict\_public\_buckets](#input\_restrict\_public\_buckets) | Switch to restrict public bucket policies for this bucket. | `bool` | `true` | no |
 | <a name="input_server_side_encryption_configuration"></a> [server\_side\_encryption\_configuration](#input\_server\_side\_encryption\_configuration) | Map configuring server-side encryption configuration for the bucket. | `any` | `{}` | no |
+| <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 | <a name="input_versioning"></a> [versioning](#input\_versioning) | A map configuring bucket versioning. | `map(string)` | `{}` | no |
 | <a name="input_website"></a> [website](#input\_website) | Map containing static website hosting configuration. | `any` | `{}` | no |
 

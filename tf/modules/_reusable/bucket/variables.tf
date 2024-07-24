@@ -91,6 +91,12 @@ variable "server_side_encryption_configuration" {
   default     = {}
 }
 
+variable "service" {
+  description = "An optional service namespace."
+  type        = string
+  default     = null
+}
+
 variable "website" {
   description = "Map containing static website hosting configuration."
   type        = any
