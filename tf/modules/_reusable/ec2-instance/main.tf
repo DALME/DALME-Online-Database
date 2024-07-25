@@ -19,7 +19,7 @@ locals {
 }
 
 resource "aws_launch_template" "this" {
-  name_prefix            = "${module.ec2_label.name}-"
+  name_prefix            = "${module.ec2_label.id}-"
   image_id               = data.aws_ami.this.id
   instance_type          = var.instance_type
   update_default_version = var.update_default_version

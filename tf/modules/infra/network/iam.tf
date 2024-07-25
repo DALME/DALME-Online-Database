@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "jump_host_policy_assume" {
 }
 
 resource "aws_iam_role" "jump_host_role" {
-  name               = module.network_jh_role_label.name
+  name               = module.network_jh_role_label.id
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.jump_host_policy_assume.json
 
@@ -109,7 +109,7 @@ data "aws_iam_policy_document" "jump_host_policy_ssm" {
 }
 
 resource "aws_iam_policy" "jump_host_policy_ssm" {
-  name   = module.network_jh_policy_label.name
+  name   = module.network_jh_policy_label.id
   policy = data.aws_iam_policy_document.jump_host_policy_ssm.json
 
   tags = module.network_jh_policy_label.tags

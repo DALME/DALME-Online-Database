@@ -8,7 +8,7 @@ locals {
 }
 
 resource "aws_wafv2_ip_set" "ipv4" {
-  name               = module.waf_ipv4_label.name
+  name               = module.waf_ipv4_label.id
   scope              = local.scope
   ip_address_version = "IPV4"
   addresses          = var.ipv4_ip_set_addresses
@@ -17,7 +17,7 @@ resource "aws_wafv2_ip_set" "ipv4" {
 }
 
 resource "aws_wafv2_ip_set" "ipv6" {
-  name               = module.waf_ipv6_label.name
+  name               = module.waf_ipv6_label.id
   scope              = local.scope
   ip_address_version = "IPV6"
   addresses          = var.ipv6_ip_set_addresses
@@ -26,7 +26,7 @@ resource "aws_wafv2_ip_set" "ipv6" {
 }
 
 resource "aws_wafv2_web_acl" "this" {
-  name  = module.waf_label.name
+  name  = module.waf_label.id
   scope = local.scope
 
   default_action {
