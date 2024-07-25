@@ -18,7 +18,6 @@ No providers.
 |------|--------|---------|
 | <a name="module_waf"></a> [waf](#module\_waf) | ../..//_reusable/waf/ | n/a |
 | <a name="module_waf_logs"></a> [waf\_logs](#module\_waf\_logs) | ../..//_reusable/bucket/ | n/a |
-| <a name="module_waf_logs_label"></a> [waf\_logs\_label](#module\_waf\_logs\_label) | cloudposse/label/null | 0.25.0 |
 
 ## Resources
 

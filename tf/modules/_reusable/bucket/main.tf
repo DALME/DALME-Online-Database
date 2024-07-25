@@ -11,7 +11,7 @@
 # https://github.com/terraform-aws-modules/terraform-aws-s3-bucket
 
 locals {
-  bucket = var.name_override ? var.name_override : module.bucket_label.id
+  bucket = var.name_prefix ? "${var.name_prefix}-${module.bucket_label.id}" : module.bucket_label.id
 }
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-encryption-customer-key

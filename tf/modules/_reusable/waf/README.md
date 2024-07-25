@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_version"></a> [version](#requirement\_version) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
 
 ## Modules
 
@@ -26,10 +26,10 @@
 
 | Name | Type |
 |------|------|
-| [aws_wafv2_ip_set.ipv4](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_ip_set) | resource |
-| [aws_wafv2_ip_set.ipv6](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_ip_set) | resource |
-| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl) | resource |
-| [aws_wafv2_web_acl_logging_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl_logging_configuration) | resource |
+| [aws_wafv2_ip_set.ipv4](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/wafv2_ip_set) | resource |
+| [aws_wafv2_ip_set.ipv6](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/wafv2_ip_set) | resource |
+| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/wafv2_web_acl) | resource |
+| [aws_wafv2_web_acl_logging_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/wafv2_web_acl_logging_configuration) | resource |
 
 ## Inputs
 

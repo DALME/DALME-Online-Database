@@ -30,7 +30,8 @@ module "waf_logs" {
   control_object_ownership = true
   environment              = var.environment
   force_destroy            = var.force_destroy
-  name                     = module.waf_logs_label.id
+  name                     = "waf-logs"
+  name_prefix              = "aws-waf-logs"
   namespace                = var.namespace
   object_ownership         = "ObjectWriter"
 

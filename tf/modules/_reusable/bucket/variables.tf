@@ -68,8 +68,8 @@ variable "name" {
   type        = string
 }
 
-variable "name_override" {
-  description = "An (optional) complete name for the bucket. Will NOT  be augmented with namespace data."
+variable "name_prefix" {
+  description = "An (optional) value to prefix to the bucket's name."
   type        = string
   default     = null
 }

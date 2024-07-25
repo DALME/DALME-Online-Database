@@ -35,7 +35,7 @@ resource "aws_wafv2_web_acl" "this" {
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = var.name
+    metric_name                = module.waf_label.id
     sampled_requests_enabled   = true
   }
 
