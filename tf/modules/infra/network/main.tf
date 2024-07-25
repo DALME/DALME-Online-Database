@@ -8,7 +8,7 @@ module "vpc_flow_logs" {
   control_object_ownership = true
   environment              = var.environment
   force_destroy            = var.force_destroy
-  name                     = "logs-vpc"
+  name                     = "vpc-logs"
   namespace                = var.namespace
   object_ownership         = "ObjectWriter"
 
