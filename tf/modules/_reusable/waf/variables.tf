@@ -39,3 +39,9 @@ variable "rules" {
     global_dos_limit   = number,
   })
 }
+
+variable "service" {
+  description = "An optional service namespace."
+  type        = string
+  default     = null
+}

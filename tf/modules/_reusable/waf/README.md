@@ -42,6 +42,7 @@
 | <a name="input_log_destination_configs"></a> [log\_destination\_configs](#input\_log\_destination\_configs) | Optional ARN of a resource to receive WAF logs. | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_rules"></a> [rules](#input\_rules) | Data for settings parameters in the rule declarations. | <pre>object({<br>    domestic_dos_limit = number,<br>    global_dos_limit   = number,<br>  })</pre> | n/a | yes |
+| <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 
 ## Outputs
 
