@@ -15,6 +15,7 @@ No providers.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_bucket_label"></a> [bucket\_label](#module\_bucket\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_bucket_prefix_label"></a> [bucket\_prefix\_label](#module\_bucket\_prefix\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_this"></a> [this](#module\_this) | terraform-aws-modules/s3-bucket/aws | 4.1.2 |
 
 ## Resources
@@ -37,7 +38,7 @@ No resources.
 | <a name="input_lifecycle_rule"></a> [lifecycle\_rule](#input\_lifecycle\_rule) | List of maps defining bucket lifecycle managment. | `any` | `[]` | no |
 | <a name="input_logging"></a> [logging](#input\_logging) | A map containing log configuration for bucket access. | `any` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the bucket. Will be augmented with namespace data. | `string` | n/a | yes |
-| <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | An (optional) value to prefix to the bucket's name. | `string` | `null` | no |
+| <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | An (optional) value for prefixing the bucket's name. If this is supplied it will be used in place of 'name' in the rendered label and moved to the front of the label's id. | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_object_ownership"></a> [object\_ownership](#input\_object\_ownership) | Controls the ownership mode of the objects uploaded to your bucket. | `string` | `"BucketOwnerEnforced"` | no |
 | <a name="input_restrict_public_buckets"></a> [restrict\_public\_buckets](#input\_restrict\_public\_buckets) | Switch to restrict public bucket policies for this bucket. | `bool` | `true` | no |

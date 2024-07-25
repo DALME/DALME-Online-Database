@@ -31,7 +31,7 @@ module "waf_logs" {
   environment              = var.environment
   force_destroy            = var.force_destroy
   name                     = "waf-logs"
-  name_prefix              = "aws-waf-logs"
+  name_prefix              = "aws-waf-logs" # The WAF demands this prefix.
   namespace                = var.namespace
   object_ownership         = "ObjectWriter"
 
@@ -86,7 +86,7 @@ module "waf" {
   environment             = var.environment
   ipv4_ip_set_addresses   = var.ipv4_ip_set_addresses
   ipv6_ip_set_addresses   = var.ipv6_ip_set_addresses
-  log_destination_configs = module.waf_logs.arn
+  log_destination_configs = module.waf_logs.bucket_arn
   namespace               = var.namespace
   rules                   = var.rules
 }

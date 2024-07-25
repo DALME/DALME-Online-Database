@@ -69,7 +69,7 @@ variable "name" {
 }
 
 variable "name_prefix" {
-  description = "An (optional) value to prefix to the bucket's name."
+  description = "An (optional) value for prefixing the bucket's name. If this is supplied it will be used in place of 'name' in the rendered label and moved to the front of the label's id."
   type        = string
   default     = null
 }
