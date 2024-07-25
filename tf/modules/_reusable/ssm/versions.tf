@@ -1,4 +1,4 @@
-# Providers for the ssm module.S
+# Providers for the ssm module.
 
 terraform {
   required_version = "~> 1.6"
