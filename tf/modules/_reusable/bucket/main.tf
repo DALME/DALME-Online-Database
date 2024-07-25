@@ -10,12 +10,16 @@
 #
 # https://github.com/terraform-aws-modules/terraform-aws-s3-bucket
 
+locals {
+  bucket = var.name_override ? var.name_override : module.bucket_label.id
+}
+
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-encryption-customer-key
 module "this" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket                               = module.bucket_label.id
+  bucket                               = local.bucket
   acl                                  = var.acl
   block_public_acls                    = var.block_public_acls
   block_public_policy                  = var.block_public_policy

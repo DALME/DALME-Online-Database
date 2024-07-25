@@ -6,7 +6,7 @@ module "waf_label" {
 
   namespace   = var.namespace
   environment = var.environment
-  name        = "waf"
+  name        = "waf-${lower(local.scope)}"
 
   labels_as_tags = ["namespace", "environment", "name"]
 }

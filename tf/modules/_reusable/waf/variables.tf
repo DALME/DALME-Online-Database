@@ -27,11 +27,6 @@ variable "log_destination_configs" {
   default     = null
 }
 
-variable "name" {
-  description = "The name of the WAF instance."
-  type        = string
-}
-
 variable "namespace" {
   description = "The project namespace."
   type        = string
