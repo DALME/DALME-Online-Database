@@ -55,9 +55,10 @@ resource "aws_lb" "this" {
   security_groups            = [aws_security_group.alb.id]
   subnets                    = var.subnets
 
-  # The load balancer must be public to connect to Cloudfront.
+  # Note, internal must be set to false if you want the load balancer to be
+  # connected to a Cloudfront origin.
   # tfsec:ignore:aws-elb-alb-not-public
-  internal = false
+  internal = var.internal
 
   depends_on = [
     aws_acm_certificate_validation.alb
