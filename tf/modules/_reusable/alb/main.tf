@@ -49,16 +49,16 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_lb" "this" {
+  # Note, internal must be set to false if you want the load balancer to be
+  # connected to a Cloudfront origin.
+  # tfsec:ignore:aws-elb-alb-not-public
+  internal = var.internal
+
   drop_invalid_header_fields = true
   enable_deletion_protection = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.alb.id]
   subnets                    = var.subnets
-
-  # Note, internal must be set to false if you want the load balancer to be
-  # connected to a Cloudfront origin.
-  # tfsec:ignore:aws-elb-alb-not-public
-  internal = var.internal
 
   depends_on = [
     aws_acm_certificate_validation.alb
