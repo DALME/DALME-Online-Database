@@ -17,7 +17,7 @@ variable "default_cache_behavior" {
 }
 
 variable "default_root_object" {
-  description = "The object to return (for example, index.html) the root URL is requested."
+  description = "The object to return (for example, index.html) when the root URL is requested."
   type        = string
   default     = null
 }

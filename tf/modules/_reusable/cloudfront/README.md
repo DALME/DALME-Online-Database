@@ -21,6 +21,7 @@
 |------|--------|---------|
 | <a name="module_cloudfront_certificate_label"></a> [cloudfront\_certificate\_label](#module\_cloudfront\_certificate\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cloudfront_label"></a> [cloudfront\_label](#module\_cloudfront\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_cloudfront_oac_label"></a> [cloudfront\_oac\_label](#module\_cloudfront\_oac\_label) | cloudposse/label/null | 0.25.0 |
 
 ## Resources
 
@@ -39,7 +40,7 @@
 | <a name="input_additional_domains"></a> [additional\_domains](#input\_additional\_domains) | Other domains to be served by this distribution. | `list(string)` | n/a | yes |
 | <a name="input_aliases"></a> [aliases](#input\_aliases) | Extra CNAMEs (alternate domain names), if any, for this distribution. | `list(string)` | `null` | no |
 | <a name="input_default_cache_behavior"></a> [default\_cache\_behavior](#input\_default\_cache\_behavior) | The default cache definition for the distribution. | `any` | n/a | yes |
-| <a name="input_default_root_object"></a> [default\_root\_object](#input\_default\_root\_object) | The object to return (for example, index.html) the root URL is requested. | `string` | `null` | no |
+| <a name="input_default_root_object"></a> [default\_root\_object](#input\_default\_root\_object) | The object to return (for example, index.html) when the root URL is requested. | `string` | `null` | no |
 | <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate DNS record. | `number` | n/a | yes |
 | <a name="input_domain"></a> [domain](#input\_domain) | The origin of the service. | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |

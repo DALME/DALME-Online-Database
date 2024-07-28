@@ -19,3 +19,12 @@ module "cloudfront_certificate_label" {
 
   context = module.cloudfront_label.context
 }
+
+module "cloudfront_oac_label" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0"
+
+  attributes = ["oac"]
+
+  context = module.cloudfront_label.context
+}

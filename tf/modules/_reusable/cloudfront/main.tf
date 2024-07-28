@@ -1,12 +1,9 @@
 # Entrypoint for the cloudfront module.
 
 locals {
-  # TODO: So we only need to slice this because we want to keep the ida in the
-  # tenants so to make this more portable we should just do it one level up and
-  # pass it in, then it's a bit more flexible.
-  additional_domains        = slice(var.additional_domains, 1, length(var.additional_domains))
-  wildcard_domains          = [for domain in var.additional_domains : "*.${domain}"]
-  subject_alternative_names = concat(local.additional_domains, local.wildcard_domains)
+  all_tldrs                 = concat(var.domain, var.additional_domains)
+  wildcard_domains          = [for domain in local.all_tldrs : "*.${domain}"]
+  subject_alternative_names = concat(var.additional_domains, local.wildcard_domains)
   zone_ids = {
     for zone in data.aws_route53_zone.tenant_zones : zone.name => zone.zone_id
   }
@@ -50,9 +47,9 @@ resource "aws_acm_certificate_validation" "cloudfront" {
 }
 
 # Cloudfront is a complicated resource and here I've just abstracted it to the
-# extent that we are actually using that functionality. Should we need to start
-# using anything else it has to offer then this definition can be extended to
-# cover those needs.
+# extent that we are actually using the functionality it offers. Should we need
+# to start using anything else not represented here, this definition can be
+# extended to cover those needs.
 resource "aws_cloudfront_distribution" "this" {
   aliases             = var.aliases
   default_root_object = var.default_root_object
