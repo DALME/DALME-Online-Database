@@ -22,6 +22,7 @@ Cdn
 | <a name="module_assets"></a> [assets](#module\_assets) | ../..//_reusable/bucket/ | n/a |
 | <a name="module_cdn_access_logs_label"></a> [cdn\_access\_logs\_label](#module\_cdn\_access\_logs\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cdn_label"></a> [cdn\_label](#module\_cdn\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_cloudfront"></a> [cloudfront](#module\_cloudfront) | ../..//_reusable/cloudfront/ | n/a |
 | <a name="module_staticfiles"></a> [staticfiles](#module\_staticfiles) | ../..//_reusable/bucket/ | n/a |
 
 ## Resources
@@ -36,7 +37,9 @@ Cdn
 | [aws_s3_bucket_policy.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/s3_bucket_policy) | resource |
 | [aws_iam_policy_document.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/lb) | data source |
 | [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/route53_zone) | data source |
+| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/wafv2_web_acl) | data source |
 
 ## Inputs
 

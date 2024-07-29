@@ -17,10 +17,9 @@ locals {
   additional_domains    = slice(var.tenant_domains, 1, length(var.tenant_domains))
   allowed_methods       = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
   allowed_origins       = [for domain in var.tenant_domains : "https://${domain}"]
-  origin_id             = "${var.namespace}-${var.environment}-s3-origin"
-  alb_origin_id         = "${var.namespace}-${var.environment}-s3-origin-alb"
-  staticfiles_origin_id = "${var.namespace}-${var.environment}-s3-origin-staticfiles"
-  index                 = var.default_root_object
+  origin_id_alb         = "${var.namespace}-${var.environment}-s3-origin-alb"
+  origin_id_assets      = "${var.namespace}-${var.environment}-s3-origin-assets"
+  origin_id_staticfiles = "${var.namespace}-${var.environment}-s3-origin-staticfiles"
 }
 
 // Buckets
@@ -161,30 +160,102 @@ resource "aws_cloudfront_function" "viewer_request" {
   code    = file("${path.module}/files/viewer-request.js")
 }
 
-# module "cloudfront" {
-#   source = "../..//_reusable/cloudfront/"
+module "cloudfront" {
+  source = "../..//_reusable/cloudfront/"
 
-#   # Any Cloudfront distribution must be in us-east-1.
-#   providers = {
-#     aws = aws.acm
-#   }
+  # Any Cloudfront distribution must be in us-east-1.
+  providers = {
+    aws = aws.acm
+  }
 
-#   domain             = var.domain
-#   additional_domains = local.additional_domains
+  domain             = var.domain
+  aliases            = var.tenant_domains
+  additional_domains = local.additional_domains
 
-#   aliases = var.tenant_domains
-#   # default_root_object = "index.html"  # TODO: Don't think we need this.
-#   dns_ttl         = var.dns_ttl
-#   log_destination = "${module.access_logs.bucket_id}.s3.amazonaws.com"
-#   namespace       = var.namespace
-#   price_class     = var.price_class
-#   web_acl_id      = data.aws_wafv2_web_acl.this.arn
+  dns_ttl         = var.dns_ttl
+  log_destination = "${module.access_logs.bucket_id}.s3.amazonaws.com"
+  namespace       = var.namespace
+  price_class     = var.price_class
+  web_acl_id      = data.aws_wafv2_web_acl.this.arn
 
-# TODO: All origin config here.
-# https://github.com/ocp/DALME-Online-Database/blob/74901dc7baff0655ca312d4dd05e6dfab2c62de6/tf/modules/cloudfront/main.tf#L202
-# But bring up to spec with:
-# https://github.com/SHARIAsource/ops-infra/blob/ocp/development/tf/modules/infra/cdn/main.tf
-# }
+  origins = {
+    alb = {
+      domain_name = var.alb_dns
+      origin_id   = local.origin_id_alb
+
+      custom_origin_config = {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = "match-viewer"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
+    }
+
+    assets = {
+      domain_name              = module.assets.s3_bucket_bucket_regional_domain_name
+      origin_id                = local.origin_id_assets
+      origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
+    }
+
+    staticfiles = {
+      domain_name              = module.staticfiles.s3_bucket_bucket_regional_domain_name
+      origin_id                = local.origin_id_staticfiles
+      origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
+    }
+  }
+
+  default_cache_behavior = {
+    allowed_methods        = local.allowed_methods
+    cached_methods         = ["GET", "HEAD"]
+    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+    target_origin_id       = local.origin_id_alb
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  ordered_cache_behavior = [
+    {
+      path_pattern           = "/db*"
+      allowed_methods        = local.allowed_methods
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = local.origin_id_assets
+      viewer_protocol_policy = "redirect-to-https"
+
+      forwarded_values = {
+        query_string = true
+        cookies = {
+          forward = "all"
+        }
+      }
+
+      function_association = {
+        event_type   = "viewer-request"
+        function_arn = aws_cloudfront_function.viewer_request.arn
+      }
+    },
+    {
+      path_pattern           = "/media*"
+      allowed_methods        = local.allowed_methods
+      cached_methods         = ["GET", "HEAD"]
+      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+      target_origin_id       = local.origin_id_staticfiles
+      viewer_protocol_policy = "redirect-to-https"
+    },
+    {
+      path_pattern           = "/static*"
+      allowed_methods        = local.allowed_methods
+      cached_methods         = ["GET", "HEAD"]
+      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+      target_origin_id       = local.origin_id_staticfiles
+      viewer_protocol_policy = "redirect-to-https"
+    },
+  ]
+
+  restrictions = {
+    geo_restriction = {
+      restriction_type = "none"
+    }
+  }
+}
 
 // DNS
 resource "aws_route53_record" "www-a" {
