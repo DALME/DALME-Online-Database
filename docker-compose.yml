@@ -198,7 +198,6 @@ volumes:
   rsdata:
   pgadmin-data:
 
-
 networks:
   app-network:
     driver: bridge
