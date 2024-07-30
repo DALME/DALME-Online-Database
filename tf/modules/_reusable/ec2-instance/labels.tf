@@ -15,7 +15,7 @@ module "ec2_label_sg" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes = ["sg"]
+  attributes = ["security", "group"]
 
   context = module.ec2_label.context
 }

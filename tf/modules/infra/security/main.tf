@@ -9,6 +9,6 @@ resource "aws_kms_key" "global" {
 }
 
 resource "aws_kms_alias" "global" {
-  name          = "alias/${var.namespace}/global/${var.environment}"
+  name          = "alias/${var.namespace}/${var.environment}/global"
   target_key_id = aws_kms_key.global.key_id
 }
