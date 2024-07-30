@@ -1,4 +1,4 @@
-Rds
+[RDS](https://aws.amazon.com/rds/)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

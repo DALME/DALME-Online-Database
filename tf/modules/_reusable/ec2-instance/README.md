@@ -1,4 +1,4 @@
-# [EC2 Instance](https://aws.amazon.com/ec2/)
+# [EC2 Instance](https://aws.amazon.com/ec2)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

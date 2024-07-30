@@ -1,6 +1,6 @@
-# OIDC
+# [OIDC](https://registry.terraform.io/modules/terraform-module/github-oidc-provider/aws/latest)
 
-Deploy a Github Actions OIDC provider to your environment.
+Deploys a Github Actions OIDC provider to your environment.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

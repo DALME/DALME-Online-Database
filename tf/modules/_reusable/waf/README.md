@@ -1,4 +1,4 @@
-# [WAF](https://docs.aws.amazon.com/waf/)
+# [WAF](https://docs.aws.amazon.com/waf)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

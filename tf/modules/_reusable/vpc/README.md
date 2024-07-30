@@ -1,4 +1,4 @@
-# [VPC](https://docs.aws.amazon.com/vpc/)
+# [VPC](https://docs.aws.amazon.com/vpc)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

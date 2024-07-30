@@ -1,4 +1,4 @@
-# [Elastic Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/)
+# [Elastic Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
