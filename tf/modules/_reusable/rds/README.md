@@ -50,6 +50,7 @@
 | <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The encryption key ARN. | `string` | n/a | yes |
 | <a name="input_manage_master_user_password"></a> [manage\_master\_user\_password](#input\_manage\_master\_user\_password) | Toggle automatic password opsec management. | `bool` | n/a | yes |
 | <a name="input_multi_az"></a> [multi\_az](#input\_multi\_az) | Is the db replicated across zones for failover. | `bool` | n/a | yes |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_parameter_rds_force_ssl"></a> [parameter\_rds\_force\_ssl](#input\_parameter\_rds\_force\_ssl) | Require SSL to connect to the instance. | `bool` | n/a | yes |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Specify whether Performance Insights are enabled. | `bool` | n/a | yes |
 | <a name="input_performance_insights_retention_period"></a> [performance\_insights\_retention\_period](#input\_performance\_insights\_retention\_period) | How long to preserve performance logs. | `number` | n/a | yes |

@@ -70,6 +70,11 @@ variable "multi_az" {
   type        = bool
 }
 
+variable "namespace" {
+  description = "The project namespace."
+  type        = string
+}
+
 variable "parameter_rds_force_ssl" {
   description = "Require SSL to connect to the instance."
   type        = bool
