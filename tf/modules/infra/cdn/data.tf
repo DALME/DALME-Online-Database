@@ -1,4 +1,7 @@
 # Data sources for the cdn module.
+#
+# Any dependencies between this node and ancestors on the environment DAG
+# should be resolved here and then passed to resources in this module.
 
 data "aws_lb" "this" {
   tags = {
