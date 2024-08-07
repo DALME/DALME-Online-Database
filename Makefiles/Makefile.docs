@@ -11,13 +11,13 @@ docs.help:
 
 docs.render: _docs.clean
 	docker compose run --rm -T \
-		$(PROJECT).docs \
+		$(NAMESPACE).docs \
 		sphinx-build -b html -nW /opt/docs /opt/docs/_build/html
 .PHONY: docs.render
 
 docs.shell:
 	docker compose run --rm \
-		$(PROJECT).docs \
+		$(NAMESPACE).docs \
 		bash
 .PHONY: docs.shell
 
@@ -30,12 +30,12 @@ docs.write:
 
 ### Private (non-interface) targets.
 _docs.build:
-	docker compose up -d --no-deps --build $(PROJECT).docs
+	docker compose up -d --no-deps --build $(NAMESPACE).docs
 .PHONY: _docs.build
 
 _docs.clean:
 	docker compose run --rm -T \
-		$(PROJECT).docs \
+		$(NAMESPACE).docs \
 		rm -rf /opt/docs/_build
 .PHONY: _docs.clean
 

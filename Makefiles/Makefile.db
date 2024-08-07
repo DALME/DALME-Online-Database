@@ -31,12 +31,12 @@ db.drop: _confirm
 
 db.dump:
 	docker compose exec \
-		$(PROJECT).db \
+		$(NAMESPACE).db \
 		pg_dump \
 		-Fc $(args) \
-		--dbname $(PROJECT) \
-		--username $(PROJECT) \
-		-f $(DUMPS)/$(PROJECT)-$$(date -u +"%Y%m%d-T%s").dump
+		--dbname $(NAMESPACE) \
+		--username $(NAMESPACE) \
+		-f $(DUMPS)/$(NAMESPACE)-$$(date -u +"%Y%m%d-T%s").dump
 .PHONY: db.dump
 
 db.load: _db.create_restore_schema
@@ -45,33 +45,33 @@ ifndef dump
 		Usage: make db.load dump='dalme-20231025-T1698276955.dump')
 else
 	docker exec -i \
-		$(PROJECT).db \
+		$(NAMESPACE).db \
 		pg_restore \
 		--clean \
 		--verbose \
 		--if-exists \
 		--schema=$(RESTORE_SCHEMA) \
-		--dbname=$(PROJECT) \
-		--username=$(PROJECT) \
+		--dbname=$(NAMESPACE) \
+		--username=$(NAMESPACE) \
 		$(DUMPS)/$(dump)
 endif
 .PHONY: db.load
 
 db.migrate:
 	docker compose run --rm \
-		$(PROJECT).web \
+		$(NAMESPACE).web \
 		python manage.py migrate_schemas $(args)
 .PHONY: db.migrate
 
 db.migrate.fake:
 	docker compose run --rm \
-		$(PROJECT).web \
+		$(NAMESPACE).web \
 		python manage.py migrate_schemas --fake $(args)
 .PHONY: db.migrate.fake
 
 db.migrations.make:
 	docker compose run --rm \
-		$(PROJECT).web \
+		$(NAMESPACE).web \
 		python manage.py makemigrations
 .PHONY: db.migrations.make
 
@@ -81,45 +81,45 @@ ifndef app
 		Usage: make db.migrations.empty app='core')
 else
 	docker compose run --rm \
-		$(PROJECT).web \
+		$(NAMESPACE).web \
 		python manage.py makemigrations --empty $(app)
 endif
 .PHONY: db.migrations.empty
 
 db.migrations.merge:
 	docker compose run --rm \
-		$(PROJECT).web \
+		$(NAMESPACE).web \
 		python manage.py migrations.make --merge
 .PHONY: db.migrations.merge
 
 db.migrations.show:
 	docker compose run --rm \
-		$(PROJECT).web \
+		$(NAMESPACE).web \
 		python manage.py showmigrations
 .PHONY: db.migrations.show
 
 db.psql:
-	PGPASSWORD=$(PROJECT) \
+	PGPASSWORD=$(NAMESPACE) \
 		docker compose exec \
-		$(PROJECT).db \
+		$(NAMESPACE).db \
 		psql -wx \
-		--username $(PROJECT) \
-		--dbname $(PROJECT)
+		--username $(NAMESPACE) \
+		--dbname $(NAMESPACE)
 .PHONY: db.psql
 
 db.shell:
-	PGPASSWORD=$(PROJECT) \
+	PGPASSWORD=$(NAMESPACE) \
 		docker compose exec \
-		$(PROJECT).db \
+		$(NAMESPACE).db \
 		bash
 .PHONY: db.shell
 
 ### Private (non-interface) targets.
 _db.create_restore_schema:
 	docker compose exec \
-		$(PROJECT).db \
+		$(NAMESPACE).db \
 		psql -wx \
-		--dbname $(PROJECT) \
-		--username $(PROJECT) \
+		--dbname $(NAMESPACE) \
+		--username $(NAMESPACE) \
 		-c 'CREATE SCHEMA IF NOT EXISTS $(RESTORE_SCHEMA)'
 .PHONY: _db.create_restore_schema

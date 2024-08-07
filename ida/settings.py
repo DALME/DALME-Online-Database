@@ -460,14 +460,16 @@ class Development(Base, Configuration):
         'http://localhost:8888',
     ]
 
-    CSRF_COOKIE_SECURE = False
     CSRF_TRUSTED_ORIGINS = [
         'http://ida.localhost:8000',
         'http://dalme.localhost:8000',
         'http://pharmacopeias.localhost:8000',
         'http://localhost:8888',
     ]
+
+    CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
+
     SECURE_SSL_REDIRECT = False
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

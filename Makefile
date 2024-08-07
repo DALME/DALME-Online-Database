@@ -1,13 +1,13 @@
 # IDA project Makefile
 .DEFAULT_GOAL := help
 
-export PROJECT := ida
 export ROOT := $(CURDIR)
 export CONFIG := $(ROOT)/config
 export DOCS := $(ROOT)/docs
 export TF := $(ROOT)/tf
 export UI := $(ROOT)/ui
 
+export NAMESPACE := ida
 export ENVIRONMENT := staging
 
 export PY := $(shell cat "$(ROOT)/.python-version")

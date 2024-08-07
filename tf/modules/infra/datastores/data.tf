@@ -8,10 +8,7 @@ data "aws_kms_alias" "global" {
 }
 
 data "aws_security_group" "tunnel" {
-  filter {
-    name   = "group-name"
-    values = ["${var.namespace}-${var.environment}-jump-host-security-group-*"]
-  }
+  name = "${var.namespace}-${var.environment}-ec2-jump-host-security-group"
 
   tags = {
     Environment = var.environment

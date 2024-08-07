@@ -6,7 +6,8 @@ module "ec2_label" {
 
   namespace   = var.namespace
   environment = var.environment
-  name        = var.name
+  name        = "ec2"
+  attributes  = [var.name]
 
   labels_as_tags = ["namespace", "environment", "name"]
 }

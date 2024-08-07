@@ -11,16 +11,18 @@ data "aws_vpc" "this" {
 }
 
 data "aws_security_group" "alb" {
+  name = "${var.namespace}-${var.environment}-alb-security-group"
+
   tags = {
-    Name        = "${var.key}-alb-security-group-${var.environment}"
     Environment = var.environment
     Namespace   = var.namespace
   }
 }
 
 data "aws_security_group" "postgres" {
+  name = "${var.namespace}-${var.environment}-rds-postgres-security-group"
+
   tags = {
-    Name        = "${var.key}-rds-postgres-security-${var.environment}"
     Environment = var.environment
     Namespace   = var.namespace
   }
