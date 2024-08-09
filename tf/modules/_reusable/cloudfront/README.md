@@ -58,4 +58,6 @@
 | Name | Description |
 |------|-------------|
 | <a name="output_arn"></a> [arn](#output\_arn) | ARN for the distribution. |
+| <a name="output_domain_name"></a> [domain\_name](#output\_domain\_name) | Domain name corresponding to the distribution. |
+| <a name="output_hosted_zone_id"></a> [hosted\_zone\_id](#output\_hosted\_zone\_id) | Route53 zone ID for the distribution. |
 <!-- END_TF_DOCS -->

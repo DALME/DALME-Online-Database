@@ -1,7 +1,7 @@
 # Entrypoint for the cloudfront module.
 
 locals {
-  all_tldrs                 = concat(var.domain, var.additional_domains)
+  all_tldrs                 = concat([var.domain], var.additional_domains)
   wildcard_domains          = [for domain in local.all_tldrs : "*.${domain}"]
   subject_alternative_names = concat(var.additional_domains, local.wildcard_domains)
   zone_ids = {

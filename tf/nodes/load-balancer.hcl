@@ -16,6 +16,7 @@ inputs = {
   cidr_blocks      = "0.0.0.0/0",
   domain           = local.domain
   dns_ttl          = 60
+  internal         = false
   ipv6_cidr_blocks = "::/0",
   health_check = {
     interval            = 200

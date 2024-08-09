@@ -67,12 +67,12 @@ repos:
       language: system
       types_or: [hcl, terraform]
       require_serial: true
-    # - id: tf-validate
-    #   name: terraform validate
-    #   entry: make -s deploy.validate
-    #   language: system
-    #   types_or: [hcl, terraform]
-    #   require_serial: true
+    - id: tf-validate
+      name: terraform validate
+      entry: make -s _deploy.validate
+      language: system
+      types_or: [hcl, terraform]
+      require_serial: true
     - id: tf-docs
       name: terraform docs
       entry: make -s _deploy.docs

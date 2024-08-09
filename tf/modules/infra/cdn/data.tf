@@ -4,8 +4,9 @@
 # should be resolved here and then passed to resources in this module.
 
 data "aws_lb" "this" {
+  name = "${var.namespace}-${var.environment}-alb"
+
   tags = {
-    Name      = "${var.namespace}-${var.environment}-alb"
     Namespace = var.namespace
   }
 }

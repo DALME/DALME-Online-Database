@@ -146,15 +146,16 @@ module "staticfiles" {
 
 // Distribution
 resource "aws_cloudfront_origin_access_control" "s3" {
-  name                              = module.cloudfront_oac_label.id
+  name                              = module.cdn_oac_label.id
   description                       = "OAC for Cloudfront"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
 }
 
+# TODO: This should be _reusable, just pass in the file reference.
 resource "aws_cloudfront_function" "viewer_request" {
-  name    = "${var.service}-cloudfront-function-viewer-request-${var.environment}"
+  name    = module.cloudfront_function_label_vr.id
   runtime = "cloudfront-js-1.0"
   publish = true
   code    = file("${path.module}/files/viewer-request.js")
@@ -173,14 +174,15 @@ module "cloudfront" {
   additional_domains = local.additional_domains
 
   dns_ttl         = var.dns_ttl
+  environment     = var.environment
   log_destination = "${module.access_logs.bucket_id}.s3.amazonaws.com"
   namespace       = var.namespace
   price_class     = var.price_class
   web_acl_id      = data.aws_wafv2_web_acl.this.arn
 
-  origins = {
+  origin = {
     alb = {
-      domain_name = var.alb_dns
+      domain_name = data.aws_lb.this.dns_name
       origin_id   = local.origin_id_alb
 
       custom_origin_config = {
@@ -192,13 +194,13 @@ module "cloudfront" {
     }
 
     assets = {
-      domain_name              = module.assets.s3_bucket_bucket_regional_domain_name
+      domain_name              = module.assets.bucket_regional_domain_name
       origin_id                = local.origin_id_assets
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
     }
 
     staticfiles = {
-      domain_name              = module.staticfiles.s3_bucket_bucket_regional_domain_name
+      domain_name              = module.staticfiles.bucket_regional_domain_name
       origin_id                = local.origin_id_staticfiles
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
     }
@@ -249,12 +251,6 @@ module "cloudfront" {
       viewer_protocol_policy = "redirect-to-https"
     },
   ]
-
-  restrictions = {
-    geo_restriction = {
-      restriction_type = "none"
-    }
-  }
 }
 
 // DNS
@@ -265,8 +261,8 @@ resource "aws_route53_record" "www-a" {
   type     = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.main.domain_name
-    zone_id                = aws_cloudfront_distribution.main.hosted_zone_id
+    name                   = module.cloudfront.domain_name
+    zone_id                = module.cloudfront.hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -278,8 +274,8 @@ resource "aws_route53_record" "www-aaaa" {
   type     = "AAAA"
 
   alias {
-    name                   = aws_cloudfront_distribution.main.domain_name
-    zone_id                = aws_cloudfront_distribution.main.hosted_zone_id
+    name                   = module.cloudfront.domain_name
+    zone_id                = module.cloudfront.hosted_zone_id
     evaluate_target_health = false
   }
 }

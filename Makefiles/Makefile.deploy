@@ -183,7 +183,7 @@ _deploy.docs:
 		docker compose run -T --rm \
 			$(NAMESPACE).deploy \
 			terraform-docs \
-			markdown \
+			markdown table \
 			--recursive \
 			--recursive-path $$dir \
 			--output-file README.md \
@@ -241,6 +241,10 @@ _deploy.update.provider:
 	@$(MAKE) _deploy.update.message
 .PHONY: _deploy.update.provider
 
+# Ensure validate doesn't try to call out to any kind of backend when it runs
+# during pre-commit. This seems to be a bug in terragrunt/terraform which only
+# happens with the security module. Here we just ensure no auto init happens,
+# which is easier than muddying everything else up with dynamic machinery.
 _deploy.validate:
 	docker compose run -T --rm \
 		-e TF_DISABLE_INIT=true \

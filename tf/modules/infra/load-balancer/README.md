@@ -39,6 +39,7 @@
 | <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate DNS record. | `number` | n/a | yes |
 | <a name="input_domain"></a> [domain](#input\_domain) | The origin of the service. | `string` | n/a | yes |
 | <a name="input_health_check"></a> [health\_check](#input\_health\_check) | Parameters configuring the ALB's healthcheck. | <pre>object({<br>    interval            = number, # Frequency (secs) of the health checks.<br>    matcher             = number, # HTTP status code indicating a passing health check.<br>    path                = string, # URL route of the healthcheck.<br>    threshold           = number, # Count before considering an unhealthy target healthy.<br>    timeout             = number, # Time (secs) without a response indicting a failed health check.<br>    unhealthy_threshold = number, # Consecutive failed health checks before considering a target unhealthy.<br>  })</pre> | n/a | yes |
+| <a name="input_internal"></a> [internal](#input\_internal) | Should this ALB have a public IP or not. | `bool` | n/a | yes |
 | <a name="input_ipv6_cidr_blocks"></a> [ipv6\_cidr\_blocks](#input\_ipv6\_cidr\_blocks) | IPv6 range for the ALB security groups. | `string` | n/a | yes |
 | <a name="input_protocol"></a> [protocol](#input\_protocol) | Transport protocol for the security group. | `string` | n/a | yes |
 | <a name="input_proxy_port"></a> [proxy\_port](#input\_proxy\_port) | Reverse proxy listening port. | `number` | n/a | yes |

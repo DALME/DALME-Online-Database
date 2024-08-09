@@ -22,7 +22,10 @@
 | <a name="module_assets"></a> [assets](#module\_assets) | ../..//_reusable/bucket/ | n/a |
 | <a name="module_cdn_access_logs_label"></a> [cdn\_access\_logs\_label](#module\_cdn\_access\_logs\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cdn_label"></a> [cdn\_label](#module\_cdn\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_cdn_oac_label"></a> [cdn\_oac\_label](#module\_cdn\_oac\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cloudfront"></a> [cloudfront](#module\_cloudfront) | ../..//_reusable/cloudfront/ | n/a |
+| <a name="module_cloudfront_function_label"></a> [cloudfront\_function\_label](#module\_cloudfront\_function\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_cloudfront_function_label_vr"></a> [cloudfront\_function\_label\_vr](#module\_cloudfront\_function\_label\_vr) | cloudposse/label/null | 0.25.0 |
 | <a name="module_staticfiles"></a> [staticfiles](#module\_staticfiles) | ../..//_reusable/bucket/ | n/a |
 
 ## Resources
@@ -50,6 +53,7 @@
 | <a name="input_domain"></a> [domain](#input\_domain) | The origin of the service. | `string` | n/a | yes |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether deletion protection is active on buckets. | `bool` | n/a | yes |
 | <a name="input_price_class"></a> [price\_class](#input\_price\_class) | Selects the price class for the distribution. | `string` | n/a | yes |
+| <a name="input_tenant_domains"></a> [tenant\_domains](#input\_tenant\_domains) | Domain names per application tenant. | `list(string)` | n/a | yes |
 
 ## Outputs
 

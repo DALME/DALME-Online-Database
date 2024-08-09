@@ -32,6 +32,11 @@ variable "health_check" {
   })
 }
 
+variable "internal" {
+  description = "Should this ALB have a public IP or not."
+  type        = bool
+}
+
 variable "ipv6_cidr_blocks" {
   description = "IPv6 range for the ALB security groups."
   type        = string

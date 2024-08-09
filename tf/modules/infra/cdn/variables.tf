@@ -25,3 +25,8 @@ variable "price_class" {
   description = "Selects the price class for the distribution."
   type        = string
 }
+
+variable "tenant_domains" {
+  description = "Domain names per application tenant."
+  type        = list(string)
+}

@@ -8,6 +8,7 @@ module "alb" {
   domain       = var.domain
   environment  = var.environment
   health_check = var.health_check
+  internal     = var.internal
   namespace    = var.namespace
   ssl_port     = var.ssl_port
   subnets      = data.aws_subnets.public.ids

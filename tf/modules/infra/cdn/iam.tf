@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "oac_assets" {
       "s3:GetObjectVersion",
     ]
     resources = [
-      "${module.assets.s3_bucket_arn}/*",
+      "${module.assets.bucket_arn}/*",
     ]
 
     principals {
@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "oac_assets" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
-      values   = [aws_cloudfront_distribution.main.arn]
+      values   = [module.cloudfront.arn]
     }
   }
 }
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "oac_staticfiles" {
       "s3:GetObjectVersion",
     ]
     resources = [
-      "${module.staticfiles.s3_bucket_arn}/*",
+      "${module.staticfiles.bucket_arn}/*",
     ]
 
     principals {
@@ -40,17 +40,17 @@ data "aws_iam_policy_document" "oac_staticfiles" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
-      values   = [aws_cloudfront_distribution.main.arn]
+      values   = [module.cloudfront.arn]
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "oac_assets" {
-  bucket = module.assets.s3_bucket_id
+  bucket = module.assets.bucket_id
   policy = data.aws_iam_policy_document.oac_assets.json
 }
 
 resource "aws_s3_bucket_policy" "oac_staticfiles" {
-  bucket = module.staticfiles.s3_bucket_id
+  bucket = module.staticfiles.bucket_id
   policy = data.aws_iam_policy_document.oac_staticfiles.json
 }
