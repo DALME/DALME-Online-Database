@@ -1,5 +1,5 @@
 # Variables for the cdn module.
-#
+
 variable "force_destroy" {
   description = "Whether deletion protection is active on buckets."
   type        = bool

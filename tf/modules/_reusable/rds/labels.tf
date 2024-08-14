@@ -7,7 +7,7 @@ module "rds_label" {
   namespace   = var.namespace
   environment = var.environment
   name        = "rds"
-  attributes  = [var.engine]
+  attributes  = [var.engine, var.engine_version]
 
   labels_as_tags = ["namespace", "environment", "name"]
 }

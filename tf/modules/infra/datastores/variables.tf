@@ -8,7 +8,7 @@
 # This could be more dynamic (a list) if you have multiple RDS instances but
 # it's not necessary for us at the moment so we'll just make it flat.
 variable "rds_postgres" {
-  description = "Configuration for a PostgreSQL RDS instance."
+  description = "Configuration for an RDS instance."
   type = object({
     allocated_storage                     = number
     apply_immediately                     = bool
