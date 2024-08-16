@@ -30,7 +30,7 @@ class Images(IDABaseViewSet):
     """API endpoint for managing DAM images."""
 
     permission_classes = [ImageAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & ImageAccessPolicy]
 
     queryset = rs_resource.objects.filter(resource_type=1, archive=0, ref__gte=0)
     serializer_class = RSImageSerializer

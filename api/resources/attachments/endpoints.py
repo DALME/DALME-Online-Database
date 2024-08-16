@@ -21,7 +21,7 @@ class Attachments(viewsets.ModelViewSet):
     """API endpoint for managing attachments."""
 
     permission_classes = [AttachmentAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & AttachmentAccessPolicy]
 
     parser_classes = (MultiPartParser, FormParser, FileUploadParser)
     queryset = Attachment.objects.all()

@@ -19,7 +19,7 @@ class Library(viewsets.ViewSet):
     """API endpoint for accessing Zotero libraries."""
 
     permission_classes = [LibraryAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & LibraryAccessPolicy]
 
     def list(self, request, *args, **kwargs):  # noqa: ARG002
         """Return list of bibliographic sources."""

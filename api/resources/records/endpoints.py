@@ -27,7 +27,7 @@ class Records(IDABaseViewSet):
     """API endpoint for managing records."""
 
     permission_classes = [RecordAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & RecordAccessPolicy]
 
     queryset = Record.objects.all()
     # queryset = Record.include_attrs.all()

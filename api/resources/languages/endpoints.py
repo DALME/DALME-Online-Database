@@ -13,7 +13,7 @@ class Languages(IDABaseViewSet):
     """API endpoint for managing languages."""
 
     permission_classes = [GeneralAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & GeneralAccessPolicy]
 
     queryset = LanguageReference.objects.all()
     serializer_class = LanguageReferenceSerializer

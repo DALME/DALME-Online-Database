@@ -20,7 +20,7 @@ class Rights(IDABaseViewSet):
     """API endpoint for managing rights policies."""
 
     permission_classes = [RightsAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & RightsAccessPolicy]
 
     queryset = RightsPolicy.objects.all()
     serializer_class = RightsPolicySerializer

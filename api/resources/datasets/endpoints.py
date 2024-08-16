@@ -13,7 +13,7 @@ class Datasets(viewsets.GenericViewSet):
     """API endpoint for generating and retrieving datasets."""
 
     permission_classes = [PublicAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & PublicAccessPolicy]
 
     def retrieve(self, request, pk=None, fmt=None):  # noqa: ARG002
         """Return requested dataset."""

@@ -19,7 +19,7 @@ class Places(IDABaseViewSet):
     """API endpoint for managing places."""
 
     permission_classes = [PlaceAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & PlaceAccessPolicy]
 
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer

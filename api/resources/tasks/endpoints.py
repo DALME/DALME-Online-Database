@@ -28,7 +28,7 @@ class Tasks(IDABaseViewSet):
     """API endpoint for managing tasks."""
 
     permission_classes = [TaskAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & TaskAccessPolicy]
 
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
@@ -72,7 +72,7 @@ class TaskLists(IDABaseViewSet):
     """API endpoint for managing tasks lists."""
 
     permission_classes = [TaskListAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & TaskListAccessPolicy]
 
     queryset = TaskList.objects.all()
     serializer_class = TaskListSerializer

@@ -26,7 +26,7 @@ class Tickets(IDABaseViewSet):
     """API endpoint for managing issue tickets."""
 
     permission_classes = [TicketAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & TicketAccessPolicy]
 
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer

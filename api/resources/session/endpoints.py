@@ -13,7 +13,7 @@ class Session(viewsets.ViewSet):
     """API endpoint for managing user sessions."""
 
     permission_classes = [SessionAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & SessionAccessPolicy]
 
     def retrieve(self, request, pk=None):  # noqa: ARG002
         """Return session."""

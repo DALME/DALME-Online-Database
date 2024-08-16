@@ -153,7 +153,6 @@ resource "aws_cloudfront_origin_access_control" "s3" {
   signing_protocol                  = "sigv4"
 }
 
-# TODO: This should be _reusable, just pass in the file reference.
 resource "aws_cloudfront_function" "viewer_request" {
   name    = module.cloudfront_function_label_vr.id
   runtime = "cloudfront-js-1.0"

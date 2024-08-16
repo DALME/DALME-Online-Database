@@ -23,7 +23,7 @@ class Users(IDABaseViewSet):
     """API endpoint for managing users."""
 
     permission_classes = [UserAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & UserAccessPolicy]
 
     lookup_url_kwarg = 'pk'
     queryset = get_user_model().objects.all()

@@ -33,8 +33,9 @@ class Pages(IDABaseViewSet):
     """API endpoint for managing pages."""
 
     permission_classes = [PageAccessPolicy]
-    # TODO: commented out because it's preventing access to unregistered users from the public frontend
-    # this shuould probably be integrated with the overal permissions system, e.g. PageAccessPolicy
+    # TODO: commented out because it's preventing access to unregistered users
+    # from the public frontend this should probably be integrated with the
+    # overal permissions system, e.g. PageAccessPolicy
     # oauth_permission_classes = [TokenHasReadWriteScope]
 
     queryset = Page.objects.all()

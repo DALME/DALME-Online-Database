@@ -13,7 +13,7 @@ class Ping(viewsets.ViewSet):
     """Determine if the API is up and running."""
 
     permission_classes = [SessionAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & SessionAccessPolicy]
 
     @action(detail=False, methods=['get'])
     def ping(self, request):

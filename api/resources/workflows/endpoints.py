@@ -27,7 +27,7 @@ class Workflows(viewsets.ModelViewSet):
     """API endpoint for managing the project's workflow."""
 
     permission_classes = [WorkflowAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & WorkflowAccessPolicy]
 
     queryset = Workflow.objects.all()
     serializer_class = WorkflowSerializer

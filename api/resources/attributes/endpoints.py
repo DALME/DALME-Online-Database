@@ -37,7 +37,7 @@ class ContentTypes(IDABaseViewSet):
     """API endpoint for managing ContentTypes."""
 
     permission_classes = [GeneralAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & GeneralAccessPolicy]
 
     queryset = ContentTypeExtended.objects.all()
     serializer_class = ContentTypeSerializer
@@ -48,7 +48,7 @@ class AttributeTypes(IDABaseViewSet):
     """API endpoint for managing attribute types."""
 
     permission_classes = [AttributeTypesAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & AttributeTypesAccessPolicy]
     queryset = AttributeType.objects.all()
     serializer_class = AttributeTypeSerializer
     is_public = False
@@ -100,6 +100,7 @@ class PublicAttributeTypes(AttributeTypes):
     """Public API endpoint for managing attribute types."""
 
     permission_classes = [PublicAccessPolicy]
+    oauth_permission_classes = [PublicAccessPolicy]
     is_public = True
 
 
@@ -107,7 +108,7 @@ class Attributes(IDABaseViewSet):
     """API endpoint for managing attributes and options."""
 
     permission_classes = [AttributeAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & AttributeAccessPolicy]
     queryset = Attribute.objects.all().order_by('attribute_type')
     serializer_class = AttributeSerializer
     is_public = False
@@ -147,4 +148,5 @@ class PublicAttributes(Attributes):
     """Public API endpoint for managing attributes and options."""
 
     permission_classes = [PublicAccessPolicy]
+    oauth_permission_classes = [PublicAccessPolicy]
     is_public = True

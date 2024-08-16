@@ -25,7 +25,7 @@ class Transcriptions(viewsets.ModelViewSet):
     """API endpoint for managing transcriptions."""
 
     permission_classes = [TranscriptionAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & TranscriptionAccessPolicy]
 
     queryset = Transcription.objects.all()
     serializer_class = TranscriptionSerializer

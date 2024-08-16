@@ -13,7 +13,7 @@ class Countries(IDABaseViewSet):
     """API endpoint for managing countries."""
 
     permission_classes = [GeneralAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & GeneralAccessPolicy]
 
     queryset = CountryReference.objects.all()
     serializer_class = CountryReferenceSerializer

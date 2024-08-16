@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 
 class IDABaseViewSet(viewsets.ModelViewSet):
-    """Generic viewset. Should be subclassed for specific API endpoints."""
+    """Generic viewset. Should be subclassed for s§pecific API endpoints."""
 
     authentication_classes = None  # This is dynamic, see `initialize_request`.
 
@@ -26,11 +26,8 @@ class IDABaseViewSet(viewsets.ModelViewSet):
         authentication = OAuth2Authentication if is_ajax else SessionAuthentication
         self.authentication_classes = [authentication]  # Should only ever be one or the other.
 
-        if is_ajax and self.oauth_permission_classes:
-            self.permission_classes = [
-                *self.oauth_permission_classes,
-                *self.permission_classes,
-            ]
+        if is_ajax:
+            self.permission_classes = self.oauth_permission_classes
 
         return super().initialize_request(request, *args, **kwargs)
 

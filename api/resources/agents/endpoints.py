@@ -19,7 +19,7 @@ class Agents(IDABaseViewSet):
     """API endpoint for managing agents."""
 
     permission_classes = [AgentAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & AgentAccessPolicy]
 
     queryset = Agent.objects.all()
     serializer_class = AgentSerializer

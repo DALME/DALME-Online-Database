@@ -24,7 +24,7 @@ class Comments(viewsets.ModelViewSet):
     """API endpoint for managing comments."""
 
     permission_classes = [CommentAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & CommentAccessPolicy]
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer

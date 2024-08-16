@@ -13,7 +13,7 @@ class Locations(IDABaseViewSet):
     """API endpoint for managing places."""
 
     permission_classes = [GeneralAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & GeneralAccessPolicy]
 
     queryset = Location.objects.all()
     serializer_class = LocationSerializer

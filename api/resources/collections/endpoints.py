@@ -26,7 +26,7 @@ class Collections(IDABaseViewSet):
     """API endpoint for managing collections."""
 
     permission_classes = [CollectionAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & CollectionAccessPolicy]
 
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer

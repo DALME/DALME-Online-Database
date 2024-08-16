@@ -19,7 +19,7 @@ class Locales(IDABaseViewSet):
     """API endpoint for managing locales."""
 
     permission_classes = [LocaleAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & LocaleAccessPolicy]
 
     queryset = LocaleReference.objects.all()
     serializer_class = LocaleReferenceSerializer
