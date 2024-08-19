@@ -8,7 +8,7 @@ locals {
   environment = "staging"
 
   # AWS data
-  aws_account = 800895234148
+  aws_account = 905418315284
   admins = [
     "ops@ocp.systems",
   ]

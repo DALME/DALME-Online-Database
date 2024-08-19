@@ -11,9 +11,9 @@ concurrency:
 env:
   APP: ida
   ROLE: gha-oidc-role
-  ACCOUNT: ${{ github.repository_owner == 'DALME' && 701541878387 || 800895234148 }}
+  ACCOUNT: ${{ github.repository_owner == 'DALME' && 701541878387 || 905418315284 }}
   ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-  REGION: ${{ github.repository_owner == 'DALME' && 'us-east-1' || 'eu-west-2' }}
+  REGION: us-east-1
   ROLE_SESSION: GithubActionsOIDCDeploy
   TAG: ${{ github.ref_name == 'main' && 'latest' || 'staging' }}
   TF_ROOT: ./tf
