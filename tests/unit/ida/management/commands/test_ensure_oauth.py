@@ -16,7 +16,7 @@ EXPECTED_TENANTS = ['ida', 'dalme', 'pharmacopeias']
 @mock.patch('ida.management.commands.ensure_oauth.call_command')
 @mock.patch('ida.management.commands.ensure_oauth.Application')
 @mock.patch('ida.management.commands.ensure_oauth.logger')
-def test_ensure_oauth_create_appliaction_some_failure(mock_logger, mock_application, mock_call_command, mock_io):
+def test_ensure_oauth_create_application_some_failure(mock_logger, mock_application, mock_call_command, mock_io):
     mock_application.DoesNotExist = Application.DoesNotExist
     mock_application.objects.get.side_effect = Application.DoesNotExist('Some error')
     mock_io.return_value.__enter__.return_value.getvalue.return_value = 'Some error message'

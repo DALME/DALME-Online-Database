@@ -15,13 +15,13 @@ class IDABaseViewSet(viewsets.ModelViewSet):
     permission_classes = []
     oauth_permission_classes = []
 
+    context = None
     queryset = None
     serializer_class = None
-    context = None
 
     def initialize_request(self, request, *args, **kwargs):
         """Override to switch between session or OAuth authentication systems."""
-        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        is_ajax = request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
         authentication = OAuth2Authentication if is_ajax else SessionAuthentication
         self.authentication_classes = [authentication]  # Should only ever be one or the other.
