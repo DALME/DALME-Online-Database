@@ -10,6 +10,17 @@ JUMP_HOST := $(NAMESPACE)-$(ENVIRONMENT)-network-jump-host-asg
 CLUSTER := $(NAMESPACE)-$(ENVIRONMENT)-ecs-cluster
 SERVICE := $(NAMESPACE)-$(ENVIRONMENT)-ecs-service
 
+# DAG order of infra module application.
+APPLY := authorization \
+	network \
+	security \
+	firewall \
+	load-balancer \
+	cdn \
+	datastores \
+	orchestration \
+	ida
+
 deploy.help:
 	@echo "  deploy.apply           provision a single module"
 	@echo "  deploy.ecs             update the ecs service/task"
