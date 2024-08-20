@@ -6,7 +6,7 @@
 data "aws_vpc" "this" {
   tags = {
     Environment = var.environment
-    Namepsace   = var.namespace
+    Namespace   = var.namespace
   }
 }
 
