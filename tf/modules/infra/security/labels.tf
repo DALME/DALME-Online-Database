@@ -9,5 +9,5 @@ module "kms_label" {
   name        = "kms"
   attributes  = ["key", "global"]
 
-  labels_as_tags = ["name"]
+  labels_as_tags = ["namespace", "environment", "name"]
 }

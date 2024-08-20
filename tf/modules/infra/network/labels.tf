@@ -8,7 +8,7 @@ module "network_label" {
   environment = var.environment
   name        = "network"
 
-  labels_as_tags = ["name"]
+  labels_as_tags = ["namespace", "environment", "name"]
 }
 
 module "network_jh_asg_label" {
