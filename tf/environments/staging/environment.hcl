@@ -15,7 +15,7 @@ locals {
   # NOTE: You can get this value by calling `aws sts get-caller-identity`
   # against whatever SSO profile you are using to invoke terraform.
   allowed_roles = [
-    "arn:aws:sts::905418248901:assumed-role/AWSReservedSSO_AWSAdministratorAccess_6443825320a5e78f/james_harrington",
+    "arn:aws:sts::905418315284:assumed-role/AWSReservedSSO_AWSAdministratorAccess_f0b0802c3e187d9c/jhrr",
   ]
 
   # General infrastructure data
