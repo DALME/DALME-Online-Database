@@ -118,7 +118,7 @@ deploy.lint: _deploy.format _deploy.validate \
 	_deploy.docs _deploy.tfsec
 .PHONY: deploy.lint
 
-deploy.plan:
+deploy.plan:  _deploy.ensure.cache
 ifndef module
 	$(error Supply module for operation. \
 		Usage: make deploy.plan module=ecs)
