@@ -1,7 +1,6 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 RESOLVER := /etc/resolver/localhost
-TENANTS = dalme pharmacopeias
 
 web.help:
 	@echo "  web.collectstatic      bundle static files for all apps and tenants"
