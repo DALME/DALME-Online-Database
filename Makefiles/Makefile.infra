@@ -2,11 +2,11 @@
 # vi: set ft=make :
 
 infra.help:
-	@echo "  infra.bootstrap        ready the development environment"
-	@echo "  infra.log              tail the container logs"
-	@echo "  infra.rebuild          rebuild the containers"
-	@echo "  infra.start            spin up the container network"
-	@echo "  infra.stop             stop the container network"
+	@echo "  infra.bootstrap          ready the development environment"
+	@echo "  infra.log                tail the container logs"
+	@echo "  infra.rebuild            rebuild the containers"
+	@echo "  infra.start              spin up the container network"
+	@echo "  infra.stop               stop the container network"
 	@echo ""
 .PHONY: infra.help
 

@@ -25,11 +25,11 @@ help:
 	@echo "usage: make [option]"
 	@echo "Makefile for running development tasks. Requires gmake."
 	@echo ""
-	@echo "  dev                    run the developer environment"
-	@echo "  help                   show this message"
-	@echo "  init                   bootstrap the developer environment"
-	@echo "  sync                   update and rebuild the developer environment"
-	@echo "  test                   run the entire automated test suite"
+	@echo "  dev                      run the developer environment"
+	@echo "  help                     show this message"
+	@echo "  init                     bootstrap the developer environment"
+	@echo "  sync                     update and rebuild the developer environment"
+	@echo "  test                     run the entire automated test suite"
 	@echo ""
 	@$(MAKE) db.help
 	@$(MAKE) deploy.help

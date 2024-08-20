@@ -4,13 +4,13 @@ NODE_MODULES := $(UI)/node_modules
 PROXY_PORT := 8000
 
 ui.help:
-	@echo "  ui.lint                invoke eslint over the ui code"
-	@echo "  ui.open                view the ui in your browser"
-	@echo "  ui.shell               shell into the ui container"
-	@echo "  ui.sync                install the ui dependencies and rebuild the service"
-	@echo "  ui.test                run the ui test suite"
-	@echo "  ui.test.debug          run the ui test suite and halt on breakpoints"
-	@echo "  ui.test.watch          re-run the test suite on code changes"
+	@echo "  ui.lint                  invoke eslint over the ui code"
+	@echo "  ui.open                  view the ui in your browser"
+	@echo "  ui.shell                 shell into the ui container"
+	@echo "  ui.sync                  install the ui dependencies and rebuild the service"
+	@echo "  ui.test                  run the ui test suite"
+	@echo "  ui.test.debug            run the ui test suite and halt on breakpoints"
+	@echo "  ui.test.watch            re-run the test suite on code changes"
 	@echo ""
 .PHONY: ui.help
 

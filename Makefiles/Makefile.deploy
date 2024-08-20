@@ -22,19 +22,21 @@ APPLY := authorization \
 	ida
 
 deploy.help:
-	@echo "  deploy.apply           provision a single module"
-	@echo "  deploy.ecs             update the ecs service/task"
-	@echo "  deploy.destroy         delete a single module"
-	@echo "  deploy.init            initialize a single resource module"
-	@echo "  deploy.init.upgrade    re-init/upgrade terraform providers for a module"
-	@echo "  deploy.lint            invoke all terraform linters"
-	@echo "  deploy.plan            generate a provisioning scheme for a single terraform module"
-	@echo "  deploy.state.ls        detail the resources in the state for a module"
-	@echo "  deploy.state.rm        do some surgery on the state for a module"
-	@echo "  deploy.shell           shell into the deploy container"
-	@echo "  deploy.ssh             open a secure shell to a deploy environment"
-	@echo "  deploy.tunnel          forward ports via a secure tunnel into a deploy environment"
-	@echo "  deploy.update          update all terraform provider and third-party module versions"
+	@echo "  deploy.apply             provision a single module"
+	@echo "  deploy.ecs               update the ecs service/task"
+	@echo "  deploy.destroy           delete a single module"
+	@echo "  deploy.init              initialize a single resource module"
+	@echo "  deploy.init.upgrade      re-init/upgrade terraform providers for a module"
+	@echo "  deploy.lint              invoke all terraform linters"
+	@echo "  deploy.plan              generate a provisioning scheme for a single terraform module"
+	@echo "  deploy.state.ls          detail the resources in the state for a module"
+	@echo "  deploy.state.rm          do some surgery on the state for a module"
+	@echo "  deploy.shell             shell into the deploy container"
+	@echo "  deploy.ssh               open a secure shell to a deploy environment"
+	@echo "  deploy.tunnel            forward ports via a secure tunnel into a deploy environment"
+	@echo "  deploy.update            update all terraform provider and third-party module versions"
+	@echo "  deploy.validate          validate all terraform modules and configuration."
+	@echo "  deploy.validate.module   validate a single terraform modules."
 	@echo ""
 .PHONY: deploy.help
 
@@ -190,6 +192,44 @@ deploy.tunnel:
 deploy.update: _deploy.update.provider _deploy.update.module
 .PHONY: deploy.update
 
+# Ensure validate doesn't try to call out to any kind of backend when it runs
+# during pre-commit. This seems to be a bug in terragrunt/terraform which only
+# happens with certain modules. Here we just ensure no auto init happens,
+# which is easier than muddying everything else up with dynamic machinery.
+deploy.validate:
+ifdef IN_CI
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		$(NAMESPACE).deploy \
+		terragrunt run-all validate \
+		--terragrunt-working-dir environments/$(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+else
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		$(NAMESPACE).deploy \
+		terragrunt run-all validate \
+		--terragrunt-working-dir environments/$(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG) \
+		--terragrunt-no-auto-init
+endif
+.PHONY: deploy.validate
+
+deploy.validate.module:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.validate module=vpc)
+else
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		$(NAMESPACE).deploy \
+		terragrunt validate \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG) \
+		$(args)
+endif
+.PHONY: deploy.validate.module
+
 ### Private (non-interface) targets.
 _deploy.confirm.destroy:
 	@echo "CAUTION - Are you certain? Confirm with 'destroy' [destroy/N] " && \
@@ -259,16 +299,3 @@ _deploy.update.provider:
 		tfupdate provider aws modules -r
 	@$(MAKE) _deploy.update.message
 .PHONY: _deploy.update.provider
-
-# Ensure validate doesn't try to call out to any kind of backend when it runs
-# during pre-commit. This seems to be a bug in terragrunt/terraform which only
-# happens with the security module. Here we just ensure no auto init happens,
-# which is easier than muddying everything else up with dynamic machinery.
-_deploy.validate:
-	docker compose run -T --rm \
-		-e TF_DISABLE_INIT=true \
-		$(NAMESPACE).deploy \
-		terragrunt run-all validate \
-		--terragrunt-working-dir environments/$(ENVIRONMENT) \
-		--terragrunt-log-level $(TF_LOG)
-.PHONY: _deploy.validate

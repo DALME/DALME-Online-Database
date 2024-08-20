@@ -3,17 +3,17 @@
 RESOLVER := /etc/resolver/localhost
 
 web.help:
-	@echo "  web.collectstatic      bundle static files for all apps and tenants"
-	@echo "  web.manage             call django management commands"
-	@echo "  web.open               view the site in your browser"
-	@echo "  web.python             shell into python on the web container"
-	@echo "  web.shell              shell into the web container"
-	@echo "  web.sync               install the web requirements and rebuild the service"
-	@echo "  web.test               run the web test suite in full"
-	@echo "  web.test.i             run only the web integration tests"
-	@echo "  web.test.p             run only the web property tests"
-	@echo "  web.test.u             run only the web unit tests"
-	@echo "  web.test.watch         re-run the test suite on code changes"
+	@echo "  web.collectstatic        bundle static files for all apps and tenants"
+	@echo "  web.manage               call django management commands"
+	@echo "  web.open                 view the site in your browser"
+	@echo "  web.python               shell into python on the web container"
+	@echo "  web.shell                shell into the web container"
+	@echo "  web.sync                 install the web requirements and rebuild the service"
+	@echo "  web.test                 run the web test suite in full"
+	@echo "  web.test.i               run only the web integration tests"
+	@echo "  web.test.p               run only the web property tests"
+	@echo "  web.test.u               run only the web unit tests"
+	@echo "  web.test.watch           re-run the test suite on code changes"
 	@echo ""
 .PHONY: web.help
 

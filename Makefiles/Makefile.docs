@@ -2,10 +2,10 @@
 # vi: set ft=make :
 
 docs.help:
-	@echo "  docs.render            output the documentation as html"
-	@echo "  docs.shell             shell into the docs container"
-	@echo "  docs.sync              compile the docs requirements file and rebuild the service"
-	@echo "  docs.write             run the documentation live-reload server"
+	@echo "  docs.render              output the documentation as html"
+	@echo "  docs.shell               shell into the docs container"
+	@echo "  docs.sync                compile the docs requirements file and rebuild the service"
+	@echo "  docs.write               run the documentation live-reload server"
 	@echo ""
 .PHONY: docs.help
 
