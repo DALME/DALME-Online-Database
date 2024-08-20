@@ -33,6 +33,7 @@ ifndef module
 		Usage: make deploy.apply module=ecs)
 else
 	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		-e IAMLIVE=$(IAMLIVE) \
 		$(NAMESPACE).deploy \
 		terragrunt apply \
@@ -47,6 +48,7 @@ ifndef module
 		Usage: make deploy.destroy module=ecs)
 else
 	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt destroy \
 		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
@@ -58,6 +60,7 @@ endif
 
 deploy.ecs:
 	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		ecs deploy $(CLUSTER) $(SERVICE) \
 		--timeout -1
@@ -65,6 +68,7 @@ deploy.ecs:
 
 deploy.graph:
 	docker compose run -T --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt graph-dependencies \
 		--terragrunt-working-dir environments/$(ENVIRONMENT) \
@@ -109,6 +113,7 @@ ifndef module
 		Usage: make deploy.plan module=ecs)
 else
 	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		-e IAMLIVE=$(IAMLIVE) \
 		$(NAMESPACE).deploy \
 		terragrunt plan \
@@ -129,6 +134,7 @@ ifndef module
 		Usage: make deploy.state.ls module=ecs)
 else
 	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt state list \
 		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
@@ -144,6 +150,7 @@ ifndef resource
 		module=ecs)
 else
 	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt state rm \
 		$(resource) \
@@ -228,6 +235,7 @@ ifndef args
 		args='3.15.1 terraform-aws-modules/s3-bucket/aws')
 else
 	docker compose run -T --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		tfupdate module -r --version $(args) modules
 endif
