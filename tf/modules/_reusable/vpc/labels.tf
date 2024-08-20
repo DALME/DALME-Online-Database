@@ -51,8 +51,8 @@ module "vpc_rt_private_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes         = ["rt"]
-  additional_tag_map = { Scope = "private" }
+  attributes = ["rt"]
+  tags       = { Scope = "private" }
 
   context = module.vpc_label.context
 }
@@ -61,8 +61,8 @@ module "vpc_rt_public_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes         = ["rt"]
-  additional_tag_map = { Scope = "public" }
+  attributes = ["rt"]
+  tags       = { Scope = "public" }
 
   context = module.vpc_label.context
 }
@@ -71,8 +71,8 @@ module "vpc_subnet_private_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes         = ["subnet"]
-  additional_tag_map = { Scope = "private" }
+  attributes = ["subnet"]
+  tags       = { Scope = "private" }
 
   context = module.vpc_label.context
 }
@@ -81,8 +81,8 @@ module "vpc_subnet_public_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes         = ["subnet"]
-  additional_tag_map = { Scope = "public" }
+  attributes = ["subnet"]
+  tags       = { Scope = "public" }
 
   context = module.vpc_label.context
 }
