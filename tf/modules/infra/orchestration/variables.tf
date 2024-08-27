@@ -19,6 +19,11 @@ variable "postgres_port" {
   type        = number
 }
 
+variable "postgres_version" {
+  description = "Version of rds postgres in use forming part of its identifier."
+  type        = number
+}
+
 variable "proxy_port" {
   description = "Reverse proxy listening port."
   type        = number

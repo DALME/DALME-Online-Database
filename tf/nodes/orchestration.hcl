@@ -26,6 +26,7 @@ inputs = {
     weight            = 100
     capacity_provider = local.spot_provider
   }
-  postgres_port = local.ports.postgres
-  proxy_port    = local.ports.proxy
+  postgres_port    = local.ports.postgres
+  postgres_version = 15
+  proxy_port       = local.ports.proxy
 }
