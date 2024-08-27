@@ -23,6 +23,7 @@ inputs = {
     engine                                = "postgres"
     engine_version                        = 15
     iam_database_authentication_enabled   = false
+    identifier                            = "rds-postgres"
     instance_class                        = "db.t3.micro"
     ipv6_cidr_blocks                      = "::/0"
     storage_encrypted                     = true

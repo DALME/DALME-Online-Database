@@ -37,7 +37,6 @@
 | <a name="input_ami_most_recent"></a> [ami\_most\_recent](#input\_ami\_most\_recent) | If more than one ami result is returned, use the most recent. | `bool` | `true` | no |
 | <a name="input_ami_name_regex"></a> [ami\_name\_regex](#input\_ami\_name\_regex) | Regex for filtering down the ami data source. | `string` | n/a | yes |
 | <a name="input_ami_owners"></a> [ami\_owners](#input\_ami\_owners) | List of AMI owners for filtering down the ami data source | `list(string)` | <pre>[<br>  "amazon"<br>]</pre> | no |
-| <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Create a security group to house the instance. | `bool` | `true` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_iam_instance_profile_name"></a> [iam\_instance\_profile\_name](#input\_iam\_instance\_profile\_name) | The IAM Instance Profile to attach to the instance. | `string` | n/a | yes |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | The type of the ec2 instance. | `string` | n/a | yes |

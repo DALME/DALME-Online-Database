@@ -23,12 +23,6 @@ variable "ami_owners" {
   default     = ["amazon"]
 }
 
-variable "create_security_group" {
-  description = "Create a security group to house the instance."
-  type        = bool
-  default     = true
-}
-
 variable "environment" {
   description = "Identify the deployment environment."
   type        = string

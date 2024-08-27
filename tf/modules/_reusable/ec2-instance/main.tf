@@ -1,8 +1,6 @@
 # Entrypoint for the ec2-instance module.
 
 resource "aws_security_group" "this" {
-  count = var.create_security_group ? 1 : 0
-
   description = "Security group for the ec2 instance."
   name_prefix = "${module.ec2_label_sg.name}-"
   vpc_id      = var.vpc_id
@@ -15,7 +13,7 @@ resource "aws_security_group" "this" {
 }
 
 locals {
-  default_security_group_id = aws_security_group.this[0].id
+  default_security_group_id = aws_security_group.this.id
 }
 
 resource "aws_launch_template" "this" {

@@ -8,11 +8,10 @@ data "aws_kms_alias" "global" {
 }
 
 data "aws_security_group" "tunnel" {
-  name = "${var.namespace}-${var.environment}-ec2-jump-host-security-group"
-
   tags = {
     Environment = var.environment
     Namespace   = var.namespace
+    Name        = "${var.namespace}-${var.environment}-ec2-jump-host-security-group"
   }
 }
 
