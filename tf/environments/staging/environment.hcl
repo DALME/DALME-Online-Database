@@ -37,6 +37,6 @@ locals {
   tenant_domains = [
     "ida.ocp.systems",
     "dalme.ocp.systems",
-    "globalpharmacopeias.ocp.systems",
+    "pharmacopeias.ocp.systems",
   ]
 }
