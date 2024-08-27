@@ -34,8 +34,8 @@
 |------|------|
 | [aws_cloudfront_function.viewer_request](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudfront_function) | resource |
 | [aws_cloudfront_origin_access_control.s3](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudfront_origin_access_control) | resource |
-| [aws_route53_record.www-a](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/route53_record) | resource |
-| [aws_route53_record.www-aaaa](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/route53_record) | resource |
+| [aws_route53_record.www_a](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/route53_record) | resource |
+| [aws_route53_record.www_aaaa](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/route53_record) | resource |
 | [aws_s3_bucket_policy.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/s3_bucket_policy) | resource |
 | [aws_s3_bucket_policy.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/s3_bucket_policy) | resource |
 | [aws_iam_policy_document.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
@@ -48,7 +48,6 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_default_root_object"></a> [default\_root\_object](#input\_default\_root\_object) | The object to return (for example, index.html) the root URL is requested. | `string` | `null` | no |
 | <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate DNS record. | `number` | n/a | yes |
 | <a name="input_domain"></a> [domain](#input\_domain) | The origin of the service. | `string` | n/a | yes |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether deletion protection is active on buckets. | `bool` | n/a | yes |

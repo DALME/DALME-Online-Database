@@ -5,12 +5,6 @@ variable "force_destroy" {
   type        = bool
 }
 
-variable "default_root_object" {
-  description = "The object to return (for example, index.html) the root URL is requested."
-  type        = string
-  default     = null
-}
-
 variable "dns_ttl" {
   description = "Time to live for the certificate DNS record."
   type        = number

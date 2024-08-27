@@ -22,7 +22,7 @@ locals {
   origin_id_staticfiles = "${var.namespace}-${var.environment}-s3-origin-staticfiles"
 }
 
-// Buckets
+# Buckets
 module "access_logs" {
   source = "../..//_reusable/bucket/"
 
@@ -144,7 +144,7 @@ module "staticfiles" {
   }
 }
 
-// Distribution
+# Distribution
 resource "aws_cloudfront_origin_access_control" "s3" {
   name                              = module.cdn_oac_label.id
   description                       = "OAC for Cloudfront"
@@ -228,10 +228,12 @@ module "cloudfront" {
         }
       }
 
-      function_association = {
-        event_type   = "viewer-request"
-        function_arn = aws_cloudfront_function.viewer_request.arn
-      }
+      function_association = [
+        {
+          event_type   = "viewer-request"
+          function_arn = aws_cloudfront_function.viewer_request.arn
+        }
+      ]
     },
     {
       path_pattern           = "/media*"
@@ -252,8 +254,8 @@ module "cloudfront" {
   ]
 }
 
-// DNS
-resource "aws_route53_record" "www-a" {
+# DNS
+resource "aws_route53_record" "www_a" {
   for_each = data.aws_route53_zone.tenant_zones
   zone_id  = each.value.zone_id
   name     = each.value.name
@@ -266,7 +268,7 @@ resource "aws_route53_record" "www-a" {
   }
 }
 
-resource "aws_route53_record" "www-aaaa" {
+resource "aws_route53_record" "www_aaaa" {
   for_each = data.aws_route53_zone.tenant_zones
   zone_id  = each.value.zone_id
   name     = each.value.name

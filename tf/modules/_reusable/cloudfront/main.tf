@@ -148,7 +148,7 @@ resource "aws_cloudfront_distribution" "this" {
         iterator = f
 
         content {
-          event_type   = f.key
+          event_type   = f.value.event_type
           function_arn = f.value.function_arn
         }
       }
@@ -203,7 +203,7 @@ resource "aws_cloudfront_distribution" "this" {
         iterator = f
 
         content {
-          event_type   = f.key
+          event_type   = f.value.event_type
           function_arn = f.value.function_arn
         }
       }
