@@ -15,14 +15,14 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_this_label"></a> [this\_label](#module\_this\_label) | cloudposse/label/null | 0.25.0 |
-| <a name="module_this_label_certificate"></a> [this\_label\_certificate](#module\_this\_label\_certificate) | cloudposse/label/null | 0.25.0 |
-| <a name="module_this_label_log_es_application"></a> [this\_label\_log\_es\_application](#module\_this\_label\_log\_es\_application) | cloudposse/label/null | 0.25.0 |
-| <a name="module_this_label_log_index_slow"></a> [this\_label\_log\_index\_slow](#module\_this\_label\_log\_index\_slow) | cloudposse/label/null | 0.25.0 |
-| <a name="module_this_label_log_policy"></a> [this\_label\_log\_policy](#module\_this\_label\_log\_policy) | cloudposse/label/null | 0.25.0 |
-| <a name="module_this_label_log_search_slow"></a> [this\_label\_log\_search\_slow](#module\_this\_label\_log\_search\_slow) | cloudposse/label/null | 0.25.0 |
-| <a name="module_this_label_service_linked_role"></a> [this\_label\_service\_linked\_role](#module\_this\_label\_service\_linked\_role) | cloudposse/label/null | 0.25.0 |
-| <a name="module_this_label_sg"></a> [this\_label\_sg](#module\_this\_label\_sg) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_certificate_label"></a> [opensearch\_certificate\_label](#module\_opensearch\_certificate\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_label"></a> [opensearch\_label](#module\_opensearch\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_log_es_application_label"></a> [opensearch\_log\_es\_application\_label](#module\_opensearch\_log\_es\_application\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_log_index_slow_label"></a> [opensearch\_log\_index\_slow\_label](#module\_opensearch\_log\_index\_slow\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_log_policy_label"></a> [opensearch\_log\_policy\_label](#module\_opensearch\_log\_policy\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_log_search_slow_label"></a> [opensearch\_log\_search\_slow\_label](#module\_opensearch\_log\_search\_slow\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_service_linked_role_label"></a> [opensearch\_service\_linked\_role\_label](#module\_opensearch\_service\_linked\_role\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_sg_label"></a> [opensearch\_sg\_label](#module\_opensearch\_sg\_label) | cloudposse/label/null | 0.25.0 |
 
 ## Resources
 

@@ -7,7 +7,7 @@ output "endpoint" {
 
 output "label_context" {
   description = "The root label context."
-  value       = module.this_label.context
+  value       = module.opensearch_label.context
 }
 
 output "security_group_id" {

@@ -1,6 +1,6 @@
 # Labels for the opensearch module.
 
-module "this_label" {
+module "opensearch_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
@@ -11,68 +11,68 @@ module "this_label" {
   labels_as_tags = ["namespace", "environment", "name"]
 }
 
-module "this_label_certificate" {
+module "opensearch_certificate_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["ssl", "certificate"]
 
-  context = module.this_label.context
+  context = module.opensearch_label.context
 }
 
-module "this_label_sg" {
+module "opensearch_sg_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["security", "group"]
 
-  context = module.this_label.context
+  context = module.opensearch_label.context
 }
 
-module "this_label_service_linked_role" {
+module "opensearch_service_linked_role_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["service", "linked", "role"]
 
-  context = module.this_label.context
+  context = module.opensearch_label.context
 }
 
-module "this_label_log_policy" {
+module "opensearch_log_policy_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["log", "policy"]
 
-  context = module.this_label.context
+  context = module.opensearch_label.context
 }
 
-module "this_label_log_es_application" {
+module "opensearch_log_es_application_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["es-application"]
   delimiter  = "/"
 
-  context = module.this_label.context
+  context = module.opensearch_label.context
 }
 
-module "this_label_log_index_slow" {
+module "opensearch_log_index_slow_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["index-slow"]
   delimiter  = "/"
 
-  context = module.this_label.context
+  context = module.opensearch_label.context
 }
 
-module "this_label_log_search_slow" {
+module "opensearch_log_search_slow_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
   attributes = ["search-slow"]
   delimiter  = "/"
 
-  context = module.this_label.context
+  context = module.opensearch_label.context
 }

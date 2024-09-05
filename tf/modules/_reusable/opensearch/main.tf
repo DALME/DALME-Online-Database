@@ -17,7 +17,7 @@ resource "aws_acm_certificate" "this" {
     create_before_destroy = true
   }
 
-  tags = module.this_label_certificate.tags
+  tags = module.opensearch_certificate_label.tags
 }
 
 resource "aws_acm_certificate_validation" "this" {
@@ -59,32 +59,32 @@ resource "aws_iam_service_linked_role" "this" {
   aws_service_name = "opensearchservice.amazonaws.com"
   description      = "AWSServiceRoleForAmazonOpenSearchService"
 
-  tags = module.this_label_service_linked_role.tags
+  tags = module.opensearch_service_linked_role_label.tags
 }
 
 # Logs - https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticsearch/model/LogType.html
 resource "aws_cloudwatch_log_group" "es_application" {
-  name              = module.this_label_log_es_application.id
+  name              = module.opensearch_log_es_application_label.id
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
-  tags = module.this_label_log_es_application.tags
+  tags = module.opensearch_log_es_application_label.tags
 }
 
 resource "aws_cloudwatch_log_group" "index_slow" {
-  name              = module.this_label_log_index_slow.id
+  name              = module.opensearch_log_index_slow_label.id
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
-  tags = module.this_label_log_index_slow.tags
+  tags = module.opensearch_log_index_slow_label.tags
 }
 
 resource "aws_cloudwatch_log_group" "search_slow" {
-  name              = module.this_label_log_search_slow.id
+  name              = module.opensearch_log_search_slow_label.id
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
-  tags = module.this_label_log_search_slow.tags
+  tags = module.opensearch_log_search_slow_label.tags
 }
 
 data "aws_iam_policy_document" "log_policy" {
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "log_policy" {
 
 resource "aws_cloudwatch_log_resource_policy" "log_policy" {
   policy_document = data.aws_iam_policy_document.log_policy.json
-  policy_name     = module.this_label_log_policy.id
+  policy_name     = module.opensearch_log_policy_label.id
 }
 
 data "aws_secretsmanager_secret_version" "master_user" {
@@ -228,17 +228,17 @@ resource "aws_opensearch_domain" "this" {
 }
 CONFIG
 
-  tags = module.this_label.tags
+  tags = module.opensearch_label.tags
 }
 
 resource "aws_security_group" "this" {
   description = "Security group for the OpenSearch instance."
-  name_prefix = module.this_label_sg.id
+  name_prefix = module.opensearch_sg_label.id
   vpc_id      = var.vpc_id
 
   lifecycle {
     create_before_destroy = true
   }
 
-  tags = module.this_label_sg.tags
+  tags = module.opensearch_sg_label.tags
 }
