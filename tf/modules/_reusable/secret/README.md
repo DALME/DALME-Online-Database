@@ -40,6 +40,7 @@
 | <a name="input_length"></a> [length](#input\_length) | The length of the generated random password | `number` | `64` | no |
 | <a name="input_min_special"></a> [min\_special](#input\_min\_special) | Minimum number of special characters. | `number` | `5` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the new secret. | `string` | n/a | yes |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_override_special"></a> [override\_special](#input\_override\_special) | Supply special characters to use for use in random strings. | `string` | `"!@#$%&*()-_=+[]{}<>:?"` | no |
 | <a name="input_recovery_window"></a> [recovery\_window](#input\_recovery\_window) | Number of days that must elapse before a secret can be deleted. | `number` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Region for replicating the secret. | `string` | `null` | no |

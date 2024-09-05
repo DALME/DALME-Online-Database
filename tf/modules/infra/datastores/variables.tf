@@ -1,9 +1,34 @@
 # Variables for the datastores module.
 
-# variable "opensearch" {
-#   description = "Configuration for managing an instance of elasticsearch."
-#   type        = object({})
-# }
+variable "domain" {
+  description = "The origin of the service."
+  type        = string
+}
+
+variable "opensearch" {
+  description = "Configuration for managing an instance of opensearch."
+  type = object({
+    admins                   = list(string)
+    dedicated_master_count   = number
+    dedicated_master_enabled = bool
+    dns_ttl                  = number
+    ebs_enabled              = bool
+    ebs_throughput           = number
+    ebs_volume_size          = number
+    ebs_volume_type          = string
+    encrypt_at_rest          = bool
+    engine_version           = string
+    instance_count           = number
+    instance_type            = string
+    keepers                  = object({ master_user_version = number })
+    log_retention_in_days    = number
+    node_to_node_encryption  = bool
+    port                     = number
+    recovery_window          = number
+    security_options_enabled = bool
+    zone_awareness_enabled   = bool
+  })
+}
 
 # This could be more dynamic (a list) if you have multiple RDS instances but
 # it's not necessary for us at the moment so we'll just make it flat.

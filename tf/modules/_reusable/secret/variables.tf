@@ -38,6 +38,11 @@ variable "name" {
   type        = string
 }
 
+variable "namespace" {
+  description = "The project namespace."
+  type        = string
+}
+
 variable "override_special" {
   description = "Supply special characters to use for use in random strings."
   type        = string

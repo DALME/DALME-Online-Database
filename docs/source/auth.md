@@ -46,7 +46,7 @@ ongoing task when taken over the long term.
 ## Sessions & Tokens
 
 - We're running two layers of auth. Sessions and tokens.
-- The authorization code view is login protected by django-oauth-toolkit.
+- The authorization code view is login protected by `django-oauth-toolkit`.
 - Wagtail uses sessions out of the box. Django admin too.
 - As long as the token authorization flow is dependent on a session being
   present then we can run them both side-by-side without issue.

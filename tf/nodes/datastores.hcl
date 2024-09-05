@@ -6,13 +6,39 @@ terraform {
 
 locals {
   env         = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
+  admins      = local.env.locals.admins
+  domain      = local.env.locals.domain
   environment = local.env.locals.environment
   namespace   = local.env.locals.namespace
   ports       = local.env.locals.ports
 }
 
 inputs = {
-  # elasticsearch = {}
+  domain = local.domain
+  opensearch = {
+    admins = local.admins
+    # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-dedicatedmasternodes.html#dedicatedmasternodes-instance
+    # If dedicated_master_enabled is true then the dedicated_master_count should be 3.
+    dedicated_master_enabled = false
+    dedicated_master_count   = 0
+    dedicated_master_type    = null
+    dns_ttl                  = 60
+    ebs_enabled              = true
+    ebs_throughput           = 250
+    ebs_volume_size          = 45
+    ebs_volume_type          = "gp3"
+    encrypt_at_rest          = true
+    engine_version           = "Elasticsearch_7.7"
+    instance_count           = 1
+    instance_type            = "t3.small.search"
+    keepers                  = { master_user_version = 1 }
+    log_retention_in_days    = 14
+    node_to_node_encryption  = true
+    port                     = local.ports.opensearch
+    recovery_window          = local.environment == "production" ? 7 : 0
+    security_options_enabled = false # NOTE: This must be false for the initial provisioning.
+    zone_awareness_enabled   = false
+  }
   rds_postgres = {
     allocated_storage                     = 20
     apply_immediately                     = contains(["development", "staging"], local.environment)
