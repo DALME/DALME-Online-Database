@@ -142,12 +142,6 @@ jobs:
           tags: ${{ env.APP }}.web:${{ env.CI_TAG }}
 
       - uses: pre-commit/action@v3.0.0
-        if: github.event_name != 'pull_request'
-        env:
-          SKIP: ${{ env.SKIP_APP }}
-
-      - uses: pre-commit-ci/lite-action@v1.0.0
-        if: github.event_name == 'pull_request'
         env:
           SKIP: ${{ env.SKIP_APP }}
 
@@ -212,12 +206,6 @@ jobs:
           tags: ${{ env.APP }}.ui:${{ env.CI_TAG }}
 
       - uses: pre-commit/action@v3.0.0
-        if: github.event_name != 'pull_request'
-        env:
-          SKIP: ${{ env.SKIP_UI }}
-
-      - uses: pre-commit-ci/lite-action@v1.0.0
-        if: github.event_name == 'pull_request'
         env:
           SKIP: ${{ env.SKIP_UI }}
 
@@ -393,12 +381,6 @@ jobs:
           tags: ${{ env.APP }}.deploy
 
       - uses: pre-commit/action@v3.0.0
-        if: github.event_name != 'pull_request'
-        env:
-          SKIP: ${{ env.SKIP_TF }}
-
-      - uses: pre-commit-ci/lite-action@v1.0.0
-        if: github.event_name == 'pull_request'
         env:
           SKIP: ${{ env.SKIP_TF }}
 

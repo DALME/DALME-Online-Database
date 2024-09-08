@@ -1,10 +1,5 @@
 # Variables for the sfn-ecs-scheduled-task module.
 
-variable "admins" {
-  description = "Project admin email addresses."
-  type        = list(string)
-}
-
 variable "assign_public_ip" {
   description = "Should the step function be exposed."
   type        = bool
@@ -27,6 +22,11 @@ variable "backoff_rate" {
 
 variable "container" {
   description = "The name of the task definition container."
+  type        = string
+}
+
+variable "cluster" {
+  description = "ARN identifying the ECS cluster."
   type        = string
 }
 
@@ -55,14 +55,29 @@ variable "environment" {
   type        = string
 }
 
+variable "failure_sns_topic" {
+  description = "SNS topic used to alert admins of task failures."
+  type        = string
+}
+
 variable "heartbeat" {
   description = "How long between function 'heartbeats' before timeout (cannot exceed timeout)."
   type        = number
 }
 
+variable "kms_key_arn" {
+  description = "ARN of thw KMS key to be used to encrypt the secret."
+  type        = string
+}
+
 variable "max_attempts" {
   description = "Number of times to retry a failed function."
   type        = number
+}
+
+variable "launch_type" {
+  description = "Defines the capacity the task will run on, eg. AWS Fargate."
+  type        = string
 }
 
 variable "name" {
@@ -85,9 +100,19 @@ variable "schedule_expression" {
   type        = string
 }
 
+variable "security_groups" {
+  description = "Security groups for the step function definition."
+  type        = list(string)
+}
+
 variable "state" {
   description = "The state of the cloudwatch rule."
   type        = string
+}
+
+variable "subnets" {
+  description = "Subnets for the step function definition."
+  type        = list(string)
 }
 
 variable "timeout" {

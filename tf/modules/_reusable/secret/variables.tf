@@ -49,6 +49,12 @@ variable "override_special" {
   default     = "!@#$%&*()-_=+[]{}<>:?"
 }
 
+variable "password_key" {
+  description = "Override the value for the key in a username/password pair."
+  type        = string
+  default     = "password"
+}
+
 variable "recovery_window" {
   description = "Number of days that must elapse before a secret can be deleted."
   type        = number
@@ -70,6 +76,12 @@ variable "username" {
   description = "The username for a username/password blob."
   type        = string
   default     = null
+}
+
+variable "username_key" {
+  description = "Override the value for the key in a username/password pair."
+  type        = string
+  default     = "username"
 }
 
 variable "username_password_pair" {

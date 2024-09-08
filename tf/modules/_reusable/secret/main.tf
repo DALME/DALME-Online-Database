@@ -10,11 +10,14 @@ resource "random_password" "this" {
 }
 
 locals {
-  random_secret = random_password.this.result
+  # TODO: We should use variable cross-validation to simplify this check...
+  # If var.username_password_pair and not var.username then fail validation.
+  is_username_password_pair = var.username_password_pair == true && var.username != null
+  random_secret             = random_password.this.result
 }
 
 locals {
-  secret_string = var.username_password_pair == true && var.username != null ? jsonencode({ username = var.username, password = local.random_secret }) : local.random_secret
+  secret_string = local.is_username_password_pair ? jsonencode(zipmap([var.username_key, var.password_key], [var.username, local.random_secret])) : local.random_secret
 }
 
 resource "aws_secretsmanager_secret" "this" {

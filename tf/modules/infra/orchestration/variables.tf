@@ -20,7 +20,7 @@ variable "postgres_port" {
 }
 
 variable "postgres_version" {
-  description = "Version of rds postgres in use forming part of its identifier."
+  description = "The release version of the rds postgres instance."
   type        = number
 }
 

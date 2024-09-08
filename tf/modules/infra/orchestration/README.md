@@ -38,7 +38,7 @@
 | <a name="input_capacity_providers"></a> [capacity\_providers](#input\_capacity\_providers) | Determine where the ECS scaling provisioning comes from. | `list(string)` | n/a | yes |
 | <a name="input_default_capacity_provider_strategy"></a> [default\_capacity\_provider\_strategy](#input\_default\_capacity\_provider\_strategy) | Tune the ECS capacity provider strategy | <pre>object({<br>    base              = number,<br>    weight            = number,<br>    capacity_provider = string,<br>  })</pre> | n/a | yes |
 | <a name="input_postgres_port"></a> [postgres\_port](#input\_postgres\_port) | Port for making PostgreSQL connections. | `number` | n/a | yes |
-| <a name="input_postgres_version"></a> [postgres\_version](#input\_postgres\_version) | Version of rds postgres in use forming part of its identifier. | `number` | n/a | yes |
+| <a name="input_postgres_version"></a> [postgres\_version](#input\_postgres\_version) | The release version of the rds postgres instance. | `number` | n/a | yes |
 | <a name="input_proxy_port"></a> [proxy\_port](#input\_proxy\_port) | Reverse proxy listening port. | `number` | n/a | yes |
 
 ## Outputs

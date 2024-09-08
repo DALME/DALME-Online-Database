@@ -95,11 +95,6 @@ variable "min_healthy_percent" {
   type        = number
 }
 
-variable "name" {
-  description = "The name of the service."
-  type        = string
-}
-
 variable "namespace" {
   description = "The project namespace."
   type        = string

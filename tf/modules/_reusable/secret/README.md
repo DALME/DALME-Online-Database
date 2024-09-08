@@ -42,10 +42,12 @@
 | <a name="input_name"></a> [name](#input\_name) | The name of the new secret. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_override_special"></a> [override\_special](#input\_override\_special) | Supply special characters to use for use in random strings. | `string` | `"!@#$%&*()-_=+[]{}<>:?"` | no |
+| <a name="input_password_key"></a> [password\_key](#input\_password\_key) | Override the value for the key in a username/password pair. | `string` | `"password"` | no |
 | <a name="input_recovery_window"></a> [recovery\_window](#input\_recovery\_window) | Number of days that must elapse before a secret can be deleted. | `number` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Region for replicating the secret. | `string` | `null` | no |
 | <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 | <a name="input_username"></a> [username](#input\_username) | The username for a username/password blob. | `string` | `null` | no |
+| <a name="input_username_key"></a> [username\_key](#input\_username\_key) | Override the value for the key in a username/password pair. | `string` | `"username"` | no |
 | <a name="input_username_password_pair"></a> [username\_password\_pair](#input\_username\_password\_pair) | If true, the password will be in username/password blob format. | `bool` | n/a | yes |
 
 ## Outputs

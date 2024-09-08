@@ -19,6 +19,7 @@ No requirements.
 | <a name="module_opensearch_label"></a> [opensearch\_label](#module\_opensearch\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_log_es_application_label"></a> [opensearch\_log\_es\_application\_label](#module\_opensearch\_log\_es\_application\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_log_index_slow_label"></a> [opensearch\_log\_index\_slow\_label](#module\_opensearch\_log\_index\_slow\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_opensearch_log_label"></a> [opensearch\_log\_label](#module\_opensearch\_log\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_log_policy_label"></a> [opensearch\_log\_policy\_label](#module\_opensearch\_log\_policy\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_log_search_slow_label"></a> [opensearch\_log\_search\_slow\_label](#module\_opensearch\_log\_search\_slow\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_service_linked_role_label"></a> [opensearch\_service\_linked\_role\_label](#module\_opensearch\_service\_linked\_role\_label) | cloudposse/label/null | 0.25.0 |

@@ -50,7 +50,7 @@ _ui.build:
 	docker compose up -d --no-deps --build $(NAMESPACE).ui
 .PHONY: _ui.build
 
-_ui.init: _ui.install
+_ui.init: _ui.install _ui.build
 .PHONY: _ui.init
 
 _ui.install:

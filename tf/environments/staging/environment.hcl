@@ -11,6 +11,7 @@ locals {
   aws_account = 905418315284
   admins = [
     "ops@ocp.systems",
+    "pizzorno@fas.harvard.edu",
   ]
   # NOTE: You can get this value by calling `aws sts get-caller-identity`
   # against whatever SSO profile you are using to invoke terraform.
@@ -31,6 +32,10 @@ locals {
     ssl        = 443
     web        = 8080
   }
+  postgres_version                   = 15
+  opensearch_version                 = "Elasticsearch_7.7"
+  opensearch_master_user_secret_name = "OPENSEARCH_MASTER_USER"
+  unmanaged_suffix                   = "UNMANAGED"
 
   # Tenant domain data
   domain = "ida.ocp.systems"

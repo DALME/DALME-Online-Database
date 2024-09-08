@@ -38,13 +38,22 @@ module "opensearch_service_linked_role_label" {
   context = module.opensearch_label.context
 }
 
+module "opensearch_log_label" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0"
+
+  attributes = ["log"]
+
+  context = module.opensearch_label.context
+}
+
 module "opensearch_log_policy_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes = ["log", "policy"]
+  attributes = ["policy"]
 
-  context = module.opensearch_label.context
+  context = module.opensearch_log_label.context
 }
 
 module "opensearch_log_es_application_label" {
@@ -54,7 +63,7 @@ module "opensearch_log_es_application_label" {
   attributes = ["es-application"]
   delimiter  = "/"
 
-  context = module.opensearch_label.context
+  context = module.opensearch_log_label.context
 }
 
 module "opensearch_log_index_slow_label" {
@@ -64,7 +73,7 @@ module "opensearch_log_index_slow_label" {
   attributes = ["index-slow"]
   delimiter  = "/"
 
-  context = module.opensearch_label.context
+  context = module.opensearch_log_label.context
 }
 
 module "opensearch_log_search_slow_label" {
@@ -74,5 +83,5 @@ module "opensearch_log_search_slow_label" {
   attributes = ["search-slow"]
   delimiter  = "/"
 
-  context = module.opensearch_label.context
+  context = module.opensearch_log_label.context
 }

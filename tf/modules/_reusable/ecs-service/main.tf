@@ -39,6 +39,7 @@ resource "aws_ecs_service" "this" {
 }
 
 locals {
+  # https://docs.aws.amazon.com/autoscaling/application/APIReference/API_RegisterScalableTarget.html#API_RegisterScalableTarget_RequestSyntax
   resource_id = "service/${var.cluster_name}/${aws_ecs_service.this.name}"
 }
 
@@ -53,7 +54,7 @@ resource "aws_appautoscaling_target" "ecs_target" {
 }
 
 resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
-  name               = module.ecs_service_autoscaling_cpu.id
+  name               = module.ecs_service_autoscaling_cpu_label.id
   policy_type        = var.scaling_policy_type
   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
@@ -71,7 +72,7 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
 }
 
 resource "aws_appautoscaling_policy" "ecs_policy_memory" {
-  name               = module.ecs_service_autoscaling_memory.id
+  name               = module.ecs_service_autoscaling_memory_label.id
   policy_type        = var.scaling_policy_type
   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension

@@ -61,7 +61,7 @@ locals {
 module "opensearch_master_user_secret" {
   source = "../..//_reusable/secret/"
 
-  name                   = "OPENSEARCH_MASTER_USER"
+  name                   = var.opensearch.opensearch_master_user_secret_name
   description            = "Credentials for the Opensearch master user."
   environment            = var.environment
   keepers                = var.opensearch.keepers

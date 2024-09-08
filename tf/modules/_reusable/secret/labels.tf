@@ -7,6 +7,8 @@ module "secret_label" {
   namespace   = var.namespace
   environment = var.environment
   name        = "secret"
+  attributes  = [var.name]
 
-  labels_as_tags = ["namespace", "environment", "name"]
+  label_value_case = "none"
+  labels_as_tags   = ["namespace", "environment", "name"]
 }

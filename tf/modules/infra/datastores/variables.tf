@@ -8,25 +8,26 @@ variable "domain" {
 variable "opensearch" {
   description = "Configuration for managing an instance of opensearch."
   type = object({
-    admins                   = list(string)
-    dedicated_master_count   = number
-    dedicated_master_enabled = bool
-    dns_ttl                  = number
-    ebs_enabled              = bool
-    ebs_throughput           = number
-    ebs_volume_size          = number
-    ebs_volume_type          = string
-    encrypt_at_rest          = bool
-    engine_version           = string
-    instance_count           = number
-    instance_type            = string
-    keepers                  = object({ master_user_version = number })
-    log_retention_in_days    = number
-    node_to_node_encryption  = bool
-    port                     = number
-    recovery_window          = number
-    security_options_enabled = bool
-    zone_awareness_enabled   = bool
+    admins                        = list(string)
+    dedicated_master_count        = number
+    dedicated_master_enabled      = bool
+    dns_ttl                       = number
+    ebs_enabled                   = bool
+    ebs_throughput                = number
+    ebs_volume_size               = number
+    ebs_volume_type               = string
+    encrypt_at_rest               = bool
+    engine_version                = string
+    instance_count                = number
+    instance_type                 = string
+    keepers                       = object({ master_user_version = number })
+    log_retention_in_days         = number
+    node_to_node_encryption       = bool
+    opensearch_master_user_secret_name = string
+    port                          = number
+    recovery_window               = number
+    security_options_enabled      = bool
+    zone_awareness_enabled        = bool
   })
 }
 

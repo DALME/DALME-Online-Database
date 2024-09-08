@@ -35,6 +35,7 @@
 | <a name="input_force_delete"></a> [force\_delete](#input\_force\_delete) | Whether to activate deletion protection on the repositories. | `bool` | n/a | yes |
 | <a name="input_image"></a> [image](#input\_image) | Application component of the container name. | `string` | n/a | yes |
 | <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The project encryption key ARN. | `string` | n/a | yes |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_retain_n"></a> [retain\_n](#input\_retain\_n) | The number of images to retain. | `number` | n/a | yes |
 | <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 

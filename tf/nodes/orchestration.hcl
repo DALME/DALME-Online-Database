@@ -5,9 +5,10 @@ terraform {
 }
 
 locals {
-  env           = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
-  ports         = local.env.locals.ports
-  spot_provider = "FARGATE_SPOT"
+  env              = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
+  ports            = local.env.locals.ports
+  postgres_version = local.env.locals.postgres_version
+  spot_provider    = "FARGATE_SPOT"
 }
 
 # Valid Fargate CPU/memory combinations
@@ -27,6 +28,6 @@ inputs = {
     capacity_provider = local.spot_provider
   }
   postgres_port    = local.ports.postgres
-  postgres_version = 15
+  postgres_version = local.postgres_version
   proxy_port       = local.ports.proxy
 }

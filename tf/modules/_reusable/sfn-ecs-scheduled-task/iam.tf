@@ -1,5 +1,48 @@
 # IAM roles and permissions for the sfn-ecs-scheduled-task module.
 
+# Cloudwatch events.
+data "aws_iam_policy_document" "cloudwatch_event_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      identifiers = ["events.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+data "aws_iam_policy_document" "cloudwatch_event_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["states:StartExecution"]
+    resources = [
+      aws_sfn_state_machine.this.id,
+    ]
+  }
+}
+
+resource "aws_iam_role" "cloudwatch_event_role" {
+  name               = module.sfn_ecs_scheduled_task_event_role_label.id
+  assume_role_policy = data.aws_iam_policy_document.cloudwatch_event_role.json
+
+  tags = module.sfn_ecs_scheduled_task_event_role_label.tags
+}
+
+resource "aws_iam_policy" "cloudwatch_event_policy" {
+  name   = module.sfn_ecs_scheduled_task_event_policy_label.id
+  policy = data.aws_iam_policy_document.cloudwatch_event_policy.json
+
+  tags = module.sfn_ecs_scheduled_task_event_policy_label.tags
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_event_role" {
+  role       = aws_iam_role.cloudwatch_event_role.name
+  policy_arn = aws_iam_policy.cloudwatch_event_policy.arn
+}
+
+# Step functions.
 data "aws_iam_policy_document" "sfn_role_policy" {
   statement {
     effect  = "Allow"
@@ -38,11 +81,9 @@ data "aws_iam_policy_document" "sfn_execution_policy" {
   }
 
   statement {
-    effect  = "Allow"
-    actions = ["ecs:RunTask"]
-    resources = [
-      "arn:aws:ecs:${var.aws_region}:${var.aws_account}:task-definition/*"
-    ]
+    effect    = "Allow"
+    actions   = ["ecs:RunTask"]
+    resources = ["${local.task_definition_family}:*"]
   }
 
   statement {
@@ -57,7 +98,7 @@ data "aws_iam_policy_document" "sfn_execution_policy" {
     condition {
       test     = "ArnEquals"
       variable = "ecs:cluster"
-      values   = [data.aws_ecs_cluster.this.arn]
+      values   = [var.cluster]
     }
   }
 
@@ -67,13 +108,13 @@ data "aws_iam_policy_document" "sfn_execution_policy" {
       "kms:Decrypt",
       "kms:GenerateDataKey",
     ]
-    resources = [data.aws_kms_alias.global.target_key_arn]
+    resources = [var.kms_key_arn]
   }
 
   statement {
     effect    = "Allow"
     actions   = ["sns:Publish"]
-    resources = [aws_sns_topic.ecs_scheduled_task_failure.arn]
+    resources = [var.failure_sns_topic]
   }
 }
 

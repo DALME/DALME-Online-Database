@@ -55,7 +55,6 @@
 | <a name="input_memory_target_value"></a> [memory\_target\_value](#input\_memory\_target\_value) | Target value for the memory metric. | `number` | n/a | yes |
 | <a name="input_min_capacity"></a> [min\_capacity](#input\_min\_capacity) | Minimum number of scaling targets. | `number` | n/a | yes |
 | <a name="input_min_healthy_percent"></a> [min\_healthy\_percent](#input\_min\_healthy\_percent) | The lower limit of running tasks that must remain healthy in a service | `number` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | The name of the service. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_proxy_name"></a> [proxy\_name](#input\_proxy\_name) | Name of the proxy sidecar container. | `string` | n/a | yes |
 | <a name="input_proxy_port"></a> [proxy\_port](#input\_proxy\_port) | Port exposed by the reverse proxy. | `number` | n/a | yes |

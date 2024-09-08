@@ -20,6 +20,11 @@ variable "kms_key_arn" {
   type        = string
 }
 
+variable "namespace" {
+  description = "The project namespace."
+  type        = string
+}
+
 variable "retain_n" {
   description = "The number of images to retain."
   type        = number
