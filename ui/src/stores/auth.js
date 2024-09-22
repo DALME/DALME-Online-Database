@@ -181,14 +181,6 @@ const generateChallenge = fromPromise(async () => {
 
 const logoutReset = () => {
   accessToken.value = null;
-  assign({
-    clientId: () => null,
-    error: () => null,
-    idToken: () => null,
-    refreshToken: () => null,
-    scope: () => null,
-    user: () => null,
-  });
 };
 
 const redirect500 = () => {
@@ -346,7 +338,17 @@ const authFlow = {
         input: ({ context }) => ({ idToken: context.idToken }),
         onDone: {
           target: "#no.reauthenticate",
-          actions: ["logoutReset"],
+          actions: [
+            "logoutReset",
+            assign({
+              clientId: () => null,
+              error: () => null,
+              idToken: () => null,
+              refreshToken: () => null,
+              scope: () => null,
+              user: () => null,
+            }),
+          ],
         },
         onError: {
           target: "authorized",
