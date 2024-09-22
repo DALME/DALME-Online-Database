@@ -42,4 +42,7 @@ wagtail==6.1
 wagtailcodeblock==1.29.0.2
 wagtail-font-awesome-svg==1.0.1
 Wand===0.6.13
-Werkzeug==3.0.2
+# Had to pin these due to upstream issue with watchdog reload false positives.
+# https://github.com/django-extensions/django-extensions/issues/1805
+Werkzeug[watchdog]==2.2.3
+watchdog==2.2
