@@ -2,7 +2,7 @@
 
 locals {
   cluster_key     = "ecs-cluster"
-  oidc_rsa_secret = "OIDC_RSA_PRIVATE_KEY"
+  oidc_rsa_secret = "OIDC-RSA-PRIVATE-KEY"
   secret_prefix   = "${var.namespace}-${var.environment}-secret"
 }
 
@@ -54,9 +54,8 @@ data "aws_s3_bucket" "staticfiles" {
 }
 
 data "aws_security_group" "ecs" {
-  name = "${var.namespace}-${var.environment}-${local.cluster_key}-security-group"
-
   tags = {
+    Name        = "${var.namespace}-${var.environment}-${local.cluster_key}-security-group"
     Namespace   = var.namespace
     Environment = var.environment
   }
