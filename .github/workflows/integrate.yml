@@ -20,7 +20,6 @@ env:
   MYSQL_PASSWORD: root
   MYSQL_HOST: 127.0.0.1
   PYTHON: 3.11
-  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
   SKIP_APP: |
     eslint,prettier,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
   SKIP_TF: |
@@ -383,6 +382,14 @@ jobs:
       - uses: pre-commit/action@v3.0.0
         env:
           SKIP: ${{ env.SKIP_TF }}
+          IN_CI: 1
+
+      # Necessary for the runner to have permissions to remove certain cached
+      # files created by the container in the course of the run.
+      - id: chown-globbed
+        run: >
+          sudo chown -R $USER:$USER
+          ${{ env.TF_ROOT }}/environments/development
 
   # If you've setup the github app integration for infracost on your
   # organization then there's no need to run this job as well, so adjust
@@ -410,7 +417,7 @@ jobs:
       # private repositories.
       # - name: add GIT_SSH_KEY
       #   run: |
-      #     ssh-agent -a $SSH_AUTH_SOCK
+      #     ssh-agent -a /tmp/ssh_agent.sock
       #     mkdir -p ~/.ssh
       #     echo '${{ secrets.GIT_SSH_KEY }}' | tr -d '\r' | ssh-add -
       #     ssh-keyscan github.com >> ~/.ssh/known_hosts
