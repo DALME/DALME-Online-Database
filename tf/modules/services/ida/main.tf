@@ -401,7 +401,7 @@ resource "aws_ecs_task_definition" "cleartokens" {
 module "sfn_cleartokens" {
   source = "../..//_reusable/sfn-ecs-scheduled-task/"
 
-  assign_public_ip            = var.scheduled_tasks.cleartokens.assign_public_ip == true ? "ENABLED" : "DISABLED"
+  assign_public_ip            = var.scheduled_tasks.cleartokens.assign_public_ip
   aws_account                 = var.aws_account
   aws_region                  = var.aws_region
   backoff_rate                = var.sfn_backoff_rate
@@ -467,7 +467,7 @@ resource "aws_ecs_task_definition" "publish" {
 module "sfn_publish" {
   source = "../..//_reusable/sfn-ecs-scheduled-task/"
 
-  assign_public_ip            = var.scheduled_tasks.publish.assign_public_ip == true ? "ENABLED" : "DISABLED"
+  assign_public_ip            = var.scheduled_tasks.publish.assign_public_ip
   aws_account                 = var.aws_account
   aws_region                  = var.aws_region
   backoff_rate                = var.sfn_backoff_rate
