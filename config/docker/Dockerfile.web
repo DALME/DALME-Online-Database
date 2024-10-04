@@ -1,6 +1,6 @@
 # ; -*- mode: dockerfile;-*-
 # vim: set ft=dockerfile:
-FROM python:3.11-slim-bookworm as base
+FROM python:3.11-slim-bookworm AS base
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     gcc \
@@ -13,12 +13,12 @@ RUN apt-get update && \
     apt-get clean
 
 ### Development stages
-FROM base as dev-reqs
+FROM base AS dev-reqs
 WORKDIR /opt/build
 COPY ./requirements.txt ./requirements-dev.txt ./
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements-dev.txt
 
-FROM python:3.11-slim-bookworm as install-dev
+FROM python:3.11-slim-bookworm AS install-dev
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl \
@@ -38,7 +38,7 @@ RUN pip install --user --no-cache-dir --upgrade pip
 RUN pip install --no-cache ./wheels/*
 
 ### TARGET: development
-FROM install-dev as development
+FROM install-dev AS development
 ENV ENV development
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -52,7 +52,7 @@ COPY ./manage.py ./
 CMD ["python", "manage.py", "runserver_plus", "--nostatic", "0.0.0.0:8001"]
 
 ### TARGET: ci
-FROM install-dev as ci
+FROM install-dev AS ci
 ENV ENV ci
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -94,12 +94,12 @@ COPY ./manage.py ./
 COPY ./pyproject.toml ./
 
 ### Production stages
-FROM base as reqs
+FROM base AS reqs
 WORKDIR /opt/build
 COPY ./requirements.txt ./
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements.txt
 
-FROM python:3.11-slim-bookworm as install
+FROM python:3.11-slim-bookworm AS install
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl \
@@ -115,7 +115,7 @@ RUN pip install --user --no-cache-dir --upgrade pip
 RUN pip install --no-cache ./wheels/*
 
 ### TARGET: production
-FROM install as production
+FROM install AS production
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV LANG=en_US.UTF-8

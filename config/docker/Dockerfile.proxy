@@ -1,6 +1,6 @@
 # ; -*- mode: dockerfile;-*-
 # vim: set ft=dockerfile:
-FROM nginx:mainline as serve
+FROM nginx:mainline AS serve
 COPY . /etc/nginx/
 COPY ./config/nginx/production/nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80

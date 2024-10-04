@@ -1,13 +1,13 @@
 # ; -*- mode: dockerfile;-*-
 # vim: set ft=dockerfile:
-FROM debian:bookworm-slim as base
+FROM debian:bookworm-slim AS base
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     curl && \
     apt-get clean
 
-FROM base as iamlive
+FROM base AS iamlive
 ARG TARGETARCH
 ARG VERSION=v1.1.8
 RUN curl -Lo \
@@ -17,7 +17,7 @@ RUN tar -xzf iamlive.tar.gz
 RUN chmod +x iamlive.tar.gz
 RUN mv iamlive /usr/local/iamlive
 
-FROM base as terragrunt
+FROM base AS terragrunt
 ARG TARGETARCH
 ARG VERSION=v0.67.16
 RUN curl -Lo \
@@ -26,7 +26,7 @@ RUN curl -Lo \
 RUN chmod +x terragrunt
 RUN mv terragrunt /usr/local/terragrunt
 
-FROM base as tfdocs
+FROM base AS tfdocs
 ARG TARGETARCH
 ARG VERSION=v0.17.0
 RUN curl -Lo \
@@ -36,7 +36,7 @@ RUN tar -xzf terraform-docs.tar.gz
 RUN chmod +x terraform-docs
 RUN mv terraform-docs /usr/local/terraform-docs
 
-FROM base as tfupdate
+FROM base AS tfupdate
 ARG TARGETARCH
 # Omit the 'v' here as their release naming convention is asymmetrical.
 ARG VERSION=0.8.2
@@ -47,12 +47,14 @@ RUN tar -xzf tfupdate.tar.gz
 RUN chmod +x tfupdate
 RUN mv tfupdate /usr/local/tfupdate
 
-FROM python:3.11-slim-bookworm as tf
+FROM python:3.11-slim-bookworm AS tf
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    awscli \
     bash \
-    procps \
-    git && \
+    git \
+    jq \
+    procps && \
     apt-get clean
 COPY --from=hashicorp/terraform:1.8.3 /bin/terraform /usr/local/bin/terraform
 COPY --from=iamlive /usr/local/iamlive /usr/local/bin/iamlive

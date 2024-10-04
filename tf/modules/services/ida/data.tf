@@ -24,19 +24,6 @@ data "aws_ecs_cluster" "this" {
   }
 }
 
-# The aws_cloudfront_distribution data source won't work without already
-# knowing the id to filter it with and it's the only argument accepted (not
-# sure what the point of that is), so we need to use an escape hatch to get
-# that data from AWS via the CLI itself.
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_distribution.html
-data "external" "cloudfront" {
-  program = ["bash", "${path.module}/files/cloudfront.sh"]
-}
-
-data "aws_opensearch_domain" "this" {
-  domain_name = "${var.namespace}-${var.environment}-opensearch"
-}
-
 data "aws_kms_alias" "global" {
   name = "alias/${var.namespace}/${var.environment}/global"
 }
@@ -47,6 +34,10 @@ data "aws_lb_target_group" "this" {
     Namespace   = var.namespace
     Name        = "${var.namespace}-${var.environment}-alb-target-group"
   }
+}
+
+data "aws_opensearch_domain" "this" {
+  domain_name = "${var.namespace}-${var.environment}-opensearch"
 }
 
 data "aws_s3_bucket" "staticfiles" {
@@ -91,4 +82,13 @@ data "aws_vpc" "this" {
     Environment = var.environment
     Namespace   = var.namespace
   }
+}
+
+# The aws_cloudfront_distribution data source won't work without already
+# knowing the id to filter it with and it's the only argument accepted (not
+# sure what the point of that is), so we need to use an escape hatch to get
+# that data from AWS via the CLI itself.
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_distribution.html
+data "external" "cloudfront" {
+  program = ["bash", "${path.module}/files/cloudfront.sh"]
 }

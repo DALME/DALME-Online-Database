@@ -1,21 +1,21 @@
 # ; -*- mode: dockerfile;-*-
 # vim: set ft=dockerfile:
-FROM node:20-bookworm-slim as base
+FROM node:20-bookworm-slim AS bASe
 WORKDIR /opt/build
 COPY ./ui/package.json ./ui/yarn.lock .
 RUN yarn install --silent
 
-FROM node:20-bookworm-slim as reqs
+FROM node:20-bookworm-slim AS reqs
 WORKDIR /opt/ui
-COPY --from=base /opt/build/node_modules ./node_modules
+COPY --from=bASe /opt/build/node_modules ./node_modules
 ENV PATH /opt/ui/node_modules/.bin:$PATH
 COPY ./ui .
 
-FROM reqs as development
+FROM reqs AS development
 CMD ["yarn", "dev"]
 
-FROM reqs as ci
+FROM reqs AS ci
 RUN yarn build
 
-FROM reqs as production
+FROM reqs AS production
 RUN yarn build
