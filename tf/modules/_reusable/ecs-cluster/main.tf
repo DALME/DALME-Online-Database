@@ -25,12 +25,12 @@ resource "aws_ecs_cluster_capacity_providers" "this" {
 
 resource "aws_security_group" "ecs" {
   description = "Controls access to the ECS cluster."
-  name_prefix = "${module.ecs_cluster_label.id}-"
+  name_prefix = "${module.ecs_cluster_sg_label.id}-"
   vpc_id      = var.vpc_id
 
   lifecycle {
     create_before_destroy = true
   }
 
-  tags = module.ecs_cluster_label.tags
+  tags = module.ecs_cluster_sg_label.tags
 }
