@@ -188,87 +188,30 @@ jobs:
           since_last_remote_commit: true
           files: tf/**/*.{tf,hcl}
 
-  # We ensure OIDC gets provisioned first so that any changes we might have
-  # made to the overall permissions profile (that this pipeline is itself
-  # using) are provisioned ready to handle the demands of the other modules.
-  provision-oidc:
-    name: 'Provision OIDC'
-    runs-on: ubuntu-latest
-    needs:
-      - should-provision-tf
-    if: needs.should-provision-tf.outputs.apply == 'true'
-    steps:
-      - uses: actions/checkout@v4
-
-      - id: set-oidc-role
-        run: |
-          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
-          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        id: oidc-credentials
-        with:
-          aws-region: ${{ env.REGION }}
-          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
-          role-session-name: ${{ env.ROLE_SESSION }}
-          output-credentials: true
-
-      - id: write-oidc-vars
-        env:
-          AUTO_VARS: terraform.auto.tfvars
-        run: |
-          vars=${{ env.TF_ROOT }}/${{ env.AUTO_VARS }}
-          token=${{ steps.oidc-credentials.outputs.aws-session-token }}
-          session=${{ env.ROLE_SESSION }}
-          echo "oidc_session_name = \"${session}\"" >> ${vars}
-          echo "oidc_web_identity_token = \"${token}\"" >> ${vars}
-
-      - uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-          terraform_wrapper: false
-
-      - id: setup-terragrunt
-        uses: autero1/action-terragrunt@v1.3.2
-        with:
-          terragrunt_version: ${{ env.TG_VERSION }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - id: set-oidc-module
-        run: >
-          echo "MODULE=${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}/${{ env.REGION }}/oidc"
-          >> $GITHUB_OUTPUT
-
-      - id: tf-plan-oidc
-        run: >
-          terragrunt plan
-          --terragrunt-non-interactive
-          --terragrunt-working-dir ${{ steps.set-oidc-module.outputs.MODULE }}
-
-      - id: tf-apply-oidc
-        run: >
-          terragrunt apply
-          -auto-approve
-          --terragrunt-non-interactive
-          --terragrunt-working-dir ${{ steps.set-oidc-module.outputs.MODULE }}
-
   provision-modules:
-    name: 'Provision Modules'
     runs-on: ubuntu-latest
     needs:
       - should-provision-tf
-      - provision-oidc
     if: >
       always() &&
       !failure() &&
       !cancelled() &&
+      github.event.pull_request.merged &&
       needs.should-provision-tf.outputs.apply == 'true'
     steps:
       - uses: actions/checkout@v4
 
+      - run: |
+          mkdir -p ~/${{ env.TFLINT_PLUGIN_CACHE }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/${{ env.TFLINT_PLUGIN_CACHE }}
+          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('**/.tflint.hcl') }}
+
       - id: set-oidc-role
         run: |
-          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.PROJECT }}-${{ env.INFRA_KEY}}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -289,42 +232,38 @@ jobs:
           echo "oidc_session_name = \"${session}\"" >> ${vars}
           echo "oidc_web_identity_token = \"${token}\"" >> ${vars}
 
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
       - id: setup-terragrunt
-        uses: autero1/action-terragrunt@v1.3.2
+        uses: autero1/action-terragrunt@v3
         with:
-          terragrunt_version: ${{ env.TG_VERSION }}
+          terragrunt-version: ${{ env.TG_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - id: set-oidc-module
-        run: >
-          echo "MODULE=${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}/${{ env.REGION }}/oidc"
-          >> $GITHUB_OUTPUT
+      - id: parse-modules
+        uses: mathiasvr/command-output@v2.0.0
+        env:
+          APPLY: '["authorization", "network", "security", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
+        with:
+          run: >
+            echo "${{ fromJSON(env.APPLY) }}" | jq -r '.[]'
 
-      # Must be run-all here to handle dependency graphs.
-      - id: tf-plan-module
+      - id: tf-apply-modules
         run: >
-          terragrunt run-all plan
-          --terragrunt-non-interactive
-          --terragrunt-working-dir ${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}
-          --terragrunt-exclude-dir ${{ steps.set-oidc-module.outputs.MODULE }}
-
-      # Must be run-all here to handle dependency graphs.
-      - id: tf-apply-module
-        run: >
-          terragrunt run-all apply
-          --terragrunt-non-interactive
-          --terragrunt-working-dir ${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}
-          --terragrunt-exclude-dir ${{ steps.set-oidc-module.outputs.MODULE }}
+          ./config/scripts/tf.apply.sh
+          ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}/${{ env.REGION }}
+          "${{ steps.parse-modules.outputs.stdout }}"
 
   deploy:
     name: 'Deploy'
     needs: provision-modules
-    if: always() && !failure() && !cancelled()
+    if: >
+      always() &&
+      !failure() &&
+      !cancelled()
     runs-on: ubuntu-latest
     steps:
       - id: set-oidc-role
