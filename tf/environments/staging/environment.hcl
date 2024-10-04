@@ -34,7 +34,7 @@ locals {
   }
   postgres_version                   = 15
   opensearch_version                 = "Elasticsearch_7.7"
-  opensearch_master_user_secret_name = "OPENSEARCH_MASTER_USER"
+  opensearch_master_user_secret_name = "OPENSEARCH-MASTER-USER"
   unmanaged_suffix                   = "UNMANAGED"
 
   # Tenant domain data

@@ -33,7 +33,6 @@ data "external" "cloudfront" {
   program = ["bash", "${path.module}/files/cloudfront.sh"]
 }
 
-# TODO: Probably should hoist this as it's now shared.
 data "aws_opensearch_domain" "this" {
   domain_name = "${var.namespace}-${var.environment}-opensearch"
 }
