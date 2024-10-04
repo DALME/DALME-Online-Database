@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APP: ida
+  NAMESPACE: ida
   ROLE: gha-oidc-role
   ACCOUNT: ${{ github.repository_owner == 'DALME' && 701541878387 || 905418315284 }}
   ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
@@ -17,8 +17,8 @@ env:
   ROLE_SESSION: GithubActionsOIDCDeploy
   TAG: ${{ github.ref_name == 'main' && 'latest' || 'staging' }}
   TF_ROOT: ./tf
-  TF_VERSION: 1.5.5
-  TG_VERSION: 0.50.12
+  TF_VERSION: 1.6
+  TG_VERSION: 0.67.16
 
 permissions:
   contents: write
@@ -35,7 +35,7 @@ jobs:
 
       - id: set-oidc-role
         run: |
-          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -54,7 +54,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.APP }}.web
+            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.NAMESPACE }}.web
           tags: |
             type=raw,priority=200,value=${{ env.TAG }}
             type=sha,priority=100,prefix=,format=long
@@ -85,7 +85,7 @@ jobs:
 
       - id: set-oidc-role
         run: |
-          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -104,7 +104,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.APP }}.proxy
+            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.NAMESPACE }}.proxy
           tags: |
             type=raw,priority=200,value=${{ env.TAG }}
             type=sha,priority=100,prefix=,format=long
@@ -131,7 +131,7 @@ jobs:
 
       - id: set-oidc-role
         run: |
-          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -154,12 +154,12 @@ jobs:
           cache-to: |
             type=gha,scope=ui.production,mode=max
           target: production
-          tags: ${{ env.APP }}.ui:build
+          tags: ${{ env.NAMESPACE }}.ui:build
 
       - uses: shrink/actions-docker-extract@v2
         id: extract
         with:
-          image: ${{ env.APP }}.ui:build
+          image: ${{ env.NAMESPACE }}.ui:build
           path: /opt/ui/dist/spa/.
 
       - uses: actions/upload-artifact@master
@@ -211,7 +211,7 @@ jobs:
 
       - id: set-oidc-role
         run: |
-          name=${{ env.PROJECT }}-${{ env.INFRA_KEY}}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.INFRA_KEY}}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -249,7 +249,7 @@ jobs:
           APPLY: '["authorization", "network", "security", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
         with:
           run: >
-            echo "${{ fromJSON(env.APPLY) }}" | jq -r '.[]'
+            echo "${{ fromJSON(env.NAMESPACELY) }}" | jq -r '.[]'
 
       - id: tf-apply-modules
         run: >
@@ -268,7 +268,7 @@ jobs:
     steps:
       - id: set-oidc-role
         run: |
-          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -286,9 +286,9 @@ jobs:
         with:
           args: >
             deploy
-            ${{ env.APP }}-${{ env.ECS_CLUSTER }}-${{ env.ENVIRONMENT }}
-            ${{ env.APP }}-${{ env.ECS_SERVICE }}-${{ env.ENVIRONMENT }}
-            --task=${{ env.APP }}-task-definition-web-${{ env.ENVIRONMENT }}
+            ${{ env.NAMESPACE }}-${{ env.ECS_CLUSTER }}-${{ env.ENVIRONMENT }}
+            ${{ env.NAMESPACE }}-${{ env.ECS_SERVICE }}-${{ env.ENVIRONMENT }}
+            --task=${{ env.NAMESPACE }}-task-definition-web-${{ env.ENVIRONMENT }}
             --timeout=600
 
       - uses: actions/download-artifact@master
@@ -305,7 +305,7 @@ jobs:
         run: >
           aws s3 sync
           ${{ runner.temp }}/dist
-          s3://${{ env.APP }}-${{ env.BUCKET }}-${{ env.ENVIRONMENT }}-${{ env.ACCOUNT }}
+          s3://${{ env.NAMESPACE }}-${{ env.BUCKET }}-${{ env.ENVIRONMENT }}-${{ env.ACCOUNT }}
           --delete
 
   invalidate:
@@ -316,7 +316,7 @@ jobs:
     steps:
       - id: set-oidc-role
         run: |
-          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -336,7 +336,7 @@ jobs:
           echo "DISTRIBUTION=$(aws
           resourcegroupstaggingapi
           get-resources
-          --tag-filters Key=Name,Values=${{ env.APP }}-${{ env.NAME }}-${{ env.ENVIRONMENT }}
+          --tag-filters Key=Name,Values=${{ env.NAMESPACE }}-${{ env.NAME }}-${{ env.ENVIRONMENT }}
           --resource-type-filters ${{ env.NAME }}
           --region=${{ env.REGION }}
           | jq -r ${{ env.FILTER }}
@@ -396,12 +396,12 @@ jobs:
           cache-to: |
             type=gha,scope=docs.render,mode=max
           target: render
-          tags: ${{ env.APP }}.docs:render
+          tags: ${{ env.NAMESPACE }}.docs:render
 
       - uses: shrink/actions-docker-extract@v2
         id: extract
         with:
-          image: ${{ env.APP }}.docs:render
+          image: ${{ env.NAMESPACE }}.docs:render
           path: /opt/docs/_build/html/.
 
       - uses: peaceiris/actions-gh-pages@v3

@@ -19,7 +19,7 @@ RUN mv iamlive /usr/local/iamlive
 
 FROM base as terragrunt
 ARG TARGETARCH
-ARG VERSION=v0.58.4
+ARG VERSION=v0.67.16
 RUN curl -Lo \
   ./terragrunt \
   https://github.com/gruntwork-io/terragrunt/releases/download/$VERSION/terragrunt_$(uname)_$TARGETARCH

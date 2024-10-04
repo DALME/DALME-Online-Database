@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APP: ida
+  NAMESPACE: ida
   ENVIRONMENT: >
     ${{ github.repository_owner == 'DALME' && github.ref_name == 'master' && 'production' || github.repository_owner == 'ocp' && github.ref_name == 'ocp/development.v2' && 'staging' || 'staging' }}
   CI_TAG: dev
@@ -125,7 +125,7 @@ jobs:
             DAM_DB_PASSWORD=${{ env.MYSQL_PASSWORD }}
             DAM_DB_HOST=${{ env.MYSQL_HOST }}
             'DAM_DB_PORT=${{ job.services.mysql.ports[3306] }}'
-            POSTGRES_DB=${{ env.APP }}
+            POSTGRES_DB=${{ env.NAMESPACE }}
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_HOST=172.17.0.1
@@ -140,7 +140,7 @@ jobs:
           cache-to: |
             type=gha,scope=web.ci,mode=max
           target: ci
-          tags: ${{ env.APP }}.web:${{ env.CI_TAG }}
+          tags: ${{ env.NAMESPACE }}.web:${{ env.CI_TAG }}
 
       - uses: pre-commit/action@v3.0.0
         env:
@@ -150,7 +150,7 @@ jobs:
         run: >
           docker run --rm
           -e DJANGO_CONFIGURATION='CI'
-          ${{ env.APP }}.web:${{ env.CI_TAG }}
+          ${{ env.NAMESPACE }}.web:${{ env.CI_TAG }}
           pytest --cov=. --cov-report=term-missing --hypothesis-show-statistics
 
   integrate_ui:
@@ -204,7 +204,7 @@ jobs:
           cache-to: |
             type=gha,scope=ui.ci,mode=max
           target: ci
-          tags: ${{ env.APP }}.ui:${{ env.CI_TAG }}
+          tags: ${{ env.NAMESPACE }}.ui:${{ env.CI_TAG }}
 
       - uses: pre-commit/action@v3.0.0
         env:
@@ -212,7 +212,7 @@ jobs:
 
       - name: Test
         run: >
-          docker run --rm ${{ env.APP }}.ui:${{ env.CI_TAG }}
+          docker run --rm ${{ env.NAMESPACE }}.ui:${{ env.CI_TAG }}
           yarn test:unit:ci
 
   integrate_docs:
@@ -379,7 +379,7 @@ jobs:
           cache-to: |
             type=gha,scope=terraform.tf,mode=max
           target: tf
-          tags: ${{ env.APP }}.deploy
+          tags: ${{ env.NAMESPACE }}.deploy
 
       - uses: pre-commit/action@v3.0.0
         env:
