@@ -14,6 +14,8 @@ concurrency:
 
 env:
   APP: ida
+  ENVIRONMENT: >
+    ${{ github.repository_owner == 'DALME' && github.ref_name == 'master' && 'production' || github.repository_owner == 'ocp' && github.ref_name == 'ocp/development.v2' && 'staging' || 'staging' }}
   CI_TAG: dev
   MYSQL_DB: test_db
   MYSQL_USER: root
@@ -389,7 +391,7 @@ jobs:
       - id: chown-globbed
         run: >
           sudo chown -R $USER:$USER
-          ${{ env.TF_ROOT }}/environments/development
+          ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}
 
   # If you've setup the github app integration for infracost on your
   # organization then there's no need to run this job as well, so adjust
