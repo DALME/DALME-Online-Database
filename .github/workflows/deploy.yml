@@ -16,6 +16,7 @@ env:
   REGION: us-east-1
   ROLE_SESSION: GithubActionsOIDCDeploy
   TAG: ${{ github.ref_name == 'main' && 'latest' || 'staging' }}
+  TFLINT_PLUGIN_CACHE: .tflint.d/plugins
   TF_ROOT: ./tf
   TF_VERSION: 1.6
   TG_VERSION: 0.67.16
@@ -245,17 +246,26 @@ jobs:
 
       - id: parse-modules
         uses: mathiasvr/command-output@v2.0.0
-        env:
-          APPLY: '["authorization", "network", "security", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
         with:
+          env:
+            GRAPH: '["authorization", "network", "security", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
           run: >
-            echo "${{ fromJSON(env.NAMESPACELY) }}" | jq -r '.[]'
+            echo -n ${{ env.GRAPH }} |
+            sed -e 's/\[//g' -e 's/\]//g' -e 's/\,//g' -e 's/\"//g'
 
-      - id: tf-apply-modules
-        run: >
-          ./config/scripts/tf.apply.sh
-          ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}/${{ env.REGION }}
-          "${{ steps.parse-modules.outputs.stdout }}"
+      - id: parse-modules
+        uses: mathiasvr/command-output@v2.0.0
+        env:
+          TRAP: >
+            trap 'echo "exit-code=$?" >> "$GITHUB_OUTPUT"' EXIT
+          APPLY: >
+            ./config/scripts/tf.apply.sh
+            ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}/${{ env.REGION }}
+            "${{ steps.parse-modules.outputs.stdout }}"
+        with:
+          run: |
+            ${{ env.TRAP }}
+            ${{ env.APPLY }}
 
   deploy:
     name: 'Deploy'
