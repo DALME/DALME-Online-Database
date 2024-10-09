@@ -1,13 +1,13 @@
 # ; -*- mode: dockerfile;-*-
 # vim: set ft=dockerfile:
-FROM node:20-bookworm-slim AS bASe
+FROM node:20-bookworm-slim AS base
 WORKDIR /opt/build
 COPY ./ui/package.json ./ui/yarn.lock .
 RUN yarn install --silent
 
 FROM node:20-bookworm-slim AS reqs
 WORKDIR /opt/ui
-COPY --from=bASe /opt/build/node_modules ./node_modules
+COPY --from=base /opt/build/node_modules ./node_modules
 ENV PATH /opt/ui/node_modules/.bin:$PATH
 COPY ./ui .
 
