@@ -117,7 +117,7 @@ resource "aws_security_group_rule" "jump_host_egress_https" {
 # new server (maybe in a different AZ if necessary) if an existing host (or AZ)
 # has become unavailable.
 resource "aws_autoscaling_group" "jump_host" {
-  name_prefix      = module.network_jh_asg_label.id
+  name_prefix      = "${module.network_jh_asg_label.id}-"
   max_size         = 1
   min_size         = 1
   desired_capacity = 1
