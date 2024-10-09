@@ -110,7 +110,7 @@ locals {
     { name = "ADMIN_USERNAME", valueFrom = "${module.secret["ADMIN-USER"].arn}:username::" },
     { name = "ADMIN_PASSWORD", valueFrom = "${module.secret["ADMIN-USER"].arn}:password::" },
     { name = "DJANGO_SECRET_KEY", valueFrom = module.secret["DJANGO-SECRET-KEY"].arn },
-    { name = "ELASTICSEARCH_USER", value = "${data.aws_secretsmanager_secret_version.opensearch_master_user.arn}:username::" },
+    { name = "ELASTICSEARCH_USER", valueFrom = "${data.aws_secretsmanager_secret_version.opensearch_master_user.arn}:username::" },
     { name = "ELASTICSEARCH_PASSWORD", valueFrom = "${data.aws_secretsmanager_secret_version.opensearch_master_user.arn}:password::" },
     { name = "OAUTH_CLIENT_SECRET", valueFrom = module.secret["OAUTH-CLIENT-SECRET"].arn },
     { name = "OIDC_RSA_PRIVATE_KEY", valueFrom = "${data.aws_secretsmanager_secret_version.oidc_rsa_key.arn}:private::" },
