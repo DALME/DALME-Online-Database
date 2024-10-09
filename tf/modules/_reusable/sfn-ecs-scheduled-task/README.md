@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 
 ## Modules
 
@@ -30,19 +30,19 @@
 
 | Name | Type |
 |------|------|
-| [aws_cloudwatch_event_rule.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_event_rule) | resource |
-| [aws_cloudwatch_event_target.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_event_target) | resource |
-| [aws_iam_policy.cloudwatch_event_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.sfn_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_policy) | resource |
-| [aws_iam_role.cloudwatch_event_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role) | resource |
-| [aws_iam_role.sfn_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy_attachment.cloudwatch_event_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.sfn_execution](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_sfn_state_machine.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/sfn_state_machine) | resource |
-| [aws_iam_policy_document.cloudwatch_event_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.cloudwatch_event_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.sfn_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.sfn_role_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_cloudwatch_event_rule.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_event_target) | resource |
+| [aws_iam_policy.cloudwatch_event_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.sfn_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_policy) | resource |
+| [aws_iam_role.cloudwatch_event_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role) | resource |
+| [aws_iam_role.sfn_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.cloudwatch_event_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.sfn_execution](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_sfn_state_machine.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/sfn_state_machine) | resource |
+| [aws_iam_policy_document.cloudwatch_event_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.cloudwatch_event_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.sfn_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.sfn_role_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 

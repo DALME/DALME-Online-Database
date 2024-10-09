@@ -6,14 +6,14 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 | <a name="requirement_external"></a> [external](#requirement\_external) | 2.3.4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 | <a name="provider_external"></a> [external](#provider\_external) | 2.3.4 |
 
 ## Modules
@@ -49,36 +49,36 @@
 
 | Name | Type |
 |------|------|
-| [aws_cloudwatch_log_group.proxy_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_log_group) | resource |
-| [aws_cloudwatch_log_group.web_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_log_group) | resource |
-| [aws_cloudwatch_log_stream.proxy_log_stream](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_log_stream) | resource |
-| [aws_cloudwatch_log_stream.web_log_stream](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_log_stream) | resource |
-| [aws_ecs_task_definition.cleartokens](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/ecs_task_definition) | resource |
-| [aws_ecs_task_definition.publish](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/ecs_task_definition) | resource |
-| [aws_ecs_task_definition.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/ecs_task_definition) | resource |
-| [aws_iam_policy.ecs_task_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.ecs_task_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_policy) | resource |
-| [aws_iam_role.ecs_task_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role) | resource |
-| [aws_iam_role.ecs_task_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy_attachment.ecs_task_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.ecs_task_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_sns_topic.ecs_scheduled_task_failure](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/sns_topic) | resource |
-| [aws_sns_topic_subscription.ecs_scheduled_task_failure](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/sns_topic_subscription) | resource |
-| [aws_db_instance.postgres](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/db_instance) | data source |
-| [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/ecs_cluster) | data source |
-| [aws_iam_policy_document.ecs_task_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.ecs_task_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.ecs_task_policy](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.ecs_task_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_kms_alias.global](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/kms_alias) | data source |
-| [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/lb_target_group) | data source |
-| [aws_opensearch_domain.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/opensearch_domain) | data source |
-| [aws_s3_bucket.staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/s3_bucket) | data source |
-| [aws_secretsmanager_secret_version.oidc_rsa_key](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/secretsmanager_secret_version) | data source |
-| [aws_secretsmanager_secret_version.opensearch_master_user](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/secretsmanager_secret_version) | data source |
-| [aws_security_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/security_group) | data source |
-| [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/subnets) | data source |
-| [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/vpc) | data source |
+| [aws_cloudwatch_log_group.proxy_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_group.web_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_stream.proxy_log_stream](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_stream) | resource |
+| [aws_cloudwatch_log_stream.web_log_stream](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_stream) | resource |
+| [aws_ecs_task_definition.cleartokens](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_task_definition) | resource |
+| [aws_ecs_task_definition.publish](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_task_definition) | resource |
+| [aws_ecs_task_definition.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_task_definition) | resource |
+| [aws_iam_policy.ecs_task_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.ecs_task_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_policy) | resource |
+| [aws_iam_role.ecs_task_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role) | resource |
+| [aws_iam_role.ecs_task_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.ecs_task_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.ecs_task_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_sns_topic.ecs_scheduled_task_failure](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/sns_topic) | resource |
+| [aws_sns_topic_subscription.ecs_scheduled_task_failure](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/sns_topic_subscription) | resource |
+| [aws_db_instance.postgres](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/db_instance) | data source |
+| [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/ecs_cluster) | data source |
+| [aws_iam_policy_document.ecs_task_execution_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.ecs_task_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.ecs_task_policy](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.ecs_task_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_kms_alias.global](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/kms_alias) | data source |
+| [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/lb_target_group) | data source |
+| [aws_opensearch_domain.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/opensearch_domain) | data source |
+| [aws_s3_bucket.staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/s3_bucket) | data source |
+| [aws_secretsmanager_secret_version.oidc_rsa_key](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
+| [aws_secretsmanager_secret_version.opensearch_master_user](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
+| [aws_security_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/security_group) | data source |
+| [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/subnets) | data source |
+| [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/vpc) | data source |
 | [external_external.cloudfront](https://registry.terraform.io/providers/hashicorp/external/2.3.4/docs/data-sources/external) | data source |
 
 ## Inputs

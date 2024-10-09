@@ -4,7 +4,6 @@ IAMLIVE := true
 REGION := us-east-1
 TF_LOG := WARN
 TF_MODULES := modules
-TF_PROVIDER := "~> 5.0"
 
 JUMP_HOST := $(NAMESPACE)-$(ENVIRONMENT)-network-jump-host-asg
 CLUSTER := $(NAMESPACE)-$(ENVIRONMENT)-ecs-cluster

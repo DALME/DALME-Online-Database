@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 
 ## Modules
 
@@ -27,10 +27,10 @@
 
 | Name | Type |
 |------|------|
-| [aws_db_instance.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/db_instance) | resource |
-| [aws_db_parameter_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/db_parameter_group) | resource |
-| [aws_db_subnet_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/db_subnet_group) | resource |
-| [aws_security_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/security_group) | resource |
+| [aws_db_instance.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/db_instance) | resource |
+| [aws_db_parameter_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/db_parameter_group) | resource |
+| [aws_db_subnet_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/db_subnet_group) | resource |
+| [aws_security_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group) | resource |
 
 ## Inputs
 

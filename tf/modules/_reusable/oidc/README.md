@@ -8,14 +8,14 @@ Deploys a Github Actions OIDC provider to your environment.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.5 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.5 |
 
 ## Modules
@@ -29,9 +29,9 @@ Deploys a Github Actions OIDC provider to your environment.
 
 | Name | Type |
 |------|------|
-| [aws_iam_openid_connect_provider.github](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_openid_connect_provider) | resource |
-| [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role) | resource |
-| [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_openid_connect_provider.github](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_openid_connect_provider) | resource |
+| [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role) | resource |
+| [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
 | [tls_certificate.github](https://registry.terraform.io/providers/hashicorp/tls/4.0.5/docs/data-sources/certificate) | data source |
 
 ## Inputs

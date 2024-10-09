@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 
 ## Modules
 
@@ -29,15 +29,15 @@
 
 | Name | Type |
 |------|------|
-| [aws_acm_certificate.alb](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/acm_certificate) | resource |
-| [aws_acm_certificate_validation.alb](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/acm_certificate_validation) | resource |
-| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/lb) | resource |
-| [aws_lb_listener.http](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/lb_listener) | resource |
-| [aws_lb_listener.https](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/lb_listener) | resource |
-| [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/lb_target_group) | resource |
-| [aws_route53_record.alb](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/route53_record) | resource |
-| [aws_security_group.alb](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/security_group) | resource |
-| [aws_route53_zone.main](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/route53_zone) | data source |
+| [aws_acm_certificate.alb](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/acm_certificate) | resource |
+| [aws_acm_certificate_validation.alb](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/acm_certificate_validation) | resource |
+| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/lb) | resource |
+| [aws_lb_listener.http](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/lb_listener) | resource |
+| [aws_lb_listener.https](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/lb_listener) | resource |
+| [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/lb_target_group) | resource |
+| [aws_route53_record.alb](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
+| [aws_security_group.alb](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group) | resource |
+| [aws_route53_zone.main](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
 

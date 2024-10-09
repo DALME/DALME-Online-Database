@@ -6,13 +6,13 @@ Virtual Private Network
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 
 ## Modules
 
@@ -32,16 +32,16 @@ Virtual Private Network
 
 | Name | Type |
 |------|------|
-| [aws_autoscaling_group.jump_host](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/autoscaling_group) | resource |
-| [aws_iam_instance_profile.jump_host_profile](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_instance_profile) | resource |
-| [aws_iam_policy.jump_host_policy_ssm](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_policy) | resource |
-| [aws_iam_role.jump_host_role](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy_attachment.jump_host_ssm](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_s3_bucket_policy.ssm_logs](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/s3_bucket_policy) | resource |
-| [aws_security_group_rule.jump_host_egress_https](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/security_group_rule) | resource |
-| [aws_iam_policy_document.jump_host_policy_assume](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.jump_host_policy_ssm](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.ssm_logs](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_autoscaling_group.jump_host](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/autoscaling_group) | resource |
+| [aws_iam_instance_profile.jump_host_profile](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_policy.jump_host_policy_ssm](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_policy) | resource |
+| [aws_iam_role.jump_host_role](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.jump_host_ssm](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_s3_bucket_policy.ssm_logs](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/s3_bucket_policy) | resource |
+| [aws_security_group_rule.jump_host_egress_https](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
+| [aws_iam_policy_document.jump_host_policy_assume](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.jump_host_policy_ssm](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.ssm_logs](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 

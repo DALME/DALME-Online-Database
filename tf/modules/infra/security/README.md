@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 
 ## Modules
 
@@ -24,9 +24,9 @@
 
 | Name | Type |
 |------|------|
-| [aws_kms_alias.global](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/kms_alias) | resource |
-| [aws_kms_key.global](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/kms_key) | resource |
-| [aws_iam_policy_document.kms](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_kms_alias.global](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/kms_alias) | resource |
+| [aws_kms_key.global](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/kms_key) | resource |
+| [aws_iam_policy_document.kms](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 

@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
 
 ## Modules
 
@@ -28,21 +28,21 @@
 
 | Name | Type |
 |------|------|
-| [aws_cloudwatch_metric_alarm.opensearch_cluster_memory](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_metric_alarm) | resource |
-| [aws_cloudwatch_metric_alarm.opensearch_cluster_nodes](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_metric_alarm) | resource |
-| [aws_cloudwatch_metric_alarm.opensearch_cluster_status](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_metric_alarm) | resource |
-| [aws_cloudwatch_metric_alarm.opensearch_cpu_usage](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_metric_alarm) | resource |
-| [aws_cloudwatch_metric_alarm.opensearch_free_space](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/cloudwatch_metric_alarm) | resource |
-| [aws_security_group_rule.jump_host_egress_postgres](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.opensearch_egress](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.opensearch_ingress](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.postgres_ingress_jump_host](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/security_group_rule) | resource |
-| [aws_sns_topic.opensearch_alarm](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/sns_topic) | resource |
-| [aws_sns_topic_subscription.opensearch_alarm](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/sns_topic_subscription) | resource |
-| [aws_kms_alias.global](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/kms_alias) | data source |
-| [aws_security_group.tunnel](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/security_group) | data source |
-| [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/subnets) | data source |
-| [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/data-sources/vpc) | data source |
+| [aws_cloudwatch_metric_alarm.opensearch_cluster_memory](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.opensearch_cluster_nodes](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.opensearch_cluster_status](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.opensearch_cpu_usage](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.opensearch_free_space](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_security_group_rule.jump_host_egress_postgres](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.opensearch_egress](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.opensearch_ingress](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.postgres_ingress_jump_host](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
+| [aws_sns_topic.opensearch_alarm](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/sns_topic) | resource |
+| [aws_sns_topic_subscription.opensearch_alarm](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/sns_topic_subscription) | resource |
+| [aws_kms_alias.global](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/kms_alias) | data source |
+| [aws_security_group.tunnel](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/security_group) | data source |
+| [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/subnets) | data source |
+| [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
