@@ -752,10 +752,21 @@ class Production(Base, Configuration):
     }
 
     # Zotero
-    ZOTERO_API_KEY = os.environ['ZOTERO_API_KEY']
-    ZOTERO_API_KEY_GP = os.environ['ZOTERO_API_KEY_GP']
-    ZOTERO_LIBRARY_ID = os.environ['ZOTERO_LIBRARY_ID']
-    ZOTERO_LIBRARY_ID_GP = os.environ['ZOTERO_LIBRARY_ID_GP']
+    @property
+    def ZOTERO_API_KEY(self):
+        return os.environ['ZOTERO_API_KEY']
+
+    @property
+    def ZOTERO_API_KEY_GP(self):
+        return os.environ['ZOTERO_API_KEY_GP']
+
+    @property
+    def ZOTERO_LIBRARY_ID(self):
+        return os.environ['ZOTERO_LIBRARY_ID']
+
+    @property
+    def ZOTERO_LIBRARY_ID_GP(self):
+        return os.environ['ZOTERO_LIBRARY_ID_GP']
 
 
 class Staging(Production, Configuration):
