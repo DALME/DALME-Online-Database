@@ -1,11 +1,10 @@
 """Create entries necessary for new data schemas."""
 
-import os
-
 from django_tenants.utils import schema_context
 from wagtail.log_actions import log
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
@@ -107,12 +106,19 @@ class Stage(BaseStage):
                 'has_biblio_sources': False,
             },
         ]
+
+        # Make sure Zotero env values are set before proceeding.
+        assert settings.ZOTERO_API_KEY
+        assert settings.ZOTERO_API_KEY_GP
+        assert settings.ZOTERO_LIBRARY_ID
+        assert settings.ZOTERO_LIBRARY_ID_GP
+
         tenant = Tenant.objects.get(name='DALME')
         new_project = Project.objects.create(
             name='DALME',
             description='The Documentary Archaeology of Late Medieval Europe',
-            zotero_library_id=int(os.environ['ZOTERO_LIBRARY_ID']),
-            zotero_api_key=os.environ['ZOTERO_API_KEY'],
+            zotero_library_id=int(settings.ZOTERO_LIBRARY_ID),
+            zotero_api_key=settings.ZOTERO_API_KEY,
             tenant=tenant,
         )
 
@@ -129,8 +135,8 @@ class Stage(BaseStage):
         new_project = Project.objects.create(
             name='Pharmacopeias',
             description='Pharmacopeias',
-            zotero_library_id=int(os.environ['ZOTERO_LIBRARY_ID_GP']),
-            zotero_api_key=os.environ['ZOTERO_API_KEY_GP'],
+            zotero_library_id=int(settings.ZOTERO_LIBRARY_ID_GP),
+            zotero_api_key=settings.ZOTERO_API_KEY_GP,
             tenant=tenant,
         )
 

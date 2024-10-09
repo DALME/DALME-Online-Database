@@ -116,6 +116,10 @@ locals {
     { name = "OIDC_RSA_PRIVATE_KEY", valueFrom = "${data.aws_secretsmanager_secret_version.oidc_rsa_key.arn}:private::" },
     { name = "POSTGRES_USERNAME", valueFrom = "${local.postgres_master_user_secret_arn}:username::" },
     { name = "POSTGRES_PASSWORD", valueFrom = "${local.postgres_master_user_secret_arn}:password::" },
+    { name = "ZOTERO_API_KEY", valueFrom = "${data.aws_secretsmanager_secret_version.zotero.arn}:api_key::" },
+    { name = "ZOTERO_API_KEY_GP", valueFrom = "${data.aws_secretsmanager_secret_version.zotero.arn}:api_key_gp::" },
+    { name = "ZOTERO_LIBRARY_ID", valueFrom = "${data.aws_secretsmanager_secret_version.zotero.arn}:library_id::" },
+    { name = "ZOTERO_LIBRARY_ID_GP", valueFrom = "${data.aws_secretsmanager_secret_version.zotero.arn}:library_id_gp::" },
   ]
 }
 

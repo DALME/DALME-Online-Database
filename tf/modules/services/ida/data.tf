@@ -4,6 +4,7 @@ locals {
   cluster_key     = "ecs-cluster"
   oidc_rsa_secret = "OIDC-RSA-PRIVATE-KEY"
   secret_prefix   = "${var.namespace}-${var.environment}-secret"
+  zotero_secret   = "ZOTERO"
 }
 
 data "aws_db_instance" "postgres" {
@@ -58,6 +59,12 @@ data "aws_security_group" "ecs" {
 # admin should name the secret whenever get around to creating it.
 data "aws_secretsmanager_secret_version" "oidc_rsa_key" {
   secret_id = "${local.secret_prefix}-${local.oidc_rsa_secret}--${var.unmanaged_suffix}"
+}
+
+# This secret is 'unmanaged' as we don't generate it ourselves here so we need
+# to populate it on AWS manually so we can read it out and inject it.
+data "aws_secretsmanager_secret_version" "zotero" {
+  secret_id = "${local.secret_prefix}-${local.zotero_secret}--${var.unmanaged_suffix}"
 }
 
 data "aws_secretsmanager_secret_version" "opensearch_master_user" {

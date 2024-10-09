@@ -570,6 +570,17 @@ class Development(Base, Configuration):
     ]
     os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
 
+    # Zotero
+    # These might be unset if you're doing casual local dev so we'll use a
+    # default fallback here, but in prod environments we'll ensure they are set
+    # in full and injected into the ECS task environment. However, be aware
+    # that if you intend to run the data migration, these values **must** be
+    # set because they are read out and stored in the Project model.
+    ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY')
+    ZOTERO_API_KEY_GP = os.environ.get('ZOTERO_API_KEY_GP')
+    ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID')
+    ZOTERO_LIBRARY_ID_GP = os.environ.get('ZOTERO_LIBRARY_ID_GP')
+
 
 class CI(Development, Configuration):
     """Continuous integration pipeline settings."""
@@ -739,6 +750,12 @@ class Production(Base, Configuration):
             'LOCATION': 'cache_table',
         },
     }
+
+    # Zotero
+    ZOTERO_API_KEY = os.environ['ZOTERO_API_KEY']
+    ZOTERO_API_KEY_GP = os.environ['ZOTERO_API_KEY_GP']
+    ZOTERO_LIBRARY_ID = os.environ['ZOTERO_LIBRARY_ID']
+    ZOTERO_LIBRARY_ID_GP = os.environ['ZOTERO_LIBRARY_ID_GP']
 
 
 class Staging(Production, Configuration):

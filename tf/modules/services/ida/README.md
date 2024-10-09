@@ -76,6 +76,7 @@
 | [aws_s3_bucket.staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/s3_bucket) | data source |
 | [aws_secretsmanager_secret_version.oidc_rsa_key](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
 | [aws_secretsmanager_secret_version.opensearch_master_user](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
+| [aws_secretsmanager_secret_version.zotero](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
 | [aws_security_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/security_group) | data source |
 | [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/subnets) | data source |
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/vpc) | data source |
