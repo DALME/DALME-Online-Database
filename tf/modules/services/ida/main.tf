@@ -17,18 +17,18 @@ module "ecr" {
 locals {
   postgres_master_user_secret_arn = data.aws_db_instance.postgres.master_user_secret[0].secret_arn
   secret_data = {
-    "ADMIN_USER" = {
+    "ADMIN-USER" = {
       description            = "Credentials for the Django superuser."
       keepers                = { version = var.keepers.admin_user_version }
       username               = "${var.namespace}-${var.environment}-superuser"
       username_password_pair = true
     },
-    "DJANGO_SECRET_KEY" = {
+    "DJANGO-SECRET-KEY" = {
       description            = "Random string required by Django to sign secure data."
       keepers                = { version = var.keepers.django_secret_key_version }
       username_password_pair = false
     },
-    "OAUTH_CLIENT_SECRET" = {
+    "OAUTH-CLIENT-SECRET" = {
       description            = "Random string required by OAuth2 logic to sign secure data."
       keepers                = { version = var.keepers.oauth_client_secret_version }
       username_password_pair = false
@@ -107,12 +107,12 @@ locals {
     { name = "TENANT_DOMAINS", value = jsonencode(var.tenant_domains) },
   ]
   web_secrets = [
-    { name = "ADMIN_USERNAME", valueFrom = "${module.secret["ADMIN_USER"].arn}:username::" },
-    { name = "ADMIN_PASSWORD", valueFrom = "${module.secret["ADMIN_USER"].arn}:password::" },
-    { name = "DJANGO_SECRET_KEY", valueFrom = module.secret["DJANGO_SECRET_KEY"].arn },
+    { name = "ADMIN_USERNAME", valueFrom = "${module.secret["ADMIN-USER"].arn}:username::" },
+    { name = "ADMIN_PASSWORD", valueFrom = "${module.secret["ADMIN-USER"].arn}:password::" },
+    { name = "DJANGO_SECRET_KEY", valueFrom = module.secret["DJANGO-SECRET-KEY"].arn },
     { name = "ELASTICSEARCH_USER", value = "${data.aws_secretsmanager_secret_version.opensearch_master_user.arn}:username::" },
     { name = "ELASTICSEARCH_PASSWORD", valueFrom = "${data.aws_secretsmanager_secret_version.opensearch_master_user.arn}:password::" },
-    { name = "OAUTH_CLIENT_SECRET", valueFrom = module.secret["OAUTH_CLIENT_SECRET"].arn },
+    { name = "OAUTH_CLIENT_SECRET", valueFrom = module.secret["OAUTH-CLIENT-SECRET"].arn },
     { name = "OIDC_RSA_PRIVATE_KEY", valueFrom = "${data.aws_secretsmanager_secret_version.oidc_rsa_key.arn}:private::" },
     { name = "POSTGRES_USERNAME", valueFrom = "${local.postgres_master_user_secret_arn}:username::" },
     { name = "POSTGRES_PASSWORD", valueFrom = "${local.postgres_master_user_secret_arn}:password::" },
