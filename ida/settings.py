@@ -777,7 +777,7 @@ class Staging(Production, Configuration):
             'tenant_type': 'project',
         },
         'PHARMACOPEIAS': {
-            'domain': 'globalpharmacopeias.ocp.systems',
+            'domain': 'pharmacopeias.ocp.systems',
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
