@@ -280,7 +280,7 @@ jobs:
     steps:
       - id: set-oidc-role
         run: |
-          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -295,12 +295,13 @@ jobs:
         env:
           ECS_CLUSTER: ecs-cluster
           ECS_SERVICE: ecs-service
+          TASK_DEFINITION: ida-ecs-task-definition-web
         with:
           args: >
             deploy
-            ${{ env.NAMESPACE }}-${{ env.ECS_CLUSTER }}-${{ env.ENVIRONMENT }}
-            ${{ env.NAMESPACE }}-${{ env.ECS_SERVICE }}-${{ env.ENVIRONMENT }}
-            --task=${{ env.NAMESPACE }}-task-definition-web-${{ env.ENVIRONMENT }}
+            ${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ECS_CLUSTER }}
+            ${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ECS_SERVICE }}
+            --task=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.TASK_DEFINITION }}
             --timeout=600
 
       - uses: actions/download-artifact@master

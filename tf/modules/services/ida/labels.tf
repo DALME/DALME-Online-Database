@@ -42,7 +42,7 @@ module "ida_ecs_task_definition_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes = ["definition"]
+  attributes = ["definition", "web"]
 
   context = module.ida_ecs_task_label.context
 }
