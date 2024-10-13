@@ -244,11 +244,11 @@ jobs:
           terragrunt-version: ${{ env.TG_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - id: parse-modules
+      - id: define-modules
         uses: mathiasvr/command-output@v2.0.0
+        env:
+          GRAPH: '["authorization", "network", "security", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
         with:
-          env:
-            GRAPH: '["authorization", "network", "security", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
           run: >
             echo -n ${{ env.GRAPH }} |
             sed -e 's/\[//g' -e 's/\]//g' -e 's/\,//g' -e 's/\"//g'
@@ -261,7 +261,7 @@ jobs:
           APPLY: >
             ./config/scripts/tf.apply.sh
             ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}/${{ env.REGION }}
-            "${{ steps.parse-modules.outputs.stdout }}"
+            "${{ steps.define-modules.outputs.stdout }}"
         with:
           run: |
             ${{ env.TRAP }}
