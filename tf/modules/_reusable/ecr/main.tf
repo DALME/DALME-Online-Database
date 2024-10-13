@@ -1,7 +1,7 @@
 # Entrypoint for the ecr module.
 
 locals {
-  name = var.service != null ? "${var.namespace}.${var.service}.${var.image}" : "${var.namespace}.${var.image}"
+  name = var.service == null ? "${var.namespace}.${var.image}" : "${var.namespace}.${var.service}.${var.image}"
 }
 
 resource "aws_ecr_repository" "this" {
