@@ -36,7 +36,7 @@ jobs:
 
       - id: set-oidc-role
         run: |
-          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
