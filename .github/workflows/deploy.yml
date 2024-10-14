@@ -318,7 +318,7 @@ jobs:
         run: >
           aws s3 sync
           ${{ runner.temp }}/dist
-          s3://${{ env.NAMESPACE }}-${{ env.BUCKET }}-${{ env.ENVIRONMENT }}-${{ env.ACCOUNT }}
+          s3://${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.BUCKET }}-${{ env.ACCOUNT }}
           --delete
 
   invalidate:
@@ -329,7 +329,7 @@ jobs:
     steps:
       - id: set-oidc-role
         run: |
-          name=${{ env.NAMESPACE }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
           echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -349,7 +349,7 @@ jobs:
           echo "DISTRIBUTION=$(aws
           resourcegroupstaggingapi
           get-resources
-          --tag-filters Key=Name,Values=${{ env.NAMESPACE }}-${{ env.NAME }}-${{ env.ENVIRONMENT }}
+          --tag-filters Key=Name,Values=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.NAME }}
           --resource-type-filters ${{ env.NAME }}
           --region=${{ env.REGION }}
           | jq -r ${{ env.FILTER }}
