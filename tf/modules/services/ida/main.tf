@@ -100,6 +100,7 @@ locals {
     { name = "DJANGO_SETTINGS_MODULE", value = "ida.settings" },
     { name = "DOMAIN", value = var.domain },
     { name = "ELASTICSEARCH_ENDPOINT", value = data.aws_opensearch_domain.this.endpoint },
+    { name = "ENV", value = var.environment },
     { name = "LOG_LEVEL", value = var.log_level },
     { name = "OAUTH_CLIENT_ID", value = var.oauth_client_id },
     { name = "POSTGRES_DB", value = data.aws_db_instance.postgres.db_name },
