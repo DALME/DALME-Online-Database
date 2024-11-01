@@ -204,7 +204,7 @@ const pkceFlow = {
       }),
     },
     onError: {
-      target: "fatal", // TODO: Render a ui 500 page as we can't proceed.
+      target: "fatal",
       actions: assign({ error: ({ event }) => event.error.message }),
     },
   },
@@ -344,7 +344,6 @@ const authFlow = {
               clientId: () => null,
               error: () => null,
               idToken: () => null,
-              refreshToken: () => null,
               scope: () => null,
               user: () => null,
             }),
@@ -362,7 +361,16 @@ const authFlow = {
         input: ({ context }) => ({ idToken: context.idToken }),
         onDone: {
           target: "#no.authenticate",
-          actions: ["logoutReset"],
+          actions: [
+            "logoutReset",
+            assign({
+              clientId: () => null,
+              error: () => null,
+              idToken: () => null,
+              scope: () => null,
+              user: () => null,
+            }),
+          ],
         },
         onError: {
           target: "authorized",
@@ -468,7 +476,7 @@ export const useAuthStore = defineStore(
     const ui = useUiStore();
     const views = useViewStore();
 
-    // TODO: Preferences logic tp be broken out to preferences machine/store.
+    // TODO: Preferences logic to be broken out to preferences machine/store.
     const preferences = ref({
       general: {
         tooltipsOn: true,

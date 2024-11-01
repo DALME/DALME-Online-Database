@@ -17,7 +17,7 @@ const API = () => {
 
     return fetcher(request)
       .then((response) => {
-        success.value = 200 <= response.status <= 299;
+        success.value = response.status >= 200 && response.status <= 299;
         status.value = response.status;
         // redirected.value = response.request.res.responseUrl === response.config.url;
         redirected.value = false;
