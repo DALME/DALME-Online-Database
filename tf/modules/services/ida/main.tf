@@ -216,7 +216,7 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
-        command     = ["python3", "manage.py", "migrate"]
+        command     = ["python3", "manage.py", "migrate_schemas"]
         cpu         = 0
         environment = local.web_env
         essential   = false
@@ -237,7 +237,7 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
-        command = ["python3", "manage.py", "s3manifestcollectstatic"]
+        command = ["python3", "manage.py", "collectstatic_tenants"]
         cpu     = 0
         dependsOn = [
           { containerName = var.namespace, condition = "HEALTHY" },
