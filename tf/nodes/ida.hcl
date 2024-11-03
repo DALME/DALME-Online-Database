@@ -48,7 +48,7 @@ locals {
 
 inputs = {
   admins                             = local.admins
-  allowed_hosts                      = local.tenant_domains
+  allowed_hosts                      = concat(["localhost"], local.tenant_domains)
   web_port                           = local.ports.web
   assign_public_ip                   = true
   cpu_scale_in_cooldown              = 300
@@ -66,7 +66,7 @@ inputs = {
   launch_type                        = "FARGATE"
   log_level                          = "INFO"
   log_retention_in_days              = 7
-  max_capacity                       = 4
+  max_capacity                       = local.environment == "staging" ? 1 : 4
   max_percent                        = 200
   memory_scale_in_cooldown           = 300
   memory_scale_out_cooldown          = 300

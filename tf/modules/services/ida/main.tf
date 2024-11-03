@@ -16,6 +16,9 @@ module "ecr" {
 # Secrets
 locals {
   postgres_master_user_secret_arn = data.aws_db_instance.postgres.master_user_secret[0].secret_arn
+  # These are secrets that we generate here and manage entirely through
+  # Terraform, as opposed to those secrets marked 'UNMANAGED' that require some
+  # manual intervention in order to get them populated and ready for use.
   secret_data = {
     "ADMIN-USER" = {
       description            = "Credentials for the Django superuser."
@@ -110,6 +113,13 @@ locals {
   web_secrets = [
     { name = "ADMIN_USERNAME", valueFrom = "${module.secret["ADMIN-USER"].arn}:username::" },
     { name = "ADMIN_PASSWORD", valueFrom = "${module.secret["ADMIN-USER"].arn}:password::" },
+    { name = "DAM_API_USER", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:api_user::" },
+    { name = "DAM_API_KEY", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:api_key::" },
+    { name = "DAM_DB_NAME", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:db_name::" },
+    { name = "DAM_DB_USER", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:db_user::" },
+    { name = "DAM_DB_PASSWORD", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:db_password::" },
+    { name = "DAM_DB_HOST", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:db_host::" },
+    { name = "DAM_DB_PORT", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:db_port::" },
     { name = "DJANGO_SECRET_KEY", valueFrom = module.secret["DJANGO-SECRET-KEY"].arn },
     { name = "ELASTICSEARCH_USER", valueFrom = "${data.aws_secretsmanager_secret_version.opensearch_master_user.arn}:username::" },
     { name = "ELASTICSEARCH_PASSWORD", valueFrom = "${data.aws_secretsmanager_secret_version.opensearch_master_user.arn}:password::" },
@@ -227,8 +237,11 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
-        command     = ["python3", "manage.py", "s3manifestcollectstatic"]
-        cpu         = 0
+        command = ["python3", "manage.py", "s3manifestcollectstatic"]
+        cpu     = 0
+        dependsOn = [
+          { containerName = var.namespace, condition = "HEALTHY" },
+        ]
         environment = local.web_env
         essential   = false
         image       = local.images.web

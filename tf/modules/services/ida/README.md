@@ -74,6 +74,7 @@
 | [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/lb_target_group) | data source |
 | [aws_opensearch_domain.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/opensearch_domain) | data source |
 | [aws_s3_bucket.staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/s3_bucket) | data source |
+| [aws_secretsmanager_secret_version.dam](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
 | [aws_secretsmanager_secret_version.oidc_rsa_key](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
 | [aws_secretsmanager_secret_version.opensearch_master_user](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |
 | [aws_secretsmanager_secret_version.zotero](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/secretsmanager_secret_version) | data source |

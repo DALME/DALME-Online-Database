@@ -1,10 +1,7 @@
 # Data sources for the ida module.
 
 locals {
-  cluster_key     = "ecs-cluster"
-  oidc_rsa_secret = "OIDC-RSA-PRIVATE-KEY"
-  secret_prefix   = "${var.namespace}-${var.environment}-secret"
-  zotero_secret   = "ZOTERO"
+  cluster_key = "ecs-cluster"
 }
 
 data "aws_db_instance" "postgres" {
@@ -53,24 +50,6 @@ data "aws_security_group" "ecs" {
   }
 }
 
-# This secret is 'unmanaged' (ie. needs to be created and populated manually)
-# because there is no truly secure way for us to generate an RSA key pair via
-# Terraform. Note the double '--' separator, which is correct, and how the
-# admin should name the secret whenever get around to creating it.
-data "aws_secretsmanager_secret_version" "oidc_rsa_key" {
-  secret_id = "${local.secret_prefix}-${local.oidc_rsa_secret}--${var.unmanaged_suffix}"
-}
-
-# This secret is 'unmanaged' as we don't generate it ourselves here so we need
-# to populate it on AWS manually so we can read it out and inject it.
-data "aws_secretsmanager_secret_version" "zotero" {
-  secret_id = "${local.secret_prefix}-${local.zotero_secret}--${var.unmanaged_suffix}"
-}
-
-data "aws_secretsmanager_secret_version" "opensearch_master_user" {
-  secret_id = "${local.secret_prefix}-${var.opensearch_master_user_secret_name}"
-}
-
 data "aws_subnets" "private" {
   filter {
     name   = "vpc-id"
@@ -98,4 +77,34 @@ data "aws_vpc" "this" {
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_distribution.html
 data "external" "cloudfront" {
   program = ["bash", "${path.module}/files/cloudfront.sh"]
+}
+
+# Secrets
+locals {
+  secret_prefix   = "${var.namespace}-${var.environment}-secret"
+  dam_secret      = "DAM"
+  oidc_rsa_secret = "OIDC-RSA-PRIVATE-KEY"
+  zotero_secret   = "ZOTERO"
+}
+
+# Any secret marked 'UNMANAGED' means we don't generate it ourselves here so we
+# need to populate it on AWS manually so we can read it out and inject it.
+data "aws_secretsmanager_secret_version" "dam" {
+  secret_id = "${local.secret_prefix}-${local.dam_secret}--${var.unmanaged_suffix}"
+}
+
+# This secret needs to be 'unmanaged' (ie. needs to be created and populated
+# manually) because there is no truly secure way for us to generate an RSA key
+# pair via Terraform. Note the double '--' separator, which is correct, and how
+# the admin should name the secret whenever get around to creating it.
+data "aws_secretsmanager_secret_version" "oidc_rsa_key" {
+  secret_id = "${local.secret_prefix}-${local.oidc_rsa_secret}--${var.unmanaged_suffix}"
+}
+
+data "aws_secretsmanager_secret_version" "zotero" {
+  secret_id = "${local.secret_prefix}-${local.zotero_secret}--${var.unmanaged_suffix}"
+}
+
+data "aws_secretsmanager_secret_version" "opensearch_master_user" {
+  secret_id = "${local.secret_prefix}-${var.opensearch_master_user_secret_name}"
 }

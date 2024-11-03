@@ -2,6 +2,7 @@
 
 locals {
   secret_arns = [
+    data.aws_secretsmanager_secret_version.dam.arn,
     data.aws_secretsmanager_secret_version.oidc_rsa_key.arn,
     data.aws_secretsmanager_secret_version.opensearch_master_user.arn,
     data.aws_secretsmanager_secret_version.zotero.arn,
