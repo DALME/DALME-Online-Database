@@ -139,28 +139,27 @@ const fetchUser = fromPromise(async () => {
   }
 });
 
-const fetchRefresh = fromCallback(async ({ input: { clientId }, sendBack }) => {
+const fetchRefresh = fromCallback(({ input: { clientId }, sendBack }) => {
   const body = {
     clientId,
     grantType: "refresh_token",
   };
   const params = new URLSearchParams(changeKeys.snakeCase(body));
-  const { data, fetchAPI, success } = apiInterface();
-  await fetchAPI(requests.auth.token(params));
+  const { data, fetchAPI } = apiInterface();
 
-  if (success.value) {
-    const payload = changeKeys.camelCase(data.value);
-    accessToken.value = payload.accessToken;
-    sendBack({ type: "REFRESHED" });
-  } else {
-    sendBack({ type: "FAILED", error: { message: "Unable to refresh token" } });
-  }
+  fetchAPI(requests.auth.token(params))
+    .then(() => {
+      const payload = changeKeys.camelCase(data.value);
+      accessToken.value = payload.accessToken;
+      sendBack({ type: "REFRESHED" });
+    })
+    .error(() => {
+      sendBack({ type: "FAILED", error: { message: "Unable to refresh token" } });
+    });
 });
 
 const fetchLogout = fromPromise(async ({ input: { idToken } }) => {
-  const body = {
-    id_token_hint: idToken,
-  };
+  const body = { idTokenHint: idToken };
   const params = new URLSearchParams(changeKeys.snakeCase(body));
   const { fetchAPI, success } = apiInterface();
   await fetchAPI(requests.auth.logout(params));

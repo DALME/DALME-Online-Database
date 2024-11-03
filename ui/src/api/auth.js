@@ -26,9 +26,9 @@ const auth = {
       data: { username, password },
     };
   },
-  logout() {
+  logout(params) {
     return {
-      url: `${authUrl}/logout/`,
+      url: `${authUrl}/logout/?${params.toString()}`,
       method: "GET",
     };
   },
