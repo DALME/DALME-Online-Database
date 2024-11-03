@@ -48,7 +48,7 @@ locals {
 
 inputs = {
   admins                             = local.admins
-  allowed_hosts                      = concat(["localhost"], local.tenant_domains)
+  allowed_hosts                      = local.tenant_domains
   web_port                           = local.ports.web
   assign_public_ip                   = true
   cpu_scale_in_cooldown              = 300

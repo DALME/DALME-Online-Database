@@ -187,7 +187,7 @@ resource "aws_ecs_task_definition" "this" {
         essential   = true
         healthCheck = {
           command = [
-            "CMD-SHELL", "curl -f http://localhost:${var.web_port}/api/ping/ || exit 1"
+            "CMD-SHELL", "curl -f http://localhost:${var.web_port}/api/healthcheck/ || exit 1"
           ]
           interval = 30
           retries  = 3
