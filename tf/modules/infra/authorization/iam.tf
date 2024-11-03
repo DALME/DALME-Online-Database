@@ -386,8 +386,8 @@ data "aws_iam_policy_document" "gha_oidc_policy_two" {
       "s3:PutObject",
     ]
     resources = [
-      "arn:aws:s3:::*${var.environment}-${var.aws_account}",
-      "arn:aws:s3:::*${var.environment}-${var.aws_account}/*",
+      "arn:aws:s3:::${var.namespace}-${var.environment}-*-${var.aws_account}",
+      "arn:aws:s3:::${var.namespace}-${var.environment}-*-${var.aws_account}/*",
     ]
   }
 
