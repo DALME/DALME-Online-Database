@@ -28,10 +28,15 @@ class TenantMiddleware:
         origin = remove_www(request.META['HTTP_HOST'])
         connection.set_schema_to_public()
 
+        if not settings.IS_DEV and origin == 'localhost':
+            # This is ECS coming online so tenants are not pertinent.
+            return self.get_response(request)
+
         try:
             domain = Domain.objects.select_related('tenant').get(domain=origin)
-        except Domain.DoesNotExist:
-            return DisallowedHost()
+        except Domain.DoesNotExist as exc:
+            msg = 'Tenant not found'
+            raise DisallowedHost(msg) from exc
 
         request.tenant = domain.tenant
         connection.set_tenant(request.tenant)

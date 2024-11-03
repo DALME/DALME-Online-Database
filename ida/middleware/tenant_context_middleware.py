@@ -2,6 +2,7 @@
 
 import contextvars
 
+from django_tenants.utils import remove_www
 from werkzeug.local import LocalProxy
 
 from django.conf import settings
@@ -29,10 +30,17 @@ class TenantContextMiddleware:
 
     def __call__(self, request):
         """Invoke the middleware layer."""
+        origin = remove_www(request.META['HTTP_HOST'])
+
+        if not settings.IS_DEV and origin == 'localhost':
+            # This is ECS coming online so tenants are not pertinent.
+            return self.get_response(request)
+
         try:
             domain = request.tenant.domains.first().domain
-        except AttributeError:
-            return DisallowedHost()
+        except AttributeError as exc:
+            msg = 'Tenant not found'
+            raise DisallowedHost(msg) from exc
 
         settings.CSRF_COOKIE_DOMAIN = f'.{domain}'
         settings.SESSION_COOKIE_DOMAIN = f'.{domain}'

@@ -2,6 +2,8 @@
 
 from unittest import mock
 
+import pytest
+
 from django.core.exceptions import DisallowedHost
 
 from ida.middleware.tenant_middleware import TenantMiddleware
@@ -19,7 +21,8 @@ def test_middleware_throws_if_tenant_not_found(mock_conn, mock_domain, rf):
     get_response = mock.MagicMock()
     middleware = TenantMiddleware(get_response)
 
-    assert isinstance(middleware(request), DisallowedHost)
+    with pytest.raises(DisallowedHost):
+        middleware(request)
 
     assert mock_conn.mock_calls == [
         mock.call.set_schema_to_public(),
