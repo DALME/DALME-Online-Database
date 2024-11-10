@@ -285,6 +285,30 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
+        command = ["python3", "manage.py", "ensure_tenants"]
+        cpu     = 0
+        dependsOn = [
+          { containerName = var.namespace, condition = "HEALTHY" },
+        ]
+        environment = local.web_env
+        essential   = false
+        image       = local.images.web
+        logConfiguration = {
+          logDriver = "awslogs"
+          options = {
+            awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+            awslogs-region        = var.aws_region
+            awslogs-stream-prefix = "ecs"
+          }
+        }
+        mountPoints    = []
+        name           = "ensure_tenants"
+        portMappings   = []
+        secrets        = local.web_secrets
+        systemControls = []
+        volumesFrom    = []
+      },
+      {
         command = ["python3", "manage.py", "ensure_superuser"]
         cpu     = 0
         dependsOn = [

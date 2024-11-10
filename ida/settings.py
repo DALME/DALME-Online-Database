@@ -776,22 +776,22 @@ class Staging(Production, Configuration):
         'IDA': {
             'domain': 'ida.ocp.systems',
             'name': 'IDA',
-            'schema_name': None,
+            'schema_name': 'public',
             'is_primary': True,
-            'tenant_type': 'public',
+            'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
             'domain': 'dalme.ocp.systems',
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
-            'tenant_type': 'project',
+            'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.ocp.systems',
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
-            'tenant_type': 'project',
+            'tenant_type': TenantTypes.PROJECT,
         },
     }
