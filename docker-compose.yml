@@ -77,7 +77,7 @@ services:
       - "3000"
 
   ida.db:
-    image: postgres
+    image: postgres:16-bookworm # This should always match the RDS version.
     container_name: ida.db
     environment:
       POSTGRES_DB: ida
