@@ -20,6 +20,11 @@ variable "environment" {
   type        = string
 }
 
+variable "force_destroy" {
+  description = "Whether deletion protection is active on buckets."
+  type        = bool
+}
+
 variable "health_check" {
   description = "Parameters configuring the ALB's healthcheck."
   type = object({
@@ -35,6 +40,21 @@ variable "health_check" {
 variable "internal" {
   description = "Should this ALB have a public IP or not."
   type        = bool
+}
+
+variable "logging_enabled" {
+  description = "Should this ALB write to logs."
+  type        = bool
+}
+
+variable "log_destination" {
+  description = "Bucket to hold the ALB access logs."
+  type        = string
+}
+
+variable "log_prefix" {
+  description = "String to prepend to the S3 bucket destination."
+  type        = string
 }
 
 variable "namespace" {

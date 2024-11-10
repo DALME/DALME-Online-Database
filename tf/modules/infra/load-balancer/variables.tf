@@ -20,6 +20,11 @@ variable "domain" {
   type        = string
 }
 
+variable "force_destroy" {
+  description = "Whether deletion protection is active on buckets."
+  type        = bool
+}
+
 variable "health_check" {
   description = "Parameters configuring the ALB's healthcheck."
   type = object({

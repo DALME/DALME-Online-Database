@@ -47,8 +47,12 @@
 | <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate's DNS record. | `number` | n/a | yes |
 | <a name="input_domain"></a> [domain](#input\_domain) | The origin of the service. | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
+| <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether deletion protection is active on buckets. | `bool` | n/a | yes |
 | <a name="input_health_check"></a> [health\_check](#input\_health\_check) | Parameters configuring the ALB's healthcheck. | <pre>object({<br>    interval            = number, # Frequency (secs) of the health checks.<br>    matcher             = number, # HTTP status code indicating a passing health check.<br>    path                = string, # URL route of the healthcheck.<br>    threshold           = number, # Count before considering an unhealthy target healthy.<br>    timeout             = number, # Time (secs) without a response indicting a failed health check.<br>    unhealthy_threshold = number, # Consecutive failed health checks before considering a target unhealthy.<br>  })</pre> | n/a | yes |
 | <a name="input_internal"></a> [internal](#input\_internal) | Should this ALB have a public IP or not. | `bool` | n/a | yes |
+| <a name="input_log_destination"></a> [log\_destination](#input\_log\_destination) | Bucket to hold the ALB access logs. | `string` | n/a | yes |
+| <a name="input_log_prefix"></a> [log\_prefix](#input\_log\_prefix) | String to prepend to the S3 bucket destination. | `string` | n/a | yes |
+| <a name="input_logging_enabled"></a> [logging\_enabled](#input\_logging\_enabled) | Should this ALB write to logs. | `bool` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 | <a name="input_ssl_port"></a> [ssl\_port](#input\_ssl\_port) | Secure HTTPS listening port. | `number` | n/a | yes |

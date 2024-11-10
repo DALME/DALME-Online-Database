@@ -64,6 +64,17 @@ resource "aws_lb" "this" {
     aws_acm_certificate_validation.alb
   ]
 
+  # Be sure to disable access logs before you delete the bucket that you
+  # configured for access logs. Otherwise, if there is a new bucket with the
+  # same name and the required bucket policy but created in an AWS account that
+  # you don't own, Elastic Load Balancing could write the access logs for your
+  # load balancer to this new bucket.
+  access_logs {
+    bucket  = var.log_destination
+    enabled = var.logging_enabled
+    prefix  = var.log_prefix
+  }
+
   lifecycle {
     ignore_changes = [
       subnets

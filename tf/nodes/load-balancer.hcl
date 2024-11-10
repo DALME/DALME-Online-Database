@@ -12,12 +12,11 @@ locals {
 }
 
 inputs = {
-  alb_port         = local.ports.alb
-  cidr_blocks      = "0.0.0.0/0",
-  domain           = local.domain
-  dns_ttl          = 60
-  internal         = false
-  ipv6_cidr_blocks = "::/0",
+  alb_port      = local.ports.alb
+  cidr_blocks   = "0.0.0.0/0",
+  dns_ttl       = 60
+  domain        = local.domain
+  force_destroy = contains(["development", "staging"], local.environment)
   health_check = {
     interval            = 200
     matcher             = 200
@@ -26,7 +25,9 @@ inputs = {
     timeout             = 10
     unhealthy_threshold = 3
   }
-  protocol   = "tcp",
-  proxy_port = local.ports.proxy
-  ssl_port   = local.ports.ssl
+  internal         = false
+  ipv6_cidr_blocks = "::/0",
+  protocol         = "tcp",
+  proxy_port       = local.ports.proxy
+  ssl_port         = local.ports.ssl
 }
