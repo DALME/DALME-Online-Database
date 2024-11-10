@@ -206,11 +206,12 @@ module "cloudfront" {
   }
 
   default_cache_behavior = {
-    allowed_methods        = local.allowed_methods
-    cached_methods         = ["GET", "HEAD"]
-    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
-    target_origin_id       = local.origin_id_alb
-    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods          = local.allowed_methods
+    cached_methods           = ["GET", "HEAD"]
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
+    target_origin_id         = local.origin_id_alb
+    viewer_protocol_policy   = "redirect-to-https"
   }
 
   ordered_cache_behavior = [
