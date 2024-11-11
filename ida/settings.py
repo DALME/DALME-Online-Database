@@ -616,7 +616,7 @@ class Production(Base, Configuration):
 
     @property
     def AWS_S3_CUSTOM_DOMAIN(self):
-        return f'{self.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+        return os.environ['CLOUDFRONT_DISTRIBUTION']
 
     @property
     def AWS_STORAGE_BUCKET_NAME(self):
