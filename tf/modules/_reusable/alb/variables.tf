@@ -1,5 +1,10 @@
 # Variables for the alb module.
 
+variable "additional_domains" {
+  description = "Other domains to be served by this ALB."
+  type        = list(string)
+}
+
 variable "alb_port" {
   description = "Load balancer listening port."
   type        = number

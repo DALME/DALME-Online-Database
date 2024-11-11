@@ -1,5 +1,6 @@
 # Data sources for the alb module.
 
-data "aws_route53_zone" "main" {
-  name = var.domain
+data "aws_route53_zone" "tenant_zones" {
+  for_each = toset(local.all_tldrs)
+  name     = each.key
 }

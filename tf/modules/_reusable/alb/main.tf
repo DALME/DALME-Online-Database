@@ -1,8 +1,17 @@
 # Entrypoint for the alb module.
 
+locals {
+  all_tldrs                 = concat([var.domain], var.additional_domains)
+  wildcard_domains          = [for domain in local.all_tldrs : "*.${domain}"]
+  subject_alternative_names = concat(var.additional_domains, local.wildcard_domains)
+  zone_ids = {
+    for zone in data.aws_route53_zone.tenant_zones : zone.name => zone.zone_id
+  }
+}
+
 resource "aws_acm_certificate" "alb" {
   domain_name               = var.domain
-  subject_alternative_names = ["*.${var.domain}"]
+  subject_alternative_names = local.subject_alternative_names
   validation_method         = "DNS"
 
   lifecycle {
@@ -15,10 +24,11 @@ resource "aws_acm_certificate" "alb" {
 resource "aws_route53_record" "alb" {
   for_each = {
     for dvo in aws_acm_certificate.alb.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
+      name    = dvo.resource_record_name
+      record  = dvo.resource_record_value
+      type    = dvo.resource_record_type
+      zone_id = local.zone_ids[dvo.domain_name]
+    } if !strcontains(dvo.domain_name, "*.")
   }
 
   allow_overwrite = true
@@ -26,7 +36,7 @@ resource "aws_route53_record" "alb" {
   records         = [each.value.record]
   ttl             = var.dns_ttl
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.main.zone_id
+  zone_id         = each.value.zone_id
 }
 
 resource "aws_acm_certificate_validation" "alb" {

@@ -62,20 +62,21 @@ module "alb_access_logs" {
 module "alb" {
   source = "../..//_reusable/alb/"
 
-  alb_port        = var.alb_port
-  dns_ttl         = var.dns_ttl
-  domain          = var.domain
-  environment     = var.environment
-  force_destroy   = var.force_destroy
-  health_check    = var.health_check
-  internal        = var.internal
-  log_destination = module.alb_access_logs.bucket_id
-  log_prefix      = local.log_prefix
-  logging_enabled = true
-  namespace       = var.namespace
-  ssl_port        = var.ssl_port
-  subnets         = data.aws_subnets.public.ids
-  vpc_id          = data.aws_vpc.this.id
+  additional_domains = var.additional_domains
+  alb_port           = var.alb_port
+  dns_ttl            = var.dns_ttl
+  domain             = var.domain
+  environment        = var.environment
+  force_destroy      = var.force_destroy
+  health_check       = var.health_check
+  internal           = var.internal
+  log_destination    = module.alb_access_logs.bucket_id
+  log_prefix         = local.log_prefix
+  logging_enabled    = true
+  namespace          = var.namespace
+  ssl_port           = var.ssl_port
+  subnets            = data.aws_subnets.public.ids
+  vpc_id             = data.aws_vpc.this.id
 }
 
 resource "aws_security_group_rule" "alb_ingress_http" {

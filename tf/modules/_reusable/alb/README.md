@@ -37,12 +37,13 @@
 | [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/lb_target_group) | resource |
 | [aws_route53_record.alb](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
 | [aws_security_group.alb](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group) | resource |
-| [aws_route53_zone.main](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/route53_zone) | data source |
+| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_additional_domains"></a> [additional\_domains](#input\_additional\_domains) | Other domains to be served by this ALB. | `list(string)` | n/a | yes |
 | <a name="input_alb_port"></a> [alb\_port](#input\_alb\_port) | Load balancer listening port. | `number` | n/a | yes |
 | <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate's DNS record. | `number` | n/a | yes |
 | <a name="input_domain"></a> [domain](#input\_domain) | The origin of the service. | `string` | n/a | yes |

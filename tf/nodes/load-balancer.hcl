@@ -5,18 +5,20 @@ terraform {
 }
 
 locals {
-  env         = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
-  domain      = local.env.locals.domain
-  environment = local.env.locals.environment
-  ports       = local.env.locals.ports
+  env            = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
+  domain         = local.env.locals.domain
+  environment    = local.env.locals.environment
+  ports          = local.env.locals.ports
+  tenant_domains = local.env.locals.tenant_domains
 }
 
 inputs = {
-  alb_port      = local.ports.alb
-  cidr_blocks   = "0.0.0.0/0",
-  dns_ttl       = 60
-  domain        = local.domain
-  force_destroy = contains(["development", "staging"], local.environment)
+  additional_domains = local.tenant_domains
+  alb_port           = local.ports.alb
+  cidr_blocks        = "0.0.0.0/0",
+  dns_ttl            = 60
+  domain             = local.domain
+  force_destroy      = contains(["development", "staging"], local.environment)
   health_check = {
     interval            = 200
     matcher             = 200
