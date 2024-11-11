@@ -17,7 +17,7 @@ urlpatterns = [
     re_path(r'^maintenance-mode/', include(maintenance_mode_urls)),
     re_path(r'^api/', include(api_urls)),
     re_path(r'^purl/', include(purl_urls)),
-    re_path(r'', TemplateView.as_view(template_name='home.html')),
+    re_path(r'^$', TemplateView.as_view(template_name='home.html')),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 
