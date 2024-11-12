@@ -70,12 +70,19 @@ class Base(Configuration):
     SESSION_COOKIE_HTTPONLY = True
     USE_X_FORWARDED_HOST = True
 
-    STATICFILES_DIRS = [
-        (BASE_DIR / 'static').as_posix(),
-    ]
-    MULTITENANT_STATICFILES_DIRS = [
-        (BASE_DIR / 'public/static/%s').as_posix(),
-    ]
+    @property
+    def STATICFILES_DIRS(self):
+        return [
+            (self.BASE_DIR / 'static').as_posix(),
+        ]
+
+    @property
+    def MULTITENANT_STATICFILES_DIRS(self):
+        return [
+            (self.BASE_DIR / 'public' / 'static' / '%s').as_posix(),
+            (self.BASE_DIR / 'tenants' / '%s' / 'static').as_posix(),
+        ]
+
     STATICFILES_FINDERS = [
         'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
         'django.contrib.staticfiles.finders.FileSystemFinder',
