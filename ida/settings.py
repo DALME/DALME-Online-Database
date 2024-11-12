@@ -223,7 +223,7 @@ class Base(Configuration):
     @property
     def MULTITENANT_TEMPLATE_DIRS(self):
         return [
-            f'{self.BASE_DIR}/tenants/%s/templates',
+            (self.BASE_DIR / 'tenants' / '%s' / 'templates').as_posix(),
             (self.BASE_DIR / 'public' / 'templates' / 'tenants' / '%s').as_posix(),
         ]
 

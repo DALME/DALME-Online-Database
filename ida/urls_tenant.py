@@ -1,6 +1,5 @@
 """URLS for the IDA's tenanted projects."""
 
-# import urllib
 from maintenance_mode import urls as maintenance_mode_urls
 from wagtail import views
 
