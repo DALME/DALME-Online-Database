@@ -5,9 +5,9 @@ REGION := us-east-1
 TF_LOG := WARN
 TF_MODULES := modules
 
-JUMP_HOST := $(NAMESPACE)-$(ENVIRONMENT)-network-jump-host-asg
 CLUSTER := $(NAMESPACE)-$(ENVIRONMENT)-ecs-cluster
 SERVICE := $(NAMESPACE)-$(ENVIRONMENT)-ecs-service
+JUMP_HOST := $(NAMESPACE)-$(ENVIRONMENT)-network-jump-host-asg
 
 # DAG order of infra module application.
 APPLY := authorization \

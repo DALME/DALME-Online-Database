@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+set -e
+
+error_handler() {
+  echo "Error encountered while applying dependency graph" >&2
+  exit 1
+}
+
+trap 'error_handler' ERR
 
 for module in ${2}; do
   msg="Applying ops module: ${module}"
@@ -10,8 +18,7 @@ for module in ${2}; do
     -auto-approve \
     --terragrunt-source-update \
     --terragrunt-non-interactive \
-    --terragrunt-working-dir "${1}/${module}" \
-    || exit 1;
+    --terragrunt-working-dir "${1}/${module}"
 
   echo "" 1>&2
 done
