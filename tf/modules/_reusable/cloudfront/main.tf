@@ -161,13 +161,14 @@ resource "aws_cloudfront_distribution" "this" {
     iterator = i
 
     content {
-      allowed_methods        = i.value.allowed_methods
-      cache_policy_id        = try(i.value.cache_policy_id, null)
-      cached_methods         = i.value.cached_methods
-      compress               = try(i.value.compress, null)
-      path_pattern           = i.value.path_pattern
-      target_origin_id       = i.value.target_origin_id
-      viewer_protocol_policy = i.value.viewer_protocol_policy
+      allowed_methods          = i.value.allowed_methods
+      cache_policy_id          = try(i.value.cache_policy_id, null)
+      cached_methods           = i.value.cached_methods
+      compress                 = try(i.value.compress, null)
+      origin_request_policy_id = try(i.value.origin_request_policy_id, null)
+      path_pattern             = i.value.path_pattern
+      target_origin_id         = i.value.target_origin_id
+      viewer_protocol_policy   = i.value.viewer_protocol_policy
 
       default_ttl = try(i.value.default_ttl, null)
       min_ttl     = try(i.value.min_ttl, null)
