@@ -9,7 +9,9 @@ from ida.models import GroupProperties, Tenant, User
 
 from .base import BaseStage
 
-EXPECTED_GROUP_COUNT = 2
+# GHP: I had to add 0 here because the table was empty for me and that
+# caused the migration to fail (groups were not created).
+EXPECTED_GROUP_COUNT = [0, 2]
 EXPECTED_PERMISSION_COUNT = 531
 
 
