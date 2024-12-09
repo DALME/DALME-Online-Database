@@ -108,7 +108,7 @@ def wagtail_index_post_save_signal_handler(instance, update_fields=None, **kwarg
         # the fields that were not passed in update_fields
         instance = type(instance).objects.get(pk=instance.pk)
 
-    for tenant in Tenant.objects.all():
+    for tenant in Tenant.objects.exclude(schema_name='public').all():
         connection.set_tenant(tenant)
         index.insert_or_update_object(instance)
 
