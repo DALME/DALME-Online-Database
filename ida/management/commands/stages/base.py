@@ -114,6 +114,9 @@ REF_CITATIONS = {
     'XL9F9RTZ': '(Carroll-Clark, 2005)',
     'MJWEGUKG': '(Blaschitz, Hundsbichler, Jaritz, & Vavra, 1992)',
     'XXD7JM9D': '(Baumgarten, 2014)',
+    'Q5VDI6EW': '(Noble 2011)',
+    'HG7QD3NE': '(Elliot 2017)',
+    'A7ZR8T6Q': '(Pamer 2025)',
 }
 
 USER_NAME_CONCORDANCE = {
