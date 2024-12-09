@@ -1,5 +1,6 @@
 """Migrate auth data."""
 
+from django_tenants.utils import tenant_context
 from wagtail.users.models import UserProfile
 
 from django.contrib.auth.models import Group
@@ -53,7 +54,7 @@ class Stage(BaseStage):
     @transaction.atomic
     def migrate_groups(self):
         """Copy group data."""
-        if Group.objects.count() == EXPECTED_GROUP_COUNT:
+        if Group.objects.count() in EXPECTED_GROUP_COUNT:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating groups')
                 cursor.execute('DELETE FROM public.auth_group;')
@@ -155,7 +156,13 @@ class Stage(BaseStage):
     def ensure_user_profile(self):
         """Make sure all users have a wagtail profile record."""
         self.logger.info('Ensuring all users have a user profile')
-        objs = User.objects.filter(wagtail_userprofile__isnull=True)
-        for obj in objs:
-            UserProfile.objects.create(user=obj)
-        self.logger.debug('Linked %s profile instances', len(objs))
+        p_count = 0
+        for user in User.objects.all():
+            with tenant_context(user.tenant_set.first()):
+                if not hasattr(user, 'wagtail_userprofile'):
+                    UserProfile.objects.create(user=user)
+                    p_count += 1
+        if p_count:
+            self.logger.debug('Linked %s profile instances', p_count)
+        else:
+            self.logger.info('All users have a user profile.')
