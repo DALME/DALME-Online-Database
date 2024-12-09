@@ -257,6 +257,7 @@ class Stage(BaseStage):
 
             subtypes = [
                 RecordType(tenant=dalme, name='Comanda', parent=inventory),
+                RecordType(tenant=dalme, name='Confiscation', parent=inventory),
                 RecordType(tenant=dalme, name='Criminal Inquest', parent=inventory),
                 RecordType(tenant=dalme, name='Custody', parent=inventory),
                 RecordType(tenant=dalme, name='Division', parent=inventory),
