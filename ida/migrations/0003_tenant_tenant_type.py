@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('ida', '0001_initial'),
+        ('ida', '0002_casts'),
     ]
 
     operations = [
