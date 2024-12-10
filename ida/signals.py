@@ -116,7 +116,7 @@ def wagtail_index_post_save_signal_handler(instance, update_fields=None, **kwarg
 @receiver(models.signals.post_delete, sender=Record)
 def wagtail_index_post_delete_signal_handler(instance, **kwargs):  # noqa: ARG001
     """Update Wagtail search index after delete method on Record objects."""
-    for tenant in Tenant.objects.all():
+    for tenant in Tenant.objects.exclude(schema_name='public').all():
         connection.set_tenant(tenant)
         index.remove_object(instance)
 
