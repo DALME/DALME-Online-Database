@@ -6,12 +6,15 @@ import json
 from django_tenants.utils import schema_context
 from psycopg import sql
 from wagtail.log_actions import log
+from wagtail.users.models import UserProfile
 
 from django.apps import apps
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.db import connection, transaction
 from django.db.utils import IntegrityError
+
+from ida.models import User
 
 from .base import BaseStage
 
@@ -327,18 +330,22 @@ class Stage(BaseStage):
             self.logger.info('Transfering user profiles from Wagtail')
             cursor.execute('SELECT * FROM restore.wagtailusers_userprofile;')
             rows = self.map_rows(cursor)
-            with schema_context('public'):
-                from wagtail.users.models import UserProfile
-
-                for row in rows:
-                    row.pop('id')
-                    row.pop('dismissibles')
-                    profile = UserProfile.objects.filter(user=row['user_id'])
-                    if profile.exists():
+            for row in rows:
+                row.pop('id')
+                row.pop('dismissibles')
+                with schema_context('public'):
+                    user = User.objects.filter(pk=row['user_id'])
+                if user.exists():
+                    user = user.first()
+                    if user.profile:
                         row.pop('user_id')
-                        profile.update(**row)
+                        for field, value in row.items():
+                            setattr(user.profile, field, value)
+                        user.profile.save()
                     else:
                         UserProfile.objects.create(**row)
+                else:
+                    self.logger.error('Failed to update profile for user "%s": user does not exist.', row['user_id'])
 
     @transaction.atomic
     def transfer_snippets(self):
@@ -577,14 +584,13 @@ class Stage(BaseStage):
                     photo_id = block_value.get('photo')
                     if photo_id:
                         photo = BaseImage.objects.get(pk=photo_id)
-                        if user:
-                            wt_profile = user.wagtail_userprofile
+                        if user and user.profile:
                             # django-tenants will try to add the tenant to the path
                             # to prevent it, we override the "storage" attribute of
                             # the field class with Django's default storage model
-                            wt_profile.avatar.storage = FileSystemStorage()
-                            wt_profile.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
-
+                            user.profile.avatar.storage = FileSystemStorage()
+                            user.profile.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
+                            user.profile.save()
                         else:
                             tm_object['defaults']['photo'] = photo
 
