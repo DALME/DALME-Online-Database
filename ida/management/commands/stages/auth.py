@@ -12,6 +12,8 @@ from .base import BaseStage
 
 # GHP: I had to add 0 here because the table was empty for me and that
 # caused the migration to fail (groups were not created).
+# actually, the count is 0 for the public schema and 2 for every other one
+# because it's Wagtail that adds those two default records
 EXPECTED_GROUP_COUNT = [0, 2]
 EXPECTED_PERMISSION_COUNT = 531
 
@@ -26,6 +28,7 @@ class Stage(BaseStage):
         """Execute the stage."""
         self.migrate_users()
         self.migrate_groups()
+        self.add_extra_wt_groups()
         self.migrate_user_groups_relation()
         self.assert_user_user_permissions_invariant()
         self.scope_dalme_groups()
@@ -74,6 +77,16 @@ class Stage(BaseStage):
                 self.logger.info('Created %s GroupProperties instances', GroupProperties.objects.count())
         else:
             self.logger.warning('Group data already exists')
+
+    @transaction.atomic
+    def add_extra_wt_groups(self):
+        """Add additional required groups to Wagtail schemas."""
+        self.logger.info('Creating additional groups...')
+        for tenant in Tenant.objects.exclude(schema_name='public').all():
+            with tenant_context(tenant):
+                Group.objects.get_or_create(name='Administrators', defaults={'id': 5})
+                Group.objects.get_or_create(name='Web Editors', defaults={'id': 7})
+            self.logger.info('Created groups in %s', tenant.name)
 
     @transaction.atomic
     def migrate_user_groups_relation(self):
