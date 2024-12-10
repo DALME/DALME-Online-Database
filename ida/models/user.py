@@ -1,5 +1,7 @@
 """User-related models."""
 
+from django_tenants.utils import tenant_context
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -66,7 +68,13 @@ class User(AbstractUser):
 
     @property
     def profile(self):
-        return self.wagtail_userprofile
+        """Return the user's wagtail user profile if it exists, otherwise None."""
+        if not self.tenant_set.exists():
+            return None
+        with tenant_context(self.tenant_set.first()):
+            if not hasattr(self, 'wagtail_userprofile'):
+                return None
+            return self.wagtail_userprofile
 
     @property
     def avatar_url(self):
