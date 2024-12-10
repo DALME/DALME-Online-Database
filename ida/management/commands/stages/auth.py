@@ -158,8 +158,8 @@ class Stage(BaseStage):
         self.logger.info('Ensuring all users have a user profile')
         p_count = 0
         for user in User.objects.all():
-            with tenant_context(user.tenant_set.first()):
-                if not hasattr(user, 'wagtail_userprofile'):
+            if not user.profile:
+                with tenant_context(user.tenant_set.first()):
                     UserProfile.objects.create(user=user)
                     p_count += 1
         if p_count:

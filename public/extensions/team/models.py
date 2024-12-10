@@ -80,24 +80,23 @@ class TeamMember(models.Model):
 
     def save(self, *args, **kwargs):
         """Override the save method to save avatar image if this is a user adding a photo."""
-        if self.user and self.photo:
-            profile_obj = self.user.wagtail_userprofile
+        if self.user and self.photo and self.user.profile:
             # django-tenants will try to add the tenant to the path
             # to prevent it, we override the "storage" attribute of
             # the field class with Django's default storage model
-            profile_obj.avatar.storage = FileSystemStorage()
-            profile_obj.avatar.save(
+            self.user.profile.avatar.storage = FileSystemStorage()
+            self.user.profile.avatar.save(
                 self.photo.title,
                 File(io.BytesIO(self.photo.file.read())),
             )
-            profile_obj.save()
+            self.user.profile.save()
             self.photo = None
         return super().save(*args, **kwargs)
 
     @property
     def avatar(self):
         if self.user:
-            return self.user.wagtail_userprofile.avatar
+            return self.user.profile.avatar
         return self.photo.file if self.photo else None
 
     @property
