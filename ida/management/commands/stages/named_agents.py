@@ -693,13 +693,15 @@ class Stage(BaseStage):
             name = entry['name']
             tr_ids = []
             for rec_id in record_ids:
-                record = Record.objects.get(pk=rec_id)
-                if record.has_transcriptions:
-                    page_nodes = record.pagenodes.all().select_related('transcription')
-                    for node in page_nodes:
-                        if node.transcription and name in node.transcription.text_blob:
-                            tr_ids.append(node.transcription.id)
-
+                try:
+                    record = Record.objects.get(pk=rec_id)
+                    if record.has_transcriptions:
+                        page_nodes = record.pagenodes.all().select_related('transcription')
+                        for node in page_nodes:
+                            if node.transcription and name in node.transcription.text_blob:
+                                tr_ids.append(node.transcription.id)
+                except Record.DoesNotExist:
+                    self.logger.error('Record %s not found.', rec_id)  # noqa: TRY400
             if tr_ids:
                 agent_type = entry['agent_type']
                 agent_model = Person if agent_type == 1 else Organization
