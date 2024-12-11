@@ -368,14 +368,14 @@ class Base(Configuration):
 
     @property
     def API_URL(self):
-        return f'{self.BASE_URL}/api'
+        return '/api'
 
     DAM_URL = 'https://dam.dalme.org'
     URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
     URL_PORT = ':8000' if IS_DEV else ''
 
     # List of settings values to make available in templates.
-    INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'API_URL', 'DAM_URL', 'PUBLIC_URL', 'WAGTAILADMIN_BASE_URL']
+    INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'API_URL', 'DAM_URL', 'WAGTAILADMIN_BASE_URL']
 
     @pristinemethod
     def TENANTS(self):
