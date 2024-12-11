@@ -44,8 +44,8 @@ STAGES = [
     FinalizeStage,
     PublicStage,
     ContentFixes,
-    PharmaStage,
     NamedAgentsStage,
+    PharmaStage,
 ]
 
 
