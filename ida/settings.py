@@ -102,6 +102,7 @@ class Base(Configuration):
         'maintenance_mode',
         'oauth2_provider',
         'rest_framework',
+        'wagtail.users',
         # IDA apps.
         'api',
         'purl',
@@ -134,7 +135,6 @@ class Base(Configuration):
         'wagtail.search',
         'wagtail.sites',
         'wagtail.snippets',
-        'wagtail.users',
         'wagtailcodeblock',
         'wagtailfontawesomesvg',
     ]
@@ -156,8 +156,7 @@ class Base(Configuration):
         },
         'project': {
             'APPS': [
-                'django.contrib.contenttypes',
-                'django.contrib.auth',
+                # NOTE: GHP: do these belong here?
                 'django.contrib.admin',
                 'django.contrib.sessions',
                 'django.contrib.messages',
