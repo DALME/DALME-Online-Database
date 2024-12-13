@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 
 class IDABaseViewSet(viewsets.ModelViewSet):
-    """Generic viewset. Should be subclassed for s§pecific API endpoints."""
+    """Generic viewset. Should be subclassed for specific API endpoints."""
 
     authentication_classes = None  # This is dynamic, see `initialize_request`.
 
