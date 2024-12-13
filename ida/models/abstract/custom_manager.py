@@ -13,6 +13,7 @@ from django.db import models
 from django.db.models import Case, Exists, ExpressionWrapper, OuterRef, When
 
 from ida.context import get_current_tenant
+from ida.models.abstract.uuid_mixin import UuidMixin
 
 PROD_ENVS = {'staging', 'production'}
 
@@ -33,8 +34,15 @@ class CustomQuerySet(models.QuerySet):
 
         qs = self.prefetch_related('attributes')
         for attr in args:
+            # check if we're dealing with multi-table inheritance
+            # in which case we need to use the parent model
+            model = self.model
+            bases = model._meta.get_parent_list()  # noqa: SLF001
+            if len(bases) == 1 and issubclass(bases[0], UuidMixin) and bases[0] != self.model:
+                model = bases[0]
+
             attr_sq = Attribute.objects.filter(
-                **{f'ida_{self.model.__name__.lower()}_related': OuterRef('pk'), 'attribute_type__name': attr}
+                **{f'ida_{model.__name__.lower()}_related': OuterRef('pk'), 'attribute_type__name': attr}
             )
             qs = qs.annotate(
                 **{
