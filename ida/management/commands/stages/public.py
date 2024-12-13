@@ -6,7 +6,6 @@ import json
 from django_tenants.utils import schema_context
 from psycopg import sql
 from wagtail.log_actions import log
-from wagtail.users.models import UserProfile
 
 from django.apps import apps
 from django.core.files import File
@@ -330,22 +329,27 @@ class Stage(BaseStage):
             self.logger.info('Transfering user profiles from Wagtail')
             cursor.execute('SELECT * FROM restore.wagtailusers_userprofile;')
             rows = self.map_rows(cursor)
-            for row in rows:
-                row.pop('id')
-                row.pop('dismissibles')
-                with schema_context('public'):
-                    user = User.objects.filter(pk=row['user_id'])
-                if user.exists():
-                    user = user.first()
-                    if user.profile:
-                        row.pop('user_id')
-                        for field, value in row.items():
-                            setattr(user.profile, field, value)
-                        user.profile.save()
+            with schema_context('public'):
+                from wagtail.users.models import UserProfile
+
+                for row in rows:
+                    row.pop('id')
+                    row.pop('dismissibles')
+                    with schema_context('public'):
+                        user = User.objects.filter(pk=row['user_id'])
+                    if user.exists():
+                        user = user.first()
+                        if user.profile:
+                            row.pop('user_id')
+                            for field, value in row.items():
+                                setattr(user.profile, field, value)
+                            user.profile.save()
+                        else:
+                            UserProfile.objects.create(**row)
                     else:
-                        UserProfile.objects.create(**row)
-                else:
-                    self.logger.error('Failed to update profile for user "%s": user does not exist.', row['user_id'])
+                        self.logger.error(
+                            'Failed to update profile for user "%s": user does not exist.', row['user_id']
+                        )
 
     @transaction.atomic
     def transfer_snippets(self):
