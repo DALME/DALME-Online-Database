@@ -162,8 +162,12 @@ class AttributeField(CheckFieldDefaultMixin, Field):
         obj_id = value.get('id')
         if app and model and obj_id:
             try:
-                model = apps.get_model(app_label=app, model_name=model)
+                model = apps.get_app_config(app).get_model(model)
+                # ensure all values are returned even if model is tenanted
+                if hasattr(model, 'is_tenanted') and model.is_tenanted:
+                    return model.unscoped.get(pk=obj_id)
                 return model.objects.get(pk=obj_id)
+
             except model.DoesNotExist:
                 return value
         return value
