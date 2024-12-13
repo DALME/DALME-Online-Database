@@ -51,7 +51,7 @@ class Stage(BaseStage):
             ('dalme', 'wagtailforms'),
             ('dalme', 'wagtailimages'),
             ('dalme', 'wagtailredirects'),
-            ('dalme', 'wagtailusers'),
+            ('public', 'wagtailusers'),
             ('dalme', 'public'),
             ('dalme', 'publicimages'),
         ]
