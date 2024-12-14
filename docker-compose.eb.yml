@@ -20,6 +20,8 @@ services:
       bash -c "python manage.py collectstatic --noinput && \ python manage.py compress --verbosity=0 && \ ./wait-for-it.sh db:3306 -- gunicorn -c gunicorn.conf.py dalme.wsgi"
     depends_on:
       - dalme.db
+    environment:
+      DATABASE_URL: mysql://dalme:dalme@dalme.db:3306/dalme_db
     networks:
       - app-network
     ports:

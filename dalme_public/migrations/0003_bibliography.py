@@ -3,15 +3,14 @@
 import dalme_public.blocks
 from django.db import migrations, models
 import django.db.models.deletion
-import wagtail.core.blocks
-import wagtail.core.fields
+import wagtail.blocks
+import wagtail.fields
 import wagtail.documents.blocks
 import wagtail.embeds.blocks
 import wagtail.images.blocks
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('wagtailcore', '0059_apply_collection_ordering'),
         ('dalme_public', '0002_auto_20201217_1218'),
@@ -21,11 +20,120 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Bibliography',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('inline_image', wagtail.images.blocks.ImageChooserBlock()), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock()), ('institution', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False))]))], null=True)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            ('inline_image', wagtail.images.blocks.ImageChooserBlock()),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock()),
+                                        ('institution', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                        ],
+                        null=True,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,

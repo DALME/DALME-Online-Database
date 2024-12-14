@@ -1,4 +1,4 @@
-from wagtail.core import blocks
+from wagtail import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
 from django.core.exceptions import ValidationError
@@ -37,7 +37,7 @@ class BibliographyBlock(blocks.StructBlock):
             ('BKW2PVCM', 'Glossaries and dictionaries'),
             ('QM9AZNT3', 'Methodology'),
             ('SLIT6LID', 'Studies'),
-            ('FRLVXUWL', 'Other resources')
+            ('FRLVXUWL', 'Other resources'),
         ],
     )
 
@@ -55,11 +55,7 @@ class CarouselBlock(blocks.ListBlock):
 class ChartEmbedBlock(blocks.StructBlock):
     html = blocks.RawHTMLBlock()
     alignment = blocks.ChoiceBlock(
-        choices=[
-            ('left', 'Left-aligned'),
-            ('right', 'Right-aligned'),
-            ('full', 'Full-width')
-        ],
+        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')],
     )
 
     class Meta:
@@ -69,11 +65,7 @@ class ChartEmbedBlock(blocks.StructBlock):
 
 class DocumentBlock(blocks.StructBlock):
     type = blocks.ChoiceBlock(
-        choices=[
-            ('document', 'Document'),
-            ('publication', 'Publication'),
-            ('talk', 'Talk')
-        ],
+        choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')],
     )
     title = blocks.CharBlock()
     abstract = blocks.CharBlock(required=False)
@@ -121,10 +113,7 @@ class InlineImageBlock(blocks.StructBlock):
     image_id = blocks.CharBlock(required=False, help_text='Can be used as an anchor to link to the image.')
     caption = blocks.RichTextBlock(required=False)
     alignment = blocks.ChoiceBlock(
-        choices=[
-            ('left', 'Left-aligned'),
-            ('right', 'Right-aligned')
-        ],
+        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')],
     )
     show_caption = blocks.BooleanBlock(required=False, default=True)
     resize_rule = blocks.ChoiceBlock(
@@ -135,20 +124,20 @@ class InlineImageBlock(blocks.StructBlock):
             ('height', 'Reduce height to the given dimension'),
             ('scale', 'Resize to the given percentage'),
             ('fill', 'Resize and crop to the given dimensions'),
-            ('background', 'As background with given parameters')
+            ('background', 'As background with given parameters'),
         ],
         required=False,
         help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>\
-            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.'
+            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
     )
     dimensions = blocks.CharBlock(
         required=False,
         validators=[validate_dimensions],
-        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.'
+        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
     )
     parameters = blocks.CharBlock(
         required=False,
-        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".'
+        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
     )
 
     class Meta:
@@ -198,14 +187,12 @@ class SubsectionBlock(blocks.StructBlock):
 
 
 class SubsectionEndMarkerBlock(blocks.StructBlock):
-
     class Meta:
         icon = 'collapse-up'
         template = 'dalme_public/blocks/_subsection_end.html'
 
 
 class FootnotesPlaceMarker(blocks.StructBlock):
-    
     class Meta:
         icon = 'list-ol'
         template = 'dalme_public/blocks/_footnote_placemarker.html'

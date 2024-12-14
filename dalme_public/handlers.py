@@ -1,4 +1,4 @@
-from wagtail.core.rich_text import LinkHandler
+from wagtail.rich_text import LinkHandler
 from wagtail.admin.rich_text.converters.html_to_contentstate import LinkElementHandler, InlineEntityElementHandler
 from django.utils.html import escape
 from dalme_app.models import SavedSearch
@@ -33,11 +33,7 @@ class SavedSearchElementHandler(LinkElementHandler):
             saved_search = SavedSearch.objects.get(id=attrs['id'])
         except SavedSearch.DoesNotExist:
             _id = int(attrs['id'])
-            return {
-                'id': _id,
-                'url': f'/collections/search/{_id}/',
-                'parentId': 'saved_search'
-            }
+            return {'id': _id, 'url': f'/collections/search/{_id}/', 'parentId': 'saved_search'}
 
         return {
             'id': str(saved_search.id),
@@ -95,7 +91,11 @@ class FootnoteElementHandler(InlineEntityElementHandler):
 
 
 def footnote_decorator(props):
-    return DOM.create_element('span', {
-        'data-note_id': props['note_id'],
-        'data-footnote': props['text'],
-    }, props['children'])
+    return DOM.create_element(
+        'span',
+        {
+            'data-note_id': props['note_id'],
+            'data-footnote': props['text'],
+        },
+        props['children'],
+    )

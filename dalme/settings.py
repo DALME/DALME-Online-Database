@@ -26,7 +26,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '.us-east-1.elasticbeanstalk.com',
     '.compute-1.amazonaws.com',
-    '.us-east-1.elb.amazonaws.com'
+    '.us-east-1.elb.amazonaws.com',
 ]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,7 +86,7 @@ SESSION_COOKIE_DOMAIN = '.dalme.org'
 SESSION_COOKIE_SECURE = True
 
 CSRF_COOKIE_DOMAIN = '.dalme.org'
-CSRF_TRUSTED_ORIGINS = ['.dalme.org']
+CSRF_TRUSTED_ORIGINS = ['https://*.dalme.org']
 CSRF_COOKIE_SECURE = True
 
 SECURE_SSL_REDIRECT = True
@@ -129,7 +129,7 @@ INSTALLED_APPS = [
     'wagtail.images',
     'wagtail.search',
     'wagtail.admin',
-    'wagtail.core',
+    'wagtail',
     'wagtailmodelchooser',
     'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
@@ -153,7 +153,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    'django_hosts.middleware.HostsResponseMiddleware'
+    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
 TEMPLATES = [
@@ -184,10 +184,18 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
@@ -207,9 +215,9 @@ SAML_IDP_CONFIG = {
                     ('https://db.dalme.org/idp/sso/post/', saml2.BINDING_HTTP_POST),
                     ('https://db.dalme.org/idp/sso/redirect/', saml2.BINDING_HTTP_REDIRECT),
                 ],
-                "single_logout_service": [
-                    ("https://db.dalme.org/idp/slo/post/", saml2.BINDING_HTTP_POST),
-                    ("https://db.dalme.org/idp/slo/redirect/", saml2.BINDING_HTTP_REDIRECT)
+                'single_logout_service': [
+                    ('https://db.dalme.org/idp/slo/post/', saml2.BINDING_HTTP_POST),
+                    ('https://db.dalme.org/idp/slo/redirect/', saml2.BINDING_HTTP_REDIRECT),
                 ],
             },
             'name_id_format': [NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED],
@@ -218,15 +226,16 @@ SAML_IDP_CONFIG = {
             'want_authn_requests_signed': False,
         },
     },
-
     # Signing
     'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
     'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
     # Encryption
-    'encryption_keypairs': [{
-        'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
-        'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
-    }],
+    'encryption_keypairs': [
+        {
+            'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
+            'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
+        }
+    ],
     'valid_for': 365 * 24,
 }
 
@@ -248,7 +257,7 @@ DATABASES = {
         'USER': os.environ.get('DAM_USERNAME', ''),
         'PASSWORD': os.environ.get('DAM_PASSWORD', ''),
         'HOST': os.environ.get('DAM_HOSTNAME', ''),
-    }
+    },
 }
 
 db_from_env = dj_database_url.config(conn_max_age=500)
@@ -273,17 +282,13 @@ SEARCH_RESULTS_PER_PAGE = 10
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.SessionAuthentication',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'dalme_api.renderers.SelectRenderer',
-        'dalme_api.renderers.DTEJSONRenderer'
+        'dalme_api.renderers.DTEJSONRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
@@ -292,7 +297,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
-        'dalme_api.filter_backends.DalmeOrderingFilter'
+        'dalme_api.filter_backends.DalmeOrderingFilter',
     ],
     'EXCEPTION_HANDLER': 'dalme_api.utils.DTE_exception_handler',
 }
@@ -325,7 +330,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'www', 'static')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -336,14 +341,14 @@ STATICFILES_FINDERS = (
 COMPRESS_OFFLINE = True
 COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
 COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
-COMPRESS_FILTERS = {
-    'css': ['compressor.filters.cssmin.rCSSMinFilter'],
-    'js': ['compressor.filters.jsmin.JSMinFilter']
-}
+COMPRESS_FILTERS = {'css': ['compressor.filters.cssmin.rCSSMinFilter'], 'js': ['compressor.filters.jsmin.JSMinFilter']}
 
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
 WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
+WAGTAILADMIN_BASE_URL = 'cms/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 Q_CLUSTER = {
     'name': 'dalme_q',
@@ -358,8 +363,8 @@ Q_CLUSTER = {
     'sqs': {
         'aws_region': AWS_REGION,
         'aws_access_key_id': AWS_ACCESS_KEY_ID,
-        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY
-    }
+        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
+    },
 }
 
 CACHES = {
@@ -378,10 +383,7 @@ LOGGING = {
             'level': 'ERROR',
             'include_html': True,
         },
-        'logfile': {
-            'class': 'logging.handlers.WatchedFileHandler',
-            'filename': '/opt/python/log/dalme_app.log'
-        },
+        'logfile': {'class': 'logging.handlers.WatchedFileHandler', 'filename': '/opt/python/log/dalme_app.log'},
     },
     'loggers': {
         'django.request': {
@@ -394,11 +396,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'dalme_app': {
-            'handlers': ['logfile'],
-            'level': 'ERROR',
-            'propagate': False
-        },
+        'dalme_app': {'handlers': ['logfile'], 'level': 'ERROR', 'propagate': False},
     },
 }
 

@@ -2,14 +2,13 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import wagtail.core.blocks
-import wagtail.core.fields
+import wagtail.blocks
+import wagtail.fields
 import wagtail.embeds.blocks
 import wagtail.images.blocks
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('dalme_public', '0005_home_banners'),
     ]
@@ -19,35 +18,134 @@ class Migration(migrations.Migration):
             name='ExplorePage',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text_before', wagtail.core.fields.StreamField([('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('html', wagtail.core.blocks.RawHTMLBlock())], null=True)),
-                ('text_after', wagtail.core.fields.StreamField([('inline_image', wagtail.images.blocks.ImageChooserBlock()), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('html', wagtail.core.blocks.RawHTMLBlock()), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media'))], null=True)),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'text_before',
+                    wagtail.fields.StreamField(
+                        [
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                        ],
+                        null=True,
+                    ),
+                ),
+                (
+                    'text_after',
+                    wagtail.fields.StreamField(
+                        [
+                            ('inline_image', wagtail.images.blocks.ImageChooserBlock()),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                        ],
+                        null=True,
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='RecordBrowser',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='RecordViewer',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='SearchPage',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('help_content', wagtail.core.fields.StreamField([('text', wagtail.core.blocks.RichTextBlock()), ('html', wagtail.core.blocks.RawHTMLBlock())], null=True)),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'help_content',
+                    wagtail.fields.StreamField(
+                        [('text', wagtail.blocks.RichTextBlock()), ('html', wagtail.blocks.RawHTMLBlock())], null=True
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.DeleteModel(

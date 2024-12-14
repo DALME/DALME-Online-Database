@@ -50,7 +50,7 @@ ALLOWED_HOSTS = [
     'purl.127.0.0.1.sslip.io:8000',
     'purl.127.0.0.1.sslip.io',
     '.dalme.org',
-    'dalme.org'
+    'dalme.org',
 ]
 
 SECURE_SSL_REDIRECT = False
@@ -63,21 +63,21 @@ SESSION_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
 
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
-    '.127.0.0.1.sslip.io',
-    '.127.0.0.1.sslip.io:8443',
-    '.127.0.0.1.sslip.io:8000',
-    'data.127.0.0.1.sslip.io',
-    'data.127.0.0.1.sslip.io:8443',
-    'data.127.0.0.1.sslip.io:8000',
-    'db.127.0.0.1.sslip.io',
-    'db.127.0.0.1.sslip.io:8443',
-    'db.127.0.0.1.sslip.io:8000',
-    '127.0.0.1.sslip.io',
-    '127.0.0.1.sslip.io:8443',
-    '127.0.0.1.sslip.io:8000',
-    'purl.127.0.0.1.sslip.io:8443',
-    'purl.127.0.0.1.sslip.io:8000',
-    'purl.127.0.0.1.sslip.io'
+    'https://*.127.0.0.1.sslip.io',
+    'https://*.127.0.0.1.sslip.io:8443',
+    'https://*.127.0.0.1.sslip.io:8000',
+    'https://data.127.0.0.1.sslip.io',
+    'https://data.127.0.0.1.sslip.io:8443',
+    'https://data.127.0.0.1.sslip.io:8000',
+    'https://db.127.0.0.1.sslip.io',
+    'https://db.127.0.0.1.sslip.io:8443',
+    'https://db.127.0.0.1.sslip.io:8000',
+    'https://127.0.0.1.sslip.io',
+    'https://127.0.0.1.sslip.io:8443',
+    'https://127.0.0.1.sslip.io:8000',
+    'https://purl.127.0.0.1.sslip.io:8443',
+    'https://purl.127.0.0.1.sslip.io:8000',
+    'https://purl.127.0.0.1.sslip.io',
 ]
 CSRF_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
 
@@ -98,7 +98,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://db.127.0.0.1.sslip.io',
     'https://purl.127.0.0.1.sslip.io:8443',
     'https://purl.127.0.0.1.sslip.io:8000',
-    'http://purl.127.0.0.1.sslip.io'
+    'http://purl.127.0.0.1.sslip.io',
 ]
 
 ROOT_HOSTCONF = 'dalme.hosts'
@@ -144,7 +144,7 @@ INSTALLED_APPS = [
     'wagtail.images',
     'wagtail.search',
     'wagtail.admin',
-    'wagtail.core',
+    'wagtail',
     'wagtailmodelchooser',
     'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
@@ -152,7 +152,7 @@ INSTALLED_APPS = [
     'dalme_purl.application.DalmePURLConfig',
 ]
 
-ENABLE_DJANGO_EXTENSIONS = bool(int(os.environ.get("ENABLE_DJANGO_EXTENSIONS", "1")))
+ENABLE_DJANGO_EXTENSIONS = bool(int(os.environ.get('ENABLE_DJANGO_EXTENSIONS', '1')))
 if DEBUG and ENABLE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ['django_extensions']
 
@@ -198,15 +198,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dalme.wsgi.application'
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend'
-]
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
@@ -227,9 +233,9 @@ SAML_IDP_CONFIG = {
                     ('https://127.0.0.1.sslip.io:8443/idp/sso/post/', saml2.BINDING_HTTP_POST),
                     ('https://127.0.0.1.sslip.io:8443/idp/sso/redirect/', saml2.BINDING_HTTP_REDIRECT),
                 ],
-                "single_logout_service": [
-                    ("https://127.0.0.1.sslip.io:8443/idp/slo/post/", saml2.BINDING_HTTP_POST),
-                    ("https://127.0.0.1.sslip.io:8443/idp/slo/redirect/", saml2.BINDING_HTTP_REDIRECT)
+                'single_logout_service': [
+                    ('https://127.0.0.1.sslip.io:8443/idp/slo/post/', saml2.BINDING_HTTP_POST),
+                    ('https://127.0.0.1.sslip.io:8443/idp/slo/redirect/', saml2.BINDING_HTTP_REDIRECT),
                 ],
             },
             'name_id_format': [NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED],
@@ -238,15 +244,16 @@ SAML_IDP_CONFIG = {
             'want_authn_requests_signed': False,
         },
     },
-
     # Signing
     'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
     'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
     # Encryption
-    'encryption_keypairs': [{
-        'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
-        'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
-    }],
+    'encryption_keypairs': [
+        {
+            'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
+            'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
+        }
+    ],
     'valid_for': 365 * 24,
 }
 
@@ -275,7 +282,7 @@ DATABASES = {
         'USER': os.environ['DAM_USERNAME'],
         'PASSWORD': os.environ['DAM_PASSWORD'],
         'HOST': os.environ['DAM_HOSTNAME'],
-    }
+    },
 }
 
 db_from_env = dj_database_url.config(conn_max_age=500)
@@ -300,18 +307,14 @@ SEARCH_RESULTS_PER_PAGE = 10
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.SessionAuthentication',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'dalme_api.renderers.SelectRenderer',
         'dalme_api.renderers.DTEJSONRenderer',
-        'dalme_api.renderers.DBRenderer'
+        'dalme_api.renderers.DBRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
@@ -320,7 +323,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
-        'dalme_api.filter_backends.DalmeOrderingFilter'
+        'dalme_api.filter_backends.DalmeOrderingFilter',
     ],
     'EXCEPTION_HANDLER': 'dalme_api.utils.DTE_exception_handler',
 }
@@ -351,7 +354,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'www', 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -362,15 +365,15 @@ STATICFILES_FINDERS = (
 COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
-COMPRESS_FILTERS = {
-    'css': ['compressor.filters.cssmin.rCSSMinFilter'],
-    'js': ['compressor.filters.jsmin.JSMinFilter']
-}
+COMPRESS_FILTERS = {'css': ['compressor.filters.cssmin.rCSSMinFilter'], 'js': ['compressor.filters.jsmin.JSMinFilter']}
 COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
 
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
 WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
+WAGTAILADMIN_BASE_URL = 'cms/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # CELERY_BROKER_URL = 'sqs://'
 # CELERY_BROKER_TRANSPORT_OPTIONS = {
@@ -399,8 +402,8 @@ Q_CLUSTER = {
     'sqs': {
         'aws_region': AWS_REGION,
         'aws_access_key_id': AWS_ACCESS_KEY_ID,
-        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY
-    }
+        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
+    },
 }
 
 CACHES = {
@@ -414,11 +417,7 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/django/dalme_app.log'
-        },
+        'file': {'level': 'DEBUG', 'class': 'logging.FileHandler', 'filename': '/var/log/django/dalme_app.log'},
     },
     'loggers': {
         'django': {
@@ -437,7 +436,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'error',
 }
 
-if "LOG_TO_STDOUT" in os.environ:
+if 'LOG_TO_STDOUT' in os.environ:
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -455,5 +454,5 @@ if "LOG_TO_STDOUT" in os.environ:
         },
     }
 
-if "HEROKU_APP_NAME" in os.environ:
-    ALLOWED_HOSTS = ["*"]
+if 'HEROKU_APP_NAME' in os.environ:
+    ALLOWED_HOSTS = ['*']

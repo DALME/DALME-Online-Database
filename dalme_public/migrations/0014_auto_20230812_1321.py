@@ -2,15 +2,14 @@
 
 import dalme_public.blocks
 from django.db import migrations
-import wagtail.core.blocks
-import wagtail.core.fields
+import wagtail.blocks
+import wagtail.fields
 import wagtail.documents.blocks
 import wagtail.embeds.blocks
 import wagtail.images.blocks
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('dalme_public', '0013_auto_20230803_1114'),
     ]
@@ -19,56 +18,1681 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='bibliography',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='collection',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='collections',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='essay',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='explorepage',
             name='text_after',
-            field=wagtail.core.fields.StreamField([('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('html', wagtail.core.blocks.RawHTMLBlock()), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media'))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='featuredinventory',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='featuredobject',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='features',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='flat',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='home',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name='section',
             name='body',
-            field=wagtail.core.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.core.blocks.StructBlock([('html', wagtail.core.blocks.RawHTMLBlock()), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.core.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.core.blocks.RichTextBlock(required=False)), ('alignment', wagtail.core.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('resize_rule', wagtail.core.blocks.ChoiceBlock(choices=[('max', 'Fit within the given dimensions'), ('min', 'Cover the given dimensions'), ('width', 'Reduce width to the given dimension'), ('height', 'Reduce height to the given dimension'), ('scale', 'Resize to the given percentage'), ('fill', 'Resize and crop to the given dimensions'), ('background', 'As background with given parameters')], help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.', required=False)), ('dimensions', wagtail.core.blocks.CharBlock(help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.', required=False, validators=[dalme_public.blocks.validate_dimensions])), ('parameters', wagtail.core.blocks.CharBlock(help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".', required=False))])), ('text', wagtail.core.blocks.RichTextBlock()), ('heading', wagtail.core.blocks.CharBlock()), ('pullquote', wagtail.core.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.core.blocks.PageChooserBlock()), ('bibliography', wagtail.core.blocks.StructBlock([('collection', wagtail.core.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.core.blocks.StructBlock([('type', wagtail.core.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.core.blocks.CharBlock()), ('abstract', wagtail.core.blocks.CharBlock(required=False)), ('author', wagtail.core.blocks.CharBlock()), ('detail', wagtail.core.blocks.CharBlock(required=False)), ('version', wagtail.core.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('page', wagtail.core.blocks.PageChooserBlock(required=False)), ('date', wagtail.core.blocks.DateBlock())])), ('person', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock()), ('job', wagtail.core.blocks.CharBlock(required=False)), ('institution', wagtail.core.blocks.CharBlock(required=False)), ('url', wagtail.core.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock()), ('info', wagtail.core.blocks.CharBlock()), ('url', wagtail.core.blocks.URLBlock()), ('date', wagtail.core.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.core.blocks.RawHTMLBlock()), ('subsection', wagtail.core.blocks.StructBlock([('subsection', wagtail.core.blocks.CharBlock()), ('collapsed', wagtail.core.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.core.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.core.blocks.StructBlock([])), ('footnotes_placemarker', wagtail.core.blocks.StructBlock([]))], null=True),
+            field=wagtail.fields.StreamField(
+                [
+                    ('main_image', dalme_public.blocks.MainImageBlock()),
+                    ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                    (
+                        'chart_embed',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('html', wagtail.blocks.RawHTMLBlock()),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('left', 'Left-aligned'),
+                                            ('right', 'Right-aligned'),
+                                            ('full', 'Full-width'),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    (
+                        'inline_image',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                (
+                                    'alignment',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                    ),
+                                ),
+                                ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                (
+                                    'resize_rule',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('max', 'Fit within the given dimensions'),
+                                            ('min', 'Cover the given dimensions'),
+                                            ('width', 'Reduce width to the given dimension'),
+                                            ('height', 'Reduce height to the given dimension'),
+                                            ('scale', 'Resize to the given percentage'),
+                                            ('fill', 'Resize and crop to the given dimensions'),
+                                            ('background', 'As background with given parameters'),
+                                        ],
+                                        help_text='Resize the image using one of <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">Wagtail\'s built-in rules</a>            or use it as a background and style it with CSS. If the latter is chosen, the dimensions will be used to determine the size of the containing &lt;div&gt;.',
+                                        required=False,
+                                    ),
+                                ),
+                                (
+                                    'dimensions',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='Width and height separated by an "x", e.g. "400x200". The maximum allowed width for an inline image is 308px.',
+                                        required=False,
+                                        validators=[dalme_public.blocks.validate_dimensions],
+                                    ),
+                                ),
+                                (
+                                    'parameters',
+                                    wagtail.blocks.CharBlock(
+                                        help_text='CSS parameters to be used if the image is displayed as a background, e.g. "no-repeat top/cover".',
+                                        required=False,
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                    ('text', wagtail.blocks.RichTextBlock()),
+                    ('heading', wagtail.blocks.CharBlock()),
+                    ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                    ('page', wagtail.blocks.PageChooserBlock()),
+                    (
+                        'bibliography',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'collection',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('A4QHN348', 'Editions'),
+                                            ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                            ('QM9AZNT3', 'Methodology'),
+                                            ('SLIT6LID', 'Studies'),
+                                            ('FRLVXUWL', 'Other resources'),
+                                        ]
+                                    ),
+                                )
+                            ]
+                        ),
+                    ),
+                    (
+                        'document',
+                        wagtail.blocks.StructBlock(
+                            [
+                                (
+                                    'type',
+                                    wagtail.blocks.ChoiceBlock(
+                                        choices=[
+                                            ('document', 'Document'),
+                                            ('publication', 'Publication'),
+                                            ('talk', 'Talk'),
+                                        ]
+                                    ),
+                                ),
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                ('author', wagtail.blocks.CharBlock()),
+                                ('detail', wagtail.blocks.CharBlock(required=False)),
+                                ('version', wagtail.blocks.FloatBlock(required=False)),
+                                ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    (
+                        'person',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('name', wagtail.blocks.CharBlock()),
+                                ('job', wagtail.blocks.CharBlock(required=False)),
+                                ('institution', wagtail.blocks.CharBlock(required=False)),
+                                ('url', wagtail.blocks.URLBlock(required=False)),
+                                ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                            ]
+                        ),
+                    ),
+                    (
+                        'external_resource',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('title', wagtail.blocks.CharBlock()),
+                                ('info', wagtail.blocks.CharBlock()),
+                                ('url', wagtail.blocks.URLBlock()),
+                                ('date', wagtail.blocks.DateBlock()),
+                            ]
+                        ),
+                    ),
+                    ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                    ('html', wagtail.blocks.RawHTMLBlock()),
+                    (
+                        'subsection',
+                        wagtail.blocks.StructBlock(
+                            [
+                                ('subsection', wagtail.blocks.CharBlock()),
+                                ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                            ]
+                        ),
+                    ),
+                    ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                    ('footnotes_placemarker', wagtail.blocks.StructBlock([])),
+                ],
+                null=True,
+            ),
         ),
     ]

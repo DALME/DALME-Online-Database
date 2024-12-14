@@ -21,7 +21,7 @@ class FootnoteSource extends React.Component {
 
     componentDidMount() {
         const { onClose, editorState, entity, entityType } = this.props;
-        const url = global.chooserUrls.footnoteEntry;
+        const url = window.chooserUrls.footnoteEntry;
         $(document.body).on('hidden.bs.modal', this.onClose);
         const urlParams = {}
 
@@ -52,7 +52,7 @@ class FootnoteSource extends React.Component {
           }
         };
 
-        this.workflow = global.ModalWorkflow({
+        this.workflow = window.ModalWorkflow({
           url,
           urlParams,
           onload,

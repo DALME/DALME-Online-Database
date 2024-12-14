@@ -6,7 +6,7 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from django.contrib.auth import views as auth_views
 from django_hosts.resolvers import reverse
-from wagtail.core import views
+from wagtail import views
 from dalme_public.views import enter_footnote, saved_search, reroute_chooser, biblio_entry
 
 
@@ -28,5 +28,5 @@ urlpatterns = [
     path('enter-footnote/', enter_footnote, name='wagtailadmin_enter_footnote'),
     path('choose-reroute/', reroute_chooser, name='wagtailadmin_chooser_page_reroute'),
     path('choose-reroute/<slug:route>/', reroute_chooser, name='wagtailadmin_chooser_page_reroute_child'),
-    re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve')
+    re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
