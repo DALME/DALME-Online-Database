@@ -31,6 +31,7 @@ provider "registry.terraform.io/hashicorp/tls" {
   version     = "4.0.5"
   constraints = "4.0.5"
   hashes = [
+    "h1:8SvE8StpMGNcAXPKbtd5HJ9tEKqTw0T9d4a5MrfWZbE=",
     "h1:e4LBdJoZJNOQXPWgOAG0UuPBVhCStu98PieNlqJTmeU=",
     "h1:kcw9sNLNFMY2S0HIGOkjlwKtUc8lpqZsQGsC2SG9xEQ=",
     "h1:yLqz+skP3+EbU3yyvw8JqzflQTKDQGsC9QyZAg+S4dg=",
