@@ -30,7 +30,6 @@ class Records(IDABaseViewSet):
     oauth_permission_classes = [TokenHasReadWriteScope & RecordAccessPolicy]
 
     queryset = Record.objects.all()
-    # queryset = Record.include_attrs.all()
     serializer_class = RecordSerializer
     filterset_class = RecordFilter
     search_fields = ['name', 'short_name']
@@ -66,7 +65,6 @@ class Records(IDABaseViewSet):
 class PublicRecords(Records):
     """API endpoint for managing records for frontend apps."""
 
-    # queryset = Record.include_attrs.filter(workflow__is_public=True)
     queryset = Record.objects.filter(workflow__is_public=True)
     permission_classes = [PublicAccessPolicy]
     pagination_class = IDAPageNumberPagination
