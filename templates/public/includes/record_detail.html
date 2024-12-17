@@ -1,4 +1,4 @@
-{% load get_record_details wagtailroutablepage_tags %}
+{% load get_record_details get_string_list wagtailroutablepage_tags %}
 
 {% get_record_details as record_data %}
 {% if record_data.record or record_data.record_collection %}
@@ -12,7 +12,7 @@
             <span>| {{ record_data.date }}</span>
           {% endif %}
           {% if record_data.language %}
-            <span>| {{ record_data.language.name }}</span>
+            <span>| {{ data.language|get_string_list:'name' }}</span>
           {% endif %}
           {% if record_data.locale %}
             <span>| {{ record_data.locale.name }} ({{ record_data.locale.administrative_region }}, {{ record_data.locale.country.name }})</span>
