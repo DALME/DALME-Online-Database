@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
-from ida.models import PublicRegister
+from domain.models import PublicRegister
 
 
 class Endpoint(viewsets.GenericViewSet):
