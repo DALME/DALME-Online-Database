@@ -3,7 +3,7 @@
     "label": "Transcription",
     "type": "text",
     "placeholder": "Type one or more words",
-    "child_relationship": "PublicFolio",
+    "child_relationship": "WebFolio",
     "highlight": {
       "number_of_fragments": 10
     }

@@ -2638,18 +2638,18 @@ section.transcription.basic tei-hi[rend="subscript"] {
   border-top: 1px dashed #c4c4c4;
   margin-top: 8px;
   padding-top: 5px;
-} 
+}
 
 /* Media Queries */
 @media only screen and (min-width: 600px) {
   #notebar {
     right: 13px;
-  }  
+  }
 }
 @media only screen and (min-width: 1200px) {
   #notebar {
     right: calc(4rem + 13px);
-  }    
+  }
 }
 @media only screen and (min-width: 1600px) {
   #notebar {

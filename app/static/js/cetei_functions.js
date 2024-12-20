@@ -113,7 +113,7 @@ const idaTeiBehaviours = {
     },
     'expan': function(e) { e = setTitle(e); },
     'gap': function(e) { e = setExtent(e); },
-    'sic': function(e) { 
+    'sic': function(e) {
       e.setAttribute('title', 'sic');
       e.setAttribute('data-toggle', 'tooltip');
      },
