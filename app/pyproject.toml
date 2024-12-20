@@ -1,5 +1,5 @@
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = 'ida.settings'
+DJANGO_SETTINGS_MODULE = 'app.settings'
 DJANGO_CONFIGURATION = 'Development'
 addopts = "--strict-markers"
 markers = [
@@ -11,7 +11,7 @@ markers = [
 [tool.coverage.run]
 omit = [
   "*/migrations/*",
-  "ida/management/commands/custom_createcachetable.py",
+  "app/app/management/commands/custom_createcachetable.py",
   "manage.py*",
   "tests/*",
 ]
@@ -116,3 +116,7 @@ section-order = [
 
 [tool.ruff.lint.isort.sections]
 django = ["django"]
+
+[tool.django-stubs]
+django_settings_module = "app.settings"
+strict_settings = false
