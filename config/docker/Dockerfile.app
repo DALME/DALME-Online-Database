@@ -1,5 +1,7 @@
 # ; -*- mode: dockerfile;-*-
 # vim: set ft=dockerfile:
+ARG BUILD
+
 FROM python:3.11-slim-bookworm AS base
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -15,7 +17,7 @@ RUN apt-get update && \
 ### Development stages
 FROM base AS dev-reqs
 WORKDIR /opt/build
-COPY ./requirements.txt ./requirements-dev.txt ./
+COPY ./app/requirements.txt ./app/requirements-dev.txt ./
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements-dev.txt
 
 FROM python:3.11-slim-bookworm AS install-dev
@@ -39,23 +41,22 @@ RUN pip install --no-cache ./wheels/*
 
 ### TARGET: development
 FROM install-dev AS development
-ENV ENV development
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONBREAKPOINT ipdb.set_trace
-WORKDIR /opt/web
+ENV ENV=development
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONBREAKPOINT=ipdb.set_trace
+WORKDIR /opt/app
 COPY ./config/env.web.dev ./.env
-RUN mkdir /opt/web/www
 COPY ./config/oidc.key ./oidc.key
-COPY ./static ./static
-COPY ./manage.py ./
+RUN mkdir /opt/app/www
 CMD ["python", "manage.py", "runserver_plus", "--nostatic", "0.0.0.0:8001"]
+STOPSIGNAL SIGINT
 
-### TARGET: ci
+### CI stage
 FROM install-dev AS ci
-ENV ENV ci
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV ENV=ci
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 ARG DAM_DB_NAME
 ARG DAM_DB_USER
 ARG DAM_DB_PASSWORD
@@ -75,28 +76,19 @@ ENV POSTGRES_DB=$POSTGRES_DB \
     POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
     POSTGRES_HOST=$POSTGRES_HOST \
     POSTGRES_PORT=$POSTGRES_PORT
-ENV LOG_LEVEL ERROR
-ENV OAUTH_CLIENT_ID oauth.ida.development
-ENV OAUTH_CLIENT_SECRET django-insecure-development-environment-oauth-client-secret
-ENV OIDC_RSA_PRIVATE_KEY /opt/web/oidc.key
-WORKDIR /opt/web
-RUN mkdir /opt/web/www
-RUN openssl genrsa -out /opt/web/oidc.key 4096
-COPY ./ida ./ida
-COPY ./api ./api
-COPY ./purl ./purl
-COPY ./public ./public
-COPY ./tenants ./tenants
-COPY ./templates ./templates
-COPY ./static ./static
-COPY ./tests ./tests
-COPY ./manage.py ./
-COPY ./pyproject.toml ./
+ENV LOG_LEVEL=ERROR
+ENV OAUTH_CLIENT_ID=oauth.ida.development
+ENV OAUTH_CLIENT_SECRET=django-insecure-development-environment-oauth-client-secret
+ENV OIDC_RSA_PRIVATE_KEY=/opt/app/oidc.key
+WORKDIR /opt/app
+COPY ./app .
+RUN mkdir /opt/app/www
+RUN openssl genrsa -out /opt/app/oidc.key 4096
 
 ### Production stages
 FROM base AS reqs
 WORKDIR /opt/build
-COPY ./requirements.txt ./
+COPY ./app/requirements.txt ./
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements.txt
 
 FROM python:3.11-slim-bookworm AS install
@@ -116,15 +108,17 @@ RUN pip install --no-cache ./wheels/*
 
 ### TARGET: production
 FROM install AS production
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 ENV LANG=en_US.UTF-8
-WORKDIR /opt/web
-COPY ./ida ./ida
-COPY ./api ./api
-COPY ./purl ./purl
-COPY ./public ./public
-COPY ./tenants ./tenants
-COPY ./templates ./templates
-COPY ./static ./static
-COPY ./manage.py ./
+ENV BUILD=$BUILD
+WORKDIR /opt/app
+COPY ./app/manage.py ./
+COPY ./app/app ./app
+COPY ./app/domain ./domain
+COPY ./app/api ./api
+COPY ./app/purl ./purl
+COPY ./app/web ./web
+COPY ./app/tenants ./tenants
+COPY ./app/static ./static
+STOPSIGNAL SIGTERM
