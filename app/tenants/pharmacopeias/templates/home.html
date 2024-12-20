@@ -1,4 +1,4 @@
-{% extends "public/layouts/single_column.html" %}
+{% extends "web/layouts/single_column.html" %}
 {% load wagtailcore_tags wagtailimages_tags sponsors static %}
 
 {% block extra_styles %}
@@ -7,8 +7,8 @@
 
 {% block header_extra %}
   <div class="title u-flex u-type-serif">
-    <h1 class="small">{{ settings.public.Settings.name }}</h1>
-    <h1 class="last">{{ settings.public.Settings.tagline }}</h1>
+    <h1 class="small">{{ settings.web.Settings.name }}</h1>
+    <h1 class="last">{{ settings.web.Settings.tagline }}</h1>
     <br />
     {% if page.learn_more_page %}
       <a class="u-lozenge" href="{% pageurl page.learn_more_page %}">LEARN MORE</a>
@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block main_column %}
-    {% include "public/includes/featured.html" %}
+    {% include "web/includes/featured.html" %}
     {% include_block page.body %}
     {% sponsors %}
 {% endblock %}
