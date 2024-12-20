@@ -1,4 +1,4 @@
-"""Test the ida.management.commands.ensure_oauth module."""
+"""Test the app.management.commands.ensure_oauth module."""
 
 import io
 from unittest import mock
@@ -7,15 +7,15 @@ from oauth2_provider.models import Application
 
 from django.core.management import call_command
 
-from ida.management.commands.ensure_oauth import Command as EnsureOAuth
+from app.management.commands.ensure_oauth import Command as EnsureOAuth
 
 EXPECTED_TENANTS = ['ida', 'dalme', 'pharmacopeias']
 
 
-@mock.patch('ida.management.commands.ensure_oauth.io.StringIO')
-@mock.patch('ida.management.commands.ensure_oauth.call_command')
-@mock.patch('ida.management.commands.ensure_oauth.Application')
-@mock.patch('ida.management.commands.ensure_oauth.logger')
+@mock.patch('app.management.commands.ensure_oauth.io.StringIO')
+@mock.patch('app.management.commands.ensure_oauth.call_command')
+@mock.patch('app.management.commands.ensure_oauth.Application')
+@mock.patch('app.management.commands.ensure_oauth.logger')
 def test_ensure_oauth_create_application_some_failure(mock_logger, mock_application, mock_call_command, mock_io):
     mock_application.DoesNotExist = Application.DoesNotExist
     mock_application.objects.get.side_effect = Application.DoesNotExist('Some error')
@@ -24,7 +24,7 @@ def test_ensure_oauth_create_application_some_failure(mock_logger, mock_applicat
     EnsureOAuth().handle()
 
     assert mock_application.mock_calls == [
-        mock.call.objects.get(client_id='oauth.ida.development'),
+        mock.call.objects.get(client_id='oauth.app.development'),
     ]
     assert mock_call_command.mock_calls == [
         mock.call(
@@ -32,7 +32,7 @@ def test_ensure_oauth_create_application_some_failure(mock_logger, mock_applicat
             'confidential',
             'authorization-code',
             stdout=mock_io.return_value.__enter__.return_value,
-            client_id='oauth.ida.development',
+            client_id='oauth.app.development',
             client_secret='django-insecure-development-environment-oauth-client-secret',
             algorithm='RS256',
             name='IDA',
@@ -49,10 +49,10 @@ def test_ensure_oauth_create_application_some_failure(mock_logger, mock_applicat
     ]
 
 
-@mock.patch('ida.management.commands.ensure_oauth.io.StringIO')
-@mock.patch('ida.management.commands.ensure_oauth.call_command')
-@mock.patch('ida.management.commands.ensure_oauth.Application')
-@mock.patch('ida.management.commands.ensure_oauth.logger')
+@mock.patch('app.management.commands.ensure_oauth.io.StringIO')
+@mock.patch('app.management.commands.ensure_oauth.call_command')
+@mock.patch('app.management.commands.ensure_oauth.Application')
+@mock.patch('app.management.commands.ensure_oauth.logger')
 def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, mock_io):
     mock_oauth_application = mock.MagicMock(spec=Application)
     mock_application.DoesNotExist = Application.DoesNotExist
@@ -62,8 +62,8 @@ def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, m
     EnsureOAuth().handle()
 
     assert mock_application.mock_calls == [
-        mock.call.objects.get(client_id='oauth.ida.development'),
-        mock.call.objects.get(client_id='oauth.ida.development'),
+        mock.call.objects.get(client_id='oauth.app.development'),
+        mock.call.objects.get(client_id='oauth.app.development'),
     ]
     assert mock_call_command.mock_calls == [
         mock.call(
@@ -71,7 +71,7 @@ def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, m
             'confidential',
             'authorization-code',
             stdout=mock_io.return_value.__enter__.return_value,
-            client_id='oauth.ida.development',
+            client_id='oauth.app.development',
             client_secret='django-insecure-development-environment-oauth-client-secret',
             algorithm='RS256',
             name='IDA',
@@ -89,23 +89,23 @@ def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, m
         mock.call.save(),
     ]
     assert mock_logger.mock_calls == [
-        mock.call.info('Created oauth application with client_id: %s', client_id='oauth.ida.development')
+        mock.call.info('Created oauth application with client_id: %s', client_id='oauth.app.development')
     ]
 
 
-@mock.patch('ida.management.commands.ensure_oauth.call_command')
-@mock.patch('ida.management.commands.ensure_oauth.Application')
-@mock.patch('ida.management.commands.ensure_oauth.logger')
+@mock.patch('app.management.commands.ensure_oauth.call_command')
+@mock.patch('app.management.commands.ensure_oauth.Application')
+@mock.patch('app.management.commands.ensure_oauth.logger')
 def test_ensure_oauth_refresh(mock_logger, mock_application, mock_call_command):
     out = io.StringIO()
     call_command('ensure_oauth', (), stdout=out, stderr=io.StringIO())
 
     assert out.getvalue() == ''
     assert mock_application.mock_calls == [
-        mock.call.objects.get(client_id='oauth.ida.development'),
+        mock.call.objects.get(client_id='oauth.app.development'),
         mock.call.objects.get().save(),
     ]
     assert not mock_call_command.mock_calls
     assert mock_logger.mock_calls == [
-        mock.call.info('Refreshed existing oauth application with client_id: %s', client_id='oauth.ida.development')
+        mock.call.info('Refreshed existing oauth application with client_id: %s', client_id='oauth.app.development')
     ]

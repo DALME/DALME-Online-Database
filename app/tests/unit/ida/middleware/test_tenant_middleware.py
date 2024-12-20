@@ -1,17 +1,17 @@
-"""Test the ida.middleware.tenant_middleware module."""
+"""Test the app.middleware.tenant_middleware module."""
 
 from unittest import mock
 
 import pytest
+from core.middleware.tenant_middleware import TenantMiddleware
 
 from django.core.exceptions import DisallowedHost
 
-from ida.middleware.tenant_middleware import TenantMiddleware
-from ida.models import Domain, Tenant
+from domain.models import Domain, Tenant
 
 
-@mock.patch('ida.middleware.tenant_middleware.Domain')
-@mock.patch('ida.middleware.tenant_middleware.connection')
+@mock.patch('app.middleware.tenant_middleware.Domain')
+@mock.patch('app.middleware.tenant_middleware.connection')
 def test_middleware_throws_if_tenant_not_found(mock_conn, mock_domain, rf):
     """Assert the middleware catches non-existant tenants."""
     request = rf.get('/', headers={'HOST': 'some.domain'})
@@ -29,8 +29,8 @@ def test_middleware_throws_if_tenant_not_found(mock_conn, mock_domain, rf):
     ]
 
 
-@mock.patch('ida.middleware.tenant_middleware.Domain')
-@mock.patch('ida.middleware.tenant_middleware.connection')
+@mock.patch('app.middleware.tenant_middleware.Domain')
+@mock.patch('app.middleware.tenant_middleware.connection')
 def test_middleware(mock_conn, mock_domain, rf):
     """Assert the middleware queries and sets the appropriate tenant."""
     request = rf.get('/', headers={'HOST': 'dalme.localhost'})

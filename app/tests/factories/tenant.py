@@ -10,14 +10,14 @@ class DomainFactory(factory.django.DjangoModelFactory):
     is_primary = False  # We don't use a primary domain.
 
     class Meta:
-        model = 'ida.Domain'
+        model = 'domain.Domain'
 
 
 class TenantFactory(factory.django.DjangoModelFactory):
     """Generate Tenant model fixtures."""
 
     class Meta:
-        model = 'ida.Tenant'
+        model = 'domain.Tenant'
 
     name = factory.Sequence(lambda n: 'Tenant %03d' % n)
     domains = factory.RelatedFactory(DomainFactory, factory_related_name='tenant')

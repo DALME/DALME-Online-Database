@@ -1,18 +1,17 @@
-"""Test the ida.management.commands.ensure_superuser module."""
+"""Test the app.management.commands.ensure_superuser module."""
 
 import os
 from unittest import mock
 
 import pytest
+from core.management.commands.ensure_superuser import Command as EnsureSuperuser
 
 from django.contrib.auth.models import User
 
-from ida.management.commands.ensure_superuser import Command as EnsureSuperuser
-
 
 @mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo'})
-@mock.patch('ida.management.commands.ensure_superuser.User')
-@mock.patch('ida.management.commands.ensure_superuser.logger')
+@mock.patch('app.management.commands.ensure_superuser.User')
+@mock.patch('app.management.commands.ensure_superuser.logger')
 def test_ensure_superuser_no_creds(mock_logger, mock_user):
     with pytest.raises(KeyError) as exc:
         EnsureSuperuser().handle()
@@ -26,8 +25,8 @@ def test_ensure_superuser_no_creds(mock_logger, mock_user):
 
 
 @mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
-@mock.patch('ida.management.commands.ensure_superuser.User')
-@mock.patch('ida.management.commands.ensure_superuser.logger')
+@mock.patch('app.management.commands.ensure_superuser.User')
+@mock.patch('app.management.commands.ensure_superuser.logger')
 def test_ensure_superuser_create(mock_logger, mock_user):
     mock_user.DoesNotExist = User.DoesNotExist
     mock_user.objects.get.side_effect = User.DoesNotExist('Some error')
@@ -48,8 +47,8 @@ def test_ensure_superuser_create(mock_logger, mock_user):
 
 
 @mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
-@mock.patch('ida.management.commands.ensure_superuser.User')
-@mock.patch('ida.management.commands.ensure_superuser.logger')
+@mock.patch('app.management.commands.ensure_superuser.User')
+@mock.patch('app.management.commands.ensure_superuser.logger')
 def test_ensure_superuser_refresh(mock_logger, mock_user):
     EnsureSuperuser().handle()
 

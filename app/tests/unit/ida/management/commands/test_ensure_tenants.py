@@ -1,4 +1,4 @@
-"""Test the ida.management.commands.ensure_tenants module."""
+"""Test the app.management.commands.ensure_tenants module."""
 
 from unittest import mock
 
@@ -6,14 +6,14 @@ import pytest
 
 from django.db import DataError
 
-from ida.management.commands.ensure_tenants import Command as EnsureTenants
-from ida.models import Domain, Tenant
-from ida.settings import TenantTypes
+from app.management.commands.ensure_tenants import Command as EnsureTenants
+from app.settings import TenantTypes
+from domain.models import Domain, Tenant
 
 
-@mock.patch('ida.management.commands.ensure_tenants.Domain')
-@mock.patch('ida.management.commands.ensure_tenants.Tenant')
-@mock.patch('ida.management.commands.ensure_tenants.logger')
+@mock.patch('app.management.commands.ensure_tenants.Domain')
+@mock.patch('app.management.commands.ensure_tenants.Tenant')
+@mock.patch('app.management.commands.ensure_tenants.logger')
 def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
     mock_tenant.objects.filter.return_value.exists.side_effect = [True, False]
 
@@ -23,7 +23,7 @@ def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
     assert mock_tenant.mock_calls == [
         mock.call.objects.filter(name='IDA'),
         mock.call.objects.filter().exists(),
-        mock.call.objects.filter(domains__domain='ida.localhost'),
+        mock.call.objects.filter(domains__domain='app.localhost'),
         mock.call.objects.filter().exists(),
     ]
     assert mock_domain.called is False
@@ -31,14 +31,14 @@ def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
         mock.call.error(
             'Invalid existing tenant record for this environment',
             tenant='IDA',
-            domain='ida.localhost',
+            domain='app.localhost',
         ),
     ]
 
 
-@mock.patch('ida.management.commands.ensure_tenants.Domain')
-@mock.patch('ida.management.commands.ensure_tenants.Tenant')
-@mock.patch('ida.management.commands.ensure_tenants.logger')
+@mock.patch('app.management.commands.ensure_tenants.Domain')
+@mock.patch('app.management.commands.ensure_tenants.Tenant')
+@mock.patch('app.management.commands.ensure_tenants.logger')
 def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
     mock_tenant.objects.filter.return_value.exists.side_effect = [True, True, True, True, False]
     new_tenant = mock.MagicMock(spec=Tenant)
@@ -51,7 +51,7 @@ def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
     assert mock_tenant.mock_calls == [
         mock.call.objects.filter(name='IDA'),
         mock.call.objects.filter().exists(),
-        mock.call.objects.filter(domains__domain='ida.localhost'),
+        mock.call.objects.filter(domains__domain='app.localhost'),
         mock.call.objects.filter().exists(),
         mock.call.objects.filter(name='DALME'),
         mock.call.objects.filter().exists(),
@@ -76,7 +76,7 @@ def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
         mock.call.info(
             'Existing tenant found for domain',
             tenant='IDA',
-            domain='ida.localhost',
+            domain='app.localhost',
         ),
         mock.call.info(
             'Existing tenant found for domain',

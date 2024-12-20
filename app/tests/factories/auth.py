@@ -2,7 +2,7 @@
 
 import factory
 
-from ida.models.groups import GroupProperties
+from domain.models.groups import GroupProperties
 
 from .tenant import TenantFactory
 
@@ -11,7 +11,7 @@ class UserFactory(factory.DjangoModelFactory):
     """Generate User model fixtures."""
 
     class Meta:
-        model = 'ida.User'
+        model = 'domain.User'
         django_get_or_create = ('email', 'username')
 
     username = factory.Sequence(lambda n: 'User %03d' % n)
@@ -41,7 +41,7 @@ class GroupPropertiesFactory(factory.django.DjangoModelFactory):
     """Generate GroupProperties model fixtures."""
 
     class Meta:
-        model = 'ida.GroupProperties'
+        model = 'domain.GroupProperties'
 
     group_type = factory.fuzzy.FuzzyChoice(GroupProperties.GROUP_TYPES, getter=lambda c: c[0])
     description = factory.Sequence(lambda n: 'Some group description %03d' % n)

@@ -1,4 +1,4 @@
-"""Test the ida.middleware.tenant_context_middleware module."""
+"""Test the app.middleware.tenant_context_middleware module."""
 
 from unittest import mock
 
@@ -7,9 +7,9 @@ from werkzeug.local import LocalProxy
 
 from django.core.exceptions import DisallowedHost
 
-from ida.context import get_current_tenant
-from ida.middleware.tenant_context_middleware import TenantContextMiddleware
-from ida.models import Tenant
+from app.context import get_current_tenant
+from app.middleware.tenant_context_middleware import TenantContextMiddleware
+from domain.models import Tenant
 
 
 def test_get_current_tenant_fails_when_not_set(mock_get_current_tenant):
@@ -34,7 +34,7 @@ def test_middleware_throws_if_tenant_not_on_request(rf):
         middleware(request)
 
 
-@mock.patch('ida.middleware.tenant_context_middleware._tenant')
+@mock.patch('app.middleware.tenant_context_middleware._tenant')
 def test_middleware(mock_ctx, rf, settings):
     """Assert the middleware sets and unsets the context correctly."""
     request = rf.get('/', headers={'HOST': 'dalme.localhost'})
