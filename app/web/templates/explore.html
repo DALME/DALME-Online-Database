@@ -1,4 +1,4 @@
-{% extends "public/layouts/left_side_column.html" %}
+{% extends "web/layouts/left_side_column.html" %}
 {% load static wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}Explore &mdash; {{ block.super }}{% endblock %}
@@ -11,24 +11,24 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "public/includes/simple_header.html" %}
+  {% include "web/includes/simple_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "public/includes/collections_filter.html" %}
-  {% include "public/includes/features_nav.html" %}
+  {% include "web/includes/collections_filter.html" %}
+  {% include "web/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
   <div class="content">
-    {% if settings.public.Settings.explore_text_before %}
-      {{ settings.public.Settings.explore_text_before }}
+    {% if settings.web.Settings.explore_text_before %}
+      {{ settings.web.Settings.explore_text_before }}
     {% endif %}
     <div id="map_container" style="height:50vh;" class="mt-2 mb-3 d-flex">
       <i class="fas fa-cog fa-spin fa-5x m-auto loader"></i>
     </div>
-    {% if settings.public.Settings.explore_text_after %}
-      {{ settings.public.Settings.explore_text_after }}
+    {% if settings.web.Settings.explore_text_after %}
+      {{ settings.web.Settings.explore_text_after }}
     {% endif %}
   </div>
 {% endblock %}

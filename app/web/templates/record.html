@@ -1,4 +1,4 @@
-{% extends "public/layouts/single_column.html" %}
+{% extends "web/layouts/single_column.html" %}
 {% load get_citation_data settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; {{ title }}{% endblock %}
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "public/includes/breadcrumbs.html" %}
+  {% include "web/includes/breadcrumbs.html" %}
 {% endblock %}
 
 {% block main_column %}
@@ -241,7 +241,7 @@
   <div class="folios u-flex viewer" :class="viewerMode">
     <section class="folio">
       <div class="record-info" v-if="showInfoPanel" v-on-clickaway="toggleInfoPanel">
-        {% include "public/includes/record_info_panel.html" %}
+        {% include "web/includes/record_info_panel.html" %}
       </div>
       <div id="diva_viewer">
         <beat-loader v-show="loading && transcriptionId" color="#aaa"></beat-loader>
@@ -390,7 +390,7 @@
           headerHeight: 93,
           windowWidth: window.innerWidth,
           transcriptionWidth: 0,
-          api_url: '{% settings_val 'API_URL' %}/public',
+          api_url: '{% settings_val 'API_URL' %}/web',
         },
         watch: {
           folioIndex: "switchFolio",
@@ -561,7 +561,7 @@
             this.handleHelpPlacement = split == 'vertical-split' ? 'left' : 'bottom';
             this.updateViewer();
             $('section.transcription').scrollTop(0);
-            window.CustomUtils.updateSession({ 'public-viewer-mode': split });
+            window.CustomUtils.updateSession({ 'web-viewer-mode': split });
           },
           updateViewer(divaHeight=false) {
             if (divaHeight) this.divaHeight = divaHeight;
@@ -722,7 +722,7 @@
           },
           changeRenderMode(mode) {
             this.renderMode = mode;
-            window.CustomUtils.updateSession({ 'public-render-mode': mode });
+            window.CustomUtils.updateSession({ 'web-render-mode': mode });
             this.softWrap = mode == 'basic' ? true : false;
             setTimeout(() => this.toggleTeiContainers(), 0);
           },

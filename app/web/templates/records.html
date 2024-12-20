@@ -1,4 +1,4 @@
-{% extends "public/layouts/single_column.html" %}
+{% extends "web/layouts/single_column.html" %}
 {% load get_breadcrumbs_nav settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; Record Browser{% endblock %}
@@ -35,7 +35,7 @@
         <li>
           <small>${statusInfo}</small>
         </li>
-        {% include "public/includes/pagination.html" %}
+        {% include "web/includes/pagination.html" %}
 
         <li class="search ml-auto position-relative" v-if="showModes">
           <input
@@ -317,7 +317,7 @@
     </section>
     <div v-if="!spinner" class="pager">
       <ul class="pagination">
-        {% include "public/includes/pagination.html" %}
+        {% include "web/includes/pagination.html" %}
       </ul>
     </div>
   </div>
@@ -417,7 +417,7 @@
         choices: {},
         windowWidth: window.innerWidth,
         session_data: null,
-        api_url: '{% settings_val 'API_URL' %}/public',
+        api_url: '{% settings_val 'API_URL' %}/web',
         choiceLists: {
           collection: { propName: 'collectionChoices', placeholder: "Filter by collection" },
           corpus: { propName: 'corpusChoices', placeholder: "Filter by corpus" },
@@ -547,7 +547,7 @@
         async setMode(e) {
           const mode = e.currentTarget.id;
           if (this.mode !== mode) {
-            window.CustomUtils.updateSession({ 'public-browse-mode': mode });
+            window.CustomUtils.updateSession({ 'web-browse-mode': mode });
             if (!this.hasThumbs) {
               await this.fetchData(`${this.api_url}/records/?thumbs=1&${this.currentParams.toString()}`);
               this.mode = mode;

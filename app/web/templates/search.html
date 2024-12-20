@@ -1,4 +1,4 @@
-{% extends "public/layouts/left_side_column.html" %}
+{% extends "web/layouts/left_side_column.html" %}
 {% load static js_translate dd_record_name get_highlights wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}{{ block.super }} &ndash; Search{% endblock %}
@@ -16,12 +16,12 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "public/includes/simple_header.html" %}
+  {% include "web/includes/simple_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "public/includes/collections_filter.html" %}
-  {% include "public/includes/features_nav.html" %}
+  {% include "web/includes/collections_filter.html" %}
+  {% include "web/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
@@ -209,7 +209,7 @@
           switch>
           <small>Show/hide tooltips</small>
         </b-form-checkbox>
-        {{ settings.public.Settings.search_help_content }}
+        {{ settings.web.Settings.search_help_content }}
       </div>
     </b-form>
     <div class="search-results" v-if="hasResults">

@@ -13,8 +13,8 @@
       <link rel="manifest" href="{% static 'icons/site_public.webmanifest' %}">
       <link rel="mask-icon" href="{% static 'icons/safari-pinned-tab.svg' %}" color="#912643">
       <link rel="shortcut icon" href="{% static 'icons/favicon.ico' %}">
-      <meta name="apple-mobile-web-app-title" content="{{ settings.public.Settings.short_form }}">
-      <meta name="application-name" content="{{ settings.public.Settings.short_form }}">
+      <meta name="apple-mobile-web-app-title" content="{{ settings.web.Settings.short_form }}">
+      <meta name="application-name" content="{{ settings.web.Settings.short_form }}">
       <meta name="msapplication-TileColor" content="#b91d47">
       <meta name="msapplication-TileImage" content="{% static 'icons/mstile-144x144.png' %}">
       <meta name="msapplication-config" content="{% static 'icons/browserconfig.xml' %}">
@@ -23,7 +23,7 @@
 
     <title>
       {% block title %}
-        {{ settings.public.Settings.name }}
+        {{ settings.web.Settings.name }}
       {% endblock %}
     </title>
 
@@ -46,7 +46,7 @@
     {% block extra_styles %}{% endblock %}
 
     {% block js %}
-      <script async defer data-domain="{{ settings.public.Settings.analytics_domain }}" src="https://plausible.io/js/plausible.js"></script>
+      <script async defer data-domain="{{ settings.web.Settings.analytics_domain }}" src="https://plausible.io/js/plausible.js"></script>
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
       <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
       <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -88,7 +88,7 @@
         {% endif %}
         style="{{ styles }}"
       {% endif %}>
-      {% include "public/includes/nav.html" %}
+      {% include "web/includes/nav.html" %}
       {% block header_extra %}{% endblock %}
     </header>
 
