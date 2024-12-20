@@ -59,19 +59,19 @@ endif
 
 db.migrate:
 	docker compose run --rm \
-		$(NAMESPACE).web \
+		$(NAMESPACE).app \
 		python manage.py migrate_schemas $(args)
 .PHONY: db.migrate
 
 db.migrate.fake:
 	docker compose run --rm \
-		$(NAMESPACE).web \
+		$(NAMESPACE).app \
 		python manage.py migrate_schemas --fake $(args)
 .PHONY: db.migrate.fake
 
 db.migrations.make:
 	docker compose run --rm \
-		$(NAMESPACE).web \
+		$(NAMESPACE).app \
 		python manage.py makemigrations
 .PHONY: db.migrations.make
 
@@ -81,20 +81,20 @@ ifndef app
 		Usage: make db.migrations.empty app='core')
 else
 	docker compose run --rm \
-		$(NAMESPACE).web \
+		$(NAMESPACE).app \
 		python manage.py makemigrations --empty $(app)
 endif
 .PHONY: db.migrations.empty
 
 db.migrations.merge:
 	docker compose run --rm \
-		$(NAMESPACE).web \
+		$(NAMESPACE).app \
 		python manage.py migrations.make --merge
 .PHONY: db.migrations.merge
 
 db.migrations.show:
 	docker compose run --rm \
-		$(NAMESPACE).web \
+		$(NAMESPACE).app \
 		python manage.py showmigrations
 .PHONY: db.migrations.show
 
