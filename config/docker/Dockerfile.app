@@ -113,12 +113,14 @@ ENV PYTHONUNBUFFERED=1
 ENV LANG=en_US.UTF-8
 ENV BUILD=$BUILD
 WORKDIR /opt/app
-COPY ./app/manage.py ./
+COPY ./app/api ./api
 COPY ./app/app ./app
 COPY ./app/domain ./domain
-COPY ./app/api ./api
+COPY ./app/oauth ./oauth
 COPY ./app/purl ./purl
-COPY ./app/web ./web
-COPY ./app/tenants ./tenants
 COPY ./app/static ./static
+COPY ./app/tenants ./tenants
+COPY ./app/web ./web
+COPY ./app/manage.py ./
+
 STOPSIGNAL SIGTERM

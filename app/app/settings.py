@@ -45,7 +45,7 @@ class Base(Configuration):
 
     ENV = os.environ.get('ENV', 'development')
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-    AUTH_USER_MODEL = 'domain.User'
+    AUTH_USER_MODEL = 'oauth.User'
     TENANT_MODEL = 'domain.Tenant'
     TENANT_DOMAIN_MODEL = 'domain.Domain'
     HAS_MULTI_TYPE_TENANTS = True
@@ -325,7 +325,7 @@ class Base(Configuration):
         {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
         {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
     ]
-    OAUTH2_PROVIDER_APPLICATION_MODEL = 'domain.Application'
+    OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.Application'
     OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', 3600)  # 1 hour
     OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get('OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', 3600 * 24 * 14)  # 14 days
 
@@ -529,7 +529,7 @@ class Development(Base, Configuration):
             return {
                 'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
                 'ALLOWED_REDIRECT_URI_SCHEMES': ['http'],
-                'OAUTH2_VALIDATOR_CLASS': 'app.auth.IDAOAuth2Validator',
+                'OAUTH2_VALIDATOR_CLASS': 'oauth.validators.OAuth2Validator',
                 'OIDC_ENABLED': True,
                 'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
                 'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,
@@ -688,7 +688,7 @@ class Production(Base, Configuration):
         return {
             'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
             'ALLOWED_REDIRECT_URI_SCHEMES': ['https'],
-            'OAUTH2_VALIDATOR_CLASS': 'app.auth.IDAOAuth2Validator',
+            'OAUTH2_VALIDATOR_CLASS': 'oauth.validators.OAuth2Validator',
             'OIDC_ENABLED': True,
             'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
             'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,

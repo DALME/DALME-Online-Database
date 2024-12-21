@@ -2,7 +2,7 @@
 
 import factory
 
-from domain.models.groups import GroupProperties
+from oauth.models import GroupProperties
 
 from .tenant import TenantFactory
 
@@ -41,7 +41,7 @@ class GroupPropertiesFactory(factory.django.DjangoModelFactory):
     """Generate GroupProperties model fixtures."""
 
     class Meta:
-        model = 'domain.GroupProperties'
+        model = 'oauth.GroupProperties'
 
     group_type = factory.fuzzy.FuzzyChoice(GroupProperties.GROUP_TYPES, getter=lambda c: c[0])
     description = factory.Sequence(lambda n: 'Some group description %03d' % n)

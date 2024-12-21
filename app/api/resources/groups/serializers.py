@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 
 from api.dynamic_serializer import DynamicSerializer
 from api.resources.tenants import TenantSerializer
-from domain.models import GroupProperties
+from oauth.models import GroupProperties
 
 
 class GroupSerializer(DynamicSerializer, WritableNestedModelSerializer):

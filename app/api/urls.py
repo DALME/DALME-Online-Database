@@ -4,7 +4,7 @@ from rest_framework import routers
 
 from django.urls import include, path
 
-from app.auth import urls as auth_urls
+from oauth.urls import urls as auth_urls
 
 from . import resources
 from .csrf import csrf

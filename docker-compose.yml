@@ -39,19 +39,20 @@ services:
     networks:
       - app-network
     volumes:
-      - ./app/app:/opt/app/app
       - ./app/api:/opt/app/api
+      - ./app/app:/opt/app/app
       - ./app/domain:/opt/app/domain
-      - ./app/purl:/opt/app/purl
-      - ./app/tests:/opt/app/tests
-      - ./app/web:/opt/app/web
-      - ./app/static:/opt/app/static
-      - ./app/tenants/:/opt/app/tenants
       - ./app/media/media:/opt/app/www/media
-      - ./app/pyproject.toml:/opt/app/pyproject.toml
-      - ./app/manage.py:/opt/app/manage.py
       - ./app/notebooks:/opt/app/notebooks
       - ./app/notebooks/ipython:/root/.ipython/profile_default
+      - ./app/oauth/:/opt/app/oauth
+      - ./app/purl:/opt/app/purl
+      - ./app/static:/opt/app/static
+      - ./app/tenants/:/opt/app/tenants
+      - ./app/tests:/opt/app/tests
+      - ./app/web:/opt/app/web
+      - ./app/manage.py:/opt/app/manage.py
+      - ./app/pyproject.toml:/opt/app/pyproject.toml
     restart: unless-stopped
     stdin_open: true
     tty: true
