@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from domain.models import Tenant
+from tenants.models import Tenant
 
 
 class TenantSerializer(serializers.ModelSerializer):

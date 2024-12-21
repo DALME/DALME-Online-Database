@@ -1,4 +1,4 @@
-"""Interface for the domain.models.tenant module.
+"""Interface for the tenants.models module.
 
 Includes definitions of fields, models, and managers.
 

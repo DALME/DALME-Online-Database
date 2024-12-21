@@ -6,7 +6,7 @@ from django_tenants.utils import get_tenant_type_choices
 from django.conf import settings
 from django.db import models
 
-from domain.models.abstract import TrackingMixin
+from app.abstract import TrackingMixin
 
 
 class Tenant(TrackingMixin, TenantMixin):

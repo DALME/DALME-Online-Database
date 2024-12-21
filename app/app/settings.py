@@ -46,8 +46,8 @@ class Base(Configuration):
     ENV = os.environ.get('ENV', 'development')
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     AUTH_USER_MODEL = 'oauth.User'
-    TENANT_MODEL = 'domain.Tenant'
-    TENANT_DOMAIN_MODEL = 'domain.Domain'
+    TENANT_MODEL = 'tenants.Tenant'
+    TENANT_DOMAIN_MODEL = 'tenants.Domain'
     HAS_MULTI_TYPE_TENANTS = True
     MULTI_TYPE_DATABASE_FIELD = 'tenant_type'
 
@@ -108,6 +108,8 @@ class Base(Configuration):
         'rest_framework',
         'wagtail.users',
         # IDA apps.
+        'tenants',
+        'oauth',
         'app',
         'domain',
         'api',
@@ -186,8 +188,8 @@ class Base(Configuration):
         'app.middleware.HealthCheckMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'app.middleware.TenantMiddleware',
-        'app.middleware.TenantContextMiddleware',
+        'tenants.middleware.TenantMiddleware',
+        'tenants.middleware.TenantContextMiddleware',
         'django_structlog.middlewares.RequestMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -751,10 +753,10 @@ class Production(Base, Configuration):
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
-            'BACKEND': 'app.storage_backends.MediaStorage',
+            'BACKEND': 'tenants.storage_backends.MediaStorage',
         },
         'staticfiles': {
-            'BACKEND': 'app.storage_backends.StaticStorage',
+            'BACKEND': 'tenants.storage_backends.StaticStorage',
         },
     }
 

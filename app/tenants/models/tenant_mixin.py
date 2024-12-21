@@ -14,8 +14,8 @@ import os
 
 from django.db import models
 
+from app.abstract.custom_manager import CustomManager, CustomQuerySet
 from app.context import get_current_tenant
-from domain.models.abstract.custom_manager import CustomManager, CustomQuerySet
 
 
 class TenantMixin(models.Model):

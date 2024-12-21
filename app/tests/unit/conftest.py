@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from domain.models import Tenant
+from tenants.models import Tenant
 
 
 @pytest.fixture(scope='session', autouse=True)

@@ -21,7 +21,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
-from domain.models import Tenant
+from tenants.models import Tenant
 
 logger = structlog.get_logger(__name__)
 

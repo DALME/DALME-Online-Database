@@ -9,8 +9,8 @@ import pytest
 
 from django.core.management.base import CommandError
 
-from app.management.commands.collectstatic_tenants import Command as CollectstaticTenants
-from domain.models import Tenant
+from tenants.management.commands.collectstatic_tenants import Command as CollectstaticTenants
+from tenants.models import Tenant
 
 MANIFEST_DATA = json.dumps(
     {

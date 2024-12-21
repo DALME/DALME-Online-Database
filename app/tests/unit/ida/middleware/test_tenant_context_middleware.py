@@ -8,8 +8,8 @@ from werkzeug.local import LocalProxy
 from django.core.exceptions import DisallowedHost
 
 from app.context import get_current_tenant
-from app.middleware.tenant_context_middleware import TenantContextMiddleware
-from domain.models import Tenant
+from tenants.middleware.tenant_context_middleware import TenantContextMiddleware
+from tenants.models import Tenant
 
 
 def test_get_current_tenant_fails_when_not_set(mock_get_current_tenant):
