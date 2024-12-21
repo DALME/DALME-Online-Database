@@ -11,6 +11,9 @@ from django.db import connection, models
 from django.dispatch import receiver
 from django.utils import timezone
 
+from oauth.models import User
+from tenants.models import Tenant
+
 from .models import (
     Page,
     PageNode,
@@ -18,9 +21,7 @@ from .models import (
     PreferenceKey,
     PublicRegister,
     Record,
-    Tenant,
     Transcription,
-    User,
     Workflow,
     WorkLog,
     rs_resource,
