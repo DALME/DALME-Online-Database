@@ -19,7 +19,7 @@ export VENV_BIN := $(abspath ${VENV})/bin
 -include Makefiles/Makefile.docs
 -include Makefiles/Makefile.infra
 -include Makefiles/Makefile.ui
--include Makefiles/Makefile.web
+-include Makefiles/Makefile.app
 
 help:
 	@echo "usage: make [option]"
