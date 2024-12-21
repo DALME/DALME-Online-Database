@@ -7,11 +7,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from domain.models.abstract import OwnedMixin, TrackingMixin, UuidMixin
+from app.abstract import OwnedMixin, TrackingMixin, UuidMixin
 from domain.models.attribute import AttributeMixin
 from domain.models.comment import CommentMixin
 from domain.models.permission import PermissionMixin
-from domain.models.tenant import TenantMixin
+from tenants.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

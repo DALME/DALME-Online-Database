@@ -7,8 +7,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from domain.models.abstract import TrackingMixin
-from domain.models.tenant import TenantMixin
+from app.abstract import TrackingMixin
+from tenants.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

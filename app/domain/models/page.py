@@ -9,8 +9,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import options
 
+from app.abstract import TrackingMixin, UuidMixin
 from domain.models import AttributeType
-from domain.models.abstract import TrackingMixin, UuidMixin
 from domain.models.resourcespace import rs_api_query
 from domain.models.tag import TagMixin
 

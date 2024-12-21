@@ -5,8 +5,8 @@ import lxml.etree as et
 from django.db import models
 from django.db.models import options
 
+from app.abstract import TrackingMixin, UuidMixin
 from app.context import get_current_username
-from domain.models.abstract import TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

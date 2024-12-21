@@ -3,7 +3,7 @@
 from django.db import models
 from django.db.models import options
 
-from domain.models.abstract import TrackingMixin, UuidMixin
+from app.abstract import TrackingMixin, UuidMixin
 from domain.models.attribute import AttributeMixin
 from domain.models.comment import CommentMixin
 from domain.models.tag import TagMixin

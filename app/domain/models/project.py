@@ -3,8 +3,7 @@
 from django.db import models
 from django.db.models import options
 
-from domain.models.abstract import TrackingMixin
-from domain.models.tenant import Tenant
+from app.abstract import TrackingMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
@@ -25,7 +24,7 @@ class Project(TrackingMixin):
         verbose_name='Zotero API key',
         help_text="Zotero API key granting access to project's library.",
     )
-    tenant = models.OneToOneField(Tenant, on_delete=models.PROTECT, null=True)
+    tenant = models.OneToOneField('tenants.Tenant', on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return f'{self.name} ({self.id})'

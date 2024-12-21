@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import options
 from django.urls import reverse
 
-from domain.models.abstract import TrackingMixin
+from app.abstract import TrackingMixin
 from domain.models.comment import CommentMixin
 from domain.models.tag import TagMixin
 

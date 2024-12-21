@@ -1,7 +1,6 @@
 """Interface for the domain.models module."""
 
 from .agent import Agent, Organization, Person
-from .application import Application
 from .attachment import Attachment
 from .attribute import Attribute, AttributeReference, AttributeType
 from .collection import Collection, CollectionMembership
@@ -10,7 +9,6 @@ from .concept import Concept
 from .content import ContentAttributes, ContentTypeExtended
 from .country_reference import CountryReference
 from .entity import EntityPhrase
-from .group import GroupProperties
 from .headword import Headword
 from .language_reference import LanguageReference
 from .locale_reference import LocaleReference
@@ -39,18 +37,15 @@ from .saved_search import SavedSearch
 from .scope import Scope, ScopeType
 from .tag import Tag
 from .task import Task, TaskList
-from .tenant import Domain, Tenant
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
-from .user import User
 from .wordform import Wordform
 from .workflow import Workflow, WorkLog
 from .zotero_collection import ZoteroCollection
 
 __all__ = [
     'Agent',
-    'Application',
     'Attachment',
     'Attribute',
     'AttributeReference',
@@ -62,10 +57,8 @@ __all__ = [
     'ContentAttributes',
     'ContentTypeExtended',
     'CountryReference',
-    'Domain',
     'EntityPhrase',
     'PageNode',
-    'GroupProperties',
     'Headword',
     'LanguageReference',
     'LocaleReference',
@@ -102,11 +95,9 @@ __all__ = [
     'Tag',
     'Task',
     'TaskList',
-    'Tenant',
     'Ticket',
     'Token',
     'Transcription',
-    'User',
     'Wordform',
     'WorkLog',
     'Workflow',

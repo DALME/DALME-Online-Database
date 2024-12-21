@@ -13,7 +13,8 @@ from django.db import models
 from django.db.models import Case, Exists, ExpressionWrapper, OuterRef, When
 
 from app.context import get_current_tenant
-from domain.models.abstract.uuid_mixin import UuidMixin
+
+from .uuid_mixin import UuidMixin
 
 PROD_ENVS = {'staging', 'production'}
 

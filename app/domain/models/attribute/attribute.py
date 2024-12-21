@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from domain.models.abstract import TrackingMixin, UuidMixin
+from app.abstract import TrackingMixin, UuidMixin
 from domain.models.attribute.attribute_field import AttributeField
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')

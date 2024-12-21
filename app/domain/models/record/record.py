@@ -9,14 +9,14 @@ from django.db import models
 from django.db.models import Q, options
 from django.utils.functional import cached_property
 
+from app.abstract import OwnedMixin, TrackingMixin, UuidMixin
 from domain.historical_date import HistoricalDateRange
-from domain.models.abstract import OwnedMixin, TrackingMixin, UuidMixin
 from domain.models.attribute.attribute_mixin import AttributeMixin
 from domain.models.comment import CommentMixin
 from domain.models.permission import PermissionMixin
 from domain.models.relationship import RelationshipMixin
 from domain.models.tag import TagMixin
-from domain.models.tenant import TenantMixin
+from tenants.models.tenant import TenantMixin
 
 from .record_helpers import format_credit_line, format_credits, format_source
 

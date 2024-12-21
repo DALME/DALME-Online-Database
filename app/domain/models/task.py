@@ -11,10 +11,10 @@ from django.db.models import options
 from django.urls import reverse
 from django.utils import timezone
 
-from domain.models.abstract import OwnedMixin, TrackingMixin
+from app.abstract import OwnedMixin, TrackingMixin
 from domain.models.comment import CommentMixin
 from domain.models.permission import PermissionMixin
-from domain.models.tenant import TenantMixin
+from tenants.models.tenant import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

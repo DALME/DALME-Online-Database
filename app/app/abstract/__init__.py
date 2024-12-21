@@ -1,4 +1,4 @@
-"""Interface for the domain.models.abstract module.
+"""Interface for the app.abstract module.
 
 Includes mixins used to more easily associate common data points with system data models.
 None of the models defined here should map to a database table.

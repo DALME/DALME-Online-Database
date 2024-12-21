@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.utils import ProgrammingError
 
-from domain.models.abstract.custom_manager import CustomManager, CustomQuerySet
+from app.abstract.custom_manager import CustomManager, CustomQuerySet
 
 
 class AttributeMixin(models.Model):

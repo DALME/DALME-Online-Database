@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 
 from api.dynamic_serializer import DynamicSerializer
 from api.resources.groups import GroupSerializer
-from domain.models.abstract import BASE_DATA_TYPES
+from app.abstract import BASE_DATA_TYPES
 from domain.models.preference import Preference
 
 

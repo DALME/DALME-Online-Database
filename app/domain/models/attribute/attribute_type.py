@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import models
 
-from domain.models.abstract import DATA_TYPES, TrackingMixin
+from app.abstract import DATA_TYPES, TrackingMixin
 
 
 class AttributeType(TrackingMixin):
