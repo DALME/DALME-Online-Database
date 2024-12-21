@@ -39,8 +39,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  integrate_web:
-    name: 'Integrate Web'
+  integrate_app:
+    name: 'Integrate App'
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
@@ -82,46 +82,46 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: .
-          file: config/docker/Dockerfile.web
+          file: config/docker/Dockerfile.app
           load: false
           push: false
           cache-from: |
-            type=gha,scope=web.base
+            type=gha,scope=app.base
           cache-to: |
-            type=gha,scope=web.base,mode=max
+            type=gha,scope=app.base,mode=max
           target: base
 
       - uses: docker/build-push-action@v3
         with:
           context: .
-          file: config/docker/Dockerfile.web
+          file: config/docker/Dockerfile.app
           load: false
           push: false
           cache-from: |
-            type=gha,scope=web.dev-reqs
-            type=gha,scope=web.base
+            type=gha,scope=app.dev-reqs
+            type=gha,scope=app.base
           cache-to: |
-            type=gha,scope=web.dev-reqs,mode=max
+            type=gha,scope=app.dev-reqs,mode=max
           target: dev-reqs
 
       - uses: docker/build-push-action@v3
         with:
           context: .
-          file: config/docker/Dockerfile.web
+          file: config/docker/Dockerfile.app
           load: false
           push: false
           cache-from: |
-            type=gha,scope=web.install-dev
-            type=gha,scope=web.dev-reqs
-            type=gha,scope=web.base
+            type=gha,scope=app.install-dev
+            type=gha,scope=app.dev-reqs
+            type=gha,scope=app.base
           cache-to: |
-            type=gha,scope=web.install-dev,mode=max
+            type=gha,scope=app.install-dev,mode=max
           target: install-dev
 
       - uses: docker/build-push-action@v3
         with:
           context: .
-          file: config/docker/Dockerfile.web
+          file: config/docker/Dockerfile.app
           build-args: |
             DAM_DB_NAME=${{ env.MYSQL_DB }}
             DAM_DB_USER=${{ env.MYSQL_USER }}
@@ -136,14 +136,14 @@ jobs:
           load: true
           push: false
           cache-from: |
-            type=gha,scope=web.ci
-            type=gha,scope=web.install-dev
-            type=gha,scope=web.dev-reqs
-            type=gha,scope=web.base
+            type=gha,scope=app.ci
+            type=gha,scope=app.install-dev
+            type=gha,scope=app.dev-reqs
+            type=gha,scope=app.base
           cache-to: |
-            type=gha,scope=web.ci,mode=max
+            type=gha,scope=app.ci,mode=max
           target: ci
-          tags: ${{ env.NAMESPACE }}.web:${{ env.CI_TAG }}
+          tags: ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
 
       - uses: pre-commit/action@v3.0.0
         env:
@@ -153,7 +153,7 @@ jobs:
         run: >
           docker run --rm
           -e DJANGO_CONFIGURATION='CI'
-          ${{ env.NAMESPACE }}.web:${{ env.CI_TAG }}
+          ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
           pytest --cov=. --cov-report=term-missing --hypothesis-show-statistics
 
   integrate_ui:

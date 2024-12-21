@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   build_app:
-    name: 'Build Web'
+    name: 'Build App'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.NAMESPACE }}.web
+            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.NAMESPACE }}.app
           tags: |
             type=raw,priority=200,value=${{ env.TAG }}
             type=sha,priority=100,prefix=,format=long
@@ -63,15 +63,15 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: .
-          file: config/docker/Dockerfile.web
+          file: config/docker/Dockerfile.app
           push: true
           cache-from: |
-            type=gha,scope=web.production
-            type=gha,scope=web.install
-            type=gha,scope=web.reqs
-            type=gha,scope=web.base
+            type=gha,scope=app.production
+            type=gha,scope=app.install
+            type=gha,scope=app.reqs
+            type=gha,scope=app.base
           cache-to: |
-            type=gha,scope=web.production,mode=max
+            type=gha,scope=app.production,mode=max
           target: production
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
