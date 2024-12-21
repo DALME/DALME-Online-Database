@@ -3,15 +3,15 @@
 from unittest import mock
 
 import pytest
-from core.middleware.tenant_middleware import TenantMiddleware
 
 from django.core.exceptions import DisallowedHost
 
-from domain.models import Domain, Tenant
+from tenants.middleware.tenant_middleware import TenantMiddleware
+from tenants.models import Domain, Tenant
 
 
-@mock.patch('app.middleware.tenant_middleware.Domain')
-@mock.patch('app.middleware.tenant_middleware.connection')
+@mock.patch('tenants.middleware.tenant_middleware.Domain')
+@mock.patch('tenants.middleware.tenant_middleware.connection')
 def test_middleware_throws_if_tenant_not_found(mock_conn, mock_domain, rf):
     """Assert the middleware catches non-existant tenants."""
     request = rf.get('/', headers={'HOST': 'some.domain'})
@@ -29,8 +29,8 @@ def test_middleware_throws_if_tenant_not_found(mock_conn, mock_domain, rf):
     ]
 
 
-@mock.patch('app.middleware.tenant_middleware.Domain')
-@mock.patch('app.middleware.tenant_middleware.connection')
+@mock.patch('tenants.middleware.tenant_middleware.Domain')
+@mock.patch('tenants.middleware.tenant_middleware.connection')
 def test_middleware(mock_conn, mock_domain, rf):
     """Assert the middleware queries and sets the appropriate tenant."""
     request = rf.get('/', headers={'HOST': 'dalme.localhost'})

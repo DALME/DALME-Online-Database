@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
-from domain.models import Application
+from oauth.models import Application
 
 logger = structlog.get_logger(__name__)
 

@@ -33,10 +33,10 @@ def test_collectstatic_tenants_args():
 
 
 @mock.patch.dict(os.environ, {'ENV': 'development'})
-@mock.patch('app.management.commands.collectstatic_tenants.connection')
-@mock.patch('app.management.commands.collectstatic_tenants.call_command')
-@mock.patch('app.management.commands.collectstatic_tenants.Tenant')
-@mock.patch('app.management.commands.collectstatic_tenants.logger')
+@mock.patch('tenants.management.commands.collectstatic_tenants.connection')
+@mock.patch('tenants.management.commands.collectstatic_tenants.call_command')
+@mock.patch('tenants.management.commands.collectstatic_tenants.Tenant')
+@mock.patch('tenants.management.commands.collectstatic_tenants.logger')
 def test_collectstatic_tenants_development(mock_logger, mock_tenant, mock_call_command, mock_connection):
     tenant_1 = mock.MagicMock(spec=Tenant)
     tenant_1.schema_name = 'tenant1'
@@ -58,10 +58,10 @@ def test_collectstatic_tenants_development(mock_logger, mock_tenant, mock_call_c
 
 
 @mock.patch.dict(os.environ, {'ENV': 'production'})
-@mock.patch('app.management.commands.collectstatic_tenants.connection')
-@mock.patch('app.management.commands.collectstatic_tenants.call_command')
-@mock.patch('app.management.commands.collectstatic_tenants.Tenant')
-@mock.patch('app.management.commands.collectstatic_tenants.logger')
+@mock.patch('tenants.management.commands.collectstatic_tenants.connection')
+@mock.patch('tenants.management.commands.collectstatic_tenants.call_command')
+@mock.patch('tenants.management.commands.collectstatic_tenants.Tenant')
+@mock.patch('tenants.management.commands.collectstatic_tenants.logger')
 def test_collectstatic_tenants_insufficient_workers(mock_logger, mock_tenant, mock_call_command, mock_connection):
     tenant_1 = mock.MagicMock(spec=Tenant)
     tenant_1.schema_name = 'tenant1'

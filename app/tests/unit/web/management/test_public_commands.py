@@ -1,4 +1,4 @@
-"""Test the public.management module."""
+"""Test the web.management module."""
 
 import os
 from unittest import mock

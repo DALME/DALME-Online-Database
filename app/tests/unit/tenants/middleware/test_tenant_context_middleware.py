@@ -34,7 +34,7 @@ def test_middleware_throws_if_tenant_not_on_request(rf):
         middleware(request)
 
 
-@mock.patch('app.middleware.tenant_context_middleware._tenant')
+@mock.patch('tenants.middleware.tenant_context_middleware._tenant')
 def test_middleware(mock_ctx, rf, settings):
     """Assert the middleware sets and unsets the context correctly."""
     request = rf.get('/', headers={'HOST': 'dalme.localhost'})

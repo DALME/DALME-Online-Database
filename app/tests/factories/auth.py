@@ -11,7 +11,7 @@ class UserFactory(factory.DjangoModelFactory):
     """Generate User model fixtures."""
 
     class Meta:
-        model = 'domain.User'
+        model = 'oauth.User'
         django_get_or_create = ('email', 'username')
 
     username = factory.Sequence(lambda n: 'User %03d' % n)

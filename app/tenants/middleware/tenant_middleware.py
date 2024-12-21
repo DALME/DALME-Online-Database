@@ -14,7 +14,7 @@ from django.core.exceptions import DisallowedHost
 from django.db import connection
 from django.urls import set_urlconf
 
-from domain.models import Domain
+from tenants.models import Domain
 
 
 class TenantMiddleware:

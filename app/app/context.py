@@ -40,7 +40,7 @@ def get_biblio_pages():
 
 def get_current_tenant():
     """Defer importing the tenant context to minimize impact on import resolution."""
-    from app.middleware import TENANT
+    from tenants.middleware import TENANT
 
     return TENANT
 
