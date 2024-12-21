@@ -19,9 +19,9 @@ from domain.models import (
     ScopeType,
     Tag,
     Task,
-    Tenant,
-    User,
 )
+from oauth.models import User
+from tenants.models import Tenant
 
 from .base import BaseStage
 

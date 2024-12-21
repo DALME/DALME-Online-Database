@@ -10,9 +10,9 @@ from domain.models import (
     CollectionMembership,
     Permission,
     Record,
-    Tenant,
-    User,
 )
+from oauth.models import User
+from tenants.models import Tenant
 
 from .base import BaseStage
 

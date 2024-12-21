@@ -6,8 +6,8 @@ from domain.models import (
     AttributeType,
     OptionsList,
     RecordType,
-    Tenant,
 )
+from tenants.models import Tenant
 
 from .base import BaseStage
 

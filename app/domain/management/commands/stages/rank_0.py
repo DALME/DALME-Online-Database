@@ -16,9 +16,9 @@ from domain.models import (
     Person,
     SavedSearch,
     TaskList,
-    Tenant,
     Transcription,
 )
+from tenants.models import Tenant
 
 from .base import BaseStage
 

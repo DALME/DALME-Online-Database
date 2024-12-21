@@ -6,7 +6,8 @@ from wagtail.users.models import UserProfile
 from django.contrib.auth.models import Group
 from django.db import connection, transaction
 
-from domain.models import GroupProperties, Tenant, User
+from oauth.models import GroupProperties, User
+from tenants.models import Tenant
 
 from .base import BaseStage
 

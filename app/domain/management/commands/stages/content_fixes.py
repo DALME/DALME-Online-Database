@@ -14,9 +14,9 @@ from domain.models import (
     CollectionMembership,
     PreferenceKey,
     Project,
-    Tenant,
     ZoteroCollection,
 )
+from tenants.models import Tenant
 
 from .base import BaseStage
 
