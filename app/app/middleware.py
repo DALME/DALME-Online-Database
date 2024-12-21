@@ -1,4 +1,4 @@
-"""Define the health check middleware."""
+"""Define middleware for the app module."""
 
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
