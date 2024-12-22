@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
     initial = True
     dependencies = [
-        ('domain', '0001_initial'),
+        ('domain', '0002_initial'),
     ]
     operations = [
         # the following SQL statements are a workaround for an issue filtering over generic relations in postgres
