@@ -5,22 +5,54 @@ import pathlib
 
 from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.conf import settings
+from django.http import HttpResponseRedirect
 
 from api.access_policies import RecordAccessPolicy, WebAccessPolicy
 from api.base_viewset import IDABaseViewSet
 from api.paginators import IDAPageNumberPagination
 from domain.filters import RecordFilter
-from domain.models import Record
+from domain.models import PublicRegister, Record
 
 from .serializers import RecordSerializer
 
 with pathlib.Path('static/snippets/iiif_manifest.json').open() as fp:
     MANIFEST = json.load(fp)
+
+
+class PURLEndpoint(viewsets.GenericViewSet):
+    """Permanent URL endpoint for IDA records.
+
+    Accepts the following formats:
+
+    None -> Redirect to public website.
+    db -> Redirect to database (if session present and auth/permission checks pass).
+    api -> Redirect to API View in database, subject to same checks as above.
+    json -> JSON response.
+    json-p -> JSON-P response.
+
+    """
+
+    queryset = PublicRegister.objects.all()
+
+    def retrieve(self, request, pk=None, fmt=None):  # noqa: ARG002
+        """Get individual record."""
+        self.get_object()
+
+        if format == 'db':
+            return HttpResponseRedirect(f'{settings.HOST}/db/records/{pk}/')
+
+        if format in ['api', 'json']:
+            return HttpResponseRedirect(
+                f'{settings.HOST}/api/records/{pk}/?format={fmt}',
+            )
+
+        return HttpResponseRedirect(f'{settings.HOST}/collections/records/{pk}/')
 
 
 class Records(IDABaseViewSet):

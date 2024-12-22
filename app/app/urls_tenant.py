@@ -10,7 +10,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, re_path
 
 from api import urls as api_urls
-from purl import urls as purl_urls
 from web.urls import urlpatterns as web_urls
 
 urlpatterns = [
@@ -18,7 +17,6 @@ urlpatterns = [
     re_path(r'^maintenance-mode/', include(maintenance_mode_urls)),
     *web_urls,
     re_path(r'^api/', include(api_urls)),
-    re_path(r'^purl/', include(purl_urls)),
     re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve'),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]

@@ -113,7 +113,6 @@ class Base(Configuration):
         'app',
         'domain',
         'api',
-        'purl',
     ]
     PROJECT_TENANT_APPS = [
         'modelcluster',

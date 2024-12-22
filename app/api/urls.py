@@ -44,6 +44,8 @@ router.register(r'web/records', resources.WebRecords, basename='web_records')
 router.register(r'web/attribute_types', resources.WebAttributeTypes, basename='web_attribute_types')
 router.register(r'web/attributes', resources.WebAttributes, basename='web_attributes')
 
+# purl endpoint
+router.register(r'purl', resources.PURLEndpoint, basename='purl')
 
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='api_endpoint')),

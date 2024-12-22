@@ -44,7 +44,6 @@ services:
       - ./app/domain:/opt/app/domain
       - ./app/media/media:/opt/app/www/media
       - ./app/oauth/:/opt/app/oauth
-      - ./app/purl:/opt/app/purl
       - ./app/static:/opt/app/static
       - ./app/tenants/:/opt/app/tenants
       - ./app/tests:/opt/app/tests
