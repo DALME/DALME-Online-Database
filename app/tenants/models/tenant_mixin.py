@@ -22,7 +22,7 @@ class TenantMixin(models.Model):
     """Mixin to make a model multitenant aware."""
 
     tenant = models.ForeignKey(
-        'domain.Tenant',
+        'tenants.Tenant',
         on_delete=models.PROTECT,
         null=False,
     )

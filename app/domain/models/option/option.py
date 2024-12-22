@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import options
 
 from app.abstract import TrackingMixin
-from tenants.models.tenant import TenantMixin
+from tenants.models import TenantMixin
 
 from .options_serializer import OptionsSerializer
 

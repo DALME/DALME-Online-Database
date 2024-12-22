@@ -11,7 +11,7 @@ from app.abstract import OwnedMixin, TrackingMixin, UuidMixin
 from domain.models.attribute import AttributeMixin
 from domain.models.comment import CommentMixin
 from domain.models.permission import PermissionMixin
-from tenants.models.tenant import TenantMixin
+from tenants.models import TenantMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

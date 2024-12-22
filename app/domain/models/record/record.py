@@ -16,7 +16,7 @@ from domain.models.comment import CommentMixin
 from domain.models.permission import PermissionMixin
 from domain.models.relationship import RelationshipMixin
 from domain.models.tag import TagMixin
-from tenants.models.tenant import TenantMixin
+from tenants.models import TenantMixin
 
 from .record_helpers import format_credit_line, format_credits, format_source
 
