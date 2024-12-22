@@ -129,5 +129,5 @@ _app.init: _app.install _app.dns
 
 _app.install:
 	$(VENV_BIN)/python3 -m \
-		pip install -r $(ROOT)/requirements-dev.txt
+		pip install -r $(ROOT)/app/requirements-dev.txt
 .PHONY: _app.install
