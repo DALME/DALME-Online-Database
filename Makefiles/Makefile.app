@@ -20,7 +20,7 @@ app.help:
 app.collectstatic:
 	docker compose exec \
 		$(NAMESPACE).app \
-		python manage.py collectstatic_tenants --noinput
+		python manage.py collectstatic_tenants
 .PHONY: app.collectstatic
 
 app.manage:
