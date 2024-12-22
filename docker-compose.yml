@@ -43,8 +43,6 @@ services:
       - ./app/app:/opt/app/app
       - ./app/domain:/opt/app/domain
       - ./app/media/media:/opt/app/www/media
-      - ./app/notebooks:/opt/app/notebooks
-      - ./app/notebooks/ipython:/root/.ipython/profile_default
       - ./app/oauth/:/opt/app/oauth
       - ./app/purl:/opt/app/purl
       - ./app/static:/opt/app/static
@@ -53,6 +51,8 @@ services:
       - ./app/web:/opt/app/web
       - ./app/manage.py:/opt/app/manage.py
       - ./app/pyproject.toml:/opt/app/pyproject.toml
+      - ./notebooks:/opt/notebooks
+      - ./notebooks/ipython:/root/.ipython/profile_default
     restart: unless-stopped
     stdin_open: true
     tty: true

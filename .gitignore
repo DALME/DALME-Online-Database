@@ -4,6 +4,7 @@
 _extra
 *.ipynb
 *.ipynb_checkpoints
+notebooks
 
 # local environment
 env
