@@ -1,4 +1,4 @@
-"""Define search utilities."""
+"""Define search utils."""
 
 import json
 import math
@@ -12,8 +12,8 @@ from elasticsearch_dsl.query import Q
 from django.conf import settings
 from django.utils.functional import cached_property
 
-from domain.documents import FullRecord, WebRecord
-from domain.forms import SearchForm
+from search.documents import FullRecord, WebRecord
+from search.forms import SearchForm
 
 
 class Search:

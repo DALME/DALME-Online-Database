@@ -2,7 +2,7 @@
 
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
-from django.http import JsonResponse
+from django.http import HttpResponsePermanentRedirect, JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 
 
@@ -35,4 +35,17 @@ class HealthCheckMiddleware(MiddlewareMixin):
             detail, status = ('Unhealthy', 503) if plan else ('OK', 200)
             return JsonResponse({'detail': detail}, status=status)
 
+        return self.get_response(request)
+
+
+class SubdomainRedirectMiddleware:
+    """Middleware to redirect between subdomains."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = request.get_host()
+        if host in ['www.dalme.org', 'public.dalme.org']:
+            return HttpResponsePermanentRedirect('https://dalme.org' + request.path)
         return self.get_response(request)

@@ -10,7 +10,7 @@ from elasticsearch_dsl import Join as dsl_Join
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
-from domain.models.record import PageNode, Record
+from domain.models import PageNode, Record
 
 
 class JoinField(fields.DEDField, dsl_Join):

@@ -45,6 +45,7 @@ services:
       - ./app/media/media:/opt/app/www/media
       - ./app/oauth/:/opt/app/oauth
       - ./app/static:/opt/app/static
+      - ./app/search/:/opt/app/search
       - ./app/tenants/:/opt/app/tenants
       - ./app/tests:/opt/app/tests
       - ./app/web:/opt/app/web

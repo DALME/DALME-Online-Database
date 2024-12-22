@@ -118,7 +118,15 @@ unfixable = ["F841"]
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["api", "app", "domain", "oauth", "tenants", "web"]
+known-first-party = [
+  "api",
+  "app",
+  "domain",
+  "oauth",
+  "search",
+  "tenants",
+  "web",
+]
 section-order = [
   "future",
   "standard-library",

@@ -113,6 +113,7 @@ class Base(Configuration):
         'app',
         'domain',
         'api',
+        'search',
     ]
     PROJECT_TENANT_APPS = [
         'modelcluster',
@@ -192,7 +193,7 @@ class Base(Configuration):
         'django_structlog.middlewares.RequestMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
-        'app.utils.SubdomainRedirectMiddleware',
+        'app.middleware.SubdomainRedirectMiddleware',
         'django_structlog.middlewares.RequestMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -240,7 +241,7 @@ class Base(Configuration):
         ]
 
     DATABASE_ROUTERS = [
-        'app.utils.ModelDatabaseRouter',
+        'app.database_router.ModelDatabaseRouter',
         'django_tenants.routers.TenantSyncRouter',
     ]
 

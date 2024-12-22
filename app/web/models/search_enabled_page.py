@@ -12,9 +12,10 @@ from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils import timezone
 
-from app.utils import Search, SearchContext, formset_factory
-from domain.forms import SearchForm
 from domain.models import Record, SavedSearch
+from search.forms import SearchForm
+from search.formsets import formset_factory
+from search.utils import Search, SearchContext
 from web.models.base_page import BasePage
 from web.models.settings import Settings
 
