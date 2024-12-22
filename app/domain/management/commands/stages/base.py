@@ -16,7 +16,8 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
 
-from domain.models import SavedSearch, User
+from domain.models import SavedSearch
+from oauth.models import User
 
 logger = structlog.get_logger(__name__)
 
@@ -26,6 +27,17 @@ REFERENCE_HREF = re.compile(r'(?:(?:http|https)://dalme.org)?/?/project/bibliogr
 # SELECT * FROM public.django_content_type new_ct INNER JOIN restore.django_content_type old_ct ON new_ct.model = old_ct.model;
 # SELECT * FROM public.django_content_type new_ct INNER JOIN restore.django_content_type old_ct ON new_ct.model = old_ct.model
 # WHERE new_ct.app_label != old_ct.app_label;
+
+ALTERED_APP_MAP = {
+    'public': 'web',
+    'publicbanners': 'webbanners',
+    'publicfootnotes': 'webfootnotes',
+    'publicgradients': 'webgradients',
+    'publicimages': 'webimages',
+    'publicrecords': 'webrecords',
+    'publicteam': 'webteam',
+}
+
 ALTERED_MODEL_MAP = {
     ('core', 'agent'): 'domain.agent',
     ('core', 'attribute_type'): 'domain.attributetype',
@@ -57,7 +69,7 @@ ALTERED_MODEL_MAP = {
     ('core', 'attachment'): 'domain.attachment',
     ('core', 'savedsearch'): 'domain.savedsearch',
     ('core', 'tag'): 'domain.tag',
-    ('public', 'dalmeimage'): 'publicimages.baseimage',
+    ('public', 'dalmeimage'): 'webimages.baseimage',
 }
 
 SOURCES_MODEL_MAP = {
@@ -161,7 +173,7 @@ class BaseStage(abc.ABC):
                     # it reduces the overall complexity of the transformation.
                     app_label, model = ALTERED_MODEL_MAP[(ct['app_label'], ct['model'])].split('.')
                 else:
-                    app_label, model = (ct['app_label'], ct['model'])
+                    app_label, model = (ALTERED_APP_MAP.get(ct['app_label'], ct['app_label']), ct['model'])
 
                 ct_id = ct['id']
                 # Return the data as the key into the new_cts index.
@@ -218,6 +230,9 @@ class BaseStage(abc.ABC):
             except AttributeError:  # it's a GenericForeignKey
                 continue
         return fields if as_map else list(fields.keys())
+
+    def map_app(self, old_app_name):
+        return ALTERED_APP_MAP.get(old_app_name, old_app_name)
 
     def map_content_type(self, old_id, id_only=False):
         """Map an old content type to a new content type."""

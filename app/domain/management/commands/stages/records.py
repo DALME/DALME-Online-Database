@@ -12,10 +12,10 @@ from domain.models import (
     Publication,
     Record,
     RecordGroup,
-    User,
     Workflow,
     WorkLog,
 )
+from oauth.models import User
 
 from .base import BaseStage
 

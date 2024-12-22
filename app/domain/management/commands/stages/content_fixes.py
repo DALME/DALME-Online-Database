@@ -52,8 +52,8 @@ class Stage(BaseStage):
             ('dalme', 'wagtailimages'),
             ('dalme', 'wagtailredirects'),
             ('public', 'wagtailusers'),
-            ('dalme', 'public'),
-            ('dalme', 'publicimages'),
+            ('dalme', 'web'),
+            ('dalme', 'webimages'),
         ]
 
         for schema, app in app_labels:
@@ -155,10 +155,10 @@ class Stage(BaseStage):
 
         self.logger.info('Updating footnote state fields...')
         for model_name in targets:
-            qualified_name = f'public_{model_name}'
+            qualified_name = f'web_{model_name}'
             self.logger.info('Processing "%s"', qualified_name)
             with schema_context('dalme'):
-                model = apps.get_model(app_label='public', model_name=model_name)
+                model = apps.get_model(app_label='web', model_name=model_name)
                 for instance in model.objects.all():
                     raw_content = str(instance.body.raw_data)
                     instance.has_footnotes = 'data-footnote=' in raw_content
@@ -241,7 +241,7 @@ class Stage(BaseStage):
         """Adjust paths to media files to include the tenant."""
         self.logger.info('Adjusting media file paths...')
         # we do this directly in SQL to avoid triggering any of the methods in the FileField
-        tables = ['publicimages_baseimage', 'publicimages_customrendition', 'wagtaildocs_document']
+        tables = ['webimages_baseimage', 'webimages_customrendition', 'wagtaildocs_document']
         with connection.cursor() as cursor:
             for table in tables:
                 cursor.execute(f"UPDATE dalme.{table} SET file = 'dalme/' || file;")

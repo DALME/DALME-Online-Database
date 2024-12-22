@@ -13,7 +13,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import connection, transaction
 from django.db.utils import IntegrityError
 
-from domain.models import User
+from oauth.models import User
 
 from .base import BaseStage
 
@@ -155,14 +155,14 @@ class Stage(BaseStage):
         # because all page types are subclassed from the wagtail Page model which we already
         # populated
         models = [
-            ('publicimages', 'baseimage'),
-            ('publicimages', 'customrendition'),
+            ('webimages', 'baseimage'),
+            ('webimages', 'customrendition'),
             ('wagtaildocs', 'document'),
-            ('public', 'home'),
-            ('public', 'section'),
-            ('public', 'bibliography'),
-            ('publicrecords', 'corpus'),
-            ('publicrecords', 'corpus_collections'),
+            ('web', 'home'),
+            ('web', 'section'),
+            ('web', 'bibliography'),
+            ('webrecords', 'corpus'),
+            ('webrecords', 'corpus_collections'),
         ]
 
         banners_raw = None
@@ -173,7 +173,7 @@ class Stage(BaseStage):
             model = apps.get_model(app_label=app, model_name=model_name)
             with connection.cursor() as cursor:
                 self.logger.info('Copying "%s"', f'{app}_{model_name}')
-                target = f'{app}_{model_name}' if app.startswith('w') else f'public_{model_name}'
+                target = f'{app}_{model_name}' if app.startswith('wag') else f'public_{model_name}'
                 cursor.execute(f'SELECT * FROM restore.{target};')
                 rows = self.map_rows(cursor)
 
@@ -261,7 +261,8 @@ class Stage(BaseStage):
             is_rev = model_name == 'revision'
 
             with schema_context('dalme'):
-                target = apps.get_model(app_label=app, model_name=model_name)
+                new_app_name = self.map_app(app)
+                target = apps.get_model(app_label=new_app_name, model_name=model_name)
                 target_fields = self.get_fields_by_type(target, ['JSONField', 'RichTextField'], as_map=True)
 
             with connection.cursor() as cursor:
@@ -302,7 +303,7 @@ class Stage(BaseStage):
                         if idx < len(row) - 1:
                             values += ', '
 
-                    sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    sql = f"INSERT INTO dalme.{new_app_name}_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
 
     @transaction.atomic
@@ -335,8 +336,7 @@ class Stage(BaseStage):
                 for row in rows:
                     row.pop('id')
                     row.pop('dismissibles')
-                    with schema_context('public'):
-                        user = User.objects.filter(pk=row['user_id'])
+                    user = User.objects.filter(pk=row['user_id'])
                     if user.exists():
                         user = user.first()
                         if user.profile:
@@ -510,7 +510,7 @@ class Stage(BaseStage):
             from web.extensions.gradients.models import Gradient
 
             for entry in gradients:
-                target_model = apps.get_model(app_label='public', model_name=entry.pop('model'))
+                target_model = apps.get_model(app_label='web', model_name=entry.pop('model'))
                 page_title = entry.pop('page_title', None)
 
                 # create entry in gradients table

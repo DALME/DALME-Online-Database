@@ -54,7 +54,7 @@ CT_DATA = {
     },
     'user': {
         'name': 'User Account',
-        'app_label': 'domain',
+        'app_label': 'oauth',
         'description': "A person's account in the system.",
         'atypes': [
             'last_name',
