@@ -5,6 +5,7 @@ import pathlib
 
 from rest_access_policy import AccessPolicy, AccessPolicyException
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 
@@ -52,7 +53,7 @@ class BaseAccessPolicy(AccessPolicy):
 
     def get_policy_statements(self, request, view):  # noqa: ARG002
         """Load policy statements."""
-        with pathlib.Path(f'static/policies/{self.id}.json').open() as policy:
+        with pathlib.Path(f'{settings.PROJECT_ROOT}/app/static/policies/{self.id}.json').open() as policy:
             return json.load(policy)
 
     def get_parent(self, target):

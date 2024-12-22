@@ -13,6 +13,7 @@ from web.models.settings import Settings
 
 
 class Collections(SearchEnabled, CitableMixin, GradientMixin):
+    template = 'collections.html'
     parent_page_types = ['web.Home']
     subpage_types = [
         'web.Collection',
@@ -50,6 +51,6 @@ class Collections(SearchEnabled, CitableMixin, GradientMixin):
 
         return TemplateResponse(
             request,
-            'web/explore.html',
+            'explore.html',
             context,
         )

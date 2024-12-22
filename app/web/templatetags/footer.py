@@ -7,7 +7,7 @@ from web.models import FooterLink, Settings, SocialMedia
 register = template.Library()
 
 
-@register.inclusion_tag('web/includes/footer.html', takes_context=True)
+@register.inclusion_tag('common/includes/footer.html', takes_context=True)
 def footer(context):
     request = context.get('request')
     try:

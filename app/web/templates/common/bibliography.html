@@ -1,4 +1,4 @@
-{% extends "web/layouts/left_side_column.html" %}
+{% extends "common/layouts/left_side_column.html" %}
 {% load wagtailcore_tags settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
@@ -16,12 +16,12 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "web/includes/flat_header.html" %}
+  {% include "common/includes/flat_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "web/includes/flat_nav.html" %}
-  {% include "web/includes/features_nav.html" %}
+  {% include "common/includes/flat_nav.html" %}
+  {% include "common/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}

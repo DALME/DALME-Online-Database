@@ -40,8 +40,8 @@ class TENANT:
 class Base(Configuration):
     """Common, inherited settings."""
 
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    # PROJECT_ROOT = BASE_DIR / 'app'
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent
+    PROJECT_ROOT = BASE_DIR / 'app'
 
     ENV = os.environ.get('ENV', 'development')
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -58,6 +58,7 @@ class Base(Configuration):
     LOGOUT_REDIRECT_URL = '/'
     LOGOUT_URL = '/db/?logout=true'
     TIME_ZONE = 'America/New_York'
+    SQL_TIMEOUT = 30000
     USE_I18N = True
     USE_L10N = True
     USE_TZ = True
@@ -77,14 +78,14 @@ class Base(Configuration):
     @property
     def STATICFILES_DIRS(self):
         return [
-            (self.BASE_DIR / 'static').as_posix(),
+            (self.PROJECT_ROOT / 'app' / 'static').as_posix(),
+            (self.PROJECT_ROOT / 'web' / 'static' / 'common').as_posix(),
         ]
 
     @property
     def MULTITENANT_STATICFILES_DIRS(self):
         return [
-            (self.BASE_DIR / 'web' / 'static' / '%s').as_posix(),
-            (self.BASE_DIR / 'tenants' / '%s' / 'static').as_posix(),
+            (self.PROJECT_ROOT / 'web' / 'static' / 'tenants' / '%s').as_posix(),
         ]
 
     STATICFILES_FINDERS = [
@@ -210,8 +211,8 @@ class Base(Configuration):
             {
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
                 'DIRS': [
-                    (self.BASE_DIR / 'templates').as_posix(),
-                    (self.BASE_DIR / 'web' / 'templates').as_posix(),
+                    (self.PROJECT_ROOT / 'app' / 'templates').as_posix(),
+                    (self.PROJECT_ROOT / 'web' / 'templates' / 'common').as_posix(),
                 ],
                 'OPTIONS': {
                     'context_processors': [
@@ -236,8 +237,7 @@ class Base(Configuration):
     @property
     def MULTITENANT_TEMPLATE_DIRS(self):
         return [
-            (self.BASE_DIR / 'tenants' / '%s' / 'templates').as_posix(),
-            (self.BASE_DIR / 'web' / 'templates' / 'tenants' / '%s').as_posix(),
+            (self.PROJECT_ROOT / 'web' / 'templates' / 'tenants' / '%s').as_posix(),
         ]
 
     DATABASE_ROUTERS = [
@@ -493,11 +493,11 @@ class Development(Base, Configuration):
 
     @property
     def MEDIA_ROOT(self):
-        return (self.BASE_DIR / 'www' / 'media').as_posix()
+        return (self.PROJECT_ROOT / 'www' / 'media').as_posix()
 
     @property
     def STATIC_ROOT(self):
-        return (self.BASE_DIR / 'www' / 'static').as_posix()
+        return (self.PROJECT_ROOT / 'www' / 'static').as_posix()
 
     DATABASES = {
         'default': {

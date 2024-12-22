@@ -351,7 +351,7 @@ class SearchContext:
     def context(self):
         """Return context object."""
         filename = 'search_web_record.json' if self.public else 'search_record.json'
-        path = pathlib.Path('static/snippets') / filename
+        path = pathlib.Path(f'{settings.PROJECT_ROOT}/app/static/snippets') / filename
         with path.open() as fp:
             field_data = json.load(fp)
 

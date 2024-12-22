@@ -35,7 +35,7 @@ BLOCK_SET = [
 
 
 class People(RoutablePageMixin, BasePage):
-    template = 'web/flat.html'
+    template = 'flat.html'
 
     body = StreamField(BLOCK_SET, null=True)
 
@@ -84,6 +84,6 @@ class People(RoutablePageMixin, BasePage):
 
         return TemplateResponse(
             request,
-            'web/person.html',
+            'person.html',
             context,
         )

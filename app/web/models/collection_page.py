@@ -12,6 +12,7 @@ from web.models.search_enabled_page import SearchEnabled
 
 
 class Collection(SearchEnabled, CitableMixin):
+    template = 'collection.html'
     record_collection = models.ForeignKey(
         Collection,
         on_delete=models.PROTECT,

@@ -9,6 +9,7 @@ from web.models.base_page import BasePage
 
 
 class Features(BasePage, GradientMixin):
+    template = 'features.html'
     parent_page_types = ['web.Home']
     subpage_types = [
         'web.FeaturedObject',

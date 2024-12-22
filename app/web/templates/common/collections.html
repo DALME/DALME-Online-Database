@@ -1,21 +1,21 @@
-{% extends "web/layouts/left_side_column.html" %}
+{% extends "common/layouts/left_side_column.html" %}
 {% load collection_date_range wagtailcore_tags wagtailimages_tags static %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
 
 {% block header_extra %}
-  {% include "web/includes/simple_header.html" %}
+  {% include "common/includes/simple_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "web/includes/collections_filter.html" %}
+  {% include "common/includes/collections_filter.html" %}
   {% if page.citable %}
     <div id="cite-container" class="mt-5" v-cloak>
       {% include "cite_menu.html" %}
       {% include "cite_popup.html" %}
     </div>
   {% endif %}
-  {% include "web/includes/features_nav.html" %}
+  {% include "common/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}

@@ -11,7 +11,7 @@ class FeaturedInventory(FeaturedPage, RecordClass):
     parent_page_types = ['web.Features']
     subpage_types = []
     page_description = 'A page suitable for short essays built around an inventory. Can link to records or collections.'
-    template = 'web/feature.html'
+    template = 'feature.html'
 
     metadata_panels = [
         *FeaturedPage.metadata_panels,

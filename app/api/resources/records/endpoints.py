@@ -21,7 +21,7 @@ from domain.models import PublicRegister, Record
 
 from .serializers import RecordSerializer
 
-with pathlib.Path('static/snippets/iiif_manifest.json').open() as fp:
+with pathlib.Path(f'{settings.PROJECT_ROOT}/app/static/snippets/iiif_manifest.json').open() as fp:
     MANIFEST = json.load(fp)
 
 

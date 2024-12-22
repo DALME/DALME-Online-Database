@@ -13,6 +13,8 @@ from web.models.base_page import BasePage
 
 
 class Flat(BasePage, CitableMixin):
+    template = 'flat.html'
+
     show_contact_form = models.BooleanField(
         default=False,
         help_text='Check this box to show a contact form on the page.',
@@ -58,7 +60,7 @@ class Flat(BasePage, CitableMixin):
 
             return render(
                 request,
-                'web/flat.html',
+                'flat.html',
                 {'page': self, 'form': form},
             )
 

@@ -117,7 +117,6 @@ COPY ./app/api ./api
 COPY ./app/app ./app
 COPY ./app/domain ./domain
 COPY ./app/oauth ./oauth
-COPY ./app/static ./static
 COPY ./app/search ./search
 COPY ./app/tenants ./tenants
 COPY ./app/web ./web

@@ -20,7 +20,7 @@ _biblio_pages = contextvars.ContextVar('biblio_pages', default=[])
 
 def get_gradient_pages():
     if not _gradient_pages.get():
-        app_config = apps.get_app_config('public')
+        app_config = apps.get_app_config('web')
         if app_config.models_module is not None:
             models = [
                 m.__name__.lower()
@@ -33,7 +33,7 @@ def get_gradient_pages():
 
 def get_biblio_pages():
     if not _biblio_pages.get():
-        model = apps.get_model('public', 'Bibliography')
+        model = apps.get_model('web', 'Bibliography')
         _biblio_pages.set([(p.id, p.short_title if p.short_title else p.title) for p in model.objects.all()])
     return _biblio_pages.get()
 
