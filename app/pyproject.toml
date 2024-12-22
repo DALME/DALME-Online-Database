@@ -11,7 +11,7 @@ markers = [
 [tool.coverage.run]
 omit = [
   "*/migrations/*",
-  "app/app/management/commands/custom_createcachetable.py",
+  "app/tenants/management/commands/custom_createcachetable.py",
   "manage.py*",
   "tests/*",
 ]
@@ -102,7 +102,7 @@ unfixable = ["F841"]
 [tool.ruff.lint.per-file-ignores]
 "settings.py" = ["N802"]
 "*migrations*" = ["ARG001", "D100"]
-"tests/*" = ["B018", "INP001"]
+"**/tests/*" = ["B018", "INP001"]
 
 [tool.ruff.lint.isort]
 section-order = [
