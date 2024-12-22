@@ -1,6 +1,5 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = 'app.settings'
-DJANGO_CONFIGURATION = 'Development'
 addopts = "--strict-markers"
 markers = [
   "integration: marks integration tests",
@@ -13,7 +12,7 @@ omit = [
   "*/migrations/*",
   "app/tenants/management/commands/custom_createcachetable.py",
   "manage.py*",
-  "tests/*",
+  "*/tests/*",
 ]
 
 # https://github.com/charliermarsh/ruff#configuration
@@ -100,11 +99,26 @@ select = [
 unfixable = ["F841"]
 
 [tool.ruff.lint.per-file-ignores]
-"settings.py" = ["N802"]
-"*migrations*" = ["ARG001", "D100"]
-"**/tests/*" = ["B018", "INP001"]
+"*settings.py*" = [
+  "RUF012", # mutable-class-default
+  "N802",   # invalid-function-name
+]
+"*migrations*" = [
+  "ARG001", # flake8-unused-arguments
+  "D100",   # missing-docstring
+  "E501",   # line-too-long
+  "N806",   # non-lowercase-variable-in-function
+  "RUF012", # mutable-class-default
+]
+"*tests*" = [
+  "D103",    # undocumented-public-function
+  "B018",    # useless-expression
+  "INP001",  # implicit-namespace-package
+  "PLR0913", # too-many-arguments
+]
 
 [tool.ruff.lint.isort]
+known-first-party = ["api", "app", "domain", "oauth", "purl", "tenants", "web"]
 section-order = [
   "future",
   "standard-library",
@@ -112,10 +126,12 @@ section-order = [
   "django",
   "first-party",
   "local-folder",
+  "tests",
 ]
 
 [tool.ruff.lint.isort.sections]
 django = ["django"]
+tests = ["tests"]
 
 [tool.django-stubs]
 django_settings_module = "app.settings"
