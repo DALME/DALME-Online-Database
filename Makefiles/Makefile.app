@@ -5,6 +5,7 @@ RESOLVER := /etc/resolver/localhost
 app.help:
 	@echo "  app.collectstatic        bundle static files for all apps and tenants"
 	@echo "  app.manage               call django management commands"
+	@echo "  app.notebook             start Jupyter notebook instance"
 	@echo "  app.open                 view the site in your browser"
 	@echo "  app.python               shell into python on the web container"
 	@echo "  app.shell                shell into the web container"
