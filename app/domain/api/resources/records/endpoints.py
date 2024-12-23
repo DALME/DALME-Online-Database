@@ -106,5 +106,5 @@ class WebRecords(Records):
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
-        kwargs['field_set'] = ['public', 'images'] if self.request.GET.get('thumbs') else 'public'
+        kwargs['field_set'] = ['web', 'images'] if self.request.GET.get('thumbs') else 'web'
         return serializer_class(*args, **kwargs)
