@@ -49,7 +49,7 @@ services:
       - ./app/manage.py:/opt/app/manage.py
       - ./app/pyproject.toml:/opt/app/pyproject.toml
       - ./app/app/media/media:/opt/app/www/media
-      - ./notebooks:/opt/notebooks
+      - ./notebooks:/opt/app/notebooks
       - ./notebooks/ipython:/root/.ipython/profile_default
     restart: unless-stopped
     stdin_open: true
