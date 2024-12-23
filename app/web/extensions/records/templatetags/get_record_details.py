@@ -2,7 +2,7 @@
 
 from django import template
 
-from api.resources.records import RecordSerializer
+from domain.api.resources.records import RecordSerializer
 from domain.models import Record
 
 register = template.Library()

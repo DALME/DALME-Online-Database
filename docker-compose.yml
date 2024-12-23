@@ -39,7 +39,6 @@ services:
     networks:
       - app-network
     volumes:
-      - ./app/api:/opt/app/api
       - ./app/app:/opt/app/app
       - ./app/domain:/opt/app/domain
       - ./app/oauth/:/opt/app/oauth

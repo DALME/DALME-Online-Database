@@ -2,8 +2,8 @@
 
 from oauth2_provider.oauth2_validators import OAuth2Validator
 
-from api.resources.groups import GroupSerializer
 from app.context import get_current_tenant
+from domain.api.resources.groups import GroupSerializer
 
 
 class OAuth2Validator(OAuth2Validator):

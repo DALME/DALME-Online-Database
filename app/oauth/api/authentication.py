@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from django.conf import settings
 from django.contrib.auth import login
 
-from api.access_policies import BaseAccessPolicy
+from app.access_policies import BaseAccessPolicy
 from oauth.serializers import LoginSerializer
 
 

@@ -113,7 +113,6 @@ class Base(Configuration):
         'oauth',
         'app',
         'domain',
-        'api',
         'search',
     ]
     PROJECT_TENANT_APPS = [
@@ -160,7 +159,7 @@ class Base(Configuration):
                 'django.contrib.staticfiles',
                 *SHARED_TENANT_APPS,
             ],
-            'URLCONF': 'app.urls',
+            'URLCONF': 'app.urls.urls',
         },
         'project': {
             'APPS': [
@@ -170,7 +169,7 @@ class Base(Configuration):
                 'django.contrib.messages',
                 *PROJECT_TENANT_APPS,
             ],
-            'URLCONF': 'app.urls_tenant',
+            'URLCONF': 'app.urls.urls_tenant',
         },
     }
     ROOT_URLCONF = ''  # Don't change this! Multi-type tenants relies on it.
@@ -241,7 +240,7 @@ class Base(Configuration):
         ]
 
     DATABASE_ROUTERS = [
-        'app.database_router.ModelDatabaseRouter',
+        'app.router.ModelDatabaseRouter',
         'django_tenants.routers.TenantSyncRouter',
     ]
 
@@ -296,9 +295,6 @@ class Base(Configuration):
             'domain': {
                 'level': LOG_LEVEL,
             },
-            'api': {
-                'level': LOG_LEVEL,
-            },
             'web': {
                 'level': LOG_LEVEL,
             },
@@ -343,9 +339,9 @@ class Base(Configuration):
         'DEFAULT_FILTER_BACKENDS': [
             'django_filters.rest_framework.DjangoFilterBackend',
             'rest_framework.filters.SearchFilter',
-            'api.filter_backends.IDAOrderingFilter',
+            'domain.api.filters.OrderingFilter',
         ],
-        'DEFAULT_PAGINATION_CLASS': 'api.paginators.IDALimitOffsetPagination',
+        'DEFAULT_PAGINATION_CLASS': 'domain.api.paginators.LimitOffsetPagination',
         'DEFAULT_PARSER_CLASSES': [
             'djangorestframework_camel_case.parser.CamelCaseJSONParser',
         ],

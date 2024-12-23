@@ -167,7 +167,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
             from_search = True
 
         # import serializer here to avoid exception if api is not yet loaded
-        from api.resources.records.serializers import RecordSerializer
+        from domain.api.resources.records.serializers import RecordSerializer
 
         data = RecordSerializer(record, field_set=['web', 'web_detail']).data
         purl = f'{settings.BASE_URL}/purl/{record.id}/' if as_preview else record.get_purl()

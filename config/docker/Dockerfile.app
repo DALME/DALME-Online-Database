@@ -113,7 +113,6 @@ ENV PYTHONUNBUFFERED=1
 ENV LANG=en_US.UTF-8
 ENV BUILD=$BUILD
 WORKDIR /opt/app
-COPY ./app/api ./api
 COPY ./app/app ./app
 COPY ./app/domain ./domain
 COPY ./app/oauth ./oauth
