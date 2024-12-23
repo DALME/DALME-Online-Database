@@ -8,6 +8,7 @@ or that use the sttributes system.
 import os
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
 from django.db.models import Case, Exists, ExpressionWrapper, OuterRef, When
@@ -31,7 +32,7 @@ class CustomQuerySet(models.QuerySet):
     as_manager = classmethod(as_manager)
 
     def include_attrs(self, *args):
-        from domain.models.attribute import Attribute, AttributeField, ListField
+        from domain.models.attribute import Attribute, AttributeField, AttributeType, ListField
 
         qs = self.prefetch_related('attributes')
         for attr in args:
@@ -45,14 +46,22 @@ class CustomQuerySet(models.QuerySet):
             attr_sq = Attribute.objects.filter(
                 **{f'domain_{model.__name__.lower()}_related': OuterRef('pk'), 'attribute_type__name': attr}
             )
+            # check if attribute is_unique
+            is_unique = (
+                AttributeType.objects.get(name=attr)
+                .contenttypes.get(content_type=ContentType.objects.get_for_model(model))
+                .is_unique
+            )
+
             qs = qs.annotate(
                 **{
                     attr: ExpressionWrapper(
                         Case(When(Exists(attr_sq), then=ArraySubquery(attr_sq.values_list('value', flat=True)))),
-                        output_field=ListField(AttributeField()),
+                        output_field=ListField(AttributeField(), is_unique=is_unique),
                     )
                 }
             )
+
         return qs
 
 

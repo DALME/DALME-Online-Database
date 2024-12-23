@@ -291,8 +291,13 @@ CT_DATA = {
             'no_folios',
             'has_pages',
             'is_public',
+            'language',
         ],
     },
+}
+
+CTA_PROPS = {
+    ('record', 'language'): {'is_unique': False},
 }
 
 RENAMES = {
@@ -541,7 +546,10 @@ class Stage(BaseStage):
                         q = AttributeType.objects.filter(name=at_name)
                         if q.exists():
                             atype = q.first()
-                            ContentAttributes.objects.create(content_type=new_cte, attribute_type=atype)
+                            props = {'content_type': new_cte, 'attribute_type': atype}
+                            if (new_cte.model, atype.name) in CTA_PROPS:
+                                props.update(CTA_PROPS[(new_cte.model, atype.name)])
+                            ContentAttributes.objects.create(**props)
 
             self.logger.info('Created %s ContentTypeExtended instances', ContentTypeExtended.objects.count())
         else:
