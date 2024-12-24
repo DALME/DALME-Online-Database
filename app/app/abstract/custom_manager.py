@@ -10,6 +10,7 @@ import os
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.expressions import ArraySubquery
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Case, Exists, ExpressionWrapper, OuterRef, When
 
@@ -47,11 +48,14 @@ class CustomQuerySet(models.QuerySet):
                 **{f'domain_{model.__name__.lower()}_related': OuterRef('pk'), 'attribute_type__name': attr}
             )
             # check if attribute is_unique
-            is_unique = (
-                AttributeType.objects.get(name=attr)
-                .contenttypes.get(content_type=ContentType.objects.get_for_model(model))
-                .is_unique
-            )
+            try:
+                is_unique = (
+                    AttributeType.objects.get(name=attr)
+                    .contenttypes.get(content_type=ContentType.objects.get_for_model(model))
+                    .is_unique
+                )
+            except ObjectDoesNotExist:
+                is_unique = True  # True is default value for is_unique
 
             qs = qs.annotate(
                 **{
