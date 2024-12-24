@@ -66,7 +66,7 @@ class Stage(BaseStage):
             cursor.execute('DROP SCHEMA cloned CASCADE')
 
     @transaction.atomic
-    def migrate_wagtail_tables(self):  # noqa: C901
+    def migrate_wagtail_tables(self):  # noqa: C901, PLR0912, RUF100
         """Migrate existing CMS tables to the DALME schema (BUT NOT INDICES)."""
         app_labels = [
             'taggit',
@@ -92,7 +92,7 @@ class Stage(BaseStage):
             'wagtailcore_workflowtask',
         ]
         no_bulk = ['wagtailcore_groupapprovaltask']
-        skip = ['wagtailcore_uploadedfile', 'wagtailcore_revision']
+        skip = ['wagtailcore_uploadedfile', 'wagtailcore_revision', 'wagtailadmin_editingsession']
 
         # delete existing records
         with connection.cursor() as cursor:
@@ -148,7 +148,7 @@ class Stage(BaseStage):
                                 target_model.objects.bulk_create(objs)
 
     @transaction.atomic
-    def migrate_public_tables(self):  # noqa: C901, PLR0915
+    def migrate_public_tables(self):  # noqa: C901, PLR0915, PLR0912, RUF100
         """Migrate existing Public tables to the DALME schema (BUT NOT INDICES)."""
         # we need to do these tables differently, i.e. by inserting data directly in SQL
         # because the constraints on foreign keys won't allow use of the ORM, for example
@@ -198,6 +198,12 @@ class Stage(BaseStage):
                     if model_name == 'corpus':
                         columns.append('collapsed')
                         values = values + ',False'
+
+                    if model_name == 'baseimage':
+                        if 'description' in columns:
+                            del columns[columns.index('description')]
+                        columns.append('description')
+                        values = values + ",''"
 
                     sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
