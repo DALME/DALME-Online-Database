@@ -41,7 +41,7 @@ repos:
   # Python
   # Needs to run before anything else (for Python).
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.2
+    rev: v0.8.4
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
