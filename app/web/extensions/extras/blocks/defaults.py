@@ -4,7 +4,7 @@ from wagtail import blocks
 from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.contrib.typed_table_block.blocks import TypedTableBlock
 from wagtail.embeds.blocks import EmbedBlock
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock
 from wagtailcodeblock.blocks import CodeBlock
 
 from web.extensions.bibliography.blocks import BibliographyChooserBlock
@@ -53,14 +53,14 @@ typed_table = TypedTableBlock(
         ('text', blocks.CharBlock()),
         ('numeric', blocks.FloatBlock()),
         ('rich_text', blocks.RichTextBlock()),
-        ('image', ImageChooserBlock()),
+        ('image', ImageBlock()),
     ],
     label='Table (typed)',
 )
 
 BASE_BLOCKS = [
     ('bibliography', BibliographyChooserBlock()),
-    ('carousel', CarouselBlock(ImageChooserBlock())),
+    ('carousel', CarouselBlock(ImageBlock())),
     ('chart_embed', ChartEmbedBlock()),
     ('code', CodeBlock()),
     ('document', DocumentBlock()),

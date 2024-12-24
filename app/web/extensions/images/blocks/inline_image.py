@@ -2,7 +2,7 @@
 
 from wagtail import blocks
 from wagtail.blocks.struct_block import StructBlockAdapter
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock
 from wagtail.telepath import register
 
 from django import forms
@@ -26,7 +26,7 @@ def validate_dimensions(value):
 
 
 class InlineImageBlock(blocks.StructBlock):
-    image = ImageChooserBlock(help_text='Select the image to display.')
+    image = ImageBlock(help_text='Select the image to display.')
     image_id = blocks.CharBlock(
         required=False,
         label='Image ID',
