@@ -47,6 +47,7 @@
 }
 .feature-month-container.current {
   color: #084094;
+  font-weight: 700;
 }
 .featured-object-nav hr {
   width: 100%;
@@ -54,7 +55,13 @@
   border-top: 1px dotted #9c9c9c;
   margin: 0;
 }
-
+.feature-essay-container {
+  font-size: 13px;
+  margin-left: auto;
+}
+.title-essays {
+  margin-bottom: 0.7rem;
+}
 /* Media Queries */
 @media only screen and (min-width: 600px) {
   .featured-object-nav {

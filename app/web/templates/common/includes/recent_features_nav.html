@@ -3,10 +3,19 @@
 {% get_recent_features as recent_features %}
 {% if recent_features %}
   <div class="featured-object-nav">
-    <h4 class="u-small-caps-heading">{{ recent_features.title }}</h4>
+    <h4 class="u-small-caps-heading {% if recent_features.title == "Essays" %}title-essays{% endif %}">{{ recent_features.title }}</h4>
     <div class="u-flex flex-column">
       {% for year, obj in recent_features.features.items %}
         <div class="d-flex mb-3">
+        {% if recent_features.title == "Essays" %}
+          {% for data in obj %}
+            {% if data.url and data.url != page.url %}
+              <div class="feature-essay-container">
+                <a href="{{ data.url }}">{{ data.month }} {{ year }}</a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% else %}
           <div class="u-small-caps-heading u-bottom-to-top year">{{ year }}</div>
             <div class="feature-year-container">
               {% for data in obj %}
@@ -22,7 +31,8 @@
                 {% endif %}
               {% endfor %}
             </div>
-        </div>
+          {% endif %}
+          </div>
       {% endfor %}
     </div>
   </div>
