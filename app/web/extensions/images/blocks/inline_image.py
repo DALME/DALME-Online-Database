@@ -2,12 +2,14 @@
 
 from wagtail import blocks
 from wagtail.blocks.struct_block import StructBlockAdapter
-from wagtail.images.blocks import ImageBlock
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.telepath import register
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
+
+from web.extensions.extras.widgets import CustomSelect
 
 
 def validate_dimensions(value):
@@ -26,7 +28,10 @@ def validate_dimensions(value):
 
 
 class InlineImageBlock(blocks.StructBlock):
-    image = ImageBlock(help_text='Select the image to display.')
+    image = ImageChooserBlock(
+        required=True,
+        help_text='Select the image to display.',
+    )
     image_id = blocks.CharBlock(
         required=False,
         label='Image ID',
@@ -51,6 +56,7 @@ class InlineImageBlock(blocks.StructBlock):
             ('main', 'Main image (full-width)'),
         ],
         default='left',
+        widget=CustomSelect,
         help_text='How should the image be aligned on the page?',
     )
     resize_rule = blocks.ChoiceBlock(
@@ -63,6 +69,7 @@ class InlineImageBlock(blocks.StructBlock):
             ('fill', 'Resize and crop to the given dimensions'),
             ('background', 'As background with given parameters'),
         ],
+        widget=CustomSelect,
         required=False,
         help_text='Resize using a <a href="https://docs.wagtail.org/en/v2.13.5/topics/images.html" target="_blank">built-in rule</a>\
             or use as background of &lt;div&gt; with fixed dimensions.',
@@ -83,6 +90,7 @@ class InlineImageBlock(blocks.StructBlock):
         template = 'inline_image_block.html'
         form_classname = 'struct-block inline-image-block'
         form_template = 'inline_image_form.html'
+        label_format = 'Inline image {image_id}'
 
 
 class InlineImageBlockAdapter(StructBlockAdapter):

@@ -1,13 +1,15 @@
 """Defaults for extra blocks."""
 
 from wagtail import blocks
+from wagtail.blocks import ChoiceBlock, TextBlock
 from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.contrib.typed_table_block.blocks import TypedTableBlock
 from wagtail.embeds.blocks import EmbedBlock
-from wagtail.images.blocks import ImageBlock
-from wagtailcodeblock.blocks import CodeBlock
+from wagtail.images.blocks import ImageBlock, ImageChooserBlock
+from wagtailcodeblock.blocks import CodeBlock as BaseCodeBlock
 
 from web.extensions.bibliography.blocks import BibliographyChooserBlock
+from web.extensions.extras.widgets import CustomSelect
 from web.extensions.footnotes.blocks import FootnotesPlaceMarker
 from web.extensions.images.blocks import InlineImageBlock
 from web.extensions.images.blocks.carousel import CarouselBlock
@@ -15,6 +17,41 @@ from web.extensions.images.blocks.carousel import CarouselBlock
 from .chart_embed import ChartEmbedBlock
 from .document import DocumentBlock
 from .text_expandable import TextExpandableBlock
+
+
+class CodeBlock(BaseCodeBlock):
+    """Subclass of CodeBlock from wagtailcodeblock to work around bug with language choice."""
+
+    # see: https://github.com/wagtail/wagtail/pull/11958
+    def __init__(self, local_blocks=None, **kwargs):
+        self.INCLUDED_LANGUAGES = (
+            ('html', 'HTML'),
+            ('mathml', 'MathML'),
+            ('svg', 'SVG'),
+            ('xml', 'XML'),
+        )
+
+        local_blocks = [] if local_blocks is None else local_blocks.copy()
+        language_choices, language_default = self.get_language_choice_list(**kwargs)
+
+        local_blocks.extend(
+            [
+                (
+                    'language',
+                    ChoiceBlock(
+                        choices=language_choices,
+                        label='Language',
+                        default=language_default,
+                        identifier='language',
+                        widget=CustomSelect,
+                    ),
+                ),
+                ('code', TextBlock(label='Code', identifier='code')),
+            ]
+        )
+
+        super(BaseCodeBlock, self).__init__(local_blocks, **kwargs)
+
 
 DEFAULT_TABLE_OPTIONS = {
     'minSpareRows': 0,
@@ -60,7 +97,7 @@ typed_table = TypedTableBlock(
 
 BASE_BLOCKS = [
     ('bibliography', BibliographyChooserBlock()),
-    ('carousel', CarouselBlock(ImageBlock())),
+    ('carousel', CarouselBlock(ImageChooserBlock())),
     ('chart_embed', ChartEmbedBlock()),
     ('code', CodeBlock()),
     ('document', DocumentBlock()),
@@ -71,7 +108,7 @@ BASE_BLOCKS = [
     ('inline_image', InlineImageBlock()),
     ('page', blocks.PageChooserBlock()),
     ('pullquote', blocks.RichTextBlock(icon='openquote')),
-    ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS, icon='table-cells')),
+    ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS, icon='table-cells', form_classname='table-block')),
     ('table_typed', typed_table),
     ('text', blocks.RichTextBlock()),
     ('text_expandable', TextExpandableBlock()),

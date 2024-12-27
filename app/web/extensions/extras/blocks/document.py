@@ -3,6 +3,8 @@
 from wagtail import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
 
+from web.extensions.extras.widgets import CustomSelect
+
 
 class DocumentBlock(blocks.StructBlock):
     type = blocks.ChoiceBlock(
@@ -11,10 +13,11 @@ class DocumentBlock(blocks.StructBlock):
             ('publication', 'Publication'),
             ('talk', 'Talk'),
         ],
-        help_text='Select type of document.',
+        help_text='Type of document.',
+        widget=CustomSelect,
     )
     version = blocks.DecimalBlock(required=False, help_text='Version, if applicable.')
-    date = blocks.DateBlock(help_text='Date for this entry (e.g. creation, publication, etc.')
+    date = blocks.DateBlock(help_text='Date (e.g. creation, publication, etc.')
     title = blocks.CharBlock(help_text='Title for this entry.')
     author = blocks.CharBlock(help_text='Name of the author(s) for this entry.')
     detail = blocks.CharBlock(
