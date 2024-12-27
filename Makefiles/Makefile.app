@@ -8,6 +8,7 @@ app.help:
 	@echo "  app.notebook             start Jupyter notebook instance"
 	@echo "  app.open                 view the site in your browser"
 	@echo "  app.python               shell into python on the web container"
+	@echo "  app.renditions.update    regenerate Wagtail image renditions"
 	@echo "  app.shell                shell into the web container"
 	@echo "  app.sync                 install the web requirements and rebuild the service"
 	@echo "  app.test                 run the web test suite in full"
@@ -42,6 +43,12 @@ app.migrate_data:
 		python manage.py migrate_data
 .PHONY: app.manage
 
+app.notebook:
+	docker compose exec \
+		$(NAMESPACE).app \
+		python manage.py shell_plus --notebook
+.PHONY: app.notebook
+
 app.open:
 	open http://dalme.localhost:8000/
 .PHONY: app.open
@@ -58,11 +65,11 @@ app.shell:
 		bash
 .PHONY: app.shell
 
-app.notebook:
+app.renditions.update:
 	docker compose exec \
 		$(NAMESPACE).app \
-		python manage.py shell_plus --notebook
-.PHONY: app.notebook
+		python manage.py wagtail_update_image_renditions
+.PHONY: app.renditions.update
 
 app.sync: _app.install _app.build
 .PHONY: app.sync

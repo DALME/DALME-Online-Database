@@ -4,6 +4,7 @@
 infra.help:
 	@echo "  infra.bootstrap          ready the development environment"
 	@echo "  infra.log                tail the container logs"
+	@echo "  infra.media          	  take a downloaded S3 bucket and create a local media folder in the new format"
 	@echo "  infra.rebuild            rebuild the containers"
 	@echo "  infra.start              spin up the container network"
 	@echo "  infra.stop               stop the container network"
@@ -21,6 +22,7 @@ else
 	@$(MAKE) -e app.migrate_data
 	@$(MAKE) app.manage args='ensure_oauth'
 	@$(MAKE) app.manage args='tenant_command update_index --schema=dalme'
+	@$(MAKE) app.renditions.update
 	@$(MAKE) app.collectstatic
 endif
 .PHONY: infra.bootstrap
@@ -32,6 +34,25 @@ infra.hooks.update:
 infra.log:
 	docker compose logs --follow
 .PHONY: infra.log
+
+infra.media:
+ifndef folder
+	$(error No local folder specified to process. \
+		Usage: make infra.media folder='media/media')
+else
+	rm -rf ./app/app/media
+	mkdir -p ./app/app/media/pharmacopeias/attachments
+	mkdir ./app/app/media/pharmacopeias/documents
+	mkdir ./app/app/media/pharmacopeias/images
+	mkdir ./app/app/media/pharmacopeias/original_images
+	mkdir ./app/app/media/dalme
+	cp -Rp $(folder)/avatar_images ./app/app/media/avatar_images
+	cp -Rp $(folder)/attachments ./app/app/media/dalme/attachments
+	cp -Rp $(folder)/documents ./app/app/media/dalme/documents
+	cp -Rp $(folder)/images ./app/app/media/dalme/images
+	cp -Rp $(folder)/original_images ./app/app/media/dalme/original_images
+endif
+.PHONY: infra.media
 
 infra.rebuild:
 	docker compose up -d --build --force-recreate
