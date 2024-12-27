@@ -1,5 +1,10 @@
+/* eslint-disable no-undef */
 class ColorController extends window.StimulusModule.Controller {
-  static values = { swatches: Array, theme: String };
+  constructor() {
+    super();
+    this.swatchesValue = [];
+    this.themeValue = "";
+  }
 
   connect() {
       // create
@@ -16,4 +21,4 @@ class ColorController extends window.StimulusModule.Controller {
   }
 }
 
-window.wagtail.app.register('color', ColorController);
+window.wagtail.app.register("color", ColorController);

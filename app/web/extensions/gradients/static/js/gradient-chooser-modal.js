@@ -1,14 +1,13 @@
+/* eslint-disable no-undef */
 
 class GradientChooserModal {
-  onloadHandlers = window.CHOOSER_MODAL_ONLOAD_HANDLERS;
-  chosenResponseName = 'chosen'; // identifier for the ModalWorkflow response that indicates an item was chosen
-
   constructor(baseUrl) {
     this.baseUrl = baseUrl;
+    this.onloadHandlers = window.CHOOSER_MODAL_ONLOAD_HANDLERS;
+    this.chosenResponseName = "chosen"; // identifier for ModalWorkflow response when item chosen
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getURL(opts) {
+  getURL(_opts) {
     return this.baseUrl;
   }
 
@@ -39,11 +38,14 @@ class GradientChooserModal {
 }
 
 class GradientChooser extends window.Chooser {
-  chooserModalClass = GradientChooserModal;
+  constructor(...args) {
+    super(...args);
+    this.chooserModalClass = GradientChooserModal;
+  }
 
   initHTMLElements(id) {
     super.initHTMLElements(id);
-    this.previewGradient = this.chooserElement.querySelector('[data-chooser-gradient]');
+    this.previewGradient = this.chooserElement.querySelector("[data-chooser-gradient]");
   }
 
   getStateFromHTML() {
@@ -56,15 +58,15 @@ class GradientChooser extends window.Chooser {
   }
 
   renderState(newState) {
-    this.input.setAttribute('value', newState.id);
-    this.input.dispatchEvent(new Event('change', { bubbles: true }));
+    this.input.setAttribute("value", newState.id);
+    this.input.dispatchEvent(new Event("change", { bubbles: true }));
     this.titleElement.textContent = newState.description;
     this.previewGradient.innerHTML = newState.gradient;
-    this.chooserElement.classList.remove('blank');
+    this.chooserElement.classList.remove("blank");
     if (this.editLink) {
       const editUrl = newState[this.editUrlStateKey];
       if (editUrl) {
-        this.editLink.setAttribute('href', editUrl);
+        this.editLink.setAttribute("href", editUrl);
         this.editLink.hidden = false;
       } else {
         this.editLink.hidden = true;
@@ -74,11 +76,14 @@ class GradientChooser extends window.Chooser {
 
 }
 
-ChooserFactory = window.telepath.unpack("wagtail.admin.widgets.Chooser").constructor
+ChooserFactory = window.telepath.unpack("wagtail.admin.widgets.Chooser").constructor;
 
 class GradientChooserFactory extends ChooserFactory {
-  widgetClass = GradientChooser;
-  chooserModalClass = GradientChooserModal;
+  constructor() {
+    super();
+    this.widgetClass = GradientChooser;
+    this.chooserModalClass = GradientChooserModal;
+  }
 }
 
 window.GradientChooser = GradientChooser;

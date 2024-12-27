@@ -1,4 +1,5 @@
-'use strict';
+/* eslint-disable no-undef */
+"use strict";
 
 /**
  * Copyright Marc J. Schmidt. See the LICENSE file at the top-level
@@ -13,7 +14,7 @@
     } else {
         root.ResizeSensor = factory();
     }
-}(typeof window !== 'undefined' ? window : this, function () {
+}(typeof window !== "undefined" ? window : this, function () {
 
     // Make sure it does not throw in a SSR (Server Side Rendering) situation
     if (typeof window === "undefined") {
@@ -21,14 +22,15 @@
     }
     // https://github.com/Semantic-Org/Semantic-UI/issues/3855
     // https://github.com/marcj/css-element-queries/issues/257
-    var globalWindow = typeof window != 'undefined' && window.Math == Math
+    var globalWindow = typeof window != "undefined" && window.Math == Math
         ? window
-        : typeof self != 'undefined' && self.Math == Math
+        : typeof self != "undefined" && self.Math == Math
             ? self
-            : Function('return this')();
-    // Only used for the dirty checking, so the event callback count is limited to max 1 call per fps per sensor.
-    // In combination with the event based resize sensor this saves cpu time, because the sensor is too fast and
-    // would generate too many unnecessary events.
+            : Function("return this")();
+    // Only used for the dirty checking, so the event callback count is limited to max 1 call
+    // per fps per sensor.
+    // In combination with the event based resize sensor this saves cpu time, because the
+    // sensor is too fast and would generate too many unnecessary events.
     var requestAnimationFrame = globalWindow.requestAnimationFrame ||
         globalWindow.mozRequestAnimationFrame ||
         globalWindow.webkitRequestAnimationFrame ||
@@ -44,12 +46,12 @@
      */
     function forEachElement(elements, callback){
         var elementsType = Object.prototype.toString.call(elements);
-        var isCollectionTyped = ('[object Array]' === elementsType
-            || ('[object NodeList]' === elementsType)
-            || ('[object HTMLCollection]' === elementsType)
-            || ('[object Object]' === elementsType)
-            || ('undefined' !== typeof jQuery && elements instanceof jQuery) //jquery
-            || ('undefined' !== typeof Elements && elements instanceof Elements) //mootools
+        var isCollectionTyped = ("[object Array]" === elementsType
+            || ("[object NodeList]" === elementsType)
+            || ("[object HTMLCollection]" === elementsType)
+            || ("[object Object]" === elementsType)
+            || ("undefined" !== typeof jQuery && elements instanceof jQuery) //jquery
+            || ("undefined" !== typeof Elements && elements instanceof Elements) //mootools
         );
         var i = 0, j = elements.length;
         if (isCollectionTyped) {
@@ -71,14 +73,14 @@
             return {
                 width: element.offsetWidth,
                 height: element.offsetHeight
-            }
+            };
         }
 
         var rect = element.getBoundingClientRect();
         return {
             width: Math.round(rect.width),
             height: Math.round(rect.height)
-        }
+        };
     }
 
     /**
@@ -131,7 +133,7 @@
 
             this.length = function() {
                 return q.length;
-            }
+            };
         }
 
         /**
@@ -149,46 +151,46 @@
             element.resizedAttached = new EventQueue();
             element.resizedAttached.add(resized);
 
-            element.resizeSensor = document.createElement('div');
-            element.resizeSensor.dir = 'ltr';
-            element.resizeSensor.className = 'resize-sensor';
+            element.resizeSensor = document.createElement("div");
+            element.resizeSensor.dir = "ltr";
+            element.resizeSensor.className = "resize-sensor";
 
             var style = {
-                pointerEvents: 'none',
-                position: 'absolute',
-                left: '0px',
-                top: '0px',
-                right: '0px',
-                bottom: '0px',
-                overflow: 'hidden',
-                zIndex: '-1',
-                visibility: 'hidden',
-                maxWidth: '100%'
+                pointerEvents: "none",
+                position: "absolute",
+                left: "0px",
+                top: "0px",
+                right: "0px",
+                bottom: "0px",
+                overflow: "hidden",
+                zIndex: "-1",
+                visibility: "hidden",
+                maxWidth: "100%"
             };
             var styleChild = {
-                position: 'absolute',
-                left: '0px',
-                top: '0px',
-                transition: '0s',
+                position: "absolute",
+                left: "0px",
+                top: "0px",
+                transition: "0s",
             };
 
             setStyle(element.resizeSensor, style);
 
-            var expand = document.createElement('div');
-            expand.className = 'resize-sensor-expand';
+            var expand = document.createElement("div");
+            expand.className = "resize-sensor-expand";
             setStyle(expand, style);
 
-            var expandChild = document.createElement('div');
+            var expandChild = document.createElement("div");
             setStyle(expandChild, styleChild);
             expand.appendChild(expandChild);
 
-            var shrink = document.createElement('div');
-            shrink.className = 'resize-sensor-shrink';
+            var shrink = document.createElement("div");
+            shrink.className = "resize-sensor-shrink";
             setStyle(shrink, style);
 
-            var shrinkChild = document.createElement('div');
+            var shrinkChild = document.createElement("div");
             setStyle(shrinkChild, styleChild);
-            setStyle(shrinkChild, { width: '200%', height: '200%' });
+            setStyle(shrinkChild, { width: "200%", height: "200%" });
             shrink.appendChild(shrinkChild);
 
             element.resizeSensor.appendChild(expand);
@@ -196,9 +198,14 @@
             element.appendChild(element.resizeSensor);
 
             var computedStyle = window.getComputedStyle(element);
-            var position = computedStyle ? computedStyle.getPropertyValue('position') : null;
-            if ('absolute' !== position && 'relative' !== position && 'fixed' !== position && 'sticky' !== position) {
-                element.style.position = 'relative';
+            var position = computedStyle ? computedStyle.getPropertyValue("position") : null;
+            if (
+                "absolute" !== position &&
+                "relative" !== position &&
+                "fixed" !== position &&
+                "sticky" !== position
+            ) {
+                element.style.position = "relative";
             }
 
             var dirty, rafId;
@@ -212,8 +219,8 @@
                 var width = element.offsetWidth;
                 var height = element.offsetHeight;
 
-                expandChild.style.width = (width + 10) + 'px';
-                expandChild.style.height = (height + 10) + 'px';
+                expandChild.style.width = (width + 10) + "px";
+                expandChild.style.height = (height + 10) + "px";
 
                 expand.scrollLeft = width + 10;
                 expand.scrollTop = height + 10;
@@ -273,14 +280,14 @@
 
             var addEvent = function(el, name, cb) {
                 if (el.attachEvent) {
-                    el.attachEvent('on' + name, cb);
+                    el.attachEvent("on" + name, cb);
                 } else {
                     el.addEventListener(name, cb);
                 }
             };
 
-            addEvent(expand, 'scroll', onScroll);
-            addEvent(shrink, 'scroll', onScroll);
+            addEvent(expand, "scroll", onScroll);
+            addEvent(shrink, "scroll", onScroll);
 
             // Fix for custom Elements
             lastAnimationFrame = requestAnimationFrame(reset);
@@ -291,7 +298,8 @@
         });
 
         this.detach = function(ev) {
-            // clean up the unfinished animation frame to prevent a potential endless requestAnimationFrame of reset
+            // clean up the unfinished animation frame to prevent a potential endless
+            // requestAnimationFrame of reset
             if (!lastAnimationFrame) {
                 window.cancelAnimationFrame(lastAnimationFrame);
                 lastAnimationFrame = 0;
@@ -330,7 +338,7 @@
     if (typeof MutationObserver !== "undefined") {
         var observer = new MutationObserver(function (mutations) {
             for (var i in mutations) {
-                if (mutations.hasOwnProperty(i)) {
+                if (Object.prototype.hasOwnProperty.call(mutations, i)) {
                     var items = mutations[i].addedNodes;
                     for (var j = 0; j < items.length; j++) {
                         if (items[j].resizeSensor) {
@@ -341,7 +349,7 @@
             }
         });
 
-        document.addEventListener("DOMContentLoaded", function (event) {
+        document.addEventListener("DOMContentLoaded", function (_event) {
             observer.observe(document.body, {
                 childList: true,
                 subtree: true,

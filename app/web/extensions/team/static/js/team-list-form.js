@@ -7,7 +7,7 @@ class TeamListBlockDefinition extends window.wagtailStreamField.blocks.StructBlo
         const fields = {
           role: document.getElementById(`w-field-${prefix}-role`).closest("section"),
           members: document.getElementById(`w-field-${prefix}-members`).closest("section"),
-        }
+        };
 
         const listByRole = document.createElement("div");
         listByRole.classList.add("list-by-role");
@@ -27,13 +27,14 @@ class TeamListBlockDefinition extends window.wagtailStreamField.blocks.StructBlo
                     listByRole.appendChild(entry);
                   });
                 } else {
-                  listByRole.innerHTML = '<div class="role-list-empty">No team members have been assigned this role yet.</div>'
+                  listByRole.innerHTML = "<div class=\"role-list-empty\">\
+                  No team members have been assigned this role yet.</div>";
                 }
             });
           } else {
             listByRole.innerHTML = "";
           }
-        }
+        };
 
         const toggleForm = () => {
           const selValue = modeSelect.value;
@@ -48,7 +49,7 @@ class TeamListBlockDefinition extends window.wagtailStreamField.blocks.StructBlo
             Object.keys(fields).forEach((key) => fields[key].classList.add("u-none"));
             fields["role"].removeEventListener("change", onRoleChange);
           }
-        }
+        };
 
         modeSelect.addEventListener("change", toggleForm);
         toggleForm();
@@ -58,4 +59,4 @@ class TeamListBlockDefinition extends window.wagtailStreamField.blocks.StructBlo
     }
 }
 
-window.telepath.register('webteam.TeamListBlock', TeamListBlockDefinition);
+window.telepath.register("webteam.TeamListBlock", TeamListBlockDefinition);

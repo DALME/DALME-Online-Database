@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 
 class SavedSearchSource extends window.React.Component {
 
@@ -11,7 +12,7 @@ class SavedSearchSource extends window.React.Component {
       const { onClose, entity } = this.props;
       const url = this.props.entityType?.chooserUrls["savedSearchChooser"];
       $(document.body).on("hidden.bs.modal", this.onClose);
-      const urlParams = {}
+      const urlParams = {};
       let entityId = null;
 
       if (entity) {
@@ -21,10 +22,11 @@ class SavedSearchSource extends window.React.Component {
       }
 
       const onload = {
-        enter_saved_search: function(modal, jsonData) {
+        enter_saved_search: function(modal, _jsonData) {
             $("form", modal.body).on("submit", function() {
-                const select = document.getElementById("id_saved_search-id")
-                document.getElementById("id_saved_search-name").value = select.options[select.selectedIndex].text;
+                const select = document.getElementById("id_saved_search-id");
+                document.getElementById("id_saved_search-name").value =
+                  select.options[select.selectedIndex].text;
                 modal.postForm(this.action, $(this).serialize());
                 return false;
             });
@@ -133,7 +135,7 @@ class SavedSearchDecorator extends window.draftail.TooltipEntity {
 
 // Register the plugin directly on script execution so the editor loads it when initialising.
 window.draftail.registerPlugin({
-  type: 'SAVED_SEARCH',
+  type: "SAVED_SEARCH",
   source: SavedSearchSource,
   decorator: SavedSearchDecorator,
 });

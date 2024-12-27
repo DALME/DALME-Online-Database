@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 window.CustomUtils = {
   getUUID: () => {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -12,12 +13,12 @@ window.CustomUtils = {
   },
   getCookie: (name) => {
     var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-      const cookies = document.cookie.split(';');
+    if (document.cookie && document.cookie != "") {
+      const cookies = document.cookie.split(";");
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i].trim();
         // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+        if (cookie.substring(0, name.length + 1) == (name + "=")) {
           cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
           break;
         }
@@ -33,7 +34,7 @@ window.CustomUtils = {
       crossDomain: true,
       headers: {
         "Content-Type": "application/json",
-        'X-CSRFToken': window.CustomUtils.getCookie("csrftoken")
+        "X-CSRFToken": window.CustomUtils.getCookie("csrftoken")
       },
       data : JSON.stringify(data)
     });
@@ -56,18 +57,21 @@ window.CustomUtils = {
     screenshot.dataset.scrollX = window.scrollX;
     screenshot.dataset.scrollY = window.scrollY;
     screenshot.querySelector("[data-domain]").remove();
-    screenshot.querySelectorAll("link").forEach((el) => el.href = el.href);
-    screenshot.querySelectorAll("script").forEach((el) => el.src = el.src);
-    screenshot.querySelectorAll("img").forEach((el) => el.src = el.src);
+    // screenshot.querySelectorAll("link").forEach((el) => el.href = el.href);
+    // screenshot.querySelectorAll("script").forEach((el) => el.src = el.src);
+    // screenshot.querySelectorAll("img").forEach((el) => el.src = el.src);
     screenshot.querySelectorAll("[style]").forEach((el) => {
-      el.setAttribute("style", el.getAttribute("style").replace(/url\((.+)\)/gi, `url(${window.location.href}$1)`));
+      el.setAttribute(
+        "style",
+        el.getAttribute("style").replace(/url\((.+)\)/gi,
+        `url(${window.location.href}$1)`
+      ));
     });
-    console.log(screenshot);
     const blob = new Blob([screenshot.outerHTML], { type: "text/html" });
     reader.readAsDataURL(blob);
     reader.onloadend = () => {
       window.localStorage.setItem("origin_background", reader.result);
       window.location.assign("/db/?next=/cms/");
-    }
+    };
   },
-}
+};

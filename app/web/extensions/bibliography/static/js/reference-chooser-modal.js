@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 class ReferenceSource extends window.React.Component {
   constructor(props) {
       super(props);
@@ -27,23 +28,31 @@ class ReferenceSource extends window.React.Component {
           return {
             id: entry.id.split("/")[1],
             text: citation.format("citation", { format: "text", template: "apa", lang: "en-US" }),
-            html: $(citation.format("bibliography", { format: "html", template: "apa", lang: "en-US" })),
+            html: $(citation.format("bibliography", {
+              format: "html",
+              template: "apa",
+              lang: "en-US"
+            })),
           };
         })};
-      }
+      };
 
       const getInitialValue = (el, callback) => {
         fetch(`${window.APIURL}/library/${entityId}/?content=csljson&format=json`)
         .then(response => response.json())
         .then(data => {
           const citation = new window.cite(data[0]);
-          const text = citation.format("citation", { format: "text", template: "apa", lang: "en-US" });
+          const text = citation.format("citation", {
+            format: "text",
+            template: "apa",
+            lang: "en-US"
+          });
           callback({id: entityId, text:text});
         });
-      }
+      };
 
       const onload = {
-        enter_reference: function(modal, jsonData) {
+        enter_reference: function(modal, _jsonData) {
             const selectEl = $("#id_reference-id");
             selectEl.select2({
               placeholder: "Select reference or type to search...",
@@ -55,7 +64,7 @@ class ReferenceSource extends window.React.Component {
                 dataType: "json",
                 quietMillis: 500,
                 results: processAPIResults,
-                data: (term, page) => ({
+                data: (term, _page) => ({
                   search: term,
                   limit: 10,
                   content: "csljson",
@@ -67,7 +76,7 @@ class ReferenceSource extends window.React.Component {
               formatSelection: (entry) => entry.text,
             });
 
-            $("form", modal.body).on("submit", function(evt) {
+            $("form", modal.body).on("submit", function(_evt) {
                 $("#id_reference-reference").val(selectEl.select2("data").text);
                 modal.postForm(this.action, $(this).serialize());
                 return false;
@@ -177,7 +186,7 @@ class ReferenceDecorator extends window.draftail.TooltipEntity {
 
 // Register the plugin directly on script execution so the editor loads it when initialising.
 window.draftail.registerPlugin({
-  type: 'REFERENCE',
+  type: "REFERENCE",
   source: ReferenceSource,
   decorator: ReferenceDecorator,
 });

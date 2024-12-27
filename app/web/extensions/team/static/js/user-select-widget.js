@@ -7,15 +7,18 @@ window.CustomUtils.userSelectState = {
     photoChooser: null,
     selectEl: null,
     nameField:null,
-    iconPlaceholder: '<svg class="icon icon-user user-placeholder" aria-hidden="true"><use href="#icon-user"></use></svg>',
-    getAvatarHTML: (url) => `<div class="avatar-bg" style="background: center/cover url(${url});"></div>`,
+    iconPlaceholder: "<svg class=\"icon icon-user user-placeholder\" aria-hidden=\"true\">\
+                    <use href=\"#icon-user\"></use></svg>",
+    getAvatarHTML: (url) => `<div class="avatar-bg" style="background: \
+                            center/cover url(${url});"></div>`,
     getFormattedItem: (item) => {
       const store = window.CustomUtils.userSelectState.store;
       const avatar = item.avatar ? store.getAvatarHTML(item.avatar) : store.iconPlaceholder;
-      return `<div class="user-option">${avatar}<div class="user-label"><span>${item.name}</span> <span class="user-username">${item.username}</span></div></div>`;
+      return `<div class="user-option">${avatar}<div class="user-label"><span>${item.name}</span>\
+              <span class="user-username">${item.username}</span></div></div>`;
     },
     getIdList: (val) => {
-      let result = JSON.parse(val.replaceAll(`'`, `"`));
+      let result = JSON.parse(val.replaceAll("'", "\""));
       if (typeof result == "object") {
         result = result.filter((x) => x.trim() != "");
       }
@@ -41,7 +44,9 @@ window.CustomUtils.userSelectState = {
       const store = window.CustomUtils.userSelectState.store;
       if (store.selectEl) {
         const value = store.selectEl.select2("data");
-        store.photoChooser.querySelector(".chooser__image").src = value.item.avatar ? value.item.avatar : "#";
+        store.photoChooser.querySelector(".chooser__image").src = value.item.avatar
+          ? value.item.avatar
+          : "#";
         if (!store.photoChooser.classList.contains("blank") || value.item.avatar) {
           store.photoChooser.classList.toggle("blank");
         }
@@ -90,7 +95,7 @@ window.CustomUtils.userSelectState = {
       selectEl.on("change", store.toggleForm);
     }
   },
-  disconnectCallback: (selectEl) => {
+  disconnectCallback: (_selectEl) => {
     delete window.CustomUtils.userSelectState;
   },
-}
+};

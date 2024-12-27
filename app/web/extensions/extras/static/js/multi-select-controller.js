@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 class MultiSelectController extends window.StimulusModule.Controller {
   connect() {
     const selectEl = $(this.element);
@@ -11,7 +12,7 @@ class MultiSelectController extends window.StimulusModule.Controller {
       dropdownAutoWidth: true,
       allowClear: true,
       containerCssClass: selectEl.data("container-classes"),
-    }
+    };
 
     if (selectMultiple && selectEl.prop("tagName") != "SELECT") {
       selOptions.multiple = true;
@@ -42,10 +43,12 @@ class MultiSelectController extends window.StimulusModule.Controller {
 
   disconnect() {
     const selectEl = $(this.element);
-    const state = selectEl.data("use-state") ? window.CustomUtils[selectEl.data("use-state")] : false;
+    const state = selectEl.data("use-state")
+      ? window.CustomUtils[selectEl.data("use-state")]
+      : false;
     if (state && state.disconnectCallback) state.disconnectCallback(selectEl);
     selectEl.select2("destroy");
   }
 }
 
-window.wagtail.app.register('multiselect', MultiSelectController);
+window.wagtail.app.register("multiselect", MultiSelectController);

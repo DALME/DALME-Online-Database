@@ -4,9 +4,9 @@ class InlineImageBlockDefinition extends window.wagtailStreamField.blocks.Struct
       const image = document.getElementById(`${prefix}-image`);
       const renderCaption = document.getElementById(`${prefix}-show_caption`);
       const captionFromFile = document.getElementById(`${prefix}-use_file_caption`);
-      const captionText = document.getElementById(`${prefix}-caption`).closest("div.w-field__wrapper");
+      const captionText = document.getElementById(`${prefix}-caption`)
+        .closest("div.w-field__wrapper");
       const alignment = document.getElementById(`${prefix}-alignment`);
-
       const captionFileText = document.createElement("div");
       captionFileText.id = `${prefix}-file_text`;
       captionFileText.classList.add("caption-from-file");
@@ -21,7 +21,7 @@ class InlineImageBlockDefinition extends window.wagtailStreamField.blocks.Struct
           captionFromFile.closest("div.w-panel__wrapper").classList.remove("u-hide");
           document.getElementById(`${prefix}-caption-form-section`).classList.remove("u-none");
         }
-      }
+      };
 
       const switchCaptionFromFile = () => {
         if (!captionFromFile.checked) {
@@ -31,29 +31,38 @@ class InlineImageBlockDefinition extends window.wagtailStreamField.blocks.Struct
           captionFileText.classList.remove("u-none");
           captionText.classList.add("u-none");
         }
-      }
+      };
 
       const switchParameters = () => {
         if (alignment.value == "main") {
-          document.getElementById(`${prefix}-resize_rule`).closest("div.w-panel__wrapper").classList.add("u-hide");
-          document.getElementById(`${prefix}-dimensions`).closest("div.w-panel__wrapper").classList.add("u-none");
-          document.getElementById(`${prefix}-parameters`).closest("div.w-panel__wrapper").classList.add("u-none");
+          document.getElementById(`${prefix}-resize_rule`)
+            .closest("div.w-panel__wrapper").classList.add("u-hide");
+          document.getElementById(`${prefix}-dimensions`)
+            .closest("div.w-panel__wrapper").classList.add("u-none");
+          document.getElementById(`${prefix}-parameters`)
+            .closest("div.w-panel__wrapper").classList.add("u-none");
         } else {
-          document.getElementById(`${prefix}-resize_rule`).closest("div.w-panel__wrapper").classList.remove("u-hide");
-          document.getElementById(`${prefix}-dimensions`).closest("div.w-panel__wrapper").classList.remove("u-none");
-          document.getElementById(`${prefix}-parameters`).closest("div.w-panel__wrapper").classList.remove("u-none");
+          document.getElementById(`${prefix}-resize_rule`)
+            .closest("div.w-panel__wrapper").classList.remove("u-hide");
+          document.getElementById(`${prefix}-dimensions`)
+            .closest("div.w-panel__wrapper").classList.remove("u-none");
+          document.getElementById(`${prefix}-parameters`)
+            .closest("div.w-panel__wrapper").classList.remove("u-none");
         }
-      }
+      };
 
       const setFileCaptionText = () => {
         if (image.value) {
           fetch(`/api/web/images/${image.value}/`)
           .then(response => response.json())
-          .then(data => captionFileText.innerText = data.caption ? data.caption : "No caption is associated with the original image.");
+          .then(
+            data => captionFileText.innerText = data.caption
+            ? data.caption
+            : "No caption is associated with the original image.");
         } else {
           captionFileText.innerText = "No image selected.";
         }
-      }
+      };
 
       alignment.addEventListener("change", switchParameters);
       renderCaption.addEventListener("change", switchRenderCaption);
@@ -70,4 +79,4 @@ class InlineImageBlockDefinition extends window.wagtailStreamField.blocks.Struct
   }
 }
 
-window.telepath.register('webimage.InlineImageBlock', InlineImageBlockDefinition);
+window.telepath.register("webimage.InlineImageBlock", InlineImageBlockDefinition);

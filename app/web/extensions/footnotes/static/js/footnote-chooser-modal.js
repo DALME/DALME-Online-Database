@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 class FootnoteSource extends window.React.Component {
 
     constructor(props) {
@@ -18,19 +19,21 @@ class FootnoteSource extends window.React.Component {
         }
 
         const dialogue = $(
-          '<div id="footnote-dialogue" tabindex="-1" role="dialog" aria-hidden="true">\
-            <div class="modal-dialog"><div class="modal-content">\
-                <button type="button" class="button close button--icon text-replace footnote-modal-cancel">\
-                  <svg class="icon icon-cross" aria-hidden="true"><use href="#icon-cross"></use></svg>Close</button>\
-              <div class="modal-body" data-w-dialog-target></div></div></div></div>'
+          "<div id=\"footnote-dialogue\" tabindex=\"-1\" role=\"dialog\" aria-modal=\"true\">\
+            <div class=\"modal-dialog\"><div class=\"modal-content\">\
+                <button type=\"button\" class=\"button close button--icon \
+                 text-replace footnote-modal-cancel\">\
+                  <svg class=\"icon icon-cross\" aria-hidden=\"true\"><use \
+                  href=\"#icon-cross\"></use></svg>Close</button>\
+              <div class=\"modal-body\" data-w-dialog-target></div></div></div></div>"
         );
-        const modalBg = $('<div class="modal-backdrop fade in"></div>');
+        const modalBg = $("<div class=\"modal-backdrop fade in\"></div>");
 
         const openDialogue = () => {
           dialogue.show();
           $("body").append(modalBg);
           $(document.body).addClass("footnote-modal-body");
-        }
+        };
 
         const closeDialogue = () => {
           dialogue.hide();
@@ -38,15 +41,15 @@ class FootnoteSource extends window.React.Component {
           modalBg.remove();
           $(document.body).removeClass("footnote-modal-body");
           onClose();
-        }
+        };
 
         // add dialogue to body and hide it, so content can be added to it before display
         $("body").append(dialogue);
         dialogue.hide();
-        dialogue.on("click", ".footnote-modal-cancel", closeDialogue)
+        dialogue.on("click", ".footnote-modal-cancel", closeDialogue);
 
         const onload = {
-          enter_footnote: function(modal, jsonData) {
+          enter_footnote: function(modal, _jsonData) {
               openDialogue();
 
               $("form", modal.body).on("submit", function() {
@@ -120,11 +123,18 @@ class FootnoteSource extends window.React.Component {
             editorState, { currentContent: contentWithCallout }
           );
           // move selection after call-out
-          nextState = window.DraftJS.EditorState.forceSelection(newEditorState, selectionStateAfterCallout);
+          nextState = window.DraftJS.EditorState.forceSelection(
+            newEditorState,
+            selectionStateAfterCallout
+          );
 
       } else { // if entity already exists
         const contentMerged = contentState.mergeEntityData(entityKey, data);
-        nextState = window.DraftJS.EditorState.push(editorState, contentMerged, "merge-entity-data");
+        nextState = window.DraftJS.EditorState.push(
+          editorState,
+          contentMerged,
+          "merge-entity-data"
+        );
       }
       this.workflow.close();
       onComplete(nextState);
@@ -163,13 +173,17 @@ class FootnoteDecorator extends window.draftail.TooltipEntity {
           const content = editorState.getCurrentContent();
           const selection = editorState.getSelection();
           const newContentState = window.DraftJS.Modifier.removeRange(content, selection);
-          const newEditorState = window.DraftJS.EditorState.push(editorState, newContentState, "remove-range");
+          const newEditorState = window.DraftJS.EditorState.push(
+            editorState,
+            newContentState,
+            "remove-range"
+          );
           editor.onChange(newEditorState);
         }, 10);
     }
 
     render() {
-      const { entityKey, contentState, children } = this.props;
+      const { entityKey, contentState, _children } = this.props;
       const data = contentState.getEntity(entityKey).getData();
       const { showTooltipAt } = this.state;
       const cleanText = window.CustomUtils.stripTags(data.text, "Footnote...");
