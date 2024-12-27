@@ -28,11 +28,11 @@ body.home section.featured img {
   background: #fff;
   flex-direction: column;
 }
-.monthly h3,
-.monthly h4 {
+.monthly h2,
+.monthly h3 {
   margin: 0 1.5rem;
 }
-.monthly h3 {
+.monthly h2 {
   color: #000;
   font-weight: 500;
   font-size: 1.4rem;
@@ -40,7 +40,7 @@ body.home section.featured img {
   font-family: "Lora", "Times New Roman", serif;
   font-style: italic;
 }
-.monthly h4 {
+.monthly h3 {
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0;
@@ -95,9 +95,11 @@ body.home section.featured img {
   -webkit-box-orient: vertical;
 }
 .seven-lines {
+  line-clamp: 7;
   -webkit-line-clamp: 7;
 }
 .eight-lines {
+  line-clamp: 8;
   -webkit-line-clamp: 8;
 }
 

@@ -40,6 +40,7 @@
                     menu-class="dropdown-menu p-0 pt-3 pb-3"
                     toggle-class="social footer-button border-0"
                     toggle-tag="a"
+                    :toggle-attrs="{ 'aria-label': 'share button' }"
                 >
                         <template #button-content>
                             <i class="share {{ entry.icon }}"></i>
@@ -67,7 +68,7 @@
                         </b-dropdown-item>
                     </b-dropdown>
                 {% else %}
-                <a class="{{ entry.css_class }}" href="{% if entry.url %} {{ entry.url }}  {% else %} # {% endif %}">
+                <a class="{{ entry.css_class }}" href="{% if entry.url %} {{ entry.url }}  {% else %} # {% endif %}" aria-label="{{ entry.icon }}">
                     <i class="{{ entry.icon }}"></i>
                 </a>
             {% endif %}

@@ -13,7 +13,7 @@
     <ul>
       <template v-for="(crumb, index) in breadcrumb">
         <li v-if="index == 0" class="home">
-          <a :href="crumb.url">
+          <a :href="crumb.url" aria-label="Home">
             <i class="fas fa-home"></i>
           </a>
         </li>

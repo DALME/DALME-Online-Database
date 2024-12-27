@@ -6,7 +6,7 @@
     {% for crumb in nav %}
       {% if forloop.counter0 == 0 %}
         <li class="home">
-          <a href="{{ crumb.url }}">
+          <a href="{{ crumb.url }}" aria-label="Home">
             <i class="fas fa-home"></i>
           </a>
         </li>
