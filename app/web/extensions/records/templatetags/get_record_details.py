@@ -11,13 +11,14 @@ register = template.Library()
 @register.simple_tag(takes_context=True)
 def get_record_details(context):
     page = context['page']
-    record = Record.objects.include_attrs('record_type', 'description', 'locale', 'language', 'date').get(
-        pk=page.record.id
-    )
+    record = page.record
     record_collection = page.record_collection
     result = {}
 
     if record:
+        record = Record.objects.include_attrs('record_type', 'description', 'locale', 'language', 'date').get(
+            pk=record.id
+        )
         data = RecordSerializer(record, field_set=['web', 'web_detail']).data
         result.update(
             {
