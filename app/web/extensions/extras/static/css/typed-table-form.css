@@ -8,7 +8,7 @@
   min-height: 20px;
 }
 .typed-table-block .typed-table-block__wrapper th button.delete-column {
-  top: 7px
+  top: 7px;
 }
 .typed-table-block td .image-chooser .chooser__title {
   display: none;
@@ -62,9 +62,19 @@
 }
 .typed-table-block .typed-table-block__wrapper th button.append-column,
 .typed-table-block .typed-table-block__wrapper th button.prepend-column {
-  top: -1.6rem;
+  top: -1.5rem;
 }
 .typed-table-block .typed-table-block__wrapper tbody tr button.prepend-row,
 .typed-table-block .typed-table-block__wrapper tfoot tr button.prepend-row {
   inset-inline-start: -1rem;
+}
+.typed-table-block .control-cell ul.add-column-menu {
+  top: 5px !important;
+}
+.typed-table-block tbody tr:first-of-type,
+.typed-table-block tfoot tr:first-of-type {
+  border-top: none;
+}
+.typed-table-block tbody {
+  border-bottom: 1px dotted var(--w-color-border-field-default);
 }

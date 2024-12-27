@@ -11,9 +11,9 @@
     {% endif %}
     <section class="field-row-panel manual-form collapse-help" id="{{ prefix }}-general-form-section" data-panel>
         <div class="w-field-row">
-            {% include 'field_include.html' with child=children.type col_class="col3" %}
+            {% include 'field_include.html' with child=children.type col_class="col4" %}
             {% include 'field_include.html' with child=children.version col_class="col3" %}
-            {% include 'field_include.html' with child=children.date col_class="col6" %}
+            {% include 'field_include.html' with child=children.date col_class="col5" %}
         </div>
     </section>
     {% for child in children.values %}

@@ -1,4 +1,7 @@
 /* bibliography chooser */
+.w-field--zotero_collection_chooser_widget .w-field__input {
+  width: fit-content;
+}
 .reference-modal .base-modal-box {
   min-width: 500px;
 }
