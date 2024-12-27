@@ -38,11 +38,13 @@ class InlineImageBlock(blocks.StructBlock):
         help_text='String to use as link anchor.',
     )
     show_caption = blocks.BooleanBlock(
+        required=False,
         default=True,
         label='Caption',
         help_text='Render caption?',
     )
     use_file_caption = blocks.BooleanBlock(
+        required=False,
         default=True,
         label='Caption from file',
         help_text='Uncheck to write caption.',
