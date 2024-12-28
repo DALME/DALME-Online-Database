@@ -13,6 +13,4 @@ def nav_active(context, tab):
     tab = tab.specific
     if page == tab:
         return True
-    if not isinstance(tab, Home) and page in [desc.specific for desc in tab.get_descendants()]:
-        return True
-    return False
+    return bool(not isinstance(tab, Home) and page in [desc.specific for desc in tab.get_descendants()])

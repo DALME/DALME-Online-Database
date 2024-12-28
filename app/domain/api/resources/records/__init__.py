@@ -6,7 +6,7 @@ from .serializers import RecordSerializer, RecordTypeSerializer
 __all__ = [
     'PURLEndpoint',
     'RecordSerializer',
-    'Records',
     'RecordTypeSerializer',
+    'Records',
     'WebRecords',
 ]

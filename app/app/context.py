@@ -14,8 +14,10 @@ from django_currentuser.middleware import get_current_user
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 
-_gradient_pages = contextvars.ContextVar('gradient_pages', default=[])
-_biblio_pages = contextvars.ContextVar('biblio_pages', default=[])
+_gradient_pages = contextvars.ContextVar('gradient_pages', default=None)
+_biblio_pages = contextvars.ContextVar('biblio_pages', default=None)
+_gradient_pages.set([])
+_biblio_pages.set([])
 
 
 def get_gradient_pages():

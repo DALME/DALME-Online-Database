@@ -115,8 +115,7 @@ class IDAPageNumberPagination(PageNumberPagination):
         adjacent_pages = 1
         start_offset = (current_page - 1) * page_size
         result_end = start_offset + page_size + 1
-        if result_end > total_count:
-            result_end = total_count
+        result_end = min(result_end, total_count)
         start_page = max(current_page - adjacent_pages, 1) if max(current_page - adjacent_pages, 1) >= 3 else 1  # noqa: PLR2004
         end_page = current_page + adjacent_pages if current_page + adjacent_pages <= num_pages else num_pages
         page_numbers = list(range(start_page, end_page + 1))

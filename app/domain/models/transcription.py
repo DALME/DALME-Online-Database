@@ -45,6 +45,6 @@ class Transcription(UuidMixin, TrackingMixin):
         tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
         tags = len(tree)
 
-        if tags == 1 and tree[0].tag in ['quote', 'gap', 'mute'] or tags == 0:
+        if (tags == 1 and tree[0].tag in ['quote', 'gap', 'mute']) or tags == 0:
             return len(' '.join(t for t in tree.xpath('text()'))) != 0
         return True

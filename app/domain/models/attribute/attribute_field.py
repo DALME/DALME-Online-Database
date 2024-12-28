@@ -235,7 +235,7 @@ class AFHasKeyLookup(HasKeyLookup):
 
         # Add condition for each key.
         if self.logical_operator:
-            sql = '(%s)' % self.logical_operator.join([sql] * len(rhs_params))
+            sql = f'({self.logical_operator.join([sql] * len(rhs_params))})'
 
         return sql, tuple(lhs_params) + tuple(rhs_params)
 

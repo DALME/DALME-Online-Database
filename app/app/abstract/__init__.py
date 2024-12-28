@@ -33,9 +33,9 @@ DATA_TYPES = sorted(
 __all__ = [
     'BASE_DATA_TYPES',
     'DATA_TYPES',
+    'CustomManager',
+    'CustomQuerySet',
     'OwnedMixin',
     'TrackingMixin',
     'UuidMixin',
-    'CustomManager',
-    'CustomQuerySet',
 ]

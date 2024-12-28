@@ -18,10 +18,8 @@ def js_translate(value, mode=None):
         return 'true'
     if (
         type(value) in [int, list, dict]
-        or value.startswith('"')
-        and value.endswith('"')
-        or value.startswith("'")
-        and value.endswith("'")
+        or (value.startswith('"') and value.endswith('"'))
+        or (value.startswith("'") and value.endswith("'"))
     ):
         return value
     return value if value.startswith('"') and value.endswith('"') else f'"{value}"'

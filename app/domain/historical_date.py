@@ -221,7 +221,7 @@ class HistoricalDate(dict):
         - %ELy: to include the year with era using BC/AD system
     """
 
-    def __init__(self, data, is_bce=False):  # noqa: C901, PLR0912
+    def __init__(self, data, is_bce=False):  # noqa: C901
         if not data:
             message = 'A date in a valid format must be supplied.'
             raise ValueError(message)
@@ -468,7 +468,7 @@ class HistoricalDate(dict):
 
         return self.format_incomplete_date(format_string)
 
-    def format_incomplete_date(self, format_string):
+    def format_incomplete_date(self, format_string):  # noqa: PLR0912, C901
         result = ''
         components = format_string.split('%')
         if not format_string.startswith('%'):

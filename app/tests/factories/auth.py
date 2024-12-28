@@ -14,7 +14,7 @@ class UserFactory(factory.DjangoModelFactory):
         model = 'oauth.User'
         django_get_or_create = ('email', 'username')
 
-    username = factory.Sequence(lambda n: 'User %03d' % n)
+    username = factory.Sequence(lambda n: 'User %03d' % n)  # noqa: UP031
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     email = factory.Faker('email')
@@ -44,7 +44,7 @@ class GroupPropertiesFactory(factory.django.DjangoModelFactory):
         model = 'oauth.GroupProperties'
 
     group_type = factory.fuzzy.FuzzyChoice(GroupProperties.GROUP_TYPES, getter=lambda c: c[0])
-    description = factory.Sequence(lambda n: 'Some group description %03d' % n)
+    description = factory.Sequence(lambda n: 'Some group description %03d' % n)  # noqa: UP031
     tenant = factory.SubFactory(TenantFactory)
 
 
@@ -54,7 +54,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'auth.Group'
 
-    name = factory.Sequence(lambda n: 'Group %03d' % n)
+    name = factory.Sequence(lambda n: 'Group %03d' % n)  # noqa: UP031
     properties = factory.RelatedFactory(GroupPropertiesFactory, factory_related_name='group')
 
     @factory.post_generation

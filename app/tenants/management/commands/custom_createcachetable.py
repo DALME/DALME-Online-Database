@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
         if tablename in connection.introspection.table_names():
             if self.verbosity > 0:
-                self.stdout.write("Cache table '%s' already exists." % tablename)
+                self.stdout.write(f"Cache table '{tablename}' already exists.")
             return
 
         fields = (
@@ -105,7 +105,7 @@ class Command(BaseCommand):
                     ),
                 )
             table_output.append(' '.join(field_output))
-        full_statement = ['CREATE TABLE %s (' % qn(tablename)]
+        full_statement = [f'CREATE TABLE {qn(tablename)} (']
         for i, line in enumerate(table_output):
             full_statement.append(
                 '    {}{}'.format(line, ',' if i < len(table_output) - 1 else ''),
@@ -131,9 +131,9 @@ class Command(BaseCommand):
                 curs.execute(full_statement)
             except DatabaseError as e:
                 msg = f"Cache table '{tablename}' could not be created.\nThe error was: {e}."
-                raise CommandError(msg)  # noqa: B904,TRY200
+                raise CommandError(msg)  # noqa: B904
             for statement in index_output:
                 curs.execute(statement)
 
         if self.verbosity > 1:
-            self.stdout.write("Cache table '%s' created." % tablename)
+            self.stdout.write(f"Cache table '{tablename}' created.")

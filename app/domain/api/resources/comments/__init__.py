@@ -4,6 +4,6 @@ from .endpoints import Comments
 from .serializers import CommentSerializer
 
 __all__ = [
-    'Comments',
     'CommentSerializer',
+    'Comments',
 ]

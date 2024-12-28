@@ -13,8 +13,8 @@ from .list_field import ListField
 
 __all__ = [
     'Attribute',
-    'AttributeMixin',
     'AttributeField',
+    'AttributeMixin',
     'AttributeReference',
     'AttributeType',
     'ListField',

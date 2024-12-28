@@ -6,7 +6,7 @@ register = template.Library()
 
 
 @register.filter
-def get_highlights(meta, context):  # noqa: C901,PLR0912
+def get_highlights(meta, context):  # noqa: C901
     highlights = []
     if 'highlight' in meta:
         fields = list(meta.highlight.to_dict().keys())

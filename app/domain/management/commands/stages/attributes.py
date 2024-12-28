@@ -71,7 +71,7 @@ class Stage(BaseStage):
         self.remove_unused_attribute_types()
 
     @transaction.atomic
-    def migrate_attributes(self):  # noqa: C901, PLR0915
+    def migrate_attributes(self):  # noqa: C901, PLR0915, PLR0912
         """Copy object attribute data.
 
         https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0009_data_m_attributes.py#L5

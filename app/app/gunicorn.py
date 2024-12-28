@@ -10,7 +10,7 @@ from gunicorn.http.wsgi import Response
 from gunicorn.workers.base import Worker
 
 
-def post_fork(server, worker: Worker):  # noqa: ARG001
+def post_fork(server, worker: Worker):
     """Call just after a worker has been forked.
 
     https://docs.gunicorn.org/en/stable/settings.html#post-fork

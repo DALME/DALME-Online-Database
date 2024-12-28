@@ -4,6 +4,6 @@ from .endpoints import Places
 from .serializers import PlaceSerializer
 
 __all__ = [
-    'Places',
     'PlaceSerializer',
+    'Places',
 ]

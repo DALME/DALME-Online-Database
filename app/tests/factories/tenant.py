@@ -6,7 +6,7 @@ import factory
 class DomainFactory(factory.django.DjangoModelFactory):
     """Generate Domain model fixtures."""
 
-    domain = factory.Sequence(lambda n: 'Domain %03d' % n)
+    domain = factory.Sequence(lambda n: 'Domain %03d' % n)  # noqa: UP031
     is_primary = False  # We don't use a primary domain.
 
     class Meta:
@@ -19,7 +19,7 @@ class TenantFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'tenants.Tenant'
 
-    name = factory.Sequence(lambda n: 'Tenant %03d' % n)
+    name = factory.Sequence(lambda n: 'Tenant %03d' % n)  # noqa: UP031
     domains = factory.RelatedFactory(DomainFactory, factory_related_name='tenant')
 
     @factory.post_generation
