@@ -93,8 +93,6 @@ class Base(Configuration):
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
-    MULTITENANT_RELATIVE_STATIC_ROOT = ''
-    MULTITENANT_RELATIVE_MEDIA_ROOT = ''
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
