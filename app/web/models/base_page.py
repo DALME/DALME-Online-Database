@@ -100,11 +100,16 @@ class BasePage(Page, FootnoteMixin):
     @property
     def main_image(self):
         try:
-            field = next(field for field in self.body if field.block.name in ['carousel', 'main_image'])
+            field = next(
+                field
+                for field in self.body
+                if field.block.name == 'carousel'
+                or (field.block.name == 'inline_image' and field.value.get('alignment') == 'main')
+            )
         except StopIteration:
             return None
-        if field.block.name == 'main_image':
-            return field.value
+        if field.block.name == 'inline_image':
+            return field.value.get('image')
         try:
             return field.value[0]
         except IndexError:

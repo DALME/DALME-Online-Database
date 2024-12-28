@@ -21,8 +21,8 @@
           <h4 class="featured-group-key">{{ subkey|title }}</h3>
           <div class="featured-group u-flex">
             {% for subfeature in subfeatures %}
-              {% if subfeature.main_image %}
-                {% image subfeature.main_image height-200 as figure %}
+              {% if subfeature.front_image %}
+                {% image subfeature.front_image height-200 as figure %}
                 {% if figure.width > 600 %}
                   <a class="featured-panel w3x" href="{% pageurl subfeature %}">
                 {% elif figure.width > 250 %}
