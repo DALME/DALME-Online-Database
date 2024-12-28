@@ -48,7 +48,7 @@ services:
       - ./app/web:/opt/app/web
       - ./app/manage.py:/opt/app/manage.py
       - ./app/pyproject.toml:/opt/app/pyproject.toml
-      - ./app/app/media/media:/opt/app/www/media
+      - ./app/app/media:/opt/app/www/media
       - ./notebooks:/opt/app/notebooks
       - ./notebooks/ipython:/root/.ipython/profile_default
     restart: unless-stopped
