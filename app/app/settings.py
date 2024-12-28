@@ -433,21 +433,21 @@ class Development(Base, Configuration):
 
     _TENANTS = {
         'IDA': {
-            'domain': 'ida.localhost',
+            'domains': ['ida.localhost'],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
-            'domain': 'dalme.localhost',
+            'domains': ['dalme.localhost', 'dalme.org'],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
-            'domain': 'pharmacopeias.localhost',
+            'domains': ['pharmacopeias.localhost'],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
@@ -459,6 +459,7 @@ class Development(Base, Configuration):
         'ida.localhost',
         'dalme.localhost',
         'pharmacopeias.localhost',
+        'dalme.org',  # for previews in the CMS
     ]
 
     CORS_ALLOW_ALL_ORIGINS = False
