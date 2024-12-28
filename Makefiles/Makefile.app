@@ -66,9 +66,14 @@ app.shell:
 .PHONY: app.shell
 
 app.renditions.update:
+ifndef schema
+	$(error No target schema specified. \
+		Usage: make app.renditions.update schema='dalme')
+else
 	docker compose exec \
 		$(NAMESPACE).app \
-		python manage.py wagtail_update_image_renditions
+		python manage.py tenant_command wagtail_update_image_renditions --schema=$(schema)
+endif
 .PHONY: app.renditions.update
 
 app.sync: _app.install _app.build

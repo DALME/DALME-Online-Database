@@ -22,7 +22,7 @@ else
 	@$(MAKE) -e app.migrate_data
 	@$(MAKE) app.manage args='ensure_oauth'
 	@$(MAKE) app.manage args='tenant_command update_index --schema=dalme'
-	@$(MAKE) app.renditions.update
+	@$(MAKE) app.manage args='tenant_command wagtail_update_image_renditions --schema=dalme'
 	@$(MAKE) app.collectstatic
 endif
 .PHONY: infra.bootstrap
