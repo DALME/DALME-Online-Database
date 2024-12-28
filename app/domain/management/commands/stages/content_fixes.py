@@ -34,7 +34,6 @@ class Stage(BaseStage):
         self.update_footnote_state()
         self.fix_biblio_page()
         self.replace_about_people()
-        self.fix_media_paths()
         self.process_images()
         self.add_default_preferences()
         self.migrate_corpora()
@@ -235,16 +234,6 @@ class Stage(BaseStage):
             about_page = Page.objects.get(title='About').specific
             people_page = about_page.add_child(instance=People(**people_page_data))
             people_page.save_revision().publish()
-
-    @transaction.atomic
-    def fix_media_paths(self):
-        """Adjust paths to media files to include the tenant."""
-        self.logger.info('Adjusting media file paths...')
-        # we do this directly in SQL to avoid triggering any of the methods in the FileField
-        tables = ['webimages_baseimage', 'webimages_customrendition', 'wagtaildocs_document']
-        with connection.cursor() as cursor:
-            for table in tables:
-                cursor.execute(f"UPDATE dalme.{table} SET file = 'dalme/' || file;")
 
     @transaction.atomic
     def process_images(self):
