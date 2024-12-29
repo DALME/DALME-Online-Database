@@ -20,8 +20,8 @@ class Command(BaseCommand):
         """Create application tenant records."""
         tenants = settings.TENANTS()
         for tenant in tenants:
-            domains, name, schema_name, is_primary, tenant_type = tenant.value
-            for domain in domains:
+            domain, name, schema_name, is_primary, tenant_type = tenant.value
+            for d in domain:
                 if not Tenant.objects.filter(name=name).exists():
                     tenant_obj = Tenant.objects.create(
                         name=name,
@@ -29,7 +29,7 @@ class Command(BaseCommand):
                         tenant_type=tenant_type.value,
                     )
                     domain_obj = Domain.objects.create(
-                        domain=domain,
+                        domain=d,
                         tenant=tenant_obj,
                         is_primary=is_primary,
                     )
@@ -39,13 +39,13 @@ class Command(BaseCommand):
                         domain=domain_obj,
                     )
                 else:
-                    if not Tenant.objects.filter(domains__domain=domain).exists():
+                    if not Tenant.objects.filter(domains__domain=d).exists():
                         msg = 'Invalid existing tenant record for this environment'
-                        logger.error(msg, tenant=name, domain=domain)
+                        logger.error(msg, tenant=name, domain=d)
                         raise DataError(msg)
 
                     logger.info(
                         'Existing tenant found for domain',
                         tenant=name,
-                        domain=domain,
+                        domain=d,
                     )

@@ -26,7 +26,7 @@ class TenantTypes(str, enum.Enum):
 class TENANT:
     """Structure for defining application tenants."""
 
-    domain: str
+    domain: list[str]
     name: str
     schema_name: str
     is_primary: bool
@@ -433,21 +433,21 @@ class Development(Base, Configuration):
 
     _TENANTS = {
         'IDA': {
-            'domains': ['ida.localhost'],
+            'domain': ['ida.localhost'],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
-            'domains': ['dalme.localhost', 'dalme.org'],
+            'domain': ['dalme.localhost', 'dalme.org'],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
-            'domains': ['pharmacopeias.localhost'],
+            'domain': ['pharmacopeias.localhost'],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
@@ -785,21 +785,21 @@ class Staging(Production, Configuration):
 
     _TENANTS = {
         'IDA': {
-            'domain': 'ida.ocp.systems',
+            'domain': ['ida.ocp.systems'],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
-            'domain': 'dalme.ocp.systems',
+            'domain': ['dalme.ocp.systems'],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
-            'domain': 'pharmacopeias.ocp.systems',
+            'domain': ['pharmacopeias.ocp.systems'],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
