@@ -19,6 +19,7 @@ from domain.models import (
 from tenants.models import Tenant
 
 from .base import BaseStage
+from .fixtures import COLLECTIONS, DEFAULT_PREFERENCES, PEOPLE_PAGE_DATA
 
 
 class Stage(BaseStage):
@@ -78,34 +79,6 @@ class Stage(BaseStage):
     def create_project_and_library_entries(self):
         # DALME
         self.logger.info('Creating project and library entries for DALME')
-        collections = [
-            {
-                'id': 'A4QHN348',
-                'label': 'Editions',
-                'has_biblio_sources': True,
-            },
-            {
-                'id': 'BKW2PVCM',
-                'label': 'Glossaries and dictionaries',
-                'has_biblio_sources': False,
-            },
-            {
-                'id': 'QM9AZNT3',
-                'label': 'Methodology',
-                'has_biblio_sources': False,
-            },
-            {
-                'id': 'SLIT6LID',
-                'label': 'Studies',
-                'has_biblio_sources': False,
-            },
-            {
-                'id': 'FRLVXUWL',
-                'label': 'Other resources',
-                'has_biblio_sources': False,
-            },
-        ]
-
         # Make sure Zotero env values are set before proceeding.
         assert settings.ZOTERO_API_KEY
         assert settings.ZOTERO_API_KEY_GP
@@ -121,7 +94,7 @@ class Stage(BaseStage):
             tenant=tenant,
         )
 
-        for collection in collections:
+        for collection in COLLECTIONS:
             collection.update(project=new_project)
             z_col = ZoteroCollection.objects.create(**collection)
 
@@ -183,44 +156,6 @@ class Stage(BaseStage):
     @transaction.atomic
     def replace_about_people(self):
         """Replace the About > People page with one that uses the new Team extension."""
-        people_page_data = {
-            'title': 'People',
-            'short_title': 'People',
-            'header_image_id': 11,
-            'slug': 'people',
-            'show_in_menus': True,
-            'body': [
-                {'id': 'eac3c1b6-6724-42af-a039-afef0ca8b880', 'type': 'heading', 'value': 'Project Team'},
-                {
-                    'id': '83f8d736-839d-407b-82ed-90e7ae981ccf',
-                    'type': 'team_list',
-                    'value': {
-                        'mode': 'members',
-                        'role': '',
-                        'order': 'name',
-                        'members': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-                    },
-                },
-                {'id': '61df150f-065e-4c33-b103-e5ae76991cc3', 'type': 'heading', 'value': 'Contributors'},
-                {
-                    'id': '447c0a2f-d127-4937-a72d-bb9644592883',
-                    'type': 'team_list',
-                    'value': {'mode': 'role', 'role': '3', 'order': 'name', 'members': []},
-                },
-                {'id': 'd91180b0-8a60-4c9b-8ed2-4b16fe840bec', 'type': 'heading', 'value': 'Advisory Board'},
-                {
-                    'id': 'c381034b-a89c-4df8-b578-40781dc24044',
-                    'type': 'text',
-                    'value': '<p data-block-key="khpxl">The members of the DALME board help convey news about the project to colleagues and students in the field and, in turn, bring potential contributors and resources to our attention.</p>',
-                },
-                {
-                    'id': '89294881-07a3-4582-8a86-2733be10b447',
-                    'type': 'team_list',
-                    'value': {'mode': 'role', 'role': '4', 'order': 'name', 'members': []},
-                },
-            ],
-        }
-
         self.logger.info('Replacing About > People page...')
         with schema_context('dalme'):
             from wagtail.models import Page
@@ -232,7 +167,7 @@ class Stage(BaseStage):
 
             # create new one
             about_page = Page.objects.get(title='About').specific
-            people_page = about_page.add_child(instance=People(**people_page_data))
+            people_page = about_page.add_child(instance=People(**PEOPLE_PAGE_DATA))
             people_page.save_revision().publish()
 
     @transaction.atomic
@@ -256,91 +191,8 @@ class Stage(BaseStage):
     @transaction.atomic
     def add_default_preferences(self):
         """Create default user preferences."""
-        default_preferences = [
-            {
-                'name': 'tooltipsOn',
-                'label': 'Show Tooltips',
-                'description': 'Turn UI tooltips on or off.',
-                'data_type': 'bool',
-                'group': 'IDA',
-                'default': 'True',
-            },
-            {
-                'name': 'sidebarCollapsed',
-                'label': 'Collapse sidebar',
-                'description': 'Collapse or expand the menu sidebar',
-                'data_type': 'bool',
-                'group': 'IDA',
-                'default': 'False',
-            },
-            {
-                'name': 'font_size',
-                'label': 'Font size',
-                'description': 'Size of the font in points.',
-                'data_type': 'int',
-                'group': 'Record Editor',
-                'default': '14',
-            },
-            {
-                'name': 'highlight_word',
-                'label': 'Highlight words',
-                'description': 'Highlight all instances of a word when selected.',
-                'data_type': 'bool',
-                'group': 'Record Editor',
-                'default': 'True',
-            },
-            {
-                'name': 'show_guides',
-                'label': 'Guides',
-                'description': 'Show/hide margin guides.',
-                'data_type': 'bool',
-                'group': 'Record Editor',
-                'default': 'True',
-            },
-            {
-                'name': 'show_gutter',
-                'label': 'Gutter',
-                'description': 'Show/hide the page gutter.',
-                'data_type': 'bool',
-                'group': 'Record Editor',
-                'default': 'True',
-            },
-            {
-                'name': 'show_invisibles',
-                'label': 'Invisible characters',
-                'description': 'Show/hide invisible characters.',
-                'data_type': 'bool',
-                'group': 'Record Editor',
-                'default': 'False',
-            },
-            {
-                'name': 'show_lineNumbers',
-                'label': 'Line numbers',
-                'description': 'Show/hide line numbers.',
-                'data_type': 'bool',
-                'group': 'Record Editor',
-                'default': 'True',
-            },
-            {
-                'name': 'soft_wrap',
-                'label': 'Soft wrap',
-                'description': 'Turn text soft wrapping on/off.',
-                'data_type': 'bool',
-                'group': 'Record Editor',
-                'default': 'True',
-            },
-            {
-                'name': 'theme',
-                'label': 'Theme',
-                'description': 'Change syntax colouring theme.',
-                'data_type': 'str',
-                'group': 'Record Editor',
-                'default': 'Chrome',
-            },
-        ]
-
         self.logger.info('Creating default preferences...')
-        for pref_obj in default_preferences:
+        for pref_obj in DEFAULT_PREFERENCES:
             PreferenceKey.objects.create(**pref_obj)
 
     @transaction.atomic

@@ -12,51 +12,7 @@ from domain.historical_date import HistoricalDate
 from domain.models import Attribute, AttributeType, ContentAttributes, RecordType
 
 from .base import BaseStage
-
-RECORD_TYPE_COVERSIONS = {
-    'Account Book-Other': 'Account Book',
-    'Liquidation of guardianship': 'Guardianship-Liquidation',
-    'Failed Seizure': 'Seizure-Failed',
-    'Testamentary execution': 'Testament-Execution',
-    'Object List-Fictional': 'Fictional object list',
-    'unclear': 'Unclear',
-    'Dowry': 'Inventory-Dowry',
-}
-
-ATYPES_KEEP = [
-    'title',
-    'language_gc',
-    'creation_user',
-    'modification_user',
-    'author',
-    'dam_user',
-    'dam_id',
-    'order',
-    'ref',
-    'creation_date',
-    'file_size',
-    'source',
-    'data_type',
-    'same_as',
-    'options_list',
-    'status',
-    'result',
-    'date_done',
-    'subject',
-    'file',
-    'parents',
-    'help_flag',
-    'last_modified',
-    'last_user',
-    'activity',
-    'endpoint',
-    'progress',
-    'is_published',
-    'collection_metadata',
-    'workset_progress',
-    'corpus',
-    'collection',
-]
+from .fixtures import ATYPES_KEEP, RECORD_TYPE_COVERSIONS
 
 
 class Stage(BaseStage):

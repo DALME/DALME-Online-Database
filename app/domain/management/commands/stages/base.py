@@ -19,6 +19,8 @@ from django.db import connection
 from domain.models import SavedSearch
 from oauth.models import User
 
+from .fixtures import ALTERED_APP_MAP, ALTERED_MODEL_MAP, REF_CITATIONS, SOURCES_MODEL_MAP, USER_NAME_CONCORDANCE
+
 logger = structlog.get_logger(__name__)
 
 REFERENCE_HREF = re.compile(r'(?:(?:http|https)://dalme.org)?/?/project/bibliography/#([A-Z0-9]{8})')
@@ -27,116 +29,6 @@ REFERENCE_HREF = re.compile(r'(?:(?:http|https)://dalme.org)?/?/project/bibliogr
 # SELECT * FROM public.django_content_type new_ct INNER JOIN restore.django_content_type old_ct ON new_ct.model = old_ct.model;
 # SELECT * FROM public.django_content_type new_ct INNER JOIN restore.django_content_type old_ct ON new_ct.model = old_ct.model
 # WHERE new_ct.app_label != old_ct.app_label;
-
-ALTERED_APP_MAP = {
-    'public': 'web',
-    'publicbanners': 'webbanners',
-    'publicfootnotes': 'webfootnotes',
-    'publicgradients': 'webgradients',
-    'publicimages': 'webimages',
-    'publicrecords': 'webrecords',
-    'publicteam': 'webteam',
-}
-
-ALTERED_MODEL_MAP = {
-    ('core', 'agent'): 'domain.agent',
-    ('core', 'attribute_type'): 'domain.attributetype',
-    ('core', 'concept'): 'domain.concept',
-    ('core', 'content_type'): 'domain.contenttypeextended',
-    ('core', 'countryreference'): 'domain.countryreference',
-    ('core', 'entity_phrase'): 'domain.entityphrase',
-    ('core', 'headword'): 'domain.headword',
-    ('core', 'object'): 'domain.object',
-    ('core', 'object_attribute'): 'domain.objectattribute',
-    ('core', 'page'): 'domain.page',
-    ('core', 'place'): 'domain.place',
-    ('core', 'set'): 'domain.collection',
-    ('core', 'set_x_content'): 'domain.collectionmembership',
-    ('core', 'source'): 'domain.record',
-    ('core', 'source_credit'): 'domain.relationship',
-    ('core', 'source_pages'): 'domain.pagenode',
-    ('core', 'ticket'): 'domain.ticket',
-    ('core', 'token'): 'domain.token',
-    ('core', 'transcription'): 'domain.transcription',
-    ('core', 'wordform'): 'domain.wordform',
-    ('core', 'work_log'): 'domain.worklog',
-    ('core', 'work_flow'): 'domain.workflow',
-    ('core', 'task'): 'domain.task',
-    ('core', 'tasklist'): 'domain.tasklist',
-    ('core', 'comment'): 'domain.comment',
-    ('core', 'collection'): 'domain.collection',
-    ('core', 'collectionmembership'): 'domain.collectionmembership',
-    ('core', 'attachment'): 'domain.attachment',
-    ('core', 'savedsearch'): 'domain.savedsearch',
-    ('core', 'tag'): 'domain.tag',
-    ('public', 'dalmeimage'): 'webimages.baseimage',
-}
-
-SOURCES_MODEL_MAP = {
-    1: ('domain', 'publication'),
-    2: ('domain', 'publication'),
-    3: ('domain', 'publication'),
-    4: ('domain', 'publication'),
-    5: ('domain', 'publication'),
-    6: ('domain', 'publication'),
-    7: ('domain', 'publication'),
-    8: ('domain', 'publication'),
-    9: ('domain', 'publication'),
-    10: ('domain', 'publication'),
-    11: ('domain', 'publication'),
-    12: ('domain', 'recordgroup'),
-    19: ('domain', 'organization'),
-}
-
-REF_CITATIONS = {
-    '6YDI5HL6': '(Smith, 2020)',
-    'WJLVYXYP': '(Sibon, 2011)',
-    'LYJR5IHM': '(Coulet, 2004)',
-    'TS749RWH': '(Baratier, 1961)',
-    '6NUFKTEG': '(Mély & Bishop, 1892)',
-    'F2FFVVX8': '(Volkert, 1982)',
-    '3GJ5F9HJ': '(Coulet, 2004)',
-    'ER34URS8': '(Le Roux de Lincy, 1846)',
-    '5QK2S98X': '(Barnel, 1999)',
-    'L9ALQFNF': '(Ripert, Barnel, Bresc, Herbeth, & Colin, 1993)',
-    'BZ53KGMW': '(Stouff, 1996)',
-    'IFRJ2YQ6': '(Smail, Pizzorno, & Hay, 2020)',
-    'UH5EUVZC': '(Villard, 1907)',
-    'NY7H8NIH': '(Ferrand, 2017)',
-    'DBB2IVEC': '(Livi, 1928)',
-    'SA6QKDAR': '(Longhi, 2020)',
-    'YX4Y4RRJ': '(Barry, 1898)',
-    'XAQBR8XE': '(Teaching Medieval Slavery and Captivity, n.d.)',
-    'VZQ5BBTG': '(Origo, 1955)',
-    'JHH4LIGY': '(Fernandes, Liberato, Marques, & Cunha, 2017)',
-    '6VZUI7JY': '(Oliver, 2016)',
-    'ZZXGLVMZ': '(Rigaud, 1996)',
-    'ZUMTQ5B9': '(Reitzel, 1980)',
-    '2RUWVY7B': '(Howell, 1996)',
-    'SNB4JFJ9': '(Braun, 1907)',
-    'SBBLYP96': '(Davril, Thibodeau, & Guyot, 1995)',
-    'TNEXXNIQ': '(Braun, 1937)',
-    'UCVN8LWL': '(Miller, 2014)',
-    'TQVX23W6': '(Berthod, 2001)',
-    'QZNHF7Q3': '(Piponnier, 1989)',
-    'Q62RN9ND': '(Fircks, 2018)',
-    'TBIJ9DYD': '(Deregnaucourt, 1981)',
-    'J9BYMBP2': '(Deregnaucourt, 1982)',
-    'Y44RIA8Q': '(Mane & Piponnier, 1992)',
-    'XL9F9RTZ': '(Carroll-Clark, 2005)',
-    'MJWEGUKG': '(Blaschitz, Hundsbichler, Jaritz, & Vavra, 1992)',
-    'XXD7JM9D': '(Baumgarten, 2014)',
-    'Q5VDI6EW': '(Noble 2011)',
-    'HG7QD3NE': '(Elliot 2017)',
-    'A7ZR8T6Q': '(Pamer 2025)',
-}
-
-USER_NAME_CONCORDANCE = {
-    'Anne E. Lester': 'Anne Lester',
-    'Juan Vicente García Marsilla': 'Juan-Vicente Garcia Marsilla',
-    'Juliette Calvarin': 'Jules Calvarin',
-    'Pablo Sanahuja Ferrer': 'Pablo Sanahuja',
-}
 
 
 class MigrationError(Exception):

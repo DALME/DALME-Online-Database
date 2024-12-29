@@ -16,6 +16,7 @@ from django.db.utils import IntegrityError
 from oauth.models import User
 
 from .base import BaseStage
+from .fixtures import GRADIENTS, ROLES
 
 SOURCE_SCHEMA = 'restore'
 CLONED_SCHEMA = 'cloned'
@@ -472,50 +473,11 @@ class Stage(BaseStage):
     @transaction.atomic
     def transfer_gradients(self):
         """Transfer gradient values and link page records."""
-        gradients = [
-            {
-                'colour_1': '#064e8c80',
-                'colour_2': '#114a2880',
-                'angle': '125',
-                'description': 'Homepage header',
-                'model': 'home',
-            },
-            {
-                'colour_1': '#5386a0b3',
-                'colour_2': '#3f6544e6',
-                'angle': '125',
-                'description': 'Project section headers',
-                'model': 'section',
-                'page_title': 'Project',
-            },
-            {
-                'colour_1': '#63623ab3',
-                'colour_2': '#8a4747e6',
-                'angle': '125',
-                'description': 'Features section headers',
-                'model': 'features',
-            },
-            {
-                'colour_1': '#5f516fb3',
-                'colour_2': '#173e65e6',
-                'angle': '125',
-                'description': 'Collections section headers',
-                'model': 'collections',
-            },
-            {
-                'colour_1': '#69663f99',
-                'colour_2': '#926a10e6',
-                'angle': '125',
-                'description': 'About section headers',
-                'model': 'section',
-                'page_title': 'About',
-            },
-        ]
         self.logger.info('Transfering gradient data to DALME tenant')
         with schema_context('dalme'):
             from web.extensions.gradients.models import Gradient
 
-            for entry in gradients:
+            for entry in GRADIENTS:
                 target_model = apps.get_model(app_label='web', model_name=entry.pop('model'))
                 page_title = entry.pop('page_title', None)
 
@@ -551,24 +513,7 @@ class Stage(BaseStage):
             from web.extensions.team.models import TeamMember, TeamRole
 
             self.logger.info('Creating TeamRole records...')
-            roles = {
-                'PI': TeamRole.objects.create(
-                    role='PI',
-                    description='DALME Principal Investigator.',
-                ),
-                'Project Team': TeamRole.objects.create(
-                    role='Core',
-                    description='Member of the core project team.',
-                ),
-                'Contributors': TeamRole.objects.create(
-                    role='Contributor',
-                    description='Occasional contributor to the project.',
-                ),
-                'Advisory Board': TeamRole.objects.create(
-                    role='Board',
-                    description='Member of the DALME Advisory Board.',
-                ),
-            }
+            roles = {k: TeamRole.objects.create(**v) for k, v in ROLES.items()}
 
             self.logger.info('Converting people blocks to TeamMember entities')
             for block in json.loads(people_page['body']):
