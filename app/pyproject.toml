@@ -1,5 +1,6 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = 'app.settings'
+DJANGO_CONFIGURATION = 'Development'
 addopts = "--strict-markers"
 markers = [
   "integration: marks integration tests",
@@ -131,7 +132,3 @@ section-order = [
 [tool.ruff.lint.isort.sections]
 django = ["django"]
 tests = ["tests"]
-
-[tool.django-stubs]
-django_settings_module = "app.settings"
-strict_settings = false
