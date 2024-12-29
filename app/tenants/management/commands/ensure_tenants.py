@@ -21,15 +21,22 @@ class Command(BaseCommand):
         tenants = settings.TENANTS()
         for tenant in tenants:
             domain, name, schema_name, is_primary, tenant_type = tenant.value
-            for d in domain:
-                if not Tenant.objects.filter(name=name).exists():
-                    tenant_obj = Tenant.objects.create(
-                        name=name,
-                        schema_name=schema_name,
-                        tenant_type=tenant_type.value,
-                    )
+
+            if not Tenant.objects.filter(name=name).exists():
+                tenant_obj = Tenant.objects.create(
+                    name=name,
+                    schema_name=schema_name,
+                    tenant_type=tenant_type.value,
+                )
+                # the dev environment needs multiple domains to run previews in the CMS
+                # so the domain prop is a list, otherwise, the domain prop is a string,
+                # here we turn it into a list so we can use the same logic for creating the records
+                if not settings.IS_DEV:
+                    domain = [domain]
+
+                for dom in domain:
                     domain_obj = Domain.objects.create(
-                        domain=d,
+                        domain=dom,
                         tenant=tenant_obj,
                         is_primary=is_primary,
                     )
@@ -38,14 +45,18 @@ class Command(BaseCommand):
                         tenant=tenant_obj,
                         domain=domain_obj,
                     )
-                else:
-                    if not Tenant.objects.filter(domains__domain=d).exists():
-                        msg = 'Invalid existing tenant record for this environment'
-                        logger.error(msg, tenant=name, domain=d)
-                        raise DataError(msg)
+            else:
+                # if we're in the dev environment, we only need to check the first domain
+                if settings.IS_DEV:
+                    domain = domain[0]
 
-                    logger.info(
-                        'Existing tenant found for domain',
-                        tenant=name,
-                        domain=d,
-                    )
+                if not Tenant.objects.filter(domains__domain=domain).exists():
+                    msg = 'Invalid existing tenant record for this environment'
+                    logger.error(msg, tenant=name, domain=domain)
+                    raise DataError(msg)
+
+                logger.info(
+                    'Existing tenant found for domain',
+                    tenant=name,
+                    domain=domain,
+                )

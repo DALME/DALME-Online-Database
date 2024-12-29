@@ -37,8 +37,7 @@ class Command(BaseCommand):
         client_id = settings.OAUTH_CLIENT_ID
         client_secret = settings.OAUTH_CLIENT_SECRET
 
-        domains = [tenant.value.domain for tenant in settings.TENANTS()]
-        domains = [d for lst in domains for d in lst]
+        domains = [tenant.value.domain[0] if settings.IS_DEV else tenant.value.domain for tenant in settings.TENANTS()]
         domains = [f'http://{domain}:8000' if settings.IS_DEV else f'https://{domain}' for domain in domains]
         redirect_uris = [f'{domain}/{self.CALLBACK_URL}' for domain in domains]
         post_logout_redirect_uris = [f'{domain}/' for domain in domains]

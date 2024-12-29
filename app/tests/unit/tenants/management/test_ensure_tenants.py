@@ -55,7 +55,7 @@ def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
         mock.call.objects.filter().exists(),
         mock.call.objects.filter(name='DALME'),
         mock.call.objects.filter().exists(),
-        mock.call.objects.filter(domains__domain__in=['dalme.localhost', 'dalme.org']),
+        mock.call.objects.filter(domains__domain='dalme.localhost'),
         mock.call.objects.filter().exists(),
         mock.call.objects.filter(name='Pharmacopeias'),
         mock.call.objects.filter().exists(),
