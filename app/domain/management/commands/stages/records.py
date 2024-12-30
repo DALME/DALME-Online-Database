@@ -93,7 +93,7 @@ class Stage(BaseStage):
                 total = cursor.rowcount
                 rows = self.map_rows(cursor)
 
-                for row in tqdm(rows, total=total):
+                for row in tqdm(rows, total=total, desc='                     completed', leave=False):
                     record_id = row['id']
                     type_id = row.pop('type')
                     is_private = row.pop('is_private')

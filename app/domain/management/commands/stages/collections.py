@@ -51,7 +51,7 @@ class Stage(BaseStage):
                 total = cursor.rowcount
                 rows = self.map_rows(cursor)
 
-                for row in tqdm(rows, total=total):
+                for row in tqdm(rows, total=total, desc='                     completed', leave=False):
                     row.pop('endpoint')
                     row.pop('has_landing')
 

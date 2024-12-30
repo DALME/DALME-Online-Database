@@ -59,7 +59,7 @@ class Stage(BaseStage):
                 total = cursor.rowcount
                 rows = self.map_rows(cursor)
 
-                for row in tqdm(rows, total=total):
+                for row in tqdm(rows, total=total, desc='                     completed', leave=False):
                     dtype = row.pop('data_type')
                     attribute_type_id = row.pop('attribute_type')
                     object_id = row.pop('object_id')
