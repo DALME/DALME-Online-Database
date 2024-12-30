@@ -3,6 +3,8 @@
 import json
 from collections import Counter
 
+from tqdm import tqdm
+
 from django.apps import apps
 
 # from django.contrib.auth import get_user_model
@@ -54,9 +56,10 @@ class Stage(BaseStage):
                 cursor.execute(
                     'SELECT attr.*, at.data_type FROM restore.core_attribute attr INNER JOIN restore.core_attribute_type at ON attr.attribute_type = at.id;'
                 )
+                total = cursor.rowcount
                 rows = self.map_rows(cursor)
 
-                for row in rows:
+                for row in tqdm(rows, total=total):
                     dtype = row.pop('data_type')
                     attribute_type_id = row.pop('attribute_type')
                     object_id = row.pop('object_id')
@@ -179,4 +182,4 @@ class Stage(BaseStage):
                 atype.delete()
                 count += 1
 
-        self.logger.info('Removed %s unused attribute types.', count)
+        self.logger.warning('Removed %s unused attribute types.', count)

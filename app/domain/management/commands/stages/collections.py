@@ -1,5 +1,7 @@
 """Migrate Collection (from Set) and related models and data."""
 
+from tqdm import tqdm
+
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
@@ -46,9 +48,10 @@ class Stage(BaseStage):
             with connection.cursor() as cursor:
                 self.logger.info('Migrating collections')
                 cursor.execute('SELECT * FROM restore.core_set;')
+                total = cursor.rowcount
                 rows = self.map_rows(cursor)
 
-                for row in rows:
+                for row in tqdm(rows, total=total):
                     row.pop('endpoint')
                     row.pop('has_landing')
 

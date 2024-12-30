@@ -1,5 +1,7 @@
 """Migrate Record (from Source)."""
 
+from tqdm import tqdm
+
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
@@ -88,9 +90,10 @@ class Stage(BaseStage):
                         LEFT JOIN restore.core_source parent\
                         ON s.parent_id = parent.id;',
                 )
+                total = cursor.rowcount
                 rows = self.map_rows(cursor)
 
-                for row in rows:
+                for row in tqdm(rows, total=total):
                     record_id = row['id']
                     type_id = row.pop('type')
                     is_private = row.pop('is_private')
