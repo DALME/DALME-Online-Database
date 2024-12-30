@@ -294,7 +294,7 @@ class BaseStage(abc.ABC):
                     if isinstance(block['value'], dict):
                         block['value']['use_file_caption'] = not block['value'].get('show_caption')
                     else:
-                        self.logger.error('Found inline image with int value: %s', block['value'])
+                        self.logger.warning('Found inline image with int value: %s', block['value'])
 
                 elif block.get('type') == 'main_image':
                     block['type'] = 'inline_image'
