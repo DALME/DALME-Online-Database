@@ -3,6 +3,7 @@
 from .agent import Agent, Organization, Person
 from .attachment import Attachment
 from .attribute import Attribute, AttributeReference, AttributeType
+from .avatar import Avatar
 from .collection import Collection, CollectionMembership
 from .comment import Comment
 from .concept import Concept
@@ -50,6 +51,7 @@ __all__ = [
     'Attribute',
     'AttributeReference',
     'AttributeType',
+    'Avatar',
     'Collection',
     'CollectionMembership',
     'Comment',

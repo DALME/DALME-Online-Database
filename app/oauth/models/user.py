@@ -2,19 +2,19 @@
 
 from django_tenants.utils import tenant_context
 
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q, options
 from django.urls import reverse
 
 from app.context import get_current_tenant
+from domain.models.avatar import Avatar
 from domain.models.preference import Preference, PreferenceKey
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db', 'attribute_matching_fields')
 
 
-class User(AbstractUser):
+class User(AbstractUser, Avatar):
     """Override the default auth User model."""
 
     full_name = models.CharField(max_length=255, blank=True)
@@ -75,8 +75,3 @@ class User(AbstractUser):
             if not hasattr(self, 'wagtail_userprofile'):
                 return None
             return self.wagtail_userprofile
-
-    @property
-    def avatar_url(self):
-        """Return url to avatar image."""
-        return settings.MEDIA_URL + str(self.profile.avatar) if self.profile.avatar else None

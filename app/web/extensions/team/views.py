@@ -53,7 +53,7 @@ class TeamMemberViewSet(ModelViewSet):
     menu_name = 'team_members'
     menu_order = 900
     index_view_class = TeamMemberIndexView
-    list_display = ['photo', 'name', 'user', 'title', 'affiliation']
+    list_display = ['avatar', 'name', 'user', 'title', 'affiliation']
     list_filter = ['name', 'title', 'affiliation']
     search_fields = ['name', 'title', 'affiliation', 'biography']
     index_results_template_name = 'team_list/index_results.html'
@@ -80,9 +80,9 @@ class TeamMemberViewSet(ModelViewSet):
         FieldRowPanel(
             [
                 FieldPanel('roles', classname='col8', widget=MultiSelect(placeholder='Select roles...')),
-                FieldPanel('photo', classname='col4'),
+                FieldPanel('avatar', classname='col4'),
             ],
-            heading='Roles and photo',
+            heading='Roles and avatar',
             classname='field-row-panel',
         ),
     ]

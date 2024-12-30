@@ -88,6 +88,10 @@ class Base(Configuration):
             (self.PROJECT_ROOT / 'web' / 'static' / 'tenants' / '%s').as_posix(),
         ]
 
+    STATIC_LOCATION = 'static'
+    MEDIA_LOCATION = 'media'
+    AVATARS_LOCATION = 'avatar_images'
+
     STATICFILES_FINDERS = [
         'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
         'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -733,8 +737,6 @@ class Production(Base, Configuration):
     AWS_DEFAULT_ACL = None
     AWS_IS_GZIPPED = True
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    STATIC_LOCATION = 'static'
-    MEDIA_LOCATION = 'media'
 
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_USE_TLS = True
