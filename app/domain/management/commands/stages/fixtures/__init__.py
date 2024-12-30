@@ -1,6 +1,6 @@
 """Interface for the data fixtures for the migrate_data management command."""
 
-from .attribute_types import ATYPES_KEEP, TO_BOOL, TO_FKEY, TO_INT, TO_LOCAL, TO_RREL
+from .attribute_types import ATYPES_KEEP, NEW_TYPES, RENAMES, TO_BOOL, TO_FKEY, TO_INT, TO_LOCAL, TO_RREL
 from .bibliography import COLLECTIONS, REF_CITATIONS
 from .ct_attributes_map import CT_DATA, CTA_PROPS
 from .gradients import GRADIENTS
@@ -34,6 +34,7 @@ __all__ = [
     'GRADIENTS',
     'HOME_DATA',
     'NAMED_AGENTS',
+    'NEW_TYPES',
     'OPTIONS',
     'PEOPLE_PAGE_DATA',
     'PROJECT_DATA',
@@ -41,6 +42,7 @@ __all__ = [
     'RECORD_TYPES',
     'RECORD_TYPE_COVERSIONS',
     'REF_CITATIONS',
+    'RENAMES',
     'ROLES',
     'SAMPLE_GRADIENTS',
     'SOURCES_MODEL_MAP',
