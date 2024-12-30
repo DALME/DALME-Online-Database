@@ -48,7 +48,6 @@ else
 		$(NAMESPACE).db \
 		pg_restore \
 		--clean \
-		--verbose \
 		--if-exists \
 		--schema=$(RESTORE_SCHEMA) \
 		--dbname=$(NAMESPACE) \
