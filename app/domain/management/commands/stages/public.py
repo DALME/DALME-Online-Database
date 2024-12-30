@@ -346,18 +346,9 @@ class Stage(BaseStage):
                     row.pop('id')
                     row.pop('dismissibles')
                     user = User.objects.filter(pk=row['user_id'])
+                    row.pop('avatar')
                     if user.exists():
                         user = user.first()
-                        avatar = row.pop('avatar')
-
-                        if not avatar:
-                            self.logger.warning('User %s has no avatar.', row['user_id'])
-                        else:
-                            photo = UserProfile.objects.get(user=user).avatar
-                            user.avatar.save(photo.filename, File(io.BytesIO(photo.file.read())))
-                            user.save(update_fields=['avatar'])
-                            self.logger.debug('User %s: avatar updated.', row['user_id'])
-
                         if user.profile:
                             row.pop('user_id')
                             for field, value in row.items():
@@ -586,7 +577,7 @@ class Stage(BaseStage):
                         tm.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
                         tm.save(update_fields=['avatar'])
 
-            self.logger.error('Created %s TeamMember instances.', TeamMember.objects.count())
+            self.logger.debug('Created %s TeamMember instances.', TeamMember.objects.count())
 
     @transaction.atomic
     def drop_restore_schema(self):
