@@ -156,7 +156,6 @@ class Stage(BaseStage):
         # populated
         models = [
             ('webimages', 'baseimage'),
-            ('webimages', 'customrendition'),
             ('wagtaildocs', 'document'),
             ('web', 'home'),
             ('web', 'section'),

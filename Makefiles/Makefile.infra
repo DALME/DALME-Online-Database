@@ -22,7 +22,6 @@ else
 	@$(MAKE) -e app.migrate_data
 	@$(MAKE) app.manage args='ensure_oauth'
 	@$(MAKE) app.manage args='tenant_command update_index --schema=dalme'
-	@$(MAKE) app.manage args='tenant_command wagtail_update_image_renditions --schema=dalme'
 endif
 .PHONY: infra.bootstrap
 
@@ -44,11 +43,10 @@ else
 	mkdir ./app/app/media/pharmacopeias/documents
 	mkdir ./app/app/media/pharmacopeias/images
 	mkdir ./app/app/media/pharmacopeias/original_images
-	mkdir ./app/app/media/dalme
+	mkdir -p ./app/app/media/dalme/images
 	cp -Rp $(folder)/avatar_images ./app/app/media/avatar_images
 	cp -Rp $(folder)/attachments ./app/app/media/dalme/attachments
 	cp -Rp $(folder)/documents ./app/app/media/dalme/documents
-	cp -Rp $(folder)/images ./app/app/media/dalme/images
 	cp -Rp $(folder)/original_images ./app/app/media/dalme/original_images
 endif
 .PHONY: infra.media
