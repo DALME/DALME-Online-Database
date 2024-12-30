@@ -9,7 +9,6 @@ from wagtail.log_actions import log
 
 from django.apps import apps
 from django.core.files import File
-from django.core.files.storage import FileSystemStorage
 from django.db import connection, transaction
 from django.db.utils import IntegrityError
 
@@ -337,6 +336,9 @@ class Stage(BaseStage):
             self.logger.info('Transfering user profiles from Wagtail')
             cursor.execute('SELECT * FROM restore.wagtailusers_userprofile;')
             rows = self.map_rows(cursor)
+            created = 0
+            transfered = 0
+
             with schema_context('public'):
                 from wagtail.users.models import UserProfile
 
@@ -346,17 +348,30 @@ class Stage(BaseStage):
                     user = User.objects.filter(pk=row['user_id'])
                     if user.exists():
                         user = user.first()
+                        avatar = row.pop('avatar')
+
+                        if not avatar:
+                            self.logger.warning('User %s has no avatar.', row['user_id'])
+                        else:
+                            photo = UserProfile.objects.get(user=user).avatar
+                            user.avatar.save(photo.filename, File(io.BytesIO(photo.file.read())))
+                            user.save(update_fields=['avatar'])
+                            self.logger.debug('User %s: avatar updated.', row['user_id'])
+
                         if user.profile:
                             row.pop('user_id')
                             for field, value in row.items():
                                 setattr(user.profile, field, value)
                             user.profile.save()
+                            transfered += 1
                         else:
                             UserProfile.objects.create(**row)
+                            created += 1
                     else:
                         self.logger.error(
                             'Failed to update profile for user "%s": user does not exist.', row['user_id']
                         )
+            self.logger.debug('Transfered %s user profiles and created %s', transfered, created)
 
     @transaction.atomic
     def transfer_snippets(self):
@@ -501,7 +516,7 @@ class Stage(BaseStage):
                 page.save(update_fields=['gradient'])
 
     @transaction.atomic
-    def migrate_people(self):
+    def migrate_people(self):  # noqa: C901, PLR0915
         """Convert people blocks to TeamMember entities."""
         with connection.cursor() as cursor:
             cursor.execute(sql.SQL('SELECT * FROM restore.public_flat WHERE page_ptr_id = 16;'))
@@ -537,17 +552,21 @@ class Stage(BaseStage):
                         tm_object['user'] = user
 
                     photo_id = block_value.get('photo')
-                    if photo_id:
-                        photo = BaseImage.objects.get(pk=photo_id)
-                        if user and user.profile:
-                            # django-tenants will try to add the tenant to the path
-                            # to prevent it, we override the "storage" attribute of
-                            # the field class with Django's default storage model
-                            user.profile.avatar.storage = FileSystemStorage()
-                            user.profile.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
-                            user.profile.save()
+                    has_photo = False
+
+                    try:
+                        photo = BaseImage.objects.filter(pk=photo_id)
+                        if photo.exists():
+                            has_photo = True
+                            photo = photo.first()
+                            if user and not user.avatar:
+                                user.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
+                                user.save(update_fields=['avatar'])
+                                self.logger.debug('Added avatar for user %s.', name)
                         else:
-                            tm_object['defaults']['photo'] = photo
+                            self.logger.error('No photo found for %s.', name)
+                    except:  # noqa: E722
+                        self.logger.error('%s: could not retrieve photo id=%s.', name, photo_id)  # noqa: TRY400
 
                     try:
                         tm, created = TeamMember.objects.get_or_create(**tm_object)
@@ -561,6 +580,13 @@ class Stage(BaseStage):
                         tm = TeamMember.objects.get(user=user)
                         tm.roles.add(current_role)
                         self.logger.error('Found duplicate record for %s.', name)  # noqa: TRY400
+
+                    if has_photo:
+                        photo = BaseImage.objects.get(pk=photo_id)
+                        tm.avatar.save(photo.title, File(io.BytesIO(photo.file.read())))
+                        tm.save(update_fields=['avatar'])
+
+            self.logger.error('Created %s TeamMember instances.', TeamMember.objects.count())
 
     @transaction.atomic
     def drop_restore_schema(self):
