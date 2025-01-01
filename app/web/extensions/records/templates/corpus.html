@@ -13,7 +13,8 @@
       <i class="fas {% if corpus.collapsed %}fa-caret-down{% else %}fa-caret-up{% endif %} subsection corpus"></i>
     </div>
     <div class="subsection-container corpus-container {% if corpus.collapsed %}u-none{% endif %}">
-        <div class="collection-description">
+        <div class="collection-description text-expandable-container">
+            <div class="show-button show-more u-none" onclick="window.CustomUtils.toggleShowMore(this)"></div>
             {{ corpus.description|richtext }}
         </div>
         <div class="collections-container">

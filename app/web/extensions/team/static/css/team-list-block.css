@@ -1,3 +1,6 @@
+.block-team_list {
+  padding-top: 10px;
+}
 .block-team_list .column-container {
   display: grid;
   align-content: center;
@@ -53,6 +56,7 @@
   line-height: 1.5;
   margin: 0;
 }
-.people .block-text p {
+.people .block-text p,
+.people .block-text_expandable p {
   line-height: 1.6;
 }

@@ -58,22 +58,53 @@
   border-bottom: 1px dotted #000;
   padding-bottom: 0.25rem;
 }
-.block-text + .block-heading {
+.block-text + .block-heading,
+.block-text_expandable + .block-heading {
   margin-top: 1rem;
 }
 .block-html {
   text-align: center;
 }
-.block-text {
+.block-text,
+.block-text_expandable {
   font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1.2rem;
 }
-.subsection-container + .block-text {
+.subsection-container + .block-text,
+.subsection-container + .block-text_expandable {
   padding-top: 1rem;
 }
-.content + .block-text {
+.content + .block-text,
+.content + .block-text_expandable {
   background: green;
 }
-.content > .block-text:first-child > p:first-child {
-  margin-block-end: 0;
+
+.block-text ul,
+.block-text ol,
+.block-text_expandable ul,
+.block-text_expandable ol {
+  margin: 1rem 3rem;
+}
+.block-text ul li,
+.block-text ol li,
+.block-text_expandable ul li,
+.block-text_expandable ol li {
+  list-style-type: disc;
+  list-style-position: outside;
+  font-size: 1.1rem;
+  line-height: 2;
+}
+.block-text ul li,
+.block-text_expandable ul li {
+  list-style-type: disc;
+}
+.block-text ol li,
+.block-text_expandable ol li {
+  list-style-type: unset;
+}
+.block-text ul li:not(:last-of-type),
+.block-text ol li:not(:last-of-type),
+.block-text_expandable ul li:not(:last-of-type),
+.block-text_expandable ol li:not(:last-of-type) {
+  margin-bottom: 1rem;
 }

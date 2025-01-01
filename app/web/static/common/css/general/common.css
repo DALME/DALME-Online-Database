@@ -173,28 +173,6 @@ parsererror div {
   border-color: #354d87 !important;
 }
 
-.block-text ul,
-.block-text ol {
-  margin: 1rem 3rem;
-}
-.block-text ul li,
-.block-text ol li {
-  list-style-type: disc;
-  list-style-position: outside;
-  font-size: 1.1rem;
-  line-height: 2;
-}
-.block-text ul li {
-  list-style-type: disc;
-}
-.block-text ol li {
-  list-style-type: unset;
-}
-.block-text ul li:not(:last-of-type),
-.block-text ol li:not(:last-of-type) {
-  margin-bottom: 1rem;
-}
-
 .highlight {
   background-color: #fff4bf;
 }

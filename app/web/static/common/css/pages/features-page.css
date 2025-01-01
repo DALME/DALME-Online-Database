@@ -32,9 +32,6 @@ main.essay > .content {
 :not(.featured-group-key) + .featured-group-key {
   border-top: 1px dotted #9c9c9c;
 }
-h3.featured-group-key:first-of-type {
-  margin-top: 2rem;
-}
 h3.featured-group-key {
   font-size: 1.5rem;
   color: #3a5d82;
