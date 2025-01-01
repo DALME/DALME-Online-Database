@@ -255,28 +255,23 @@ class BaseStage(abc.ABC):
         for sblock in content:
             block = copy.deepcopy(sblock)
             if not isinstance(block, str) and block.get('type') in ['subsection', 'subsection_end_marker']:
-                if block.get('value', {}).get('minor_heading'):
+                is_nested = block.get('value', {}).get('minor_heading') and subsection is not None
+
+                if is_nested:
                     block['type'] = 'nested_subsection'
-                    if nested_subsection is None:
-                        nested_subsection = block
-                    else:
-                        if subsection:
-                            if not subsection['value'].get('body'):
-                                subsection['value']['body'] = [nested_subsection]
-                            else:
-                                subsection['value']['body'].append(nested_subsection)
-                        else:
-                            new_content.append(nested_subsection)
-                        nested_subsection = block
-                else:
                     if nested_subsection:
-                        if subsection:
-                            if not subsection['value'].get('body'):
-                                subsection['value']['body'] = [nested_subsection]
-                            else:
-                                subsection['value']['body'].append(nested_subsection)
+                        if not subsection['value'].get('body'):
+                            subsection['value']['body'] = [nested_subsection]
                         else:
-                            new_content.append(nested_subsection)
+                            subsection['value']['body'].append(nested_subsection)
+                    nested_subsection = block
+
+                else:
+                    if nested_subsection and subsection:
+                        if not subsection['value'].get('body'):
+                            subsection['value']['body'] = [nested_subsection]
+                        else:
+                            subsection['value']['body'].append(nested_subsection)
 
                         nested_subsection = None
 
@@ -328,6 +323,7 @@ class BaseStage(abc.ABC):
                 else:
                     subsection['value']['body'].append(nested_subsection)
             else:
+                nested_subsection['type'] = 'subsection'
                 new_content.append(nested_subsection)
 
         if subsection:
