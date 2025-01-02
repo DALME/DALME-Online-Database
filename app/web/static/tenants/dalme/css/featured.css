@@ -3,7 +3,7 @@ body.home section.featured {
   flex-direction: column;
   margin: 0 auto;
 }
-body.home section.featured h4 {
+body.home section.featured h3 {
   text-transform: none;
 }
 body.home section.featured > div:first-child {
@@ -71,7 +71,7 @@ body.home section.featured img {
   color: #fff;
   font-weight: 600;
 }
-.monthly.essay h4 {
+.monthly.essay h3 {
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
   margin-top: 1rem;

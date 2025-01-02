@@ -336,3 +336,8 @@ div.struct-block > span > div.help svg.icon-help {
   white-space: nowrap !important;
   max-width: unset !important;
 } */
+
+/* fix help box icon alignment */
+.icon-help {
+  top: 1rem !important;
+}
