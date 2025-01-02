@@ -39,4 +39,4 @@ class Avatar(models.Model):
     @property
     def avatar_url(self):
         """Return url to avatar image."""
-        return settings.MEDIA_URL + self.avatar.file.path
+        return self.avatar.url if self.avatar else None
