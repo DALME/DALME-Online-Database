@@ -23,6 +23,7 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/user-tag.svg',
         'wagtailfontawesomesvg/solid/user.svg',
         'wagtailfontawesomesvg/solid/address-card.svg',
+        'wagtailfontawesomesvg/solid/users-line.svg',
     ]
 
 

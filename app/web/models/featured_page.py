@@ -10,16 +10,11 @@ from django.db import models
 
 from web.extensions.bibliography.models import CitableMixin
 from web.extensions.images.models import BaseImage
+from web.extensions.team.models import BylineMixin
 from web.models.base_page import BasePage
 
 
-class FeaturedPage(BasePage, CitableMixin):
-    alternate_author = models.CharField(
-        max_length=127,
-        null=True,
-        blank=True,
-        help_text='The name to display as the author of this page (instead of the user who created it).',
-    )
+class FeaturedPage(BasePage, CitableMixin, BylineMixin):
     front_page_image = models.ForeignKey(
         BaseImage,
         null=True,
@@ -31,8 +26,8 @@ class FeaturedPage(BasePage, CitableMixin):
     metadata_panels = [
         *BasePage.metadata_panels,
         *CitableMixin.metadata_panels,
+        *BylineMixin.metadata_panels,
         FieldPanel('front_page_image'),
-        FieldPanel('alternate_author'),
     ]
 
     class Meta:
@@ -42,12 +37,6 @@ class FeaturedPage(BasePage, CitableMixin):
         context = super().get_context(request)
         context['feature_type'] = self.short_title
         return context
-
-    @property
-    def author(self):
-        if self.alternate_author:
-            return self.alternate_author
-        return self.owner.full_name
 
     @property
     def scheduled_publication(self):

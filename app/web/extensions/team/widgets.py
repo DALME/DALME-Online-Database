@@ -35,3 +35,13 @@ class TeamMemberSelect(UserSelect):
             js=[*multi_media._js, 'js/team-select-widget.js'],  # noqa: SLF001
             css=multi_media._css,  # noqa: SLF001
         )
+
+
+class AuthorSelect(UserSelect):
+    @cached_property
+    def media(self):
+        multi_media = super().media
+        return Media(
+            js=[*multi_media._js, 'js/author-select-widget.js'],  # noqa: SLF001
+            css=multi_media._css,  # noqa: SLF001
+        )

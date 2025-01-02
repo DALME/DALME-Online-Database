@@ -132,16 +132,15 @@ def get_citation_data(context):  # noqa: C901, PLR0912, PLR0915
             )
 
         else:
-            author = page.alternate_author if page.alternate_author is not None else page.author
             coins_list += [
                 ('rft.atitle', page.title),
                 ('rft.identifier', page.get_full_url(context['request'])),
-                ('rft.au', author),
+                ('rft.au', page.byline),
             ]
 
             citation.update(
                 {
-                    'author': [{'literal': author}],
+                    'author': [{'literal': page.byline}],
                     'issued': {
                         'date-parts': [
                             [

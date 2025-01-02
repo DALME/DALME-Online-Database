@@ -26,7 +26,7 @@
     {% else %}
       <span>{% now "j F Y" %}</span>
     {% endif %}
-    <span>by <a href="/about/people/#{{ page.author|slugify }}">{{ page.author }}</a></span>
+    <span>by {% if page.byline_url %}<a href="{{ settings.web.Settings.team_profiles_url }}{{ page.byline_url }}">{% endif %}{{ page.byline }}{% if page.byline_url %}</a>{% endif %}</span>
   </div>
 
   <div class="content">

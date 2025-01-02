@@ -53,7 +53,7 @@ class FeaturedFilter(django_filters.FilterSet):
                 (key, list(values))
                 for key, values in itertools.groupby(
                     qs,
-                    key=lambda obj: f'{obj.author}',
+                    key=lambda obj: f'{obj.byline}',
                 )
             ]
 

@@ -1,12 +1,15 @@
 """Models for team extension."""
 
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.fields import RichTextField
 
 from django.conf import settings
 from django.db import models
 from django.db.models.functions import Lower
+from django.template.defaultfilters import slugify
 
 from domain.models import Avatar
+from web.extensions.team.widgets import AuthorSelect
 
 
 class TeamRole(models.Model):
@@ -67,3 +70,52 @@ class TeamMember(Avatar):
 
     def __str__(self):
         return str(self.name)
+
+
+class BylineMixin(models.Model):
+    authors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        help_text='Users to include in the byline. Adding authors to this field also ensures this page will show in their listed contributions.',
+    )
+    byline_text = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text='The text to be shown on the frontend. This field will be auto-generated from the users linked above, but it can be edited manually.',
+    )
+
+    metadata_panels = [
+        MultiFieldPanel(
+            [
+                FieldPanel(
+                    'authors',
+                    widget=AuthorSelect(
+                        placeholder='Select authors...',
+                        sortable=True,
+                        api_state='userSelectState',
+                    ),
+                ),
+                FieldPanel('byline_text'),
+            ],
+            heading='Byline',
+            icon='users-line',
+            classname='collapsed',
+            help_text='This section allows you to customize the byline for this page (by default, the user who created it will be shown as the author).',
+        )
+    ]
+
+    class Meta:
+        abstract = True
+
+    @property
+    def byline(self):
+        if self.byline_text:
+            return self.byline_text
+        return self.owner.full_name
+
+    @property
+    def byline_url(self):
+        if self.byline_text:
+            return None
+        return slugify(self.owner.full_name)
