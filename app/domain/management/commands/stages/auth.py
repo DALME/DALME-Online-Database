@@ -44,7 +44,9 @@ class Stage(BaseStage):
                 users = cursor.execute('SELECT * FROM restore.auth_user;')
                 users = self.map_rows(cursor)
                 for user in users:
-                    user['full_name'] = profiles.get(user['id'], {}).get('full_name', None)
+                    full_name = profiles.get(user['id'], {}).get('full_name', None)
+                    full_name = full_name.strip() if full_name else None
+                    user['full_name'] = full_name
                     User.objects.create(**user)
                 self.logger.info('Created %s User instances', User.objects.count())
         else:
