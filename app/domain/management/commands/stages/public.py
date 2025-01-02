@@ -2,6 +2,7 @@
 
 import io
 import json
+import re
 
 from django_tenants.utils import schema_context
 from psycopg import sql
@@ -15,7 +16,7 @@ from django.db.utils import IntegrityError
 from oauth.models import User
 
 from .base import BaseStage
-from .fixtures import GRADIENTS, ROLES
+from .fixtures import GRADIENTS, ROLES, USER_NAME_CONCORDANCE
 
 SOURCE_SCHEMA = 'restore'
 CLONED_SCHEMA = 'cloned'
@@ -35,6 +36,7 @@ class Stage(BaseStage):
         self.migrate_wagtail_tables()
         self.migrate_public_tables()
         self.migrate_content_tables()
+        self.add_authors_to_features()
         self.create_footnotes()
         self.transfer_wagtail_user_profiles()
         self.transfer_snippets()
@@ -244,7 +246,7 @@ class Stage(BaseStage):
                         log(instance=new_sponsor, action='wagtail.create')
 
     @transaction.atomic
-    def migrate_content_tables(self):
+    def migrate_content_tables(self):  # noqa: C901
         """Migrate Public/CMS tables with content that needs to be changed."""
         # these are tables with streamfields where content needs to be converted
         # between new and old formats, e.g. footnotes, references, people/team members
@@ -261,9 +263,10 @@ class Stage(BaseStage):
             ('wagtailcore', 'revision'),
         ]
 
-        self.logger.info('Processing models requiring content conversions')
+        self.logger.info('Processing pages requiring content conversions')
         for app, model_name in models:
             is_rev = model_name == 'revision'
+            is_feature = model_name in ['essay', 'featuredinventory', 'featuredobject']
 
             with schema_context('dalme'):
                 new_app_name = self.map_app(app)
@@ -291,25 +294,52 @@ class Stage(BaseStage):
                                 row['content'] = json.dumps(content)
 
                     for idx, (name, value) in enumerate(row.items()):
-                        columns.append(f'{name}')
+                        if is_feature and name == 'alternate_author':
+                            # we need to migrate 'alternate_author' to 'byline_text'
+                            # we can deal with the 'authors' join in the next step
+                            columns.append('byline_text')  # rename the column, keep the same value
+                            values += f'{self.clean_db_value(value, "TextField")}'
+                        else:
+                            columns.append(f'{name}')
 
-                        if name == 'permission_id':
-                            value = self.map_permissions(value)  # noqa: PLW2901
+                            if name == 'permission_id':
+                                value = self.map_permissions(value)  # noqa: PLW2901
 
-                        if name in target_fields:
-                            value = self.process_content_field(value, target_fields[name], page_id, is_rev)  # noqa: PLW2901
+                            if name in target_fields:
+                                value = self.process_content_field(value, target_fields[name], page_id, is_rev)  # noqa: PLW2901
 
-                        # the value of certain field types has to be converted to account
-                        # for differences in the way Django sets up certain fields depending
-                        # on database backend. E.g. certain fields that are setup as varchar in MySQL
-                        # are setup as jsonb in Postgres.
-                        values += f'{self.clean_db_value(value, target._meta.get_field(name).get_internal_type())}'  # noqa: SLF001
+                            # the value of certain field types has to be converted to account
+                            # for differences in the way Django sets up certain fields depending
+                            # on database backend. E.g. certain fields that are setup as varchar in MySQL
+                            # are setup as jsonb in Postgres.
+                            values += f'{self.clean_db_value(value, target._meta.get_field(name).get_internal_type())}'  # noqa: SLF001
 
                         if idx < len(row) - 1:
                             values += ', '
 
                     sql = f"INSERT INTO dalme.{new_app_name}_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
+
+    @transaction.atomic
+    def add_authors_to_features(self):
+        """Add list of authors to features with 'byline_text' (formerly 'alternate_author')."""
+        self.logger.info('Adding list of authors to features with byline_text.')
+        from web.models import Essay, FeaturedInventory, FeaturedObject
+
+        with schema_context('dalme'):
+            for model in [Essay, FeaturedInventory, FeaturedObject]:
+                for page in model.objects.all():
+                    if page.byline_text:
+                        users = []
+                        authors = [i.strip() for i in re.split(r' and | with |,', page.byline_text) if i]
+                        for author in authors:
+                            user = User.objects.filter(full_name=USER_NAME_CONCORDANCE.get(author, author))
+                            if user.exists():
+                                users.append(user.get())
+                            else:
+                                self.logger.warning('Failed to match author "%s" to a valid user.', author)
+                        if users:
+                            page.authors.add(*users)
 
     @transaction.atomic
     def create_footnotes(self):
