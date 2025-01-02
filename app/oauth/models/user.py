@@ -5,7 +5,6 @@ from django_tenants.utils import tenant_context
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q, options
-from django.urls import reverse
 
 from app.context import get_current_tenant
 from domain.models.avatar import Avatar
@@ -61,10 +60,6 @@ class User(AbstractUser, Avatar):
                 tenant.members.add(self)
         else:
             super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        """Return instance absolute url."""
-        return reverse('user_detail', kwargs={'username': self.user.username})
 
     @property
     def profile(self):
