@@ -6,6 +6,9 @@ USER_NAME_CONCORDANCE = {
     'Juan Vicente García Marsilla': 'Juan-Vicente Garcia Marsilla',
     'Juliette Calvarin': 'Jules Calvarin',
     'Pablo Sanahuja Ferrer': 'Pablo Sanahuja',
+    'Tobias Pamer': 'Tobias Karl Pamer',
+    'Yi Ran Angela Zhang': 'Angela Zhang',
+    'Laura Morreale': 'Laura K. Morreale',
 }
 
 PEOPLE_PAGE_DATA = {
