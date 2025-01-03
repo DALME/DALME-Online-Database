@@ -1,5 +1,5 @@
 {% extends "common/layouts/left_side_column.html" %}
-{% load wagtailcore_tags wagtailimages_tags static %}
+{% load wagtailcore_tags wagtailimages_tags get_previous_item static %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }} &ndash; {{ title }} {% endblock %}
 
@@ -37,7 +37,7 @@
             <div class="person-name">
                 <div>{{ person.name }}</div>
                 {% if person.url %}
-                    <a href="{{ person.url }}" class="person-url">
+                    <a href="{{ person.url }}" class="person-url" aria-label="External link to {{ person.name }}'s website">
                         <i class="fas fa-link person-url-icon"></i>
                     </a>
                 {% endif %}
@@ -55,16 +55,49 @@
                 {% include_block person.biography|richtext %}
             </div>
         </section>
-        <section>
-            <div class="block-heading">Contributions</div>
-            <div>
-                {% for item in contributions %}
-                    <div>
-                        <div>{{ item.record }}</div>
-                        <div>{{ item.credit }}</div>
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
+        {% if features %}
+            <section id="person-essays">
+                <div class="u-subsection u-flex" data-collapsed="false" onclick="window.CustomUtils.toggleSection(this)">
+                    <h3>Essays</h3><i class="fas fa-caret-up subsection"></i>
+                </div>
+                <div class="subsection-container">
+                    {% for item in features %}
+                        <div class="item-container">
+                            <a href="{{ item.url }}">{{ item.title }}</a>
+                            <div class="item-month">{{ item.month|upper }}</div>
+                            <div class="item-year
+                                {% with prev=features|get_previous_item:forloop.counter0 %}
+                                    {% if not prev or prev and prev.year != item.year%}first{% endif %}
+                                {% endwith %}
+                            ">
+                                {{ item.year }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+        {% if contributions %}
+            <section id="person-contributions">
+                <div class="u-subsection u-flex" data-collapsed="false" onclick="window.CustomUtils.toggleSection(this)">
+                    <h3>Contributions</h3><i class="fas fa-caret-up subsection"></i>
+                </div>
+                <div class="subsection-container">
+                    {% for item in contributions %}
+                        <div class="item-container">
+                            <a href="/collections/records/{{item.record.id}}/">{{ item.record.name }} <span>[{{ item.credit }}]</span></a>
+                            <div class="item-month">{{ item.month|upper }}</div>
+                            <div class="item-year
+                                {% with prev=contributions|get_previous_item:forloop.counter0 %}
+                                    {% if not prev or prev and prev.year != item.year%}first{% endif %}
+                                {% endwith %}
+                            ">
+                                {{ item.year }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
     </div>
 {% endblock %}

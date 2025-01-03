@@ -18,7 +18,7 @@ from web.extensions.extras.blocks.text_expandable import TextExpandableBlock
 from web.extensions.images.blocks import InlineImageBlock
 from web.extensions.team.blocks import TeamListBlock
 from web.extensions.team.models import TeamMember
-from web.models.base_page import BasePage
+from web.models import BasePage, Essay, FeaturedInventory, FeaturedObject
 
 BLOCK_SET = [
     ('document', DocumentBlock()),
@@ -61,16 +61,36 @@ class People(RoutablePageMixin, BasePage):
 
         person = qs.get()
 
-        contributions = [
-            {'record': r.target, 'credit': r.scopes.first().parameters['credit']}
-            for r in person.user.person_record.agent_ptr.relationships_as_source.filter(
-                Q(rel_type__short_name='authorship')
-                & (
-                    Q(scopes__parameters__credit='editor')
-                    | Q(scopes__parameters__credit='contributor')
-                    | Q(scopes__parameters__credit='corrections')
+        contributions = sorted(
+            [
+                {
+                    'record': r.target,
+                    'credit': r.scopes.first().parameters['credit'],
+                    'month': r.target.modification_timestamp.strftime('%b'),
+                    'year': r.target.modification_timestamp.year,
+                }
+                for r in person.user.person_record.agent_ptr.relationships_as_source.filter(
+                    Q(rel_type__short_name='authorship')
+                    & (
+                        Q(scopes__parameters__credit='editor')
+                        | Q(scopes__parameters__credit='contributor')
+                        | Q(scopes__parameters__credit='corrections')
+                    )
                 )
+                if r.target
+            ],
+            key=lambda x: x['record'].modification_timestamp,
+        )
+
+        q = Q(authors=person.user) | (Q(byline_text__isnull=True) & Q(owner=person.user))
+        features = [
+            {'title': i.title, 'url': i.url, 'month': i.go_live_at.strftime('%b'), 'year': i.go_live_at.year}
+            for i in FeaturedInventory.objects.filter(q)
+            .union(
+                FeaturedObject.objects.filter(q),
+                Essay.objects.filter(q),
             )
+            .order_by('-go_live_at')
         ]
 
         context = self.get_context(request)
@@ -79,6 +99,7 @@ class People(RoutablePageMixin, BasePage):
                 'title': person.name,
                 'person': person,
                 'contributions': contributions,
+                'features': features,
             }
         )
 
