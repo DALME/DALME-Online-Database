@@ -80,6 +80,7 @@ class People(RoutablePageMixin, BasePage):
                 if r.target
             ],
             key=lambda x: x['record'].modification_timestamp,
+            reverse=True,
         )
 
         q = Q(authors=person.user) | (Q(byline_text__isnull=True) & Q(owner=person.user))
