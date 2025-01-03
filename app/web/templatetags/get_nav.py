@@ -2,9 +2,7 @@
 
 from django import template
 
-from web.models import (
-    Home,
-)
+from web.models import Home
 
 register = template.Library()
 
