@@ -18,7 +18,11 @@ PEOPLE_PAGE_DATA = {
     'slug': 'people',
     'show_in_menus': True,
     'body': [
-        {'id': 'eac3c1b6-6724-42af-a039-afef0ca8b880', 'type': 'heading', 'value': 'Project Team'},
+        {
+            'id': 'eac3c1b6-6724-42af-a039-afef0ca8b880',
+            'type': 'heading',
+            'value': {'heading': 'Project Team', 'level': 'h1'},
+        },
         {
             'id': '83f8d736-839d-407b-82ed-90e7ae981ccf',
             'type': 'team_list',
@@ -29,13 +33,21 @@ PEOPLE_PAGE_DATA = {
                 'members': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
             },
         },
-        {'id': '61df150f-065e-4c33-b103-e5ae76991cc3', 'type': 'heading', 'value': 'Contributors'},
+        {
+            'id': '61df150f-065e-4c33-b103-e5ae76991cc3',
+            'type': 'heading',
+            'value': {'heading': 'Contributors', 'level': 'h1'},
+        },
         {
             'id': '447c0a2f-d127-4937-a72d-bb9644592883',
             'type': 'team_list',
             'value': {'mode': 'role', 'role': '3', 'order': 'name', 'members': []},
         },
-        {'id': 'd91180b0-8a60-4c9b-8ed2-4b16fe840bec', 'type': 'heading', 'value': 'Advisory Board'},
+        {
+            'id': 'd91180b0-8a60-4c9b-8ed2-4b16fe840bec',
+            'type': 'heading',
+            'value': {'heading': 'Advisory Board', 'level': 'h1'},
+        },
         {
             'id': 'c381034b-a89c-4df8-b578-40781dc24044',
             'type': 'text',
