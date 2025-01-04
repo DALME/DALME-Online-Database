@@ -301,6 +301,12 @@ class BaseStage(abc.ABC):
                         'alignment': 'main',
                     }
 
+                elif block.get('type') == 'heading' and block.get('value') and isinstance(block['value'], str):
+                    block['value'] = {
+                        'level': 'h1',
+                        'heading': block['value'],
+                    }
+
                 if nested_subsection:
                     if not nested_subsection['value'].get('body'):
                         nested_subsection['value']['body'] = [block]
