@@ -14,21 +14,6 @@
   opacity: 0 !important;
 }
 
-/* code block extension */
-.code-block textarea {
-  font-size: 14px;
-}
-pre[class*=language-]:after,
-pre[class*=language-]:before {
-  box-shadow: none !important;
-}
-.struct-block.code-block select {
-  width: fit-content;
-}
-.struct-block.code-block [data-contentpath="language"] .w-field__input {
-  width: fit-content;
-}
-
 /* General purpose adjustments to select2 */
 .select2-container ul.select2-choices,
 .select2-container a.select2-choice {

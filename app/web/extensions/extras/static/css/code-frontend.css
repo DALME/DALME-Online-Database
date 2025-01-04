@@ -1,0 +1,37 @@
+.block-code {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.block-code pre[class*=language-]:after,
+.block-code pre[class*=language-]:before {
+  box-shadow: none !important;
+}
+.block-code pre[class*=language-] > code {
+  box-shadow: none;
+  border-radius: 5px;
+  border: none;
+}
+.block-code .line-numbers .line-numbers-rows {
+  border-right: 1px dotted #aaa;
+}
+.block-code pre[class*=language-].line-numbers.line-numbers {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+.block-code .code-toolbar {
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+.block-code div.code-toolbar > .toolbar {
+  top: 2px;
+  right: 5px;
+}
+.block-code div.code-toolbar > .toolbar > .toolbar-item > button {
+  box-shadow: none;
+  padding-bottom: 3px;
+  background: rgb(164 223 239 / 20%);
+}
+.block-code div.code-toolbar > .toolbar > .toolbar-item > button:hover {
+  color: #1879d9;
+}
