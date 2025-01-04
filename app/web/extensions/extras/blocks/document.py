@@ -25,6 +25,7 @@ class DocumentBlock(blocks.StructBlock):
         help_text='Additional information, e.g. press/place of publication, location of the talk, etc.',
     )
     abstract = blocks.RichTextBlock(
+        editor='minimal',
         required=False,
         help_text='Abstract for this entry, if applicable.',
     )

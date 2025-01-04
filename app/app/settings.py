@@ -372,6 +372,38 @@ class Base(Configuration):
     WAGTAILADMIN_BASE_URL = 'cms/'
     WAGTAILIMAGES_IMAGE_MODEL = 'webimages.BaseImage'
     WAGTAILIMAGES_FEATURE_DETECTION_ENABLED = True
+    WAGTAILADMIN_RICH_TEXT_EDITORS = {
+        'default': {
+            'WIDGET': 'wagtail.admin.rich_text.DraftailRichTextArea',
+            'OPTIONS': {
+                'features': [
+                    'bold',
+                    'italic',
+                    'ol',
+                    'ul',
+                    'hr',
+                    'link',
+                    'superscript',
+                    'subscript',
+                    'strikethrough',
+                    'reference',
+                    'footnote',
+                    'saved_search',
+                ]
+            },
+        },
+        'minimal': {
+            'WIDGET': 'wagtail.admin.rich_text.DraftailRichTextArea',
+            'OPTIONS': {
+                'features': [
+                    'bold',
+                    'italic',
+                    'superscript',
+                    'strikethrough',
+                ]
+            },
+        },
+    }
 
     @property
     def API_URL(self):

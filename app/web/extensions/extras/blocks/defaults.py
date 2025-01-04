@@ -107,7 +107,7 @@ BASE_BLOCKS = [
     ('html', blocks.RawHTMLBlock()),
     ('inline_image', InlineImageBlock()),
     ('page', blocks.PageChooserBlock()),
-    ('pullquote', blocks.RichTextBlock(icon='openquote')),
+    ('pullquote', blocks.RichTextBlock(icon='openquote', editor='minimal')),
     ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS, icon='table-cells', form_classname='table-block')),
     ('table_typed', typed_table),
     ('text', blocks.RichTextBlock()),

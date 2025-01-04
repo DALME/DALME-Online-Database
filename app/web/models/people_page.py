@@ -14,7 +14,6 @@ from django.template.response import TemplateResponse
 from web.extensions.extras.blocks.defaults import DEFAULT_TABLE_OPTIONS
 from web.extensions.extras.blocks.document import DocumentBlock
 from web.extensions.extras.blocks.subsection import SubsectionBlock
-from web.extensions.extras.blocks.text_expandable import TextExpandableBlock
 from web.extensions.images.blocks import InlineImageBlock
 from web.extensions.team.blocks import TeamListBlock
 from web.extensions.team.models import TeamMember
@@ -25,12 +24,11 @@ BLOCK_SET = [
     ('heading', blocks.CharBlock()),
     ('inline_image', InlineImageBlock()),
     ('page', blocks.PageChooserBlock()),
-    ('pullquote', blocks.RichTextBlock(icon='openquote')),
+    ('pullquote', blocks.RichTextBlock(icon='openquote', editor='minimal')),
     ('subsection', SubsectionBlock()),
-    ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS)),
+    ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS, icon='table-cells', form_classname='table-block')),
     ('team_list', TeamListBlock()),
-    ('text', blocks.RichTextBlock()),
-    ('text_expandable', TextExpandableBlock()),
+    ('text', blocks.RichTextBlock(editor='minimal')),
 ]
 
 

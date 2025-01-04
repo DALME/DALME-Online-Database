@@ -49,7 +49,7 @@ class InlineImageBlock(blocks.StructBlock):
         label='Caption from file',
         help_text='Uncheck to write caption.',
     )
-    caption = blocks.RichTextBlock(required=False, label='Caption text')
+    caption = blocks.RichTextBlock(editor='minimal', required=False, label='Caption text')
     alignment = blocks.ChoiceBlock(
         choices=[
             ('left', 'Left-aligned'),
