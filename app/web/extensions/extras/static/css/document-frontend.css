@@ -33,7 +33,7 @@
 .block-document .doc-title {
   display: block;
 }
-.block-document .doc-title h4,
+.block-document .doc-title h2,
 .block-document .doc-title a {
   font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1.3rem;
