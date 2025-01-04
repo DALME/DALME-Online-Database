@@ -14,11 +14,11 @@ main section .subsection-container > .block-text_expandable > p {
   background: #3a5d82;
   color: white;
 }
-.u-subsection[data-collapsed='true'] h3::after,
-.u-subsection[data-collapsed='true'] h4::after {
+.u-subsection[data-collapsed='true'] h1::after,
+.u-subsection[data-collapsed='true'] h2::after {
   content: '...';
 }
-.u-subsection h3 {
+.u-subsection h1 {
   text-transform: uppercase;
   font-size: 1.2rem;
   font-weight: 650;
@@ -26,8 +26,9 @@ main section .subsection-container > .block-text_expandable > p {
   margin: 0.8rem 0 0.5rem 0;
   color: #3a5d82;
   z-index: -1;
+  line-height: 24px !important;
 }
-.u-subsection h4 {
+.u-subsection h2 {
   text-transform: capitalize;
   font-size: 1.2rem;
   font-weight: 700;
@@ -36,6 +37,7 @@ main section .subsection-container > .block-text_expandable > p {
   color: #3a5d82;
   padding-top: 0 !important;
   z-index: -1;
+  line-height: 24px !important;
 }
 .u-subsection-end {
   margin-bottom: 30px;

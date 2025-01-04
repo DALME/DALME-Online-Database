@@ -16,6 +16,7 @@ from web.extensions.images.blocks.carousel import CarouselBlock
 
 from .chart_embed import ChartEmbedBlock
 from .document import DocumentBlock
+from .heading import HeadingBlock
 from .text_expandable import TextExpandableBlock
 
 
@@ -95,6 +96,7 @@ typed_table = TypedTableBlock(
     label='Table (typed)',
 )
 
+
 BASE_BLOCKS = [
     ('bibliography', BibliographyChooserBlock()),
     ('carousel', CarouselBlock(ImageChooserBlock())),
@@ -103,7 +105,7 @@ BASE_BLOCKS = [
     ('document', DocumentBlock()),
     ('embed', EmbedBlock(icon='media')),
     ('footnotes_placemarker', FootnotesPlaceMarker()),
-    ('heading', blocks.CharBlock()),
+    ('heading', HeadingBlock()),
     ('html', blocks.RawHTMLBlock()),
     ('inline_image', InlineImageBlock()),
     ('page', blocks.PageChooserBlock()),

@@ -48,20 +48,7 @@
   margin: 0;
   line-height: 1.7;
 }
-.block-heading {
-  font-weight: 650;
-  letter-spacing: 0.1rem;
-  margin: 3rem 0 1rem 0;
-  text-transform: uppercase;
-  font-size: 1.2rem;
-  color: #3a5d82;
-  border-bottom: 1px dotted #000;
-  padding-bottom: 0.25rem;
-}
-.block-text + .block-heading,
-.block-text_expandable + .block-heading {
-  margin-top: 1rem;
-}
+
 .block-html {
   text-align: center;
 }

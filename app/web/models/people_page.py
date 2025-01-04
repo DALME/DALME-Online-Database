@@ -13,6 +13,7 @@ from django.template.response import TemplateResponse
 
 from web.extensions.extras.blocks.defaults import DEFAULT_TABLE_OPTIONS
 from web.extensions.extras.blocks.document import DocumentBlock
+from web.extensions.extras.blocks.heading import HeadingBlock
 from web.extensions.extras.blocks.subsection import SubsectionBlock
 from web.extensions.images.blocks import InlineImageBlock
 from web.extensions.team.blocks import TeamListBlock
@@ -21,7 +22,7 @@ from web.models import BasePage, Essay, FeaturedInventory, FeaturedObject
 
 BLOCK_SET = [
     ('document', DocumentBlock()),
-    ('heading', blocks.CharBlock()),
+    ('heading', HeadingBlock()),
     ('inline_image', InlineImageBlock()),
     ('page', blocks.PageChooserBlock()),
     ('pullquote', blocks.RichTextBlock(icon='openquote', editor='minimal')),

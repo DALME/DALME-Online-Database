@@ -14,6 +14,7 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/chart-area.svg',
         'wagtailfontawesomesvg/solid/file-pdf.svg',
         'wagtailfontawesomesvg/solid/table-cells.svg',
+        'wagtailfontawesomesvg/solid/heading.svg',
     ]
 
 

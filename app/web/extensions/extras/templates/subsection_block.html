@@ -8,7 +8,7 @@
 >
   <a href="#{{ value.subsection|slugify }}" class="anchor">
     {% block subsection_title %}
-      <h3 {% if value.minor_heading %} class="minor_heading" {% endif %}>{{ value.subsection }}</h3>
+      <h1 {% if value.minor_heading %} class="minor_heading" {% endif %}>{{ value.subsection }}</h1>
     {% endblock %}
   </a>
   <i class="fas {% if value.collapsed %}fa-caret-down{% else %}fa-caret-up{% endif %} subsection"></i>
