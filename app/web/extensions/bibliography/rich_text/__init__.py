@@ -13,5 +13,11 @@ class ReferenceLinkHandler(LinkHandler):
     @classmethod
     def expand_db_attributes(cls, attrs):
         ref_id = attrs['data-id']
+        ref = attrs.get('data-reference')
         # TODO: generalize url: call bibliography page and get url from it
-        return f'<a href="{settings.PUBLIC_URL}/project/bibliography/#{ref_id}">'
+        output = f'<a href="{settings.PUBLIC_URL}/project/bibliography/#{ref_id}"'
+        if ref:
+            output += f' data-toggle="tooltip" data-placement="top" title="{ref[1:-1]}"'
+        output += '>'
+
+        return output

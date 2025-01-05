@@ -24,3 +24,6 @@ document.querySelectorAll(".text-expandable-container").forEach((el) => {
     el.querySelector(".show-button").classList.toggle("u-none");
   }
 });
+
+// eslint-disable-next-line no-undef
+$("[data-toggle=\"tooltip\"]").tooltip();
