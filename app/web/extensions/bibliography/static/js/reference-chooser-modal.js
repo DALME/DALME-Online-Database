@@ -116,7 +116,20 @@ class ReferenceSource extends window.React.Component {
     let nextState;
     const contentWithEntity = content.createEntity(entityType.type, "IMMUTABLE", data);
     const newEntityKey = contentWithEntity.getLastCreatedEntityKey();
-    nextState = window.DraftJS.RichUtils.toggleLink(editorState, selection, newEntityKey);
+
+    if (selection.isCollapsed()) {
+      const newText = ` ${data.reference}`;
+      const newContent = window.DraftJS.Modifier.replaceText(
+        content,
+        selection,
+        newText,
+        null,
+        newEntityKey,
+      );
+      nextState = window.DraftJS.EditorState.push(editorState, newContent, "insert-characters");
+    } else {
+      nextState = window.DraftJS.RichUtils.toggleLink(editorState, selection, newEntityKey);
+    }
 
     this.workflow.close();
     onComplete(nextState);
