@@ -13,7 +13,7 @@
 }
 .code-block pre[class*=language-] > code {
   box-shadow: none;
-  border-radius: 5px;
-  border: 1px solid #aaa;
+  border-radius: .3125rem;
+  border: 1px solid var(--w-color-border-field-default);
   padding: 0.5em 1em;
 }
