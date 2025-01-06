@@ -19,6 +19,7 @@ from .pharma_web import (
 )
 from .preferences import DEFAULT_PREFERENCES
 from .record_types import RECORD_TYPE_COVERSIONS, RECORD_TYPES
+from .tei_elements import TEI_ATTRIBUTE_OPTIONS, TEI_ELEMENTS
 
 __all__ = [
     'ABOUT_DATA',
@@ -46,6 +47,8 @@ __all__ = [
     'ROLES',
     'SAMPLE_GRADIENTS',
     'SOURCES_MODEL_MAP',
+    'TEI_ATTRIBUTE_OPTIONS',
+    'TEI_ELEMENTS',
     'TO_BOOL',
     'TO_FKEY',
     'TO_INT',
