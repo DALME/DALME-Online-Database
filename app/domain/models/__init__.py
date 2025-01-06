@@ -38,6 +38,7 @@ from .saved_search import SavedSearch
 from .scope import Scope, ScopeType
 from .tag import Tag
 from .task import Task, TaskList
+from .tei_element import Element, ElementAttribute, ElementSet
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
@@ -59,6 +60,9 @@ __all__ = [
     'ContentAttributes',
     'ContentTypeExtended',
     'CountryReference',
+    'Element',
+    'ElementAttribute',
+    'ElementSet',
     'EntityPhrase',
     'Headword',
     'LanguageReference',
