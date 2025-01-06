@@ -181,6 +181,9 @@ class Stage(BaseStage):
 
             for image in Image.objects.all():
                 try:
+                    if image.format == 'PNG' and image.mode != 'RGBA':
+                        image.convert('RGBA')
+                        image.save()
                     if not image.has_focal_point():
                         image.set_focal_point(image.get_suggested_focal_point())
                         image.save()
