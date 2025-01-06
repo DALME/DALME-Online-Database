@@ -27,6 +27,7 @@ from .stages import (
     RankTwoStage,
     RankZeroStage,
     RecordsStage,
+    TeiElements,
 )
 
 logger = structlog.get_logger(__name__)
@@ -46,6 +47,7 @@ STAGES = [
     ContentFixes,
     NamedAgentsStage,
     PharmaStage,
+    TeiElements,
 ]
 
 

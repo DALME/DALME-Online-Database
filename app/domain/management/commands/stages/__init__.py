@@ -14,6 +14,7 @@ from .rank_0 import Stage as RankZeroStage
 from .rank_1 import Stage as RankOneStage
 from .rank_2 import Stage as RankTwoStage
 from .records import Stage as RecordsStage
+from .tei_elements import Stage as TeiElements
 
 __all__ = [
     'AttributeOptionsStage',
@@ -30,4 +31,5 @@ __all__ = [
     'RankTwoStage',
     'RankZeroStage',
     'RecordsStage',
+    'TeiElements',
 ]
