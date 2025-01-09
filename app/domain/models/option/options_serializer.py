@@ -4,10 +4,10 @@ from rest_framework import serializers
 
 
 class OptionsSerializer(serializers.Serializer):
-    label = serializers.CharField()
-    value = serializers.CharField()
-    group = serializers.CharField(required=False)
-    detail = serializers.CharField(required=False)
+    label = serializers.ReadOnlyField()
+    value = serializers.ReadOnlyField()
+    group = serializers.ReadOnlyField(required=False)
+    detail = serializers.ReadOnlyField(required=False)
 
     class Meta:
         fields = [
@@ -26,5 +26,5 @@ class OptionsSerializer(serializers.Serializer):
         fields = super().get_fields()
         if self.concordance:
             for key, value in self.concordance.items():
-                fields[key] = serializers.CharField(source=value)
+                fields[key] = serializers.ReadOnlyField(source=value)
         return fields

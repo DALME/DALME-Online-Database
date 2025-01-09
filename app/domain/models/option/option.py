@@ -42,14 +42,15 @@ class OptionsList(TrackingMixin):
     payload_type = models.CharField(max_length=15, choices=PAYLOAD_TYPES)
     description = models.TextField()
 
-    def get_values(self, serialize=True, public=False):
-        if not self.values.exists():
+    def get_values(self, serialize=True, raw_data=False, public=False, tenanted=True):
+        values = self.values.all() if tenanted else self.values.unscoped()
+        if not values.exists():
             return None
 
-        if public and self.values.filter(public=True).exists():
-            payload = self.values.filter(public=True).first().payload
+        if public and values.filter(public=True).exists():
+            payload = values.filter(public=True).first().payload
         else:
-            payload = self.values.first().payload
+            payload = values.first().payload
 
         concordance = None
         if self.payload_type == 'db_records':
@@ -66,13 +67,20 @@ class OptionsList(TrackingMixin):
         elif self.payload_type == 'static_list':
             data = payload
 
+        if raw_data:
+            return data
+
         if serialize:
             serializer = OptionsSerializer(data, many=True, concordance=concordance)
             return serializer.data
 
         value_name = concordance.get('value', 'value') if concordance else 'value'
         label_name = concordance.get('label', 'label') if concordance else 'label'
-        return [(getattr(i, value_name), getattr(i, label_name)) for i in data]
+        return (
+            [(i.get(value_name), i.get(label_name)) for i in data]
+            if isinstance(data[0], dict)
+            else [(getattr(i, value_name), getattr(i, label_name)) for i in data]
+        )
 
 
 class OptionsValue(TenantMixin, TrackingMixin):
