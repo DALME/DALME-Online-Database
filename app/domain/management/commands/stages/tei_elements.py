@@ -2,7 +2,7 @@
 
 from django.db import transaction
 
-from domain.models import Element, ElementAttribute, ElementSet, OptionsList, Project
+from domain.models import Element, ElementAttribute, ElementSet, ElementSetMembership, OptionsList, Project
 from tenants.models import Tenant
 
 from .base import BaseStage
@@ -18,7 +18,6 @@ class Stage(BaseStage):
     def apply(self):
         """Execute the stage."""
         self.create_elements()
-        self.create_default_project_set()
 
     @transaction.atomic
     def create_elements(self):
@@ -47,12 +46,26 @@ class Stage(BaseStage):
                 options_concordance[opt['key']] = options_list.id
                 self.logger.debug('Created list: %s', opt['name'])
 
+            # create default DALME element set
+            self.logger.info('Creating default DALME element set')
+            project = Project.objects.get(name='DALME')
+            dalme_set = ElementSet.objects.create(
+                label='DALME Default',
+                description='Default TEI element set for the DALME project.',
+                project=project,
+                creation_user_id=1,
+                modification_user_id=1,
+                is_default=True,
+            )
+
             # create elements
             self.logger.info('Creating TEI elements')
             for section in TEI_ELEMENTS:
                 section_name = section['id']
                 for item in section['items']:
                     attributes = item.pop('attributes', None)
+                    in_context_menu = item.pop('in_context_menu', False)
+                    in_toolbar = item.pop('in_toolbar', False)
                     item.update(
                         {
                             'section': section_name,
@@ -68,20 +81,16 @@ class Stage(BaseStage):
                             if options:
                                 att['options_id'] = options_concordance[options]
                             ElementAttribute.objects.create(**att)
+
+                    # add element to DALME set
+                    ElementSetMembership.objects.create(
+                        element_set=dalme_set,
+                        element=element,
+                        in_context_menu=in_context_menu,
+                        in_toolbar=in_toolbar,
+                    )
+
                     self.logger.debug('Created element: %s', item['label'])
 
         else:
             self.logger.warning('TEI data already exists')
-
-    @transaction.atomic
-    def create_default_project_set(self):
-        """Create default TEI elements set for DALME project."""
-        self.logger.info('Creating default TEI elements set for DALME project')
-        project = Project.objects.get(name='DALME')
-        elements = Element.objects.all()
-        element_set = ElementSet.objects.create(
-            content_object=project,
-            is_default=True,
-            description='Default TEI element set for DALME project.',
-        )
-        element_set.elements.add(*elements)

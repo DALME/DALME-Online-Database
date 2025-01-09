@@ -236,27 +236,27 @@ TEI_ATTRIBUTE_OPTIONS = [
         'payload_type': 'static_list',
         'description': 'List of options for TEI glyph element.',
         'payload': [
-            {'value': '22B6', 'description': 'Barbell right'},
-            {'value': '22B7', 'description': 'Barbell left'},
-            {'value': '25CB', 'description': 'Circle'},
-            {'value': '2655', 'description': 'Crown'},
-            {'value': '2720', 'description': 'Maltese cross'},
-            {'value': '261A', 'description': 'Manicule pointing left'},
-            {'value': '261B', 'description': 'Manicule pointing right'},
+            {'value': '22B6', 'label': 'Barbell right'},
+            {'value': '22B7', 'label': 'Barbell left'},
+            {'value': '25CB', 'label': 'Circle'},
+            {'value': '2655', 'label': 'Crown'},
+            {'value': '2720', 'label': 'Maltese cross'},
+            {'value': '261A', 'label': 'Manicule pointing left'},
+            {'value': '261B', 'label': 'Manicule pointing right'},
             {
                 'value': '00BD',
-                'description': 'fraction - half',
-                'wrapper': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.5}},
+                'label': 'fraction - half',
+                'description': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.5}},
             },
             {
                 'value': '2153',
-                'description': 'fraction - third',
-                'wrapper': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.33}},
+                'label': 'fraction - third',
+                'description': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.33}},
             },
             {
                 'value': '00BC',
-                'description': 'fraction - quarter',
-                'wrapper': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.25}},
+                'label': 'fraction - quarter',
+                'description': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.25}},
             },
         ],
     },
@@ -275,6 +275,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Glosses',
                 'tag': 'note',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-language',
                 'attributes': [
                     {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'gloss'},
                     {'value': 'text', 'label': 'Note', 'editable': True, 'required': False, 'kind': 'textarea'},
@@ -297,6 +300,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
                 'tag': 'note',
                 'compound': False,
+                'in_context_menu': True,
+                'in_toolbar': True,
+                'icon': 'fa-solid fa-note-sticky',
                 'attributes': [
                     {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'marginal'},
                     {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
@@ -310,6 +316,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
                 'tag': 'mute',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-bell-slash',
             },
             {
                 'label': 'Named entity',
@@ -319,6 +328,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Named_Entities_.28Persons.2FLocations.2FOrganizations.29',
                 'tag': 'rs',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-tag',
                 'attributes': [
                     {
                         'value': 'type',
@@ -346,6 +358,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Braces',
                 'tag': 'note',
                 'compound': True,
+                'in_context_menu': True,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-right-from-bracket',
                 'attributes': [
                     {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'brace'},
                     {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
@@ -368,6 +383,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
                 'tag': 'note',
                 'compound': True,
+                'in_context_menu': True,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-asterisk',
                 'attributes': [
                     {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'renvoi'},
                     {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
@@ -390,6 +408,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Paraphrasing',
                 'tag': 'quote',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': True,
+                'icon': 'fa-solid fa-quote-left',
                 'attributes': [
                     {
                         'value': 'resp',
@@ -415,6 +436,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Abbreviations_and_Expansions',
                 'tag': 'abbr',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-signature',
                 'attributes': [
                     {
                         'value': 'type',
@@ -434,6 +458,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations',
                 'tag': 'add',
                 'compound': False,
+                'in_context_menu': True,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-arrows-turn-to-dots',
                 'attributes': [
                     {
                         'value': 'place',
@@ -454,6 +481,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations',
                 'tag': 'del',
                 'compound': False,
+                'in_context_menu': True,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-eraser',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -474,6 +504,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Elisions',
                 'tag': 'w',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'merge-h fa-solid fa-i-cursor fa-solid fa-ellipsis',
                 'attributes': [
                     {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'elision'},
                     {
@@ -503,6 +536,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Abbreviations_and_Expansions',
                 'tag': 'expan',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-left-right',
             },
             {
                 'label': 'Hand shift',
@@ -511,6 +547,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Hyphenation',
                 'tag': 'handShift',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-user-pen',
                 'attributes': [
                     {
                         'value': 'scribe',
@@ -546,6 +585,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Hyphenation',
                 'tag': 'pc',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': True,
+                'icon': 'fa-solid fa-minus',
                 'attributes': [
                     {
                         'value': 'force',
@@ -565,6 +607,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Omissions',
                 'tag': 'gap',
                 'compound': False,
+                'in_context_menu': True,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-arrows-left-right-to-line',
                 'attributes': [
                     {
                         'value': 'reason',
@@ -592,6 +637,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Supplied_Text',
                 'tag': 'supplied',
                 'compound': False,
+                'in_context_menu': True,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-hand-holding-medical',
                 'attributes': [
                     {
                         'value': 'reason',
@@ -612,6 +660,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Unclear_Text',
                 'tag': 'unclear',
                 'compound': False,
+                'in_context_menu': True,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-circle-question',
                 'attributes': [
                     {
                         'value': 'reason',
@@ -638,6 +689,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
                 'tag': 'hi',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': True,
+                'icon': 'fa-solid fa-align-center',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -657,6 +711,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
                 'tag': 'hi',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': True,
+                'icon': 'fa-solid fa-superscript',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -676,6 +733,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
                 'tag': 'hi',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': True,
+                'icon': 'fa-solid fa-underline',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -695,6 +755,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
                 'tag': 'hi',
                 'compound': False,
+                'in_context_menu': True,
+                'in_toolbar': True,
+                'icon': 'fa-solid fa-indent',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -714,6 +777,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Paraphrasing',
                 'tag': 'quotation',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-quote-left',
             },
         ],
     },
@@ -728,6 +794,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Blank_Space',
                 'tag': 'space',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-up-down',
                 'attributes': [
                     {
                         'value': 'extent',
@@ -746,6 +815,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Columns',
                 'tag': 'layout',
                 'compound': True,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-table-columns',
                 'attributes': [
                     {
                         'value': 'columns',
@@ -763,6 +835,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Leaders',
                 'tag': 'metamark',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'from-char ⸺',
                 'attributes': [
                     {'value': 'function', 'label': 'Function', 'editable': False, 'required': True, 'default': 'hr'}
                 ],
@@ -774,6 +849,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Leaders',
                 'tag': 'metamark',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'from-char —',
                 'attributes': [
                     {'value': 'function', 'label': 'Function', 'editable': False, 'required': True, 'default': 'hhr'}
                 ],
@@ -785,6 +863,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Leaders',
                 'tag': 'metamark',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'merge-h fa-solid fa-ellipsis fa-solid fa-0',
                 'attributes': [
                     {
                         'value': 'function',
@@ -811,6 +892,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Leaders',
                 'tag': 'table',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-table',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -851,6 +935,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
                 'tag': 'metamark',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'from-char 〃',
                 'attributes': [
                     {'value': 'function', 'label': 'Function', 'editable': False, 'required': True, 'default': 'ditto'}
                 ],
@@ -862,6 +949,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
                 'tag': 'metamark',
                 'compound': False,
+                'in_context_menu': False,
+                'in_toolbar': False,
+                'icon': 'fa-solid fa-ellipsis',
                 'attributes': [
                     {
                         'value': 'function',
@@ -879,6 +969,9 @@ TEI_ELEMENTS = [
                 'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
                 'tag': 'g',
                 'compound': True,
+                'in_context_menu': False,
+                'in_toolbar': True,
+                'icon': 'fa-brands fa-glide-g',
                 'attributes': [
                     {
                         'value': 'ref',
