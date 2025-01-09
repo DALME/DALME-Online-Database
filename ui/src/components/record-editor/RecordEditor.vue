@@ -47,7 +47,7 @@
     </q-drawer>
 
     <q-page-container>
-      <q-page :class="!view.pageDrawerMini ? 'q-pl-sm' : ''">
+      <q-page :class="!view.pageDrawerMini ? 'q-pl-sm' : 'q-pa-none'">
         <q-splitter
           v-model="view.editorSplitter"
           unit="px"
@@ -94,6 +94,7 @@
 </template>
 
 <script>
+import { requests } from "@/api";
 import {
   computed,
   defineComponent,
@@ -103,8 +104,9 @@ import {
   ref,
   // watch,
 } from "vue";
-import { useEventHandling, useStores } from "@/use";
-import { IiifViewer, TeiEditor, TeiRenderer } from "@/components";
+import { useAPI, useEventHandling, useStores } from "@/use";
+import { IiifViewer, TeiRenderer } from "@/components";
+import TeiEditor from "./TeiEditor.vue";
 import { notNully } from "@/utils";
 
 export default defineComponent({
@@ -115,15 +117,10 @@ export default defineComponent({
     TeiRenderer,
   },
   setup() {
-    const {
-      currentPageData,
-      containerHeight,
-      containerWidth,
-      pageCount,
-      // ui,
-      views,
-      view,
-    } = useStores();
+    const { apiInterface } = useAPI();
+    const { success, data, fetchAPI } = apiInterface();
+    const { auth, currentPageData, containerHeight, containerWidth, pageCount, ui, views, view } =
+      useStores();
     const { eventBus } = useEventHandling();
     const columns = inject("columns");
     const pages = inject("pages");
@@ -153,11 +150,24 @@ export default defineComponent({
       editorTab: "write",
     });
 
+    const fetchTagSets = async () => {
+      ui.globalLoading = true;
+      await fetchAPI(requests.editor.getTagSets(auth.user.id));
+      if (success.value) {
+        view.value.teiTagSets = data.value;
+        ui.globalLoading = false;
+      }
+    };
+
+    if (!view.value.teiTagSets) {
+      fetchTagSets();
+    }
+
     const drawer = ref(pageCount.value > 1);
     const pageChooser = computed(() => pageCount.value > 1);
-    // const tagMenuDrawer = computed(() => {
-    //   return view.value.showTagMenu ? 250 : 0;
-    // });
+    const tagMenuDrawer = computed(() => {
+      return view.value.showTagMenu ? 300 : 0;
+    });
 
     const editor = ref(null);
 
@@ -176,13 +186,11 @@ export default defineComponent({
         : containerHeight.value,
     );
     /* eslint-enable */
-    const editorWidth = computed(() =>
-      view.value.splitterHorizontal
-        ? containerWidth.value - view.value.tagMenuDrawer - 2
-        : Math.round(containerWidth.value - view.value.editorSplitter) -
-          view.value.tagMenuDrawer -
-          8,
-    );
+    const editorWidth = computed(() => {
+      return view.value.splitterHorizontal
+        ? containerWidth.value - tagMenuDrawer.value - 2
+        : Math.round(containerWidth.value - view.value.editorSplitter) - tagMenuDrawer.value - 8;
+    });
 
     const viewerHeight = computed(() =>
       view.value.splitterHorizontal ? view.value.editorSplitter : containerHeight.value,

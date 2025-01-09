@@ -45,13 +45,14 @@
     transition-prev="jump-up"
     transition-next="jump-up"
     class="editor-panel text-body2"
+    :style="`height: ${editorHeight}px;`"
   >
     <q-tab-panel name="write" class="row q-pa-none">
-      <div class="col-grow">
+      <div class="col">
         <codemirror
           v-model="editorContent"
           placeholder="Start transcription..."
-          :style="{ height: `'${editorHeight}px'`, width: `'${editorHeight}px'` }"
+          :style="{ height: `${editorHeight}px`, width: `${editorWidth}px` }"
           :autofocus="true"
           :indent-with-tab="true"
           :tab-size="4"
@@ -156,7 +157,6 @@ import {
 } from "vue";
 import { useStores } from "@/use";
 import { TeiRenderer } from "@/components";
-import { teiTags } from "./teiTags.js";
 import { Codemirror } from "vue-codemirror";
 import { xml } from "@codemirror/lang-xml";
 import { oneDark } from "@codemirror/theme-one-dark";
@@ -184,12 +184,12 @@ export default defineComponent({
     /* eslint-disable */
     const teiTagsFiltered = computed(() =>
       isEmpty(tagFilter.value)
-        ? sortBy(prop("name"), teiTags)
+        ? sortBy(prop("name"), view.value.teiTagSets)
         : rFilter(
             (tag) => tag.name.toLowerCase().includes(tagFilter.value.toLowerCase()),
             // tag.help.toLowerCase().includes(tagFilter.value.toLowerCase())
             // tag.tagName.toLowerCase().includes(tagFilter.value.toLowerCase())
-            sortBy(prop("name"), teiTags),
+            sortBy(prop("name"), view.value.teiTagSets),
           ),
     );
     /* eslint-enable */
@@ -417,7 +417,7 @@ export default defineComponent({
       editorHeight,
       editorWidth,
       tagFilter,
-      teiTags,
+      teiTags: view.value.teiTagSets,
       teiTagsFiltered,
       onTabSwitch,
       view,
@@ -447,6 +447,7 @@ export default defineComponent({
   overflow: scroll;
   border-left: 1px solid #d1d1d1;
   margin-left: 8px;
+  max-width: 300px !important;
 }
 .tag-menu .q-btn-group {
   width: 100%;

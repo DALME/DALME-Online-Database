@@ -4,7 +4,6 @@ export * from "./widgets";
 export { default as CustomDialog } from "./custom-dialog";
 export { default as MarkdownEditor } from "./markdown-editor";
 export { default as TeiRenderer } from "./tei-renderer";
-export { default as TeiEditor } from "./tei-editor";
 export { default as IiifViewer } from "./iiif-viewer";
 export { default as DetailCard } from "./detail-card";
 export { default as DataTable } from "./data-table";
