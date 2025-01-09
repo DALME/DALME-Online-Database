@@ -15,6 +15,7 @@ from .collections import Collections, CollectionSerializer
 from .comments import Comments, CommentSerializer
 from .countries import Countries, CountryReferenceSerializer
 from .datasets import Datasets
+from .editor import ElementSets
 from .groups import Groups, GroupSerializer
 from .images import ImageOptionsSerializer, Images, ImageUrlSerializer, RSCollectionsSerializer, RSImageSerializer
 from .languages import LanguageReferenceSerializer, Languages
@@ -51,6 +52,7 @@ __all__ = [
     'Countries',
     'CountryReferenceSerializer',
     'Datasets',
+    'ElementSets',
     'GroupSerializer',
     'Groups',
     'ImageOptionsSerializer',
