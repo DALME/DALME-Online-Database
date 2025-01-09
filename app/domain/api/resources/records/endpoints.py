@@ -88,7 +88,7 @@ class Records(BaseViewSet):
             result['thumbnail']['service']['@id'] = f'{settings.DAM_URL}/loris/{dam_id_list[0]}'
             result['sequences']['@id'] = record.id
             result['sequences']['canvases'] = [json.loads(page.get_canvas()) for page in pages]
-            return Response(result, 201)
+            return Response(result, 200)
 
         except Exception as e:  # noqa: BLE001
             return Response(str(e), 400)

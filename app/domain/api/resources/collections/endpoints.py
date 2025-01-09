@@ -72,7 +72,7 @@ class Collections(BaseViewSet):
         serializer = RecordSerializer(qs, many=True, field_set='collection_member')
         payload['data'] = serializer.data
 
-        return Response(payload, 201)
+        return Response(payload, 200)
 
     @action(detail=False, methods=['post'])
     def add_members(self, request, *args, **kwargs):  # noqa: ARG002
@@ -91,7 +91,7 @@ class Collections(BaseViewSet):
                     new_members.append(new_entry)
 
             CollectionMembership.objects.bulk_create(new_members)
-            return Response({'message': 'Action succesful.'}, 201)
+            return Response({'message': 'Action succesful.'}, 200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
@@ -104,7 +104,7 @@ class Collections(BaseViewSet):
             members = self.request.data['members']
             member_objects = CollectionMembership.objects.filter(collection_id=collection_id, object_id__in=members)
             member_objects.delete()
-            return Response({'message': 'Action succesful.'}, 201)
+            return Response({'message': 'Action succesful.'}, 200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)

@@ -44,4 +44,4 @@ class Session(viewsets.ViewSet):
                 request.session[key] = value
                 result.append({'key': key, 'result': f'new value: {value}'})
 
-        return Response(result, 201)
+        return Response(result, 200)

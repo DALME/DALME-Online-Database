@@ -87,7 +87,7 @@ class Workflows(viewsets.ModelViewSet):
                 obj.save()
                 self.update_log(obj, f'status changed from {status_dict[prev_status]} to {status_dict[status]}')
 
-            return Response(201)
+            return Response(200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)

@@ -62,7 +62,7 @@ class Tasks(BaseViewSet):
                 obj.completed = False
                 obj.save(update_fields=['completed', 'modification_user', 'modification_timestamp'])
 
-            return Response({'message': 'Update successful.'}, 201)
+            return Response({'message': 'Update successful.'}, 200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)

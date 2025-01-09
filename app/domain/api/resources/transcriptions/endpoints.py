@@ -53,11 +53,11 @@ class Transcriptions(viewsets.ModelViewSet):
             if serializer.is_valid():
                 serializer.save()
                 serializer = TranscriptionSerializer(obj)
-                return Response(serializer.data, 201)
+                return Response(serializer.data, 200)
             return Response(serializer.errors, 400)
 
         serializer = TranscriptionSerializer(obj)
-        return Response(serializer.data, 201)
+        return Response(serializer.data, 200)
 
     @action(detail=True, methods=['get'])
     def check_version(self, request, pk=None):  # noqa: ARG002

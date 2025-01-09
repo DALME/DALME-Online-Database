@@ -92,7 +92,7 @@ class AttributeTypes(BaseViewSet):
         atype = self.get_object()
         options = atype.options.get_values(public=self.is_public)
         if options is not None:
-            return Response(options, 201)
+            return Response(options, 200)
         return Response({'error': 'No options could be retrieved.'}, 400)
 
 
@@ -140,7 +140,7 @@ class Attributes(BaseViewSet):
                 except AttributeError:
                     options[name] = 'No options could be retrieved.'
             if options:
-                return Response(options, 201)
+                return Response(options, 200)
         return Response({'error': 'No options could be retrieved.'}, 400)
 
 

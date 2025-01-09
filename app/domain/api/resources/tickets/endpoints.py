@@ -66,7 +66,7 @@ class Tickets(BaseViewSet):
                 obj.status = 0
                 obj.save(update_fields=['status', 'modification_user', 'modification_timestamp'])
 
-            return Response({'username': self.request.user.username}, 201)
+            return Response({'username': self.request.user.username}, 200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)

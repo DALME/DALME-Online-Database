@@ -21,7 +21,7 @@ class Datasets(viewsets.GenericViewSet):
             return Response({'error': 'There was no dataset id in the request.'}, 400)
 
         try:
-            return Response(eval(f'self.{pk}()'), 201)
+            return Response(eval(f'self.{pk}()'), 200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)

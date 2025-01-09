@@ -45,7 +45,7 @@ class Pages(BaseViewSet):
     def get_rights(self, request, *args, **kwargs):  # noqa: ARG002
         """Return rights information for page."""
         try:
-            return Response({'rights': self.get_object().get_rights()}, 201)
+            return Response({'rights': self.get_object().get_rights()}, 200)
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
 
@@ -66,7 +66,7 @@ class Pages(BaseViewSet):
             result['thumbnail']['service']['@id'] = f'{settings.DAM_URL}/loris/{page.dam_id}'
             result['sequences'][0]['@id'] = page.id
             result['sequences'][0]['canvases'] = [json.loads(page.get_canvas())]
-            return Response(result, 201)
+            return Response(result, 200)
 
         except Exception as e:  # noqa: BLE001
             return Response(str(e), 400)

@@ -65,9 +65,9 @@ class Images(BaseViewSet):
             # row_cutoff = query_params.get('param5', '20')
             response = rs_api_query(**query_params)
             try:
-                return Response(json.loads(response.text), 201)  # [:int(row_cutoff)]
+                return Response(json.loads(response.text), 200)  # [:int(row_cutoff)]
             except JSONDecodeError:
-                return Response('Your search did not return any results.', 201)
+                return Response('Your search did not return any results.', 200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
