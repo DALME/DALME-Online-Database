@@ -38,7 +38,7 @@ from .saved_search import SavedSearch
 from .scope import Scope, ScopeType
 from .tag import Tag
 from .task import Task, TaskList
-from .tei_element import Element, ElementAttribute, ElementSet
+from .tei_element import Element, ElementAttribute, ElementSet, ElementSetMembership
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
@@ -63,6 +63,7 @@ __all__ = [
     'Element',
     'ElementAttribute',
     'ElementSet',
+    'ElementSetMembership',
     'EntityPhrase',
     'Headword',
     'LanguageReference',
