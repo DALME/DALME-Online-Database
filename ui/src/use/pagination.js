@@ -2,13 +2,13 @@ import S from "string";
 import { equals, isEmpty } from "ramda";
 import { computed, ref, unref, watch } from "vue";
 import { notNully } from "@/utils";
-import { useAuthStore } from "@/stores/auth";
+import { usePreferencesStore } from "@/stores/preferences";
 
 const transformField = (field) => S(field).underscore().s;
 
 export const usePagination = (fetchData, listName, defaults, embedded = false) => {
-  const auth = useAuthStore();
-  const lists = auth.preferences.lists;
+  const preferences = usePreferencesStore();
+  const lists = preferences.keys.listPreferences;
 
   if (!notNully(lists[listName])) {
     lists[listName] = {

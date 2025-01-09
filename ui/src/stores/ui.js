@@ -1,20 +1,19 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useViewStore } from "@/stores/views";
-import { useAuthStore } from "@/stores/auth";
+import { usePreferencesStore } from "@/stores/preferences";
 import { EventBus } from "quasar";
 
 export const useUiStore = defineStore(
   "ui",
   () => {
     // stores
-    const auth = useAuthStore();
+    const preferences = usePreferencesStore();
 
     // event bus
     const eventBus = new EventBus();
 
     // state
-    // const eventBus = ref(new EventBus());
     const previousPath = ref("");
     const currentPath = ref("");
     const currentSection = ref("");
@@ -53,17 +52,17 @@ export const useUiStore = defineStore(
 
     const containerWidth = computed(() => {
       const views = useViewStore();
-      let chrome = 84;
+      let chrome = 152;
       if ("pageDrawerMini" in views.view && views.view.pageDrawerMini.value) chrome = chrome + 149;
       return windowWidth.value - chrome;
     });
 
     const showTips = computed({
       get() {
-        return auth.preferences.general.tooltipsOn;
+        return preferences.keys.tooltipsOn;
       },
       set(newValue) {
-        auth.preferences.general.tooltipsOn = newValue;
+        preferences.keys.tooltipsOn = newValue;
       },
     });
 

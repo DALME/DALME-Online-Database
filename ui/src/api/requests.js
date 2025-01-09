@@ -6,6 +6,7 @@ import auth from "./auth";
 import comments from "./comments";
 import countries from "./countries";
 import collections from "./collections";
+import editor from "./editor";
 import groups from "./groups";
 import images from "./images";
 import languages from "./languages";
@@ -21,6 +22,7 @@ import rights from "./rights";
 import tasks from "./tasks";
 import tickets from "./tickets";
 import users from "./users";
+import preferences from "./preferences";
 
 const requests = {
   agents,
@@ -31,6 +33,7 @@ const requests = {
   comments,
   countries,
   collections,
+  editor,
   groups,
   images,
   languages,
@@ -38,6 +41,7 @@ const requests = {
   locales,
   pages,
   places,
+  preferences,
   publications,
   rights,
   recordGroups,

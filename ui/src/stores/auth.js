@@ -11,13 +11,11 @@ import { useSelector } from "@xstate/vue";
 import * as yup from "yup";
 
 import { API as apiInterface, requests } from "@/api";
-import notifier from "@/notifier";
 import { router as $router } from "@/router";
 import { groupSchema, tenantSchema } from "@/schemas";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
 import { useStoreMachine } from "@/use";
-import { notNully } from "@/utils";
 
 const AUTHORIZATION_CALLBACK_URL = "api/oauth/authorize/callback/";
 const CODE_CHALLENGE_METHOD = "S256";
@@ -475,41 +473,6 @@ export const useAuthStore = defineStore(
     const ui = useUiStore();
     const views = useViewStore();
 
-    // TODO: Preferences logic to be broken out to preferences machine/store.
-    const preferences = ref({
-      general: {
-        tooltipsOn: true,
-        sidebarCollapsed: false,
-      },
-      sourceEditor: {},
-      lists: {},
-    });
-
-    const getSectionFromKey = (key, preferences) => {
-      for (const section of Object.keys(preferences)) {
-        if (Object.keys(preferences[section]).indexOf(key) > -1) {
-          return section;
-        }
-      }
-      return null;
-    };
-
-    const updatePreferences = async (route, mutation) => {
-      const { newValue, key, target } = mutation.events;
-      const useKey = Array.isArray(target) ? route : key;
-      const section = getSectionFromKey(useKey, preferences.value);
-      const useValue = Array.isArray(target) ? preferences.value[section][useKey] : newValue;
-      if (notNully(section)) {
-        const { fetchAPI, success } = apiInterface();
-        await fetchAPI(
-          requests.users.updateUserPreferences(user.value.userId, section, useKey, useValue),
-        );
-        if (!success.value) {
-          notifier.users.prefUpdateFailed();
-        }
-      }
-    };
-
     return {
       accessToken,
       actor,
@@ -523,15 +486,9 @@ export const useAuthStore = defineStore(
       state,
       unauthorized,
       user,
-
       // TODO: Refresh sub flow/machine?
       processQueue,
       queue,
-
-      // TODO: Move to independent preferences machine/store.
-      updatePreferences,
-      preferences,
-      sourceEditor: preferences.value.sourceEditor,
     };
   },
   {

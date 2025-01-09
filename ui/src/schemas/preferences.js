@@ -10,11 +10,11 @@ export const preferenceSchema = yup.object().shape({
     .mixed()
     .when("dataType", ([dataType], _schema) => {
       switch (dataType) {
-        case "bool":
+        case "BOOL":
           return yup.boolean();
-        case "int":
+        case "INT":
           return yup.number();
-        case "json":
+        case "JSON":
           return yup.mixed();
         default:
           return yup.string();

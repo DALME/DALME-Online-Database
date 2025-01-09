@@ -46,7 +46,7 @@ export default defineComponent({
   },
   setup() {
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
-    const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
+    const { auth, ui, preferences, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
     const userDrawerEl = ref(null);
     const pageBackdrop = ref(null);
@@ -59,11 +59,11 @@ export default defineComponent({
     const prefSubscription = (action) => {
       let unsubscribe = () => {};
       if (action === "subscribe") {
-        unsubscribe = auth.$subscribe(
+        unsubscribe = preferences.$subscribe(
           (mutation) => {
-            auth.updatePreferences($route.name, mutation);
+            preferences.updatePreferences($route.name, mutation);
           },
-          { detached: true },
+          { detached: true, deep: true },
         );
       } else {
         unsubscribe();
@@ -92,7 +92,10 @@ export default defineComponent({
         auth.logout();
       }
 
-      if (auth.authorized) prefSubscription("subscribe");
+      if (auth.authorized) {
+        preferences.getPreferences();
+        prefSubscription("subscribe");
+      }
       ui.resizeListener();
 
       document.addEventListener("click", outsideDrawerClick);
