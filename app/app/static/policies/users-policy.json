@@ -3,8 +3,7 @@
     "action": [
       "list",
       "retrieve",
-      "has_permission",
-      "get_preferences"
+      "has_permission"
     ],
     "principal": [
       "authenticated"
@@ -13,7 +12,6 @@
   },
   {
     "action": [
-      "update_preferences",
       "partial_update",
       "update"
     ],

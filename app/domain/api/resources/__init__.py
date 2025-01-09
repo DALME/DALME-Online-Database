@@ -25,6 +25,7 @@ from .locations import Locations, LocationSerializer
 from .pages import Pages, PageSerializer
 from .ping import Ping
 from .places import Places, PlaceSerializer
+from .preferences import Preferences, PreferenceSerializer
 from .records import PURLEndpoint, Records, RecordSerializer, RecordTypeSerializer, WebRecords
 from .rights import Rights, RightsPolicySerializer
 from .session import Session
@@ -71,6 +72,8 @@ __all__ = [
     'Ping',
     'PlaceSerializer',
     'Places',
+    'PreferenceSerializer',
+    'Preferences',
     'RSCollectionsSerializer',
     'RSImageSerializer',
     'RecordSerializer',

@@ -1,7 +1,6 @@
 """API endpoint for managing users."""
 
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
-from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
@@ -74,32 +73,4 @@ class Users(BaseViewSet):
         )
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        return Response(serializer.data, 201)
-
-    @action(detail=True, methods=['get'])
-    def get_preferences(self, request, *args, **kwargs):  # noqa: ARG002
-        """Return user preferences."""
-        user = self.get_object()
-        return Response(user.profile.preferences, 201)
-
-    @action(detail=True, methods=['post'])
-    def update_preferences(self, request, *args, **kwargs):  # noqa: ARG002
-        """Update user preferences."""
-        user = self.get_object()
-        try:
-            if request.data:
-                prefs = user.profile.preferences
-                if prefs.get(request.data['section']) is None:
-                    prefs[request.data['section']] = {request.data['key']: request.data['value']}
-                else:
-                    prefs[request.data['section']][request.data['key']] = request.data['value']
-
-                user.profile.preferences = prefs
-                user.profile.save()
-
-                return Response(201)
-
-            return Response({'error': 'Request contained no data.'}, 400)
-
-        except Exception as e:  # noqa: BLE001
-            return Response({'error': str(e)}, 400)
+        return Response(serializer.data, 200)
