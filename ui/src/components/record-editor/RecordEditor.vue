@@ -94,7 +94,6 @@
 </template>
 
 <script>
-import { requests } from "@/api";
 import {
   computed,
   defineComponent,
@@ -102,9 +101,10 @@ import {
   nextTick,
   provide,
   ref,
+  onMounted,
   // watch,
 } from "vue";
-import { useAPI, useEventHandling, useStores } from "@/use";
+import { useEventHandling, useStores } from "@/use";
 import { IiifViewer, TeiRenderer } from "@/components";
 import TeiEditor from "./TeiEditor.vue";
 import { nully } from "@/utils";
@@ -117,9 +117,7 @@ export default defineComponent({
     TeiRenderer,
   },
   setup() {
-    const { apiInterface } = useAPI();
-    const { success, data, fetchAPI } = apiInterface();
-    const { auth, currentPageData, containerHeight, containerWidth, pageCount, ui, views, view } =
+    const { currentPageData, containerHeight, containerWidth, pageCount, views, view, settings } =
       useStores();
     const { eventBus } = useEventHandling();
     const columns = inject("columns");
@@ -149,19 +147,6 @@ export default defineComponent({
       lastSplitter: 0,
       editorTab: "write",
     });
-
-    const fetchTagSets = async () => {
-      ui.globalLoading = true;
-      await fetchAPI(requests.editor.getTagSets(auth.user.id));
-      if (success.value) {
-        view.value.teiTagSets = data.value;
-        ui.globalLoading = false;
-      }
-    };
-
-    if (!view.value.teiTagSets) {
-      fetchTagSets();
-    }
 
     const drawer = ref(pageCount.value > 1);
     const pageChooser = computed(() => pageCount.value > 1);
@@ -270,6 +255,10 @@ export default defineComponent({
     provide("editorDimensions", { editorHeight, editorWidth });
     provide("viewerDimensions", { viewerHeight, viewerWidth });
     provide("pageDrawerOpen", drawer);
+
+    onMounted(() => {
+      settings.fetchTeiElements();
+    });
 
     return {
       nully,

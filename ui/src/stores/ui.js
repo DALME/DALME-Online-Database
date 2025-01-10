@@ -1,14 +1,14 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useViewStore } from "@/stores/views";
-import { usePreferencesStore } from "@/stores/preferences";
+import { useSettingsStore } from "@/stores/settings";
 import { EventBus } from "quasar";
 
 export const useUiStore = defineStore(
   "ui",
   () => {
     // stores
-    const preferences = usePreferencesStore();
+    const settings = useSettingsStore();
 
     // event bus
     const eventBus = new EventBus();
@@ -59,10 +59,10 @@ export const useUiStore = defineStore(
 
     const showTips = computed({
       get() {
-        return preferences.keys.tooltipsOn;
+        return settings.get("tooltipsOn", true);
       },
       set(newValue) {
-        preferences.keys.tooltipsOn = newValue;
+        settings.update("tooltipsOn", newValue);
       },
     });
 

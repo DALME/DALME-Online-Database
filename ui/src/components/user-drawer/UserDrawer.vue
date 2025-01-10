@@ -85,7 +85,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { computed, defineComponent, inject, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { isEmpty, isNil } from "ramda";
 import { useStores } from "@/use";
 import { CustomDialog, TooltipWidget, TaskManager } from "@/components";
@@ -101,7 +101,7 @@ export default defineComponent({
     const $q = useQuasar();
     const { auth, userDrawerOpen, windowHeight, showTips } = useStores();
     const submitting = ref(false);
-    const prefSubscription = inject("prefSubscription");
+    // const prefSubscription = inject("prefSubscription");
     const scrollHeight = computed(() => windowHeight.value - 181);
 
     const logout = () => {
@@ -116,7 +116,7 @@ export default defineComponent({
           okayButtonLabel: "Log out",
         },
       }).onOk(() => {
-        prefSubscription();
+        // prefSubscription();
         auth.logout();
       });
     };

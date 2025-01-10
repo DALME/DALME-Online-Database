@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
-import { usePreferencesStore } from "@/stores/preferences";
+import { useSettingsStore } from "@/stores/settings";
 
 const StoresSymbol = Symbol();
 
@@ -13,29 +13,29 @@ export const provideStores = () => {
   const auth = useAuthStore();
   const ui = useUiStore();
   const views = useViewStore();
-  const preferences = usePreferencesStore();
+  const settings = useSettingsStore();
 
   provide(StoresSymbol, {
     eventBus,
     auth,
     ui,
     views,
-    preferences,
+    settings,
     ...storeToRefs(auth),
     ...storeToRefs(ui),
     ...storeToRefs(views),
-    ...storeToRefs(preferences),
+    ...storeToRefs(settings),
   });
   return {
     eventBus,
     auth,
     ui,
     views,
-    preferences,
+    settings,
     ...storeToRefs(auth),
     ...storeToRefs(ui),
     ...storeToRefs(views),
-    ...storeToRefs(preferences),
+    ...storeToRefs(settings),
   };
 };
 

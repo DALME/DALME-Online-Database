@@ -69,7 +69,7 @@
             dense
             borderless
             hide-bottom-space
-            v-model="tagFilter"
+            v-model="ElementFilter"
             debounce="300"
             autocomplete="off"
             autocorrect="off"
@@ -80,24 +80,24 @@
           >
             <template v-slot:append>
               <q-icon
-                v-if="tagFilter"
+                v-if="ElementFilter"
                 name="close"
                 class="cursor-pointer"
                 size="12px"
                 color="blue-grey-5"
-                @click="tagFilter = ''"
+                @click="ElementFilter = ''"
               />
             </template>
           </q-input>
           <q-list dense separator>
-            <template v-for="(tag, idx) in teiTagsFiltered" :key="idx">
+            <template v-for="(tag, idx) in teiElementsFiltered" :key="idx">
               <q-btn-dropdown
                 flat
                 no-caps
                 auto-close
                 split
                 align="left"
-                :label="tag.name"
+                :label="tag.label"
                 content-class="tag-menu-popup outlined-item menu-shadow"
               >
                 <q-list dense separator>
@@ -105,7 +105,7 @@
                     <q-item-section>
                       <q-item-label class="text-detail text-grey-7 q-py-sm">
                         <q-icon name="o_info" size="14px" color="grey-6" class="q-mr-xs" />
-                        <span v-html="tag.help" />
+                        <span v-html="tag.description" />
                       </q-item-label>
                     </q-item-section>
                   </q-item>
@@ -127,10 +127,10 @@
       </transition>
       <q-menu touch-position context-menu transition-show="scale" transition-hide="scale">
         <q-list dense separator>
-          <template v-for="(tag, idx) in teiTags" :key="idx">
+          <template v-for="(tag, idx) in teiElements" :key="idx">
             <q-item clickable>
               <q-item-section>
-                <q-item-label>{{ tag.name }}</q-item-label>
+                <q-item-label>{{ tag.label }}</q-item-label>
               </q-item-section>
             </q-item>
           </template>
@@ -168,12 +168,12 @@ export default defineComponent({
     TeiRenderer,
   },
   setup() {
-    const { currentPageData, view } = useStores();
+    const { currentPageData, settings, view } = useStores();
     const { editorHeight, editorWidth } = inject("editorDimensions");
     const disabled = computed(() => {
       return isEmpty(currentPageData.value.tei);
     });
-    const tagFilter = ref("");
+    const ElementFilter = ref("");
     const editor = shallowRef();
     const extensions = [xml(), oneDark];
     const editorReady = (payload) => {
@@ -181,15 +181,16 @@ export default defineComponent({
     };
     const editorContent = currentPageData.value.tei;
 
+    const teiElements = settings.sets[0].members;
     /* eslint-disable */
-    const teiTagsFiltered = computed(() =>
-      isEmpty(tagFilter.value)
-        ? sortBy(prop("name"), view.value.teiTagSets)
+    const teiElementsFiltered = computed(() =>
+      isEmpty(ElementFilter.value)
+        ? sortBy(prop("label"), teiElements)
         : rFilter(
-            (tag) => tag.name.toLowerCase().includes(tagFilter.value.toLowerCase()),
-            // tag.help.toLowerCase().includes(tagFilter.value.toLowerCase())
-            // tag.tagName.toLowerCase().includes(tagFilter.value.toLowerCase())
-            sortBy(prop("name"), view.value.teiTagSets),
+            (tag) => tag.name.toLowerCase().includes(ElementFilter.value.toLowerCase()),
+            // tag.help.toLowerCase().includes(ElementFilter.value.toLowerCase())
+            // tag.tagName.toLowerCase().includes(ElementFilter.value.toLowerCase())
+            sortBy(prop("label"), teiElements),
           ),
     );
     /* eslint-enable */
@@ -416,9 +417,9 @@ export default defineComponent({
       disabled,
       editorHeight,
       editorWidth,
-      tagFilter,
-      teiTags: view.value.teiTagSets,
-      teiTagsFiltered,
+      ElementFilter,
+      teiElements,
+      teiElementsFiltered,
       onTabSwitch,
       view,
       // insertTag,

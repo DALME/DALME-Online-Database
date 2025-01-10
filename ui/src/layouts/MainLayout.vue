@@ -46,7 +46,7 @@ export default defineComponent({
   },
   setup() {
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
-    const { auth, ui, preferences, userDrawerOpen, appDrawerOpen } = provideStores();
+    const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
     const userDrawerEl = ref(null);
     const pageBackdrop = ref(null);
@@ -55,20 +55,6 @@ export default defineComponent({
     const originPage = window.localStorage.getItem("origin_background");
     const showMap = computed(() => auth.authenticate && !originPage);
     const pageBackdropLoaded = ref(originPage ? false : true);
-
-    const prefSubscription = (action) => {
-      let unsubscribe = () => {};
-      if (action === "subscribe") {
-        unsubscribe = preferences.$subscribe(
-          (mutation) => {
-            preferences.updatePreferences($route.name, mutation);
-          },
-          { detached: true, deep: true },
-        );
-      } else {
-        unsubscribe();
-      }
-    };
 
     const outsideDrawerClick = (e) => {
       e.stopPropagation();
@@ -81,21 +67,14 @@ export default defineComponent({
     provideAPI();
     provideEditing();
     provideTransport();
-
-    provide("prefSubscription", prefSubscription);
     provide("userDrawerEl", userDrawerEl);
     provide("pageBackdropLoaded", pageBackdropLoaded);
 
     onMounted(() => {
       if ($route.query.logout) {
-        prefSubscription();
         auth.logout();
       }
 
-      if (auth.authorized) {
-        preferences.getPreferences();
-        prefSubscription("subscribe");
-      }
       ui.resizeListener();
 
       document.addEventListener("click", outsideDrawerClick);
