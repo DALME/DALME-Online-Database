@@ -6,7 +6,6 @@ import auth from "./auth";
 import comments from "./comments";
 import countries from "./countries";
 import collections from "./collections";
-import editor from "./editor";
 import groups from "./groups";
 import images from "./images";
 import languages from "./languages";
@@ -23,6 +22,7 @@ import tasks from "./tasks";
 import tickets from "./tickets";
 import users from "./users";
 import preferences from "./preferences";
+import teiElements from "./tei-elements";
 
 const requests = {
   agents,
@@ -33,7 +33,7 @@ const requests = {
   comments,
   countries,
   collections,
-  editor,
+  teiElements,
   groups,
   images,
   languages,

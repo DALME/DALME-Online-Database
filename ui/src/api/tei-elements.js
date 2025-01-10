@@ -1,9 +1,9 @@
 import { apiUrl } from "./config";
 
-const endpoint = `${apiUrl}/editor`;
+const endpoint = `${apiUrl}/tei-elements`;
 
-const editor = {
-  getTagSets() {
+const teiElements = {
+  getElementSets() {
     return {
       url: `${endpoint}/`,
       method: "GET",
@@ -11,4 +11,4 @@ const editor = {
   },
 };
 
-export default editor;
+export default teiElements;
