@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from app.access_policies import BaseAccessPolicy
-from domain.api.resources.editor.serializers import ElementSerializer, ElementSetSerializer
+from domain.api.resources.tei_elements.serializers import ElementSerializer, ElementSetSerializer
 from domain.models import ElementSet
 
 

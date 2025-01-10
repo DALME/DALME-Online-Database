@@ -68,12 +68,15 @@ class ElementSetSerializer(serializers.ModelSerializer):
     """Serializer for TEI element sets."""
 
     members = ElementSetMemberSerializer(many=True, read_only=True)
+    project = serializers.ReadOnlyField(source='project.name')
 
     class Meta:
         model = ElementSet
         fields = [
+            'id',
             'label',
             'description',
+            'project',
             'is_default',
             'members',
         ]

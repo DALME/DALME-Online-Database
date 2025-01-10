@@ -15,7 +15,6 @@ from .collections import Collections, CollectionSerializer
 from .comments import Comments, CommentSerializer
 from .countries import Countries, CountryReferenceSerializer
 from .datasets import Datasets
-from .editor import ElementSets
 from .groups import Groups, GroupSerializer
 from .images import ImageOptionsSerializer, Images, ImageUrlSerializer, RSCollectionsSerializer, RSImageSerializer
 from .languages import LanguageReferenceSerializer, Languages
@@ -30,6 +29,7 @@ from .records import PURLEndpoint, Records, RecordSerializer, RecordTypeSerializ
 from .rights import Rights, RightsPolicySerializer
 from .session import Session
 from .tasks import TaskLists, TaskListSerializer, Tasks, TaskSerializer
+from .tei_elements import ElementSets
 from .tenants import TenantSerializer
 from .tickets import TicketDetailSerializer, Tickets, TicketSerializer
 from .transcriptions import Transcriptions, TranscriptionSerializer
