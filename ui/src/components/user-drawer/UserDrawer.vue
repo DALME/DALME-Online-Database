@@ -10,7 +10,7 @@
           <q-item-section avatar>
             <q-avatar size="40px" class="greyscale-50">
               <q-img
-                v-if="notNully(auth.user.avatar)"
+                v-if="!nully(auth.user.avatar)"
                 :src="auth.user.avatar"
                 fit="cover"
                 ratio="1"
@@ -89,7 +89,7 @@ import { computed, defineComponent, inject, ref } from "vue";
 import { isEmpty, isNil } from "ramda";
 import { useStores } from "@/use";
 import { CustomDialog, TooltipWidget, TaskManager } from "@/components";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "UserDrawer",
@@ -129,7 +129,7 @@ export default defineComponent({
       userDrawerOpen,
       submitting,
       logout,
-      notNully,
+      nully,
       scrollHeight,
     };
   },

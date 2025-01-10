@@ -108,7 +108,7 @@
       </template>
 
       <q-btn dense round class="q-pr-none" @click="userDrawerOpen = !userDrawerOpen">
-        <q-avatar v-if="notNully(auth.user.avatar)" size="34px">
+        <q-avatar v-if="!nully(auth.user.avatar)" size="34px">
           <q-img :src="auth.user.avatar" fit="cover" ratio="1" />
         </q-avatar>
         <q-icon v-else name="mdi-account-circle" size="lg" color="blue-grey-5" />
@@ -183,7 +183,7 @@ import { computed, defineComponent, provide, ref, watch } from "vue";
 import { navRoutes } from "@/router";
 import { TooltipWidget } from "@/components";
 import { useStores } from "@/use";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "NavBar",
@@ -253,7 +253,7 @@ export default defineComponent({
       openKB,
       userDrawerOpen,
       appDrawerOpen,
-      notNully,
+      nully,
     };
   },
 });

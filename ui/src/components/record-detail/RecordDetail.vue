@@ -191,7 +191,7 @@ import {
   TagWidget,
   WorkflowManager,
 } from "@/components";
-import { formatDate, notNully } from "@/utils";
+import { formatDate, nully } from "@/utils";
 import RecordAttributes from "./RecordAttributes.vue";
 import RecordAgents from "./RecordAgents.vue";
 import RecordChildren from "./RecordChildren.vue";
@@ -222,11 +222,11 @@ export default defineComponent({
     const { success, data, fetchAPI } = apiInterface();
     const record = ref({});
     const id = ref($route.params.id);
-    const hasAttributes = computed(() => notNully(record.value.attributes));
-    const hasAgents = computed(() => notNully(record.value.agents));
-    const hasChildren = computed(() => notNully(record.value.children));
-    const hasPlaces = computed(() => notNully(record.value.places));
-    const hasPages = computed(() => notNully(record.value.pages));
+    const hasAttributes = computed(() => !nully(record.value.attributes));
+    const hasAgents = computed(() => !nully(record.value.agents));
+    const hasChildren = computed(() => !nully(record.value.children));
+    const hasPlaces = computed(() => !nully(record.value.places));
+    const hasPages = computed(() => !nully(record.value.pages));
     const entityCount = computed(() => {
       let agentsCount = hasAgents.value ? record.value.agents.length : 0;
       let placesCount = hasPlaces.value ? record.value.places.length : 0;

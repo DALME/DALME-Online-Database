@@ -12,10 +12,10 @@
         <template v-if="openDrawer && tm.listsReady">
           <div class="q-mb-md">
             <div
-              v-if="notNully(tm.listGroups) || tm.tasks.length > 0 || tm.tasksMeta.user > 0"
+              v-if="!nully(tm.listGroups) || tm.tasks.length > 0 || tm.tasksMeta.user > 0"
               class="tasklist-toolbar"
             >
-              <TasklistManager v-if="notNully(tm.listGroups)" :lists="tm.listGroups" />
+              <TasklistManager v-if="!nully(tm.listGroups)" :lists="tm.listGroups" />
               <template v-if="tm.tasks.length > 0 || tm.tasksMeta.user > 0">
                 <q-btn-dropdown
                   label="Filter"
@@ -165,7 +165,7 @@
                     <div class="meta-label">Assignees</div>
                     <div class="meta-content">
                       <q-avatar v-for="(user, i) in tm.viewing.assignees" :key="i" size="30px">
-                        <img v-if="notNully(user.avatar)" :src="user.avatar" />
+                        <img v-if="!nully(user.avatar)" :src="user.avatar" />
                         <q-icon v-else size="38px" name="mdi-account-circle" />
                       </q-avatar>
                     </div>
@@ -239,7 +239,7 @@
 <script>
 import { useDialogPluginComponent, format, openURL } from "quasar";
 import { computed, provide, onMounted, ref, watch } from "vue";
-import { formatDate as fDate, notNully } from "@/utils";
+import { formatDate as fDate, nully } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTasks } from "@/stores/tasks";
 import TasklistManager from "./TasklistManager.vue";
@@ -358,7 +358,7 @@ export default {
       openDrawer,
       tm,
       taskStatus,
-      notNully,
+      nully,
       openURL,
       changeDueDate,
       sortMenu,

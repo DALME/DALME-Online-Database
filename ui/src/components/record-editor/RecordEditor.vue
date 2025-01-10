@@ -107,7 +107,7 @@ import {
 import { useAPI, useEventHandling, useStores } from "@/use";
 import { IiifViewer, TeiRenderer } from "@/components";
 import TeiEditor from "./TeiEditor.vue";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "RecordEditor",
@@ -272,7 +272,7 @@ export default defineComponent({
     provide("pageDrawerOpen", drawer);
 
     return {
-      notNully,
+      nully,
       changePage,
       currentPageData,
       columns,

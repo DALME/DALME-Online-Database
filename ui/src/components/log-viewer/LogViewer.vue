@@ -22,7 +22,7 @@ import { format } from "quasar";
 import { computed, defineComponent } from "vue";
 import { useConstants } from "@/use";
 import { DetailPopover } from "@/components";
-import { formatDate, notNully } from "@/utils";
+import { formatDate, nully } from "@/utils";
 
 export default defineComponent({
   name: "LogViewer",
@@ -103,7 +103,7 @@ export default defineComponent({
           title: "Ingestion",
           subtitle: getStageState(1),
           icon: workflowIconbyStage[1],
-          timestamp: notNully(eventLog) ? new Date(eventLog[0].timestamp) : null,
+          timestamp: !nully(eventLog) ? new Date(eventLog[0].timestamp) : null,
           isStage: true,
           colour: workflowTagColours[S(getStageState(1)).underscore().s]["text"],
         },

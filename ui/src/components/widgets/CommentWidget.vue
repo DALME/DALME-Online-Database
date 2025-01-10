@@ -7,7 +7,7 @@
             <q-item-section v-if="comment.creationUser.id == op" avatar>
               <q-avatar size="40px">
                 <img
-                  v-if="notNully(comment.creationUser.avatar)"
+                  v-if="!nully(comment.creationUser.avatar)"
                   :src="comment.creationUser.avatar"
                 />
                 <q-icon v-else size="38px" name="mdi-account-circle" />
@@ -27,7 +27,7 @@
             <q-item-section v-if="comment.creationUser.id != op" side>
               <q-avatar size="40px">
                 <img
-                  v-if="notNully(comment.creationUser.avatar)"
+                  v-if="!nully(comment.creationUser.avatar)"
                   :src="comment.creationUser.avatar"
                 />
                 <q-icon v-else size="38px" name="mdi-account-circle" />
@@ -44,7 +44,7 @@
       <q-item class="comment-box" :class="auth.user.userId == op ? 'op-post' : ''">
         <q-item-section v-if="auth.user.userId == op" avatar>
           <q-avatar size="40px">
-            <img v-if="notNully(auth.user.avatar)" :src="auth.avatar" />
+            <img v-if="!nully(auth.user.avatar)" :src="auth.avatar" />
             <q-icon v-else size="38px" name="mdi-account-circle" />
           </q-avatar>
         </q-item-section>
@@ -62,7 +62,7 @@
         </q-item-section>
         <q-item-section v-if="auth.user.userId != op" side>
           <q-avatar size="40px">
-            <img v-if="notNully(auth.user.avatar)" :src="auth.avatar" />
+            <img v-if="!nully(auth.user.avatar)" :src="auth.avatar" />
             <q-icon v-else size="38px" name="mdi-account-circle" />
           </q-avatar>
         </q-item-section>
@@ -77,7 +77,7 @@ import { computed, defineComponent, inject, onMounted, ref, watch } from "vue";
 import { API as apiInterface, requests } from "@/api";
 import MarkdownEditor from "@/components/markdown-editor/MarkdownEditor.vue";
 import { AdaptiveSpinner, DetailPopover } from "@/components/widgets";
-import { formatDate, notNully } from "@/utils";
+import { formatDate, nully } from "@/utils";
 import { commentPayloadSchema, commentsSchema, commentSchema } from "@/schemas";
 import { useAuthStore } from "@/stores/auth";
 import notifier from "@/notifier";
@@ -172,7 +172,7 @@ export default defineComponent({
       commentEditor,
       helpLine,
       onSubmit,
-      notNully,
+      nully,
       containerClasses,
       threadClasses,
     };

@@ -56,7 +56,7 @@
         <template v-if="target === 'users'">
           <q-item-section v-if="showAvatar" side>
             <q-avatar size="22px">
-              <img v-if="notNully(selected.avatar)" :src="selected.avatar" />
+              <img v-if="!nully(selected.avatar)" :src="selected.avatar" />
               <q-icon v-else size="22px" name="mdi-account-circle" />
             </q-avatar>
           </q-item-section>
@@ -102,7 +102,7 @@
         <template v-if="target === 'users'">
           <q-item-section v-if="showAvatar" side>
             <q-avatar size="22px">
-              <img v-if="notNully(item.avatar)" :src="item.avatar" />
+              <img v-if="!nully(item.avatar)" :src="item.avatar" />
               <q-icon v-else size="22px" name="mdi-account-circle" />
             </q-avatar>
           </q-item-section>
@@ -143,7 +143,7 @@ import { filter as rFilter, isEmpty } from "ramda";
 import { computed, defineComponent, defineAsyncComponent, onMounted, ref, watch } from "vue";
 import { API as apiInterface, requests } from "@/api";
 import { ticketListSchema, userListSchema } from "@/schemas";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "ChooserWidget",
@@ -278,7 +278,7 @@ export default defineComponent({
       selectItem,
       selected,
       itemData,
-      notNully,
+      nully,
       ticketIcon,
     };
   },

@@ -19,7 +19,7 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:grid-avatar="props">
-      <q-avatar v-if="notNully(props.row.avatar)" size="24px">
+      <q-avatar v-if="!nully(props.row.avatar)" size="24px">
         <img :src="props.row.avatar" />
       </q-avatar>
       <q-icon v-else name="account_circle" size="sm" />
@@ -120,7 +120,7 @@ import { useMeta } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { formatDate, getColumns, getDefaults, notNully } from "@/utils";
+import { formatDate, getColumns, getDefaults, nully } from "@/utils";
 import { BooleanWidget, DataTable, DetailPopover, TagWidget } from "@/components";
 import { userListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
@@ -183,7 +183,7 @@ export default defineComponent({
       filterList,
       formatDate,
       noData,
-      notNully,
+      nully,
       onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
