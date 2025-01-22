@@ -34,6 +34,7 @@ provider "registry.terraform.io/hashicorp/tls" {
     "h1:8SvE8StpMGNcAXPKbtd5HJ9tEKqTw0T9d4a5MrfWZbE=",
     "h1:e4LBdJoZJNOQXPWgOAG0UuPBVhCStu98PieNlqJTmeU=",
     "h1:kcw9sNLNFMY2S0HIGOkjlwKtUc8lpqZsQGsC2SG9xEQ=",
+    "h1:pyAluCxm2vhyqdhhGTWOmaZWo+x1J5oF6xKsovUoE1A=",
     "h1:yLqz+skP3+EbU3yyvw8JqzflQTKDQGsC9QyZAg+S4dg=",
     "h1:zeG5RmggBZW/8JWIVrdaeSJa0OG62uFX5HY1eE8SjzY=",
     "zh:01cfb11cb74654c003f6d4e32bbef8f5969ee2856394a96d127da4949c65153e",
