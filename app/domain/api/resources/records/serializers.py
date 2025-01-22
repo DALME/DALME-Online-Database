@@ -92,6 +92,7 @@ class RecordSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
     pages = PageSerializer(many=True, required=False)
+    page_info = PageSerializer(field_set='info', many=True, required=False)
     owner = UserSerializer(field_set='attribute', required=False)
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
@@ -122,6 +123,7 @@ class RecordSerializer(DynamicSerializer):
             'no_images',
             'workflow',
             'pages',
+            'page_info',
             'is_private',
             'comment_count',
             'creation_timestamp',
@@ -171,6 +173,26 @@ class RecordSerializer(DynamicSerializer):
             'option': [
                 'id',
                 'name',
+            ],
+            'list': [
+                'id',
+                'name',
+                'short_name',
+                'owner',
+                'attributes',
+                'no_folios',
+                'is_private',
+                'comment_count',
+                'creation_timestamp',
+                'creation_user',
+                'modification_timestamp',
+                'modification_user',
+                'date',
+                'collections',
+                'locale',
+                'language',
+                'source',
+                'workflow',
             ],
             'web': [
                 'id',
