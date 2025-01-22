@@ -26,6 +26,7 @@ class PageSerializer(DynamicSerializer):
         field_sets = {
             'option': ['id', 'name', 'order', 'thumbnail_url'],
             'attribute': ['id', 'name', 'dam_id'],
+            'info': ['id', 'name', 'has_image', 'has_transcription'],
         }
         extra_kwargs = {
             'dam_id': {'required': False},
