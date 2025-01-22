@@ -118,6 +118,7 @@ class BaseViewSet(viewsets.ModelViewSet):
         """Return serializer."""
         serializer_class = self.get_serializer_class()
         kwargs['context'] = self.get_serializer_context()
+        kwargs['action'] = self.action
 
         if self.options_view:
             kwargs['field_set'] = 'option'
