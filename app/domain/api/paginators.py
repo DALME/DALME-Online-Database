@@ -67,8 +67,8 @@ class LimitOffsetPagination(LimitOffsetPagination):
         return self.default_limit
 
 
-class IDAPageNumberPagination(PageNumberPagination):
-    """Pagination class for front-end."""
+class CustomPageNumberPagination(PageNumberPagination):
+    """Pagination class for the public website."""
 
     page_size = 25
 

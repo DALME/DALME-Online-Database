@@ -14,7 +14,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 
 from app.access_policies import RecordAccessPolicy, WebAccessPolicy
-from domain.api.paginators import IDAPageNumberPagination
+from domain.api.paginators import CustomPageNumberPagination
 from domain.api.viewsets import BaseViewSet
 from domain.filters import RecordFilter
 from domain.models import PublicRegister, Record
@@ -99,7 +99,7 @@ class WebRecords(Records):
 
     queryset = Record.objects.filter(workflow__is_public=True)
     permission_classes = [WebAccessPolicy]
-    pagination_class = IDAPageNumberPagination
+    pagination_class = CustomPageNumberPagination
     renderer_classes = [CamelCaseJSONRenderer]
     authentication_classes = [SessionAuthentication]
 
