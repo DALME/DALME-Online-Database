@@ -91,16 +91,16 @@ locals {
 locals {
   images = {
     proxy = "${local.registry}/${var.namespace}.proxy:${local.tag}",
-    web   = "${local.registry}/${var.namespace}.web:${local.tag}",
+    app   = "${local.registry}/${var.namespace}.app:${local.tag}",
   }
   protocol   = "tcp"
   proxy_name = "nginx"
-  web_env = [
+  app_env = [
     { name = "ALLOWED_HOSTS", value = jsonencode(var.allowed_hosts) },
     { name = "AWS_STORAGE_BUCKET_NAME", value = data.aws_s3_bucket.staticfiles.id },
     { name = "CLOUDFRONT_DISTRIBUTION", value = data.external.cloudfront.result.domain },
     { name = "DJANGO_CONFIGURATION", value = var.environment == "production" ? "Production" : "Staging" },
-    { name = "DJANGO_SETTINGS_MODULE", value = "ida.settings" },
+    { name = "DJANGO_SETTINGS_MODULE", value = "app.settings" },
     { name = "DOMAIN", value = var.domain },
     { name = "ELASTICSEARCH_ENDPOINT", value = data.aws_opensearch_domain.this.endpoint },
     { name = "ENV", value = var.environment },
@@ -110,7 +110,7 @@ locals {
     { name = "POSTGRES_HOST", value = data.aws_db_instance.postgres.address },
     { name = "TENANT_DOMAINS", value = jsonencode(var.tenant_domains) },
   ]
-  web_secrets = [
+  app_secrets = [
     { name = "ADMIN_USERNAME", valueFrom = "${module.secret["ADMIN-USER"].arn}:username::" },
     { name = "ADMIN_PASSWORD", valueFrom = "${module.secret["ADMIN-USER"].arn}:password::" },
     { name = "DAM_API_USER", valueFrom = "${data.aws_secretsmanager_secret_version.dam.arn}:api_user::" },
@@ -183,7 +183,7 @@ resource "aws_ecs_task_definition" "this" {
           var.wsgi,
         ]
         cpu         = 0
-        environment = local.web_env
+        environment = local.app_env
         essential   = true
         healthCheck = {
           command = [
@@ -193,7 +193,7 @@ resource "aws_ecs_task_definition" "this" {
           retries  = 3
           timeout  = 5
         }
-        image = local.images.web
+        image = local.images.app
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -211,16 +211,16 @@ resource "aws_ecs_task_definition" "this" {
             protocol      = local.protocol
           }
         ]
-        secrets        = local.web_secrets
+        secrets        = local.app_secrets
         systemControls = []
         volumesFrom    = []
       },
       {
         command     = ["python3", "manage.py", "migrate_schemas"]
         cpu         = 0
-        environment = local.web_env
+        environment = local.app_env
         essential   = false
-        image       = local.images.web
+        image       = local.images.app
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -232,7 +232,7 @@ resource "aws_ecs_task_definition" "this" {
         mountPoints    = []
         name           = "migrate"
         portMappings   = []
-        secrets        = local.web_secrets
+        secrets        = local.app_secrets
         systemControls = []
         volumesFrom    = []
       },
@@ -242,9 +242,9 @@ resource "aws_ecs_task_definition" "this" {
         dependsOn = [
           { containerName = var.namespace, condition = "HEALTHY" },
         ]
-        environment = local.web_env
+        environment = local.app_env
         essential   = false
-        image       = local.images.web
+        image       = local.images.app
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -256,7 +256,7 @@ resource "aws_ecs_task_definition" "this" {
         mountPoints    = []
         name           = "collectstatic"
         portMappings   = []
-        secrets        = local.web_secrets
+        secrets        = local.app_secrets
         systemControls = []
         volumesFrom    = []
       },
@@ -266,9 +266,9 @@ resource "aws_ecs_task_definition" "this" {
         dependsOn = [
           { containerName = var.namespace, condition = "HEALTHY" },
         ]
-        environment = local.web_env
+        environment = local.app_env
         essential   = false
-        image       = local.images.web
+        image       = local.images.app
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -280,7 +280,7 @@ resource "aws_ecs_task_definition" "this" {
         mountPoints    = []
         name           = "ensure_oauth"
         portMappings   = []
-        secrets        = local.web_secrets
+        secrets        = local.app_secrets
         systemControls = []
         volumesFrom    = []
       },
@@ -290,9 +290,9 @@ resource "aws_ecs_task_definition" "this" {
         dependsOn = [
           { containerName = var.namespace, condition = "HEALTHY" },
         ]
-        environment = local.web_env
+        environment = local.app_env
         essential   = false
-        image       = local.images.web
+        image       = local.images.app
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -304,7 +304,7 @@ resource "aws_ecs_task_definition" "this" {
         mountPoints    = []
         name           = "ensure_tenants"
         portMappings   = []
-        secrets        = local.web_secrets
+        secrets        = local.app_secrets
         systemControls = []
         volumesFrom    = []
       },
@@ -314,9 +314,9 @@ resource "aws_ecs_task_definition" "this" {
         dependsOn = [
           { containerName = var.namespace, condition = "HEALTHY" }
         ]
-        environment = local.web_env
+        environment = local.app_env
         essential   = false
-        image       = local.images.web
+        image       = local.images.app
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -328,7 +328,7 @@ resource "aws_ecs_task_definition" "this" {
         mountPoints    = []
         name           = "ensure_superuser"
         portMappings   = []
-        secrets        = local.web_secrets
+        secrets        = local.app_secrets
         systemControls = []
         volumesFrom    = []
       },
@@ -417,9 +417,9 @@ resource "aws_ecs_task_definition" "cleartokens" {
     {
       command     = ["python3", "manage.py", "cleartokens"]
       cpu         = 0
-      environment = local.web_env
+      environment = local.app_env
       essential   = true
-      image       = local.images.web
+      image       = local.images.app
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -431,7 +431,7 @@ resource "aws_ecs_task_definition" "cleartokens" {
       mountPoints    = []
       name           = "cleartokens"
       portMappings   = []
-      secrets        = local.web_secrets
+      secrets        = local.app_secrets
       systemControls = []
       volumesFrom    = []
     },
@@ -483,9 +483,9 @@ resource "aws_ecs_task_definition" "publish" {
     {
       command     = ["python3", "manage.py", "publish_pags"]
       cpu         = 0
-      environment = local.web_env
+      environment = local.app_env
       essential   = true
-      image       = local.images.web
+      image       = local.images.app
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -497,7 +497,7 @@ resource "aws_ecs_task_definition" "publish" {
       mountPoints    = []
       name           = "publish"
       portMappings   = []
-      secrets        = local.web_secrets
+      secrets        = local.app_secrets
       systemControls = []
       volumesFrom    = []
     },

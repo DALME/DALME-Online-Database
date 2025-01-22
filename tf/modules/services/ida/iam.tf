@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "ecs_task_execution_policy" {
     ]
     resources = [
       "arn:aws:ecr:${var.aws_region}:${var.aws_account}:repository/${var.namespace}.proxy",
-      "arn:aws:ecr:${var.aws_region}:${var.aws_account}:repository/${var.namespace}.web",
+      "arn:aws:ecr:${var.aws_region}:${var.aws_account}:repository/${var.namespace}.app",
     ]
   }
 

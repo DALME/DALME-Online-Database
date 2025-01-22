@@ -42,7 +42,7 @@ module "ida_ecs_task_definition_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes = ["definition", "web"]
+  attributes = ["definition", "app"]
 
   context = module.ida_ecs_task_label.context
 }
@@ -106,7 +106,7 @@ module "ida_log_group_web_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes = ["web"]
+  attributes = ["app"]
   delimiter  = "/"
 
   context = module.ida_log_group_label.context
@@ -116,7 +116,7 @@ module "ida_log_stream_web_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  attributes = ["web"]
+  attributes = ["app"]
 
   context = module.ida_log_stream_label.context
 }
