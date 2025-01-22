@@ -157,7 +157,7 @@ import {
 } from "vue";
 import { useStores } from "@/use";
 import { TeiRenderer } from "@/components";
-import { Codemirror } from "vue-codemirror";
+import { Codemirror } from "./codemirror.js";
 import { xml } from "@codemirror/lang-xml";
 import { oneDark } from "@codemirror/theme-one-dark";
 
