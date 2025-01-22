@@ -77,7 +77,7 @@
 
           <template v-slot:after>
             <div v-show="currentPageData.editOn" class="editor-box">
-              <TeiEditor ref="editor" />
+              <TeiEditor v-if="settings.teiReady" ref="editor" />
             </div>
             <div
               v-show="!currentPageData.editOn"
@@ -94,16 +94,7 @@
 </template>
 
 <script>
-import {
-  computed,
-  defineComponent,
-  inject,
-  nextTick,
-  provide,
-  ref,
-  onMounted,
-  // watch,
-} from "vue";
+import { computed, defineComponent, inject, nextTick, onMounted, provide, ref } from "vue";
 import { useEventHandling, useStores } from "@/use";
 import { IiifViewer, TeiRenderer } from "@/components";
 import TeiEditor from "./TeiEditor.vue";
@@ -117,7 +108,7 @@ export default defineComponent({
     TeiRenderer,
   },
   setup() {
-    const { currentPageData, containerHeight, containerWidth, pageCount, views, view, settings } =
+    const { currentPageData, containerHeight, containerWidth, pageCount, settings, views, view } =
       useStores();
     const { eventBus } = useEventHandling();
     const columns = inject("columns");
@@ -129,7 +120,6 @@ export default defineComponent({
         page.ref = idx;
         page.editorTab = "write";
         page.editOn = false;
-        page.editorSession = null;
         page.tei = page.transcription.transcription;
         page.hasChanges = false;
         page.viewerZoom = 0;
@@ -256,8 +246,10 @@ export default defineComponent({
     provide("viewerDimensions", { viewerHeight, viewerWidth });
     provide("pageDrawerOpen", drawer);
 
-    onMounted(() => {
-      settings.fetchTeiElements();
+    onMounted(async () => {
+      if (!settings.teiReady) {
+        settings.teiReady = await settings.fetchTeiElements();
+      }
     });
 
     return {
@@ -276,6 +268,7 @@ export default defineComponent({
       pagination,
       separatorHeight,
       separatorWidth,
+      settings,
       splitterLimits,
       toggleEditor,
       toggleMini,
