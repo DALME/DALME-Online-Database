@@ -14,6 +14,7 @@ from domain.models import (
     CollectionMembership,
     PreferenceKey,
     Project,
+    Transcription,
     ZoteroCollection,
 )
 from tenants.models import Tenant
@@ -38,6 +39,7 @@ class Stage(BaseStage):
         self.process_images()
         self.add_default_preferences()
         self.migrate_corpora()
+        self.fix_tei_language_capitalization()
 
     @transaction.atomic
     def adjust_id_columns(self):
@@ -230,3 +232,20 @@ class Stage(BaseStage):
                         creation_user=user_obj,
                         modification_user=user_obj,
                     )
+
+    @transaction.atomic
+    def fix_tei_language_capitalization(self):
+        """Fix capitalization of language in TEI glosses."""
+        self.logger.info('Fix capitalization of language in TEI glosses...')
+        changes = [
+            ('lang="ENG"', 'lang="eng"'),
+            ('lang="DEU"', 'lang="deu"'),
+            ('lang="ITA"', 'lang="ita"'),
+            ('lang="LAT"', 'lang="lat"'),
+        ]
+        transcriptions = Transcription.objects.all()
+        for transcription in transcriptions:
+            for change in changes:
+                if change[0] in transcription.transcription:
+                    transcription.transcription = transcription.transcription.replace(change[0], change[1])
+                    transcription.save(update_fields=['transcription'])
