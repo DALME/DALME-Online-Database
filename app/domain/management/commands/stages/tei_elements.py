@@ -2,7 +2,15 @@
 
 from django.db import transaction
 
-from domain.models import Element, ElementAttribute, ElementSet, ElementSetMembership, OptionsList, Project
+from domain.models import (
+    Element,
+    ElementSet,
+    ElementSetMembership,
+    ElementTag,
+    ElementTagAttribute,
+    OptionsList,
+    Project,
+)
 from tenants.models import Tenant
 
 from .base import BaseStage
@@ -44,7 +52,6 @@ class Stage(BaseStage):
                     modification_user_id=1,
                 )
                 options_concordance[opt['key']] = options_list.id
-                self.logger.debug('Created list: %s', opt['name'])
 
             # create default DALME element set
             self.logger.info('Creating default DALME element set')
@@ -60,37 +67,47 @@ class Stage(BaseStage):
 
             # create elements
             self.logger.info('Creating TEI elements')
-            for section in TEI_ELEMENTS:
-                section_name = section['id']
-                for item in section['items']:
-                    attributes = item.pop('attributes', None)
-                    in_context_menu = item.pop('in_context_menu', False)
-                    in_toolbar = item.pop('in_toolbar', False)
-                    item.update(
-                        {
-                            'section': section_name,
-                            'creation_user_id': 1,
-                            'modification_user_id': 1,
-                        }
-                    )
-                    element = Element.objects.create(**item)
-                    if attributes:
-                        for att in attributes:
-                            att['element_id'] = element.id
-                            options = att.pop('options', None)
-                            if options:
-                                att['options_id'] = options_concordance[options]
-                            ElementAttribute.objects.create(**att)
+            for element in TEI_ELEMENTS:
+                tags = element.pop('tags', None)
+                in_context_menu = element.pop('in_context_menu', False)
+                in_toolbar = element.pop('in_toolbar', False)
+                element.update(
+                    {
+                        'creation_user_id': 1,
+                        'modification_user_id': 1,
+                    }
+                )
 
-                    # add element to DALME set
-                    ElementSetMembership.objects.create(
-                        element_set=dalme_set,
-                        element=element,
-                        in_context_menu=in_context_menu,
-                        in_toolbar=in_toolbar,
-                    )
+                element_object = Element.objects.create(**element)
 
-                    self.logger.debug('Created element: %s', item['label'])
+                if tags:
+                    tag_concordance = {}
+                    for tag in tags:
+                        attributes = tag.pop('attributes', None)
+                        parent = tag.pop('parent', None)
+                        tag['element_id'] = element_object.id
+                        if parent:
+                            tag['parent_id'] = tag_concordance[parent]
+
+                        tag_object = ElementTag.objects.create(**tag)
+                        tag_concordance[tag_object.name] = tag_object.id
+
+                        if attributes:
+                            for att in attributes:
+                                options = att.pop('options', None)
+                                if options:
+                                    att['options_id'] = options_concordance[options]
+
+                                att['tag_id'] = tag_object.id
+                                ElementTagAttribute.objects.create(**att)
+
+                # add element to DALME set
+                ElementSetMembership.objects.create(
+                    element_set=dalme_set,
+                    element=element_object,
+                    in_context_menu=in_context_menu,
+                    in_toolbar=in_toolbar,
+                )
 
         else:
             self.logger.warning('TEI data already exists')

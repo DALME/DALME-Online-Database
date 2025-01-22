@@ -246,41 +246,103 @@ TEI_ATTRIBUTE_OPTIONS = [
             {
                 'value': '00BD',
                 'label': 'fraction - half',
-                'description': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.5}},
+                'description': {'parent': 'num', 'attributes': {'type': 'fraction', 'value': 0.5}},
             },
             {
                 'value': '2153',
                 'label': 'fraction - third',
-                'description': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.33}},
+                'description': {'parent': 'num', 'attributes': {'type': 'fraction', 'value': 0.33}},
             },
             {
                 'value': '00BC',
                 'label': 'fraction - quarter',
-                'description': {'tag': 'num', 'attributes': {'kind': 'fraction', 'value': 0.25}},
+                'description': {'parent': 'num', 'attributes': {'type': 'fraction', 'value': 0.25}},
             },
+        ],
+    },
+    {
+        'key': 'table_row_roles',
+        'name': 'TEI list of table row roles',
+        'payload_type': 'static_list',
+        'description': 'List of roles for TEI table rows.',
+        'payload': [
+            {'label': 'Label', 'value': 'label'},
+            {'label': 'Data', 'value': 'data'},
         ],
     },
 ]
 
 TEI_ELEMENTS = [
     {
-        'section': 'Annotation',
-        'id': 'annotation',
-        'items': [
+        'label': 'Gloss',
+        'description': 'Add a gloss or translation for a term.',
+        'kb_reference': '#Glosses',
+        'compound': True,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-language',
+        'section': 'annotation',
+        'tags': [
             {
-                'label': 'Gloss',
-                'kind': 'w',
+                'name': 'term',
+                'kind': 'enclosing',
                 'placeholder': 'WORD',
-                'description': 'Add a gloss or translation for a term.',
-                'kb_reference': '#Glosses',
-                'tag': 'note',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-language',
+                'icon': 'fa-solid fa-info',
                 'attributes': [
-                    {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'gloss'},
-                    {'value': 'text', 'label': 'Note', 'editable': True, 'required': False, 'kind': 'textarea'},
+                    {
+                        'value': 'xml:id',
+                        'label': 'Id',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
+                ],
+            },
+            {
+                'name': 'noteGrp',
+                'kind': 'grouping',
+                'icon': 'mdi-note-multiple-outline',
+            },
+            {
+                'name': 'note',
+                'kind': 'supplied',
+                'parent': 'noteGrp',
+                'icon': 'merge mdi-note-outline mdi-translate',
+                'attributes': [
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'gloss',
+                        'kind': 'string',
+                    },
+                    {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
+                    {
+                        'value': 'xml:id',
+                        'label': 'Id',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
+                ],
+            },
+            {
+                'name': 'gloss',
+                'kind': 'supplied',
+                'parent': 'noteGrp',
+                'icon': 'mdi-translate',
+                'attributes': [
+                    {
+                        'value': 'target',
+                        'label': 'Target',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
                     {
                         'value': 'lang',
                         'label': 'Language',
@@ -290,47 +352,69 @@ TEI_ELEMENTS = [
                         'default': 'ENG',
                         'options': 'languages',
                     },
-                    {'value': 'gloss', 'label': 'Gloss', 'editable': True, 'required': True, 'kind': 'string'},
-                ],
-            },
-            {
-                'label': 'Marginal note',
-                'kind': 's',
-                'description': 'Adds a note to the margin aligned with the point of insertion.',
-                'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
-                'tag': 'note',
-                'compound': False,
-                'in_context_menu': True,
-                'in_toolbar': True,
-                'icon': 'fa-solid fa-note-sticky',
-                'attributes': [
-                    {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'marginal'},
                     {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
                 ],
             },
+        ],
+    },
+    {
+        'label': 'Marginal note',
+        'description': 'Adds a note to the margin aligned with the point of insertion.',
+        'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
+        'compound': False,
+        'in_context_menu': True,
+        'in_toolbar': True,
+        'icon': 'fa-solid fa-note-sticky',
+        'section': 'annotation',
+        'tags': [
             {
-                'label': 'Mute',
-                'kind': 'w',
+                'name': 'note',
+                'kind': 'supplied',
+                'attributes': [
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'marginal',
+                        'kind': 'string',
+                    },
+                    {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
+                ],
+            }
+        ],
+    },
+    {
+        'label': 'Mute',
+        'description': 'Indicates that the enclosed section of the text should be hidden and ignored for all processing purposes.',
+        'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-bell-slash',
+        'section': 'annotation',
+        'tags': [
+            {
+                'name': 'mute',
+                'kind': 'enclosing',
                 'placeholder': 'CONTENT TO MUTE',
-                'description': 'Indicates that the enclosed section of the text should be hidden and ignored for all processing purposes.',
-                'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
-                'tag': 'mute',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-bell-slash',
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Named entity',
+        'description': 'Wrap text that refers to a person, place, room, etc.',
+        'kb_reference': '#Named_Entities_.28Persons.2FLocations.2FOrganizations.29',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-tag',
+        'section': 'annotation',
+        'tags': [
             {
-                'label': 'Named entity',
-                'kind': 'w',
+                'name': 'rs',
+                'kind': 'enclosing',
                 'placeholder': 'NAMED ENTITY',
-                'description': 'Wrap text that refers to a person, place, room, etc.',
-                'kb_reference': '#Named_Entities_.28Persons.2FLocations.2FOrganizations.29',
-                'tag': 'rs',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-tag',
                 'attributes': [
                     {
                         'value': 'type',
@@ -349,21 +433,41 @@ TEI_ELEMENTS = [
                         'description': 'An externally-defined means of identifying the entity, <i>e.g.</i> a database UUID.',
                     },
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Note with brace',
+        'description': 'Note with a vertical element that indicates the lines it refers to.',
+        'kb_reference': '#Braces',
+        'compound': True,
+        'in_context_menu': True,
+        'in_toolbar': False,
+        'icon': 'mdi-code-braces',
+        'section': 'annotation',
+        'tags': [
             {
-                'label': 'Note with brace',
-                'kind': 'w',
+                'name': 'seg',
+                'kind': 'enclosing',
                 'placeholder': 'CONTENT\nTO ENCLOSE\nWITH BRACE',
-                'description': 'Note with a vertical element that indicates the lines it refers to.',
-                'kb_reference': '#Braces',
-                'tag': 'note',
-                'compound': True,
-                'in_context_menu': True,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-right-from-bracket',
+                'icon': 'mdi-code-braces',
                 'attributes': [
-                    {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'brace'},
-                    {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'brace',
+                        'kind': 'string',
+                    },
+                    {
+                        'value': 'target',
+                        'label': 'Target',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
                     {
                         'value': 'rend',
                         'label': 'Rendering',
@@ -376,19 +480,54 @@ TEI_ELEMENTS = [
                 ],
             },
             {
-                'label': 'Note with renvoi',
-                'kind': 'w',
-                'placeholder': '*',
-                'description': 'Adds comments outside of the main textual stream, using a mark to indicate a specific point in the text.',
-                'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
-                'tag': 'note',
-                'compound': True,
-                'in_context_menu': True,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-asterisk',
+                'name': 'note',
+                'kind': 'supplied',
+                'icon': 'merge mdi-note-outline mdi-code-braces',
                 'attributes': [
-                    {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'renvoi'},
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'brace',
+                        'kind': 'string',
+                    },
+                    {
+                        'value': 'xml:id',
+                        'label': 'Id',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
                     {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
+                ],
+            },
+        ],
+    },
+    {
+        'label': 'Note with renvoi',
+        'description': 'Adds comments outside of the main textual stream, using a mark to indicate a specific point in the text.',
+        'kb_reference': '#Marginal_Notes_and_Insertions_via_renvoi',
+        'compound': True,
+        'in_context_menu': True,
+        'in_toolbar': False,
+        'section': 'annotation',
+        'tags': [
+            {
+                'name': 'ref',
+                'kind': 'enclosing',
+                'placeholder': '*',
+                'icon': 'mdi-asterisk-circle-outline',
+                'attributes': [
+                    {
+                        'value': 'target',
+                        'label': 'Target',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
                     {
                         'value': 'rend',
                         'label': 'Rendering',
@@ -401,16 +540,45 @@ TEI_ELEMENTS = [
                 ],
             },
             {
-                'label': 'Paraphrase',
-                'kind': 'w',
+                'name': 'note',
+                'kind': 'supplied',
+                'icon': 'merge mdi-note-outline mdi-asterisk-circle-outline',
+                'attributes': [
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'renvoi',
+                        'kind': 'string',
+                    },
+                    {'value': 'text', 'label': 'Note', 'editable': True, 'required': True, 'kind': 'textarea'},
+                    {
+                        'value': 'xml:id',
+                        'label': 'Id',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        'label': 'Paraphrase',
+        'description': 'Wrap text that has been paraphrased',
+        'kb_reference': '#Paraphrasing',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': True,
+        'icon': 'fa-solid fa-quote-left',
+        'section': 'annotation',
+        'tags': [
+            {
+                'name': 'quote',
+                'kind': 'enclosing',
                 'placeholder': 'PARAPHRASED CONTENT',
-                'description': 'Wrap text that has been paraphrased',
-                'kb_reference': '#Paraphrasing',
-                'tag': 'quote',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': True,
-                'icon': 'fa-solid fa-quote-left',
                 'attributes': [
                     {
                         'value': 'resp',
@@ -421,24 +589,23 @@ TEI_ELEMENTS = [
                         'description': 'Person responsible for the paraphrased text.',
                     }
                 ],
-            },
+            }
         ],
     },
     {
+        'label': 'Abbreviation',
+        'description': 'Wrap abbreviation',
+        'kb_reference': '#Abbreviations_and_Expansions',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-signature',
         'section': 'editorial',
-        'id': 'editorial_tags',
-        'items': [
+        'tags': [
             {
-                'label': 'Abbreviation',
-                'kind': 'w',
+                'name': 'abbr',
+                'kind': 'enclosing',
                 'placeholder': 'ABBREVIATION',
-                'description': 'Wrap abbreviation',
-                'kb_reference': '#Abbreviations_and_Expansions',
-                'tag': 'abbr',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-signature',
                 'attributes': [
                     {
                         'value': 'type',
@@ -449,18 +616,23 @@ TEI_ELEMENTS = [
                         'options': 'abbreviation_types',
                     }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Addition',
+        'description': 'Wrap text inserted in the source text',
+        'kb_reference': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations',
+        'compound': False,
+        'in_context_menu': True,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-arrows-turn-to-dots',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Addition',
-                'kind': 'w',
+                'name': 'add',
+                'kind': 'enclosing',
                 'placeholder': 'INSERTED CONTENT',
-                'description': 'Wrap text inserted in the source text',
-                'kb_reference': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations',
-                'tag': 'add',
-                'compound': False,
-                'in_context_menu': True,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-arrows-turn-to-dots',
                 'attributes': [
                     {
                         'value': 'place',
@@ -472,18 +644,23 @@ TEI_ELEMENTS = [
                         'options': 'addition_placements',
                     }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Deletion',
+        'description': 'Wrap text deleted, marked as deleted, or otherwise indicated as superfluous.',
+        'kb_reference': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations',
+        'compound': False,
+        'in_context_menu': True,
+        'in_toolbar': False,
+        'icon': 'mdi-eraser',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Deletion',
-                'kind': 'w',
+                'name': 'del',
+                'kind': 'enclosing',
                 'placeholder': 'DELETED CONTENT',
-                'description': 'Wrap text deleted, marked as deleted, or otherwise indicated as superfluous.',
-                'kb_reference': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations',
-                'tag': 'del',
-                'compound': False,
-                'in_context_menu': True,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-eraser',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -495,20 +672,32 @@ TEI_ELEMENTS = [
                         'options': 'deletion_renderings',
                     }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Elision',
+        'description': 'Wrap elided word.',
+        'kb_reference': '#Elisions',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-comment-dots',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Elision',
-                'kind': 'w',
+                'name': 'w',
+                'kind': 'enclosing',
                 'placeholder': 'ELIDED WORD',
-                'description': 'Wrap elided word.',
-                'kb_reference': '#Elisions',
-                'tag': 'w',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'merge-h fa-solid fa-i-cursor fa-solid fa-ellipsis',
                 'attributes': [
-                    {'value': 'type', 'label': 'Type', 'editable': False, 'required': True, 'default': 'elision'},
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'elision',
+                        'kind': 'string',
+                    },
                     {
                         'value': 'lemma',
                         'label': 'Lemma',
@@ -527,29 +716,39 @@ TEI_ELEMENTS = [
                         'options': 'elision_joins',
                     },
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Expansion',
+        'description': 'Wrap text that has been expanded from an abbreviation.',
+        'kb_reference': '#Abbreviations_and_Expansions',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-left-right',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Expansion',
-                'kind': 'w',
+                'name': 'expan',
+                'kind': 'enclosing',
                 'placeholder': 'EXPANDED WORD',
-                'description': 'Wrap text that has been expanded from an abbreviation.',
-                'kb_reference': '#Abbreviations_and_Expansions',
-                'tag': 'expan',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-left-right',
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Hand shift',
+        'description': 'Mark the beginning of a sequence of text written in a new hand, a change of writing style, character, or ink.',
+        'kb_reference': '#Hyphenation',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-user-pen',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Hand shift',
-                'kind': 's',
-                'description': 'Mark the beginning of a sequence of text written in a new hand, a change of writing style, character, or ink.',
-                'kb_reference': '#Hyphenation',
-                'tag': 'handShift',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-user-pen',
+                'name': 'handShift',
+                'kind': 'standalone',
                 'attributes': [
                     {
                         'value': 'scribe',
@@ -576,18 +775,23 @@ TEI_ELEMENTS = [
                         'description': 'Tint or type of ink or writing medium, <i>e.g. black ink, greenish ink, pencil</i>.',
                     },
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Hyphenation',
+        'description': 'Wrap a hyphen and indicate its type/function.',
+        'kb_reference': '#Hyphenation',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': True,
+        'icon': 'fa-solid fa-minus',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Hyphenation',
-                'kind': 'w',
+                'name': 'pc',
+                'kind': 'enclosing',
                 'placeholder': '-',
-                'description': 'Wrap a hyphen and indicate its type/function.',
-                'kb_reference': '#Hyphenation',
-                'tag': 'pc',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': True,
-                'icon': 'fa-solid fa-minus',
                 'attributes': [
                     {
                         'value': 'force',
@@ -599,17 +803,22 @@ TEI_ELEMENTS = [
                         'options': 'hyphenation_force',
                     }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Omission/Gap',
+        'description': 'Mark a gap or omission in the transcription.',
+        'kb_reference': '#Omissions',
+        'compound': False,
+        'in_context_menu': True,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-arrows-left-right-to-line',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Omission/Gap',
-                'kind': 's',
-                'description': 'Mark a gap or omission in the transcription.',
-                'kb_reference': '#Omissions',
-                'tag': 'gap',
-                'compound': False,
-                'in_context_menu': True,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-arrows-left-right-to-line',
+                'name': 'gap',
+                'kind': 'standalone',
                 'attributes': [
                     {
                         'value': 'reason',
@@ -628,18 +837,23 @@ TEI_ELEMENTS = [
                         'kind': 'string',
                     },
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Supplied',
+        'description': 'Wrap text supplied by the transcriber',
+        'kb_reference': '#Supplied_Text',
+        'compound': False,
+        'in_context_menu': True,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-hand-holding-medical',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Supplied',
-                'kind': 'w',
+                'name': 'supplied',
+                'kind': 'enclosing',
                 'placeholder': 'SUPPLIED WORD',
-                'description': 'Wrap text supplied by the transcriber',
-                'kb_reference': '#Supplied_Text',
-                'tag': 'supplied',
-                'compound': False,
-                'in_context_menu': True,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-hand-holding-medical',
                 'attributes': [
                     {
                         'value': 'reason',
@@ -651,18 +865,23 @@ TEI_ELEMENTS = [
                         'options': 'supplied_reasons',
                     }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Unclear',
+        'description': 'Wrap text that cannot be transcribed with certainty.',
+        'kb_reference': '#Unclear_Text',
+        'compound': False,
+        'in_context_menu': True,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-circle-question',
+        'section': 'editorial',
+        'tags': [
             {
-                'label': 'Unclear',
-                'kind': 'w',
+                'name': 'unclear',
+                'kind': 'enclosing',
                 'placeholder': 'UNCLEAR WORD',
-                'description': 'Wrap text that cannot be transcribed with certainty.',
-                'kb_reference': '#Unclear_Text',
-                'tag': 'unclear',
-                'compound': False,
-                'in_context_menu': True,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-circle-question',
                 'attributes': [
                     {
                         'value': 'reason',
@@ -674,129 +893,147 @@ TEI_ELEMENTS = [
                         'options': 'unclear_reasons',
                     }
                 ],
-            },
+            }
         ],
     },
     {
-        'section': 'Format',
-        'id': 'formatting',
-        'items': [
+        'label': 'Alignment',
+        'description': 'Wrap a word or phrase to indicate a change in alignment.',
+        'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': True,
+        'icon': 'fa-solid fa-align-center',
+        'section': 'formatting',
+        'tags': [
             {
-                'label': 'Alignment',
-                'kind': 'w',
+                'name': 'hi',
+                'kind': 'enclosing',
                 'placeholder': 'CONTENT TO ALIGN',
-                'description': 'Wrap a word or phrase to indicate a change in alignment.',
-                'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
-                'tag': 'hi',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': True,
-                'icon': 'fa-solid fa-align-center',
                 'attributes': [
                     {
                         'value': 'rend',
                         'label': 'Rendering',
                         'editable': True,
                         'required': True,
-                        'kind': 'menu',
+                        'kind': 'choice',
                         'options': 'alignment_options',
                     }
                 ],
-            },
-            {
-                'label': 'Baseline',
-                'kind': 'w',
-                'placeholder': 'TARGET CONTENT',
-                'description': 'Wrap a word or phrase to alter its baseline.',
-                'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
-                'tag': 'hi',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': True,
-                'icon': 'fa-solid fa-superscript',
-                'attributes': [
-                    {
-                        'value': 'rend',
-                        'label': 'Rendering',
-                        'editable': True,
-                        'required': True,
-                        'kind': 'menu',
-                        'options': 'baseline_options',
-                    }
-                ],
-            },
-            {
-                'label': 'Decoration',
-                'kind': 'w',
-                'placeholder': 'CONTENT TO DECORATE',
-                'description': 'Wrap a word or phrase and indicate a type of decoration.',
-                'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
-                'tag': 'hi',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': True,
-                'icon': 'fa-solid fa-underline',
-                'attributes': [
-                    {
-                        'value': 'rend',
-                        'label': 'Rendering',
-                        'editable': True,
-                        'required': True,
-                        'kind': 'menu',
-                        'options': 'decoration_options',
-                    }
-                ],
-            },
-            {
-                'label': 'Indentation',
-                'kind': 'w',
-                'placeholder': 'CONTENT TO INDENT',
-                'description': 'Wrap a word or phrase to assign a level of indentation to it.',
-                'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
-                'tag': 'hi',
-                'compound': False,
-                'in_context_menu': True,
-                'in_toolbar': True,
-                'icon': 'fa-solid fa-indent',
-                'attributes': [
-                    {
-                        'value': 'rend',
-                        'label': 'Rendering',
-                        'editable': True,
-                        'required': True,
-                        'kind': 'menu',
-                        'options': 'indentation_options',
-                    }
-                ],
-            },
-            {
-                'label': 'Format Quotation',
-                'kind': 'w',
-                'placeholder': 'QUOTED CONTENT',
-                'description': 'Formats wrapped text as directly quoted, e.g. from a manuscript. Mainly for use in notes.',
-                'kb_reference': '#Paraphrasing',
-                'tag': 'quotation',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-quote-left',
-            },
+            }
         ],
     },
     {
-        'section': 'Layout',
-        'id': 'layout',
-        'items': [
+        'label': 'Baseline',
+        'description': 'Wrap a word or phrase to alter its baseline.',
+        'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': True,
+        'icon': 'fa-solid fa-superscript',
+        'section': 'formatting',
+        'tags': [
             {
-                'label': 'Blank space',
-                'kind': 's',
-                'description': 'Mark <b>unusual space</b> in the source text.',
-                'kb_reference': '#Blank_Space',
-                'tag': 'space',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-up-down',
+                'name': 'hi',
+                'kind': 'enclosing',
+                'placeholder': 'TARGET CONTENT',
+                'attributes': [
+                    {
+                        'value': 'rend',
+                        'label': 'Rendering',
+                        'editable': True,
+                        'required': True,
+                        'kind': 'choice',
+                        'options': 'baseline_options',
+                    }
+                ],
+            }
+        ],
+    },
+    {
+        'label': 'Decoration',
+        'description': 'Wrap a word or phrase and indicate a type of decoration.',
+        'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': True,
+        'icon': 'fa-solid fa-underline',
+        'section': 'formatting',
+        'tags': [
+            {
+                'name': 'hi',
+                'kind': 'enclosing',
+                'placeholder': 'CONTENT TO DECORATE',
+                'attributes': [
+                    {
+                        'value': 'rend',
+                        'label': 'Rendering',
+                        'editable': True,
+                        'required': True,
+                        'kind': 'choice',
+                        'options': 'decoration_options',
+                    }
+                ],
+            }
+        ],
+    },
+    {
+        'label': 'Indentation',
+        'description': 'Wrap a word or phrase to assign a level of indentation to it.',
+        'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
+        'compound': False,
+        'in_context_menu': True,
+        'in_toolbar': True,
+        'icon': 'fa-solid fa-indent',
+        'section': 'formatting',
+        'tags': [
+            {
+                'name': 'hi',
+                'kind': 'enclosing',
+                'placeholder': 'CONTENT TO INDENT',
+                'attributes': [
+                    {
+                        'value': 'rend',
+                        'label': 'Rendering',
+                        'editable': True,
+                        'required': True,
+                        'kind': 'choice',
+                        'options': 'indentation_options',
+                    }
+                ],
+            }
+        ],
+    },
+    {
+        'label': 'Format Quotation',
+        'description': 'Formats wrapped text as directly quoted, e.g. from a manuscript. Mainly for use in notes.',
+        'kb_reference': '#Paraphrasing',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-quote-left',
+        'section': 'formatting',
+        'tags': [
+            {
+                'name': 'quotation',
+                'kind': 'enclosing',
+                'placeholder': 'QUOTED CONTENT',
+            }
+        ],
+    },
+    {
+        'label': 'Blank space',
+        'description': 'Mark <b>unusual space</b> in the source text.',
+        'kb_reference': '#Blank_Space',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-up-down',
+        'section': 'layout',
+        'tags': [
+            {
+                'name': 'space',
+                'kind': 'standalone',
                 'attributes': [
                     {
                         'value': 'extent',
@@ -807,17 +1044,23 @@ TEI_ELEMENTS = [
                         'kind': 'string',
                     }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Columns',
+        'description': 'Adds a set of columns to the page.',
+        'kb_reference': '#Columns',
+        'compound': True,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'mdi-table-column',
+        'section': 'layout',
+        'tags': [
             {
-                'label': 'Columns',
-                'kind': 'w',
-                'description': 'Adds a set of columns to the page.',
-                'kb_reference': '#Columns',
-                'tag': 'layout',
-                'compound': True,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-table-columns',
+                'name': 'layout',
+                'kind': 'grouping',
+                'icon': 'mdi-format-columns',
                 'attributes': [
                     {
                         'value': 'columns',
@@ -829,43 +1072,96 @@ TEI_ELEMENTS = [
                 ],
             },
             {
-                'label': 'Horizontal rule',
-                'kind': 's',
-                'description': 'Adds a horizontal line accross the page.',
-                'kb_reference': '#Leaders',
-                'tag': 'metamark',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'from-char ⸺',
+                'name': 'ab',
+                'kind': 'enclosing',
+                'parent': 'layout',
+                'placeholder': 'COLUMN CONTENT',
+                'icon': 'mdi-table-column',
                 'attributes': [
-                    {'value': 'function', 'label': 'Function', 'editable': False, 'required': True, 'default': 'hr'}
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'column',
+                        'kind': 'string',
+                    },
+                    {
+                        'value': 'n',
+                        'label': 'Column no.',
+                        'editable': True,
+                        'required': True,
+                        'kind': 'string',
+                    },
                 ],
             },
+        ],
+    },
+    {
+        'label': 'Horizontal rule',
+        'description': 'Adds a horizontal line accross the page.',
+        'kb_reference': '#Leaders',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-regular fa-window-minimize',
+        'section': 'layout',
+        'tags': [
             {
-                'label': 'Partial rule',
-                'kind': 's',
-                'description': 'Adds a partial, unindented horizontal line.',
-                'kb_reference': '#Leaders',
-                'tag': 'metamark',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'from-char —',
+                'name': 'metamark',
+                'kind': 'standalone',
                 'attributes': [
-                    {'value': 'function', 'label': 'Function', 'editable': False, 'required': True, 'default': 'hhr'}
+                    {
+                        'value': 'function',
+                        'label': 'Function',
+                        'editable': False,
+                        'required': True,
+                        'default': 'hr',
+                        'kind': 'string',
+                    }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Partial rule',
+        'description': 'Adds a partial, unindented horizontal line.',
+        'kb_reference': '#Leaders',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-minus',
+        'section': 'layout',
+        'tags': [
             {
-                'label': 'Leader',
-                'kind': 's',
-                'description': 'Typographical mark used to connect items on the page that might be separated by considerable horizontal distance.',
-                'kb_reference': '#Leaders',
-                'tag': 'metamark',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'merge-h fa-solid fa-ellipsis fa-solid fa-0',
+                'name': 'metamark',
+                'kind': 'standalone',
+                'attributes': [
+                    {
+                        'value': 'function',
+                        'label': 'Function',
+                        'editable': False,
+                        'required': True,
+                        'default': 'hhr',
+                        'kind': 'string',
+                    }
+                ],
+            }
+        ],
+    },
+    {
+        'label': 'Leader',
+        'description': 'Typographical mark used to connect items on the page that might be separated by considerable horizontal distance.',
+        'kb_reference': '#Leaders',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'mdi-form-textbox-password',
+        'section': 'layout',
+        'tags': [
+            {
+                'name': 'metamark',
+                'kind': 'standalone',
                 'attributes': [
                     {
                         'value': 'function',
@@ -873,6 +1169,7 @@ TEI_ELEMENTS = [
                         'editable': False,
                         'required': True,
                         'default': 'leader',
+                        'kind': 'string',
                     },
                     {
                         'value': 'rend',
@@ -884,17 +1181,23 @@ TEI_ELEMENTS = [
                         'options': 'leader_renderings',
                     },
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Table',
+        'description': 'Adds a tabular structure to the page. If applied to a comma/tab-separated block of content, the structure is parsed automatically, otherwise a skeleton table is added.',
+        'kb_reference': '#Leaders',
+        'compound': True,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'mdi-table',
+        'section': 'layout',
+        'tags': [
             {
-                'label': 'Table',
-                'kind': 'w',
-                'description': 'Adds a tabular structure to the page. If applied to a comma/tab-separated block of content, the structure is parsed automatically, otherwise a skeleton table is added.',
-                'kb_reference': '#Leaders',
-                'tag': 'table',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-table',
+                'name': 'table',
+                'kind': 'grouping',
+                'icon': 'mdi-table',
                 'attributes': [
                     {
                         'value': 'rend',
@@ -922,55 +1225,97 @@ TEI_ELEMENTS = [
                     },
                 ],
             },
-        ],
-    },
-    {
-        'section': 'Marks',
-        'id': 'marks',
-        'items': [
             {
-                'label': 'Ditto',
-                'kind': 's',
-                'description': 'Mark to indicate that the words or figures above it are to be repeated',
-                'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
-                'tag': 'metamark',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'from-char 〃',
+                'name': 'row',
+                'kind': 'grouping',
+                'parent': 'table',
+                'icon': 'mdi-table-row',
                 'attributes': [
-                    {'value': 'function', 'label': 'Function', 'editable': False, 'required': True, 'default': 'ditto'}
+                    {
+                        'value': 'role',
+                        'label': 'Role',
+                        'editable': True,
+                        'required': False,
+                        'kind': 'string',
+                        'default': 'data',
+                        'options': 'table_row_roles',
+                    },
                 ],
             },
             {
-                'label': 'Ellipsis',
-                'kind': 's',
-                'description': 'Mark to indicates the intentional omission of text without altering its original meaning',
-                'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
-                'tag': 'metamark',
-                'compound': False,
-                'in_context_menu': False,
-                'in_toolbar': False,
-                'icon': 'fa-solid fa-ellipsis',
+                'name': 'cell',
+                'kind': 'enclosing',
+                'icon': 'fa-regular fa-rectangle-list',
+                'parent': 'row',
+                'placeholder': 'CELL CONTENT',
+            },
+        ],
+    },
+    {
+        'label': 'Ditto',
+        'description': 'Mark to indicate that the words or figures above it are to be repeated',
+        'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'from-char 〃',
+        'section': 'marks',
+        'tags': [
+            {
+                'name': 'metamark',
+                'kind': 'standalone',
                 'attributes': [
                     {
                         'value': 'function',
                         'label': 'Function',
                         'editable': False,
                         'required': True,
+                        'default': 'ditto',
+                        'kind': 'string',
+                    }
+                ],
+            }
+        ],
+    },
+    {
+        'label': 'Ellipsis',
+        'description': 'Mark to indicates the intentional omission of text without altering its original meaning',
+        'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
+        'compound': False,
+        'in_context_menu': False,
+        'in_toolbar': False,
+        'icon': 'fa-solid fa-ellipsis',
+        'section': 'marks',
+        'tags': [
+            {
+                'name': 'metamark',
+                'kind': 'standalone',
+                'attributes': [
+                    {
+                        'value': 'function',
+                        'label': 'Function',
+                        'editable': False,
+                        'required': True,
+                        'kind': 'string',
                         'default': 'ellipsis',
                     }
                 ],
-            },
+            }
+        ],
+    },
+    {
+        'label': 'Glyph',
+        'description': 'Add a non-standard character (e.g. manicule, cross, fraction, etc.)',
+        'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
+        'compound': True,
+        'in_context_menu': False,
+        'in_toolbar': True,
+        'icon': 'fa-brands fa-glide-g',
+        'section': 'marks',
+        'tags': [
             {
-                'label': 'Glyph',
-                'kind': 's',
-                'description': 'Add a non-standard character (e.g. manicule, cross, fraction, etc.)',
-                'kb_reference': '#Indentations.2C_Superscripts.2C_and_Subscripts',
-                'tag': 'g',
-                'compound': True,
-                'in_context_menu': False,
-                'in_toolbar': True,
+                'name': 'g',
+                'kind': 'standalone',
                 'icon': 'fa-brands fa-glide-g',
                 'attributes': [
                     {
@@ -981,6 +1326,29 @@ TEI_ELEMENTS = [
                         'kind': 'compound',
                         'options': 'glyph_options',
                     }
+                ],
+            },
+            {
+                'name': 'num',
+                'kind': 'grouping',
+                'icon': 'fa-solid fa-hashtag',
+                'attributes': [
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
+                    {
+                        'value': 'value',
+                        'label': 'Value',
+                        'editable': False,
+                        'required': True,
+                        'default': 'auto',
+                        'kind': 'string',
+                    },
                 ],
             },
         ],
