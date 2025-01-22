@@ -21,6 +21,7 @@
     "@codemirror/language": "6.x",
     "@codemirror/state": "6.x",
     "@codemirror/view": "6.x",
+    "@codemirror/search": "6.x",
     "@codemirror/lang-xml": "6.x",
     "@codemirror/theme-one-dark": "6.x",
     "@paralleldrive/cuid2": "^2.2.2",
