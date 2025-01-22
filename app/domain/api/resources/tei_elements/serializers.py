@@ -2,16 +2,17 @@
 
 from rest_framework import serializers
 
-from domain.models import Element, ElementAttribute, ElementSet, ElementSetMembership
+from domain.api.serializers import DynamicSerializer
+from domain.models import Element, ElementSet, ElementSetMembership, ElementTag, ElementTagAttribute
 
 
-class ElementAttributeSerializer(serializers.ModelSerializer):
-    """Serializer for TEI element attributes."""
+class ElementTagAttributeSerializer(serializers.ModelSerializer):
+    """Serializer for TEI element tag attributes."""
 
     options = serializers.SerializerMethodField()
 
     class Meta:
-        model = ElementAttribute
+        model = ElementTagAttribute
         fields = [
             'label',
             'value',
@@ -29,25 +30,41 @@ class ElementAttributeSerializer(serializers.ModelSerializer):
         return None
 
 
+class ElementTagSerializer(DynamicSerializer):
+    """Serializer for TEI element tags."""
+
+    attributes = ElementTagAttributeSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ElementTag
+        fields = [
+            'id',
+            'element',
+            'name',
+            'kind',
+            'placeholder',
+            'parent',
+            'icon',
+            'attributes',
+        ]
+
+
 class ElementSerializer(serializers.ModelSerializer):
     """Serializer for TEI elements."""
 
-    attributes = ElementAttributeSerializer(many=True, read_only=True)
+    tags = ElementTagSerializer(fields=['id'], many=True, read_only=True)
 
     class Meta:
         model = Element
         fields = [
             'id',
             'label',
-            'kind',
             'section',
             'description',
             'kb_reference',
-            'tag',
+            'tags',
             'compound',
-            'placeholder',
             'icon',
-            'attributes',
         ]
 
 

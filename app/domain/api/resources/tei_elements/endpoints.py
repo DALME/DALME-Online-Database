@@ -5,8 +5,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from app.access_policies import BaseAccessPolicy
-from domain.api.resources.tei_elements.serializers import ElementSerializer, ElementSetSerializer
-from domain.models import ElementSet
+from domain.api.resources.tei_elements.serializers import ElementSerializer, ElementSetSerializer, ElementTagSerializer
+from domain.models import Element, ElementSet, ElementTag
 
 
 class EditorAccessPolicy(BaseAccessPolicy):
@@ -25,14 +25,19 @@ class ElementSets(viewsets.ViewSet):
         # user = request.user
         # TODO: filter qs to include owned sets + relevant project sets
         element_sets = ElementSet.objects.all()
-        elements = [e.elements.all() for e in element_sets]
-        elements = list({e for sl in elements for e in sl})
+        # elements = [e.elements.all() for e in element_sets]
+        # elements = list({e for sl in elements for e in sl})
+        elements = Element.objects.all()
+        tags = ElementTag.objects.all()
         set_serializer = ElementSetSerializer(element_sets, many=True)
         element_serializer = ElementSerializer(elements, many=True)
+        tag_serializer = ElementTagSerializer(tags, many=True)
+
         return Response(
             {
                 'sets': set_serializer.data,
                 'elements': element_serializer.data,
+                'tags': tag_serializer.data,
             },
             200,
         )

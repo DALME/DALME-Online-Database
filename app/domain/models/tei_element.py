@@ -7,9 +7,11 @@ from app.abstract import OwnedMixin, TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
-ELEMENT_TYPES = (
-    ('W', 'Word enclosing element'),
-    ('S', 'Stand-alone element'),
+TAG_TYPES = (
+    ('enclosing', 'Enclosing tag'),
+    ('grouping', 'Grouping tag'),
+    ('standalone', 'Stand-alone tag'),
+    ('supplied', 'Supplied-content tag'),
 )
 
 MENU_SECTIONS = (
@@ -21,28 +23,44 @@ MENU_SECTIONS = (
     ('other', 'Other'),
 )
 
+ATTRIBUTE_KINDS = (
+    ('choice', 'Choice'),
+    ('multichoice', 'Multi-choice'),
+    ('string', 'String'),
+    ('textarea', 'Text area'),
+    ('compound', 'Compound'),
+)
+
 
 class Element(UuidMixin, TrackingMixin):
     """Stores TEI element information."""
 
     label = models.CharField(max_length=55)
-    kind = models.CharField(max_length=1, choices=ELEMENT_TYPES)
     section = models.CharField(max_length=55, choices=MENU_SECTIONS)
     description = models.TextField()
     kb_reference = models.CharField(max_length=255, null=True, blank=True)
-    tag = models.CharField(max_length=55)
     compound = models.BooleanField(default=False)
-    placeholder = models.CharField(max_length=255, null=True, blank=True)
     icon = models.CharField(max_length=255, null=True, blank=True)
 
 
-class ElementAttribute(TrackingMixin):
-    """Stores TEI element attribute information."""
+class ElementTag(UuidMixin, TrackingMixin):
+    """Stores TEI element tag information."""
 
-    element = models.ForeignKey(Element, on_delete=models.CASCADE, related_name='attributes')
+    element = models.ForeignKey(Element, on_delete=models.CASCADE, related_name='tags')
+    name = models.CharField(max_length=55)
+    kind = models.CharField(max_length=10, choices=TAG_TYPES)
+    placeholder = models.CharField(max_length=255, null=True, blank=True)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
+    icon = models.CharField(max_length=255, null=True, blank=True)
+
+
+class ElementTagAttribute(TrackingMixin):
+    """Stores TEI tag attribute information."""
+
+    tag = models.ForeignKey(ElementTag, on_delete=models.CASCADE, related_name='attributes')
     label = models.CharField(max_length=255)
     value = models.CharField(max_length=55)
-    kind = models.CharField(max_length=55)
+    kind = models.CharField(max_length=15, choices=ATTRIBUTE_KINDS)
     description = models.TextField(null=True, blank=True)
     required = models.BooleanField(default=False)
     editable = models.BooleanField(default=False)
