@@ -24,6 +24,24 @@ export const recordSchema = yup.object().shape({
   owner: userAttributeSchema.required(),
   attributes: yup.array().of(attributeSchema).required(),
   noFolios: yup.number().required(),
+  isPrivate: yup.boolean().required(),
+  commentCount: yup.number().required(),
+  creationTimestamp: timeStampSchema.required(),
+  creationUser: userAttributeSchema.required(),
+  modificationTimestamp: timeStampSchema.required(),
+  modificationUser: userAttributeSchema.required(),
+  workflow: workflowSchema.nullable(),
+});
+
+export const recordListSchema = yup.array().of(recordSchema);
+
+export const recordDetailSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  name: yup.string().required(),
+  shortName: yup.string().required(),
+  owner: userAttributeSchema.required(),
+  attributes: yup.array().of(attributeSchema).required(),
+  noFolios: yup.number().required(),
   noImages: yup.number().required(),
   workflow: workflowSchema.nullable(),
   pages: yup.array().of(pageSchema).nullable(),
@@ -34,8 +52,6 @@ export const recordSchema = yup.object().shape({
   modificationTimestamp: timeStampSchema.required(),
   modificationUser: userAttributeSchema.required(),
 });
-
-export const recordListSchema = yup.array().of(recordSchema);
 
 // Field-level validation rules/schemas.
 export const recordFieldValidation = {

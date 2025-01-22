@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { OptionListSchema } from "@/schemas";
 
-export const TeiElementAttributeSchema = yup.object().shape({
+export const ElementTagAttributeSchema = yup.object().shape({
   label: yup.string().required(),
   value: yup.string().required(),
   kind: yup.string().nullable(),
@@ -12,25 +12,39 @@ export const TeiElementAttributeSchema = yup.object().shape({
   options: OptionListSchema.nullable(),
 });
 
-export const TeiElementAttributeListSchema = yup.array().of(TeiElementAttributeSchema);
+export const ElementTagAttributeListSchema = yup.array().of(ElementTagAttributeSchema);
 
-export const TeiElementSchema = yup.object().shape({
+export const ElementTagSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  element: yup.string().uuid().required(),
+  name: yup.string().required(),
+  kind: yup.string().required(),
+  placeholder: yup.string().nullable(),
+  parent: yup.string().uuid().nullable(),
+  icon: yup.string().nullable(),
+  attributes: ElementTagAttributeListSchema,
+});
+
+export const ElementTagListSchema = yup.array().of(ElementTagSchema);
+
+export const ElementSchema = yup.object().shape({
   id: yup.string().uuid().required(),
   label: yup.string().required(),
-  kind: yup.string().required(),
   section: yup.string().required(),
   description: yup.string().required(),
   kbReference: yup.string().required(),
-  tag: yup.string().required(),
   compound: yup.boolean().required(),
-  placeholder: yup.string().nullable(),
-  icon: yup.string().required(),
-  attributes: TeiElementAttributeListSchema,
+  icon: yup.string().nullable(),
+  tags: yup
+    .array()
+    .transform((tags) => tags.map((tag) => tag.id))
+    .required(),
 });
 
-export const TeiElementListSchema = yup.array().of(TeiElementSchema);
+export const ElementListSchema = yup.array().of(ElementSchema);
 
-export const TeiElementSetSchema = yup.object().shape({
+export const ElementSetSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
   label: yup.string().required(),
   description: yup.string().required(),
   project: yup.string().nullable(),
@@ -48,9 +62,10 @@ export const TeiElementSetSchema = yup.object().shape({
     .required(),
 });
 
-export const TeiElementSetListSchema = yup.array().of(TeiElementSetSchema);
+export const ElementSetListSchema = yup.array().of(ElementSetSchema);
 
-export const TeiUserElementSetsSchema = yup.object().shape({
-  sets: TeiElementSetListSchema.required(),
-  elements: TeiElementListSchema.required(),
+export const UserElementSetsSchema = yup.object().shape({
+  sets: ElementSetListSchema.required(),
+  elements: ElementListSchema.required(),
+  tags: ElementTagListSchema.required(),
 });
