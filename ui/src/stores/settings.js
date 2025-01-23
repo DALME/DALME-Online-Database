@@ -183,10 +183,11 @@ export const useSettingsStore = defineStore(
             if ("type" in attributes) {
               // console.log("type in attributes");
               const type_ref = x.attributes.find((y) => y.value === "type");
-              if (!nully(type_ref)) {
-                return !type_ref.editable && ["auto", attributes.type].includes(type_ref.default)
-                  ? true
-                  : false;
+              if (nully(type_ref)) {
+                return false;
+              }
+              if (!type_ref.editable) {
+                return ["auto", attributes.type].includes(type_ref.default);
               }
             }
             for (const property in attributes) {

@@ -75,10 +75,10 @@ import {
   inject,
   nextTick,
   getCurrentInstance,
-  h,
+  // h,
   onMounted,
-  render,
-  ref,
+  // render,
+  // ref,
   shallowRef,
   watch,
 } from "vue";
@@ -86,9 +86,7 @@ import { useStores } from "@/use";
 import { TeiRenderer } from "@/components";
 import { Codemirror } from "./codemirror.js";
 import {
-  Decoration,
   EditorView,
-  ViewPlugin,
   keymap,
   highlightSpecialChars,
   drawSelection,
@@ -109,14 +107,11 @@ import {
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { autocompletion, closeBrackets } from "@codemirror/autocomplete";
-// import { syntaxTree } from "@codemirror/language";
-// import { RangeSet } from "@codemirror/state";
 import { xml } from "@codemirror/lang-xml";
 import { oneDark } from "@codemirror/theme-one-dark";
 import TeiSidebar from "./TeiSidebar.vue";
 import ContextMenu from "./ContextMenu.vue";
-import TeiTag from "./TeiTag.vue";
-import { TagDecorator } from "./tei-tag-extension.js";
+import { tagPlugin } from "./tei-tag-plugin.js";
 
 export default defineComponent({
   name: "TeiEditor",
@@ -133,10 +128,6 @@ export default defineComponent({
     const currentInstance = getCurrentInstance();
     const editor = shallowRef();
     const editorContent = currentPageData.value.tei;
-    const widgetTracker = ref([]);
-    const tagComponents = ref([]);
-    const changeQueue = ref([]);
-    const updatingEditor = ref(false);
 
     const editorReady = (payload) => (editor.value = payload.view);
 
@@ -145,140 +136,10 @@ export default defineComponent({
       editor.value.dispatch({ changes });
     };
 
-    const tagMatcher = new TagDecorator(widgetTracker, changeQueue);
-    // const tagMatcher = new TagDecorator();
-
-    // const renderWidgets = (decorations) => {
-    //   console.log("rendering widgets", decorations);
-    //   for (let iter = decorations.iter(); iter.value !== null; iter.next()) {
-    //     const widget = iter.value.widget;
-    //     const compId = crypto.randomUUID().replace(/-/g, "");
-    //     const component = h(TeiTag, {
-    //       tag: widget.tag,
-    //       attributes: widget.attributes,
-    //       type: widget.type,
-    //       tagData: widget.tagData,
-    //       eData: widget.eData,
-    //       onUpdate: updateTag,
-    //     });
-    //     component.key = compId;
-    //     component.appContext = currentInstance.appContext.app._context;
-    //     widget.container.setAttribute("id", compId);
-    //     console.log(`rendering ${compId}`);
-    //     render(component, widget.container);
-    //   }
-    // };
-
-    // const tagPlugin = ViewPlugin.fromClass(
-    //   class {
-    //     constructor(view) {
-    //       this.tags = tagMatcher.createDeco(view);
-    //       renderWidgets(this.tags);
-    //     }
-
-    //     destroy() {
-    //       console.log("destroying tagPlugin");
-    //     }
-
-    //     update(update) {
-    //       if (
-    //         update.docChanged ||
-    //         update.viewportChanged ||
-    //         syntaxTree(update.startState) != syntaxTree(update.state)
-    //       ) {
-    //         this.tags = tagMatcher.createDeco(view);
-    //         renderWidgets(this.tags);
-    //       }
-    //     }
-    //   },
-    //   {
-    //     decorations: (instance) => instance.tags,
-    //     provide: (plugin) =>
-    //       EditorView.atomicRanges.of((view) => {
-    //         return view.plugin(plugin)?.tags || Decoration.none;
-    //       }),
-    //   },
-    // );
-
-    const renderWidgets = () => {
-      const widgetEls = document.querySelectorAll(".cm-tag-widget-container");
-      // console.log("renderWidgets", widgetEls);
-      widgetEls.forEach((el) => {
-        // console.log("processing", el);
-        const compId = el.getAttribute("id") || crypto.randomUUID().replace(/-/g, "");
-        // console.log("compId", compId);
-        if (!tagComponents.value.includes(compId)) {
-          const widgetId = el.getAttribute("data-widget");
-          const widgetEntry = widgetTracker.value.find((x) => x.widgets.includes(widgetId));
-          if (widgetEntry) {
-            widgetEntry["component"] = compId;
-            const component = h(TeiTag, {
-              id: compId,
-              tag: widgetEntry.data.tag,
-              attributes: widgetEntry.data.attributes,
-              type: widgetEntry.data.type,
-              tagData: widgetEntry.data.tagData,
-              eData: widgetEntry.data.eData,
-              pairing: widgetEntry.data.pairing,
-              anchor: el,
-              tracker: widgetTracker,
-              onUpdate: updateTag,
-            });
-            component.key = compId;
-            component.appContext = currentInstance.appContext.app._context;
-            tagComponents.value.push(compId);
-            el.setAttribute("id", compId);
-            console.log(`rendering ${compId}`);
-            render(component, el);
-          } else {
-            console.log(`no widget entry for ${widgetId}`);
-          }
-        } else {
-          console.log(`component ${compId} already rendered`);
-        }
-      });
-    };
-
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    const tagPlugin = ViewPlugin.fromClass(
-      class {
-        constructor(view) {
-          this.tags = Decoration.none;
-          this.create(view);
-        }
-
-        async create(view) {
-          this.tags = tagMatcher.createDeco(view);
-          await nextTick();
-          renderWidgets();
-        }
-
-        destroy() {
-          console.log("destroying tagPlugin");
-        }
-
-        async update(update) {
-          if (update.docChanged || update.viewportChanged) {
-            updatingEditor.value = true;
-            this.tags = await tagMatcher.updateDeco(update, this.tags);
-            updatingEditor.value = false;
-            renderWidgets();
-          }
-        }
-      },
-      {
-        decorations: (instance) => instance.tags,
-        provide: (plugin) =>
-          EditorView.atomicRanges.of((view) => {
-            return view.plugin(plugin)?.tags || Decoration.none;
-          }),
-      },
-    );
-
     const extensions = [
       xml(),
       oneDark,
-      tagPlugin,
+      tagPlugin(currentInstance, updateTag),
       EditorView.lineWrapping,
       lineNumbers(),
       highlightActiveLineGutter(),
