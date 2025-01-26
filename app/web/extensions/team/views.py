@@ -77,7 +77,7 @@ class TeamMemberViewSet(ModelViewSet):
                 FieldPanel('name', classname='col8'),
             ],
             heading='ID',
-            classname='field-row-panel',
+            classname='field-row-panel collapse-help',
         ),
         FieldRowPanel(
             [
@@ -85,17 +85,17 @@ class TeamMemberViewSet(ModelViewSet):
                 FieldPanel('avatar', classname='col3', widget=AvatarFileInput),
             ],
             heading='Roles and avatar',
-            classname='field-row-panel',
+            classname='field-row-panel collapse-help',
         ),
     ]
     professional_panels = [
         FieldRowPanel(
             [
-                FieldPanel('title', classname='col8'),
-                FieldPanel('affiliation', classname='col4'),
+                FieldPanel('title', classname='col7'),
+                FieldPanel('affiliation', classname='col5'),
             ],
             heading='Affiliation',
-            classname='field-row-panel',
+            classname='field-row-panel collapse-help',
         ),
         FieldPanel('url'),
     ]
