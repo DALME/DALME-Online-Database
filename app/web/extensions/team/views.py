@@ -12,7 +12,7 @@ from django.utils.functional import cached_property
 from web.extensions.extras.widgets import MultiSelect
 
 from .models import TeamMember, TeamRole
-from .widgets import UserSelect
+from .widgets import AvatarFileInput, UserSelect
 
 
 class TeamRoleViewSet(ModelViewSet):
@@ -81,8 +81,8 @@ class TeamMemberViewSet(ModelViewSet):
         ),
         FieldRowPanel(
             [
-                FieldPanel('roles', classname='col8', widget=MultiSelect(placeholder='Select roles...')),
-                FieldPanel('avatar', classname='col4'),
+                FieldPanel('roles', classname='col9', widget=MultiSelect(placeholder='Select roles...')),
+                FieldPanel('avatar', classname='col3', widget=AvatarFileInput),
             ],
             heading='Roles and avatar',
             classname='field-row-panel',
