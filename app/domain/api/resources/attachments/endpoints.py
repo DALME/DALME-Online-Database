@@ -31,12 +31,14 @@ class Attachments(viewsets.ModelViewSet):
         """Create new attachment record."""
         try:
             new_obj = Attachment()
-            new_obj.file = request.data['upload']
+            new_obj.filefield = request.data['upload']
             new_obj.save()
             result = {
                 'upload': {'id': new_obj.id},
                 'files': {
-                    'Attachment': {str(new_obj.id): {'filename': str(new_obj.filename), 'web_path': str(new_obj.file)}},
+                    'Attachment': {
+                        str(new_obj.id): {'filename': str(new_obj.filename), 'web_path': str(new_obj.filefield)}
+                    },
                 },
             }
             status = 201
