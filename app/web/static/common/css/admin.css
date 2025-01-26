@@ -15,40 +15,99 @@
 }
 
 /* General purpose adjustments to select2 */
-.select2-container ul.select2-choices,
-.select2-container a.select2-choice {
-  border: 1px solid var(--w-color-border-field-default);
-  color: var(--w-color-text-context) !important;
+.select-wrapper {
+  display: flex;
+  width: 100%;
+}
+.select2-container--default span.select2-selection {
+  border: 1px solid var(--w-color-border-field-default) !important;
   background-color: var(--w-color-surface-field);
-  background-image: none;
-  box-shadow: none !important;
+  min-height: 42px;
 }
-.select2-drop {
-  background: var(--w-color-surface-field);
-  color: var(--w-color-text-context) !important;
+.select2-container--default .select2-selection--single {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
-.select2-drop-active {
-  border: 1px solid var(--w-color-border-field-default);
-}
-.select2-search input {
-  border: 1px solid var(--w-color-border-field-default);
-}
-.select2-container ul.select2-choices:focus-within {
+.select2-container--default.select2-container--focus span.select2-selection {
   outline: 3px solid var(--w-color-focus) !important;
+  border: inherit;
 }
-.select2-container li.select2-search-choice {
-  color: var(--w-color-text-context) !important;
+.select2-container--default .select2-selection--single span.select2-selection__rendered {
+  display: block;
+  padding: 5px 10px 5px 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--w-color-text-meta);
 }
-.select2-search input.select2-input:focus {
-  outline: 0 !important;
+.select2-container--default span.select2-search--dropdown input.select2-search__field {
+  border-color: var(--w-color-border-field-default);
+  min-height: 23px;
+  padding: 0 5px;
+  line-height: 23px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--w-color-text-meta);
 }
-.select2-drop ul.select2-results li.select2-result {
-  border-bottom: 1px dotted var(--w-color-border-field-default);
+.select2-container--default .select2-selection--single button.select2-selection__clear {
+  color: var(--w-color-border-field-default);
+  padding: 0 5px;
+  margin: 0;
+  height: 100%;
+  border-right: 1px solid var(--w-color-border-field-default);
 }
-.select2-drop ul.select2-results li.select2-no-results {
-  background: var(--w-color-surface-field);
+.select2-container--default .select2-selection--single button.select2-selection__clear:hover {
+  color: var(--w-color-focus);
 }
-
+li.select2-results__option {
+  padding: 1px 5px;
+  border-bottom: 2px solid transparent;
+}
+.select2-container--default li.select2-results__option--highlighted.select2-results__option--selectable {
+  background-color: var(--w-color-focus) !important;
+  background-clip: padding-box;
+}
+li.select2-results__option.select2-results__option--selectable.select2-results__option--selected {
+  background-color: #00a88538;
+  background-clip: padding-box;
+}
+span.select2-dropdown {
+  background-color: var(--w-color-surface-field);
+}
+.select2-container--default span.select2-selection span.select2-selection__arrow {
+  border-left: none;
+  background-image: none;
+  background-color: unset;
+  width: 42px;
+  display: flex;
+  height: 100%;
+  position: relative;
+  top: 0;
+  right: 0;
+  margin-left: auto;
+}
+.select2-container--default span.select2-selection span.select2-selection__arrow b {
+  border: none;
+  left: unset;
+  margin: 0;
+  top: unset;
+  background-image: linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
+    linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position-x: calc(100% - 1.5rem), calc(100% - 1.125rem);
+  background-position-y: 1.125rem, 1.125rem;
+  background-repeat: no-repeat !important;
+  background-size: .375rem .375rem, .375rem .375rem !important;
+}
+.select2-container--default.select2-container--open span.select2-selection span.select2-selection__arrow b {
+  border: none;
+  background-image: linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
+    linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
+  background-position-x: calc(100% - 1.375rem), calc(100% - 1.125rem);
+}
 /* FIXES TO ADMIN UI ELEMENTS */
 /* prevent dates from wrapping in lists */
 .listing .w-human-readable-date,
@@ -239,9 +298,9 @@ input[type='checkbox'] + .w-field__comment-button {
 .field-row-panel.align-top .w-field__input {
   align-items: flex-start;
 }
-.field-row-panel:not(.rich-text) .w-panel__wrapper:last-of-type .w-field__input {
+/* .field-row-panel:not(.rich-text) .w-panel__wrapper:last-of-type .w-field__input {
   margin-right: -42px;
-}
+} */
 .field-row-panel .w-field__comment-button {
   position: relative !important;
   top: unset;

@@ -1,6 +1,7 @@
 """Custom select widget."""
 
-# workaround for: https://github.com/wagtail/wagtail/pull/11958
+# workaround for: https://github.com/wagtail/wagtail/issues/11935
+# see also: https://github.com/wagtail/wagtail/pull/11958
 
 from django.forms import Select
 

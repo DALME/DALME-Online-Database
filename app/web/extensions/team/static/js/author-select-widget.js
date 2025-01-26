@@ -5,7 +5,7 @@ window.CustomUtils.userSelectState.connectCallback = (selectEl) => {
   store.updateByline = () => {
     const data = store.selectEl.select2("data");
     if (data.length) {
-      const name_list = store.selectEl.select2("data").map((x) => x.item.name);
+      const name_list = store.selectEl.select2("data").map((x) => x.name);
       if (name_list.length === 1) {
         store.byline.value = name_list[0];
       } else if (name_list.length === 2) {

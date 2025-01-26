@@ -8,6 +8,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 
+from web.extensions.extras.widgets import CustomSelect
+
 from .models import TeamMember, TeamRole
 from .widgets import TeamMemberSelect
 
@@ -45,12 +47,14 @@ class TeamListBlock(blocks.StructBlock):
         label='List mode',
         choices=MODE_CHOICES,
         help_text='Select how you wish to define the list.',
+        widget=CustomSelect,
     )
     order = blocks.ChoiceBlock(
         label='Order',
         choices=ORDER_CHOICES,
         default='name',
         help_text='Select how the list should be ordered.',
+        widget=CustomSelect,
     )
     members = blocks.MultipleChoiceBlock(
         label='Members',
@@ -59,6 +63,7 @@ class TeamListBlock(blocks.StructBlock):
         widget=TeamMemberSelect(
             placeholder='Select members...',
             api_state='userSelectState',
+            queryset=TeamMember.objects.all(),
         ),
         help_text='Manually select team members to include in the list.',
     )
@@ -67,6 +72,7 @@ class TeamListBlock(blocks.StructBlock):
         choices=get_role_choices,
         required=False,
         help_text='Select a role to define the list (all members with that role will be included).',
+        widget=CustomSelect,
     )
 
     class Meta:

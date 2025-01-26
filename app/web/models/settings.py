@@ -8,6 +8,7 @@ from wagtail.embeds.blocks import EmbedBlock
 from wagtail.fields import StreamField
 
 from django.conf import settings as django_settings
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from web.extensions.images.blocks import InlineImageBlock
@@ -219,6 +220,7 @@ class Settings(BaseGenericSetting):
                         placeholder='Select editors...',
                         sortable=True,
                         api_state='userSelectState',
+                        queryset=get_user_model().objects.all(),
                     ),
                 ),
                 FieldPanel('doi_handle', classname='col4'),

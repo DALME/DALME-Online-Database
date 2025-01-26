@@ -6,6 +6,7 @@ from wagtail.admin.views.generic.models import IndexView
 from wagtail.admin.viewsets.base import ViewSetGroup
 from wagtail.admin.viewsets.model import ModelViewSet
 
+from django.contrib.auth import get_user_model
 from django.utils.functional import cached_property
 
 from web.extensions.extras.widgets import MultiSelect
@@ -70,6 +71,7 @@ class TeamMemberViewSet(ModelViewSet):
                         handle_form_fields=True,
                         multiselect=False,
                         api_state='userSelectState',
+                        queryset=get_user_model().objects.all(),
                     ),
                 ),
                 FieldPanel('name', classname='col8'),

@@ -1,12 +1,12 @@
 """Multi-select widget."""
 
-import json
-
-from django.forms import Media, Select
+from django.forms import Media
 from django.utils.functional import cached_property
 
+from .custom_select import CustomSelect
 
-class MultiSelect(Select):
+
+class MultiSelect(CustomSelect):
     def __init__(  # noqa: PLR0913
         self,
         attrs=None,
@@ -16,6 +16,7 @@ class MultiSelect(Select):
         multiselect=True,
         sortable=False,
         api_state=None,
+        queryset=None,
     ):
         super().__init__(attrs, choices)
         self.placeholder = placeholder
@@ -23,11 +24,9 @@ class MultiSelect(Select):
         self.allow_multiple_selected = multiselect
         self.is_sortable = sortable
         self.use_api = api_state is not None
+        self.queryset = queryset
         self.state_name = api_state
         self.option_list = []
-        if sortable or api_state:
-            self.input_type = 'hidden'
-            self.template_name = 'multi_select_input.html'
 
     def format_label(self, value, label):  # noqa: ARG002
         """Format label function to be overriden by subclasses."""
@@ -36,6 +35,7 @@ class MultiSelect(Select):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):  # noqa: PLR0913
         index = str(index) if subindex is None else '%s_%s' % (index, subindex)  # noqa: UP031
         option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
+        option_attrs = self.append_option_attrs(value, option_attrs)
         if selected:
             option_attrs.update(self.checked_attribute)
         if 'id' in option_attrs:
@@ -58,9 +58,9 @@ class MultiSelect(Select):
             'wrap_label': True,
         }
 
-    def get_option_data(self):
-        """Get option data function to be overriden by subclasses."""
-        return {'options': self.option_list}
+    def append_option_attrs(self, value, option_attrs):  # noqa: ARG002
+        """Append option attributes function to be overriden by subclasses."""
+        return option_attrs
 
     def build_attrs(self, *args, **kwargs):
         attrs = super().build_attrs(*args, **kwargs)
@@ -68,15 +68,13 @@ class MultiSelect(Select):
         attrs['data-placeholder'] = self.placeholder
         attrs['data-use-api'] = self.use_api
         attrs['data-state-name'] = self.state_name if self.state_name else False
-        attrs['data-options'] = json.dumps(self.get_option_data()) if not self.use_api else False
 
         if self.allow_multiple_selected:
             self.container_classes.append('select-multiple')
-            attrs['data-multiple'] = True
-            attrs['multiple'] = bool(not self.is_sortable and not self.use_api)
+            attrs['multiple'] = 'multiple'
             attrs['data-sortable'] = self.is_sortable
 
-        attrs['data-container-classes'] = ' '.join(self.container_classes)
+        attrs['containerclasses'] = ' '.join(list(set(self.container_classes))) if self.container_classes else False
 
         return attrs
 

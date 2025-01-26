@@ -1,98 +1,86 @@
+/* eslint-disable max-len */
 window.CustomUtils.userSelectState = {
   store: {
     baseApiUrl: "/api/web/user/",
     placeholder: "",
+    isMultiple: false,
     handleFormFields: false,
     avatarUrl: "",
-    photoChooser: null,
+    avatarPreview: null,
+    avatarButton: null,
     selectEl: null,
-    nameField:null,
-    iconPlaceholder: "<svg class=\"icon icon-user user-placeholder\" aria-hidden=\"true\">\
-                    <use href=\"#icon-user\"></use></svg>",
-    getAvatarHTML: (url) => `<div class="avatar-bg" style="background: \
-                            center/cover url(${url});"></div>`,
-    getFormattedItem: (item) => {
+    nameField: null,
+    iconPlaceholder: "<svg class=\"icon icon-user user-placeholder\" aria-hidden=\"true\"><use href=\"#icon-user\"></use></svg>",
+    getAvatarHTML: (url) => {
+      url = url.startsWith("/media") || url.startsWith("blob") ? url : `/media/${url}`;
+      return `<div class="avatar-bg" style="background: center/cover url(${url});"></div>`;
+    },
+    templateSelection: (item) => {
       const store = window.CustomUtils.userSelectState.store;
-      const avatar = item.avatar ? store.getAvatarHTML(item.avatar) : store.iconPlaceholder;
+      let avatar;
+      if (store.handleFormFields) {
+        store.avatarUrl = item.avatar;
+        avatar = store.avatarUrl ? store.getAvatarHTML(store.avatarUrl) : store.iconPlaceholder;
+      } else {
+        avatar = item.avatar ? store.getAvatarHTML(item.avatar) : store.iconPlaceholder;
+      }
       return `<div class="user-option">${avatar}<div class="user-label"><span>${item.name}</span>\
-              <span class="user-username">${item.username}</span></div></div>`;
+              <span class="user-username">${item.username||"no user account"}</span></div></div>`;
     },
-    getIdList: (val) => {
-      let result = JSON.parse(val.replaceAll("'", "\""));
-      if (typeof result == "object") {
-        result = result.filter((x) => x.trim() != "");
-      }
-      return result;
-    },
-    fetchResults: (url, callback) => {
-      const results = [];
+    templateResult: (item) => {
       const store = window.CustomUtils.userSelectState.store;
-      fetch(url)
-      .then(response => response.json())
-      .then(data => {
-          data.forEach((item) => {
-            results.push({
-              id: `${item.id}`,
-              text: store.getFormattedItem(item),
-              item: item,
-            });
-          });
-          callback(results);
-      });
-    },
-    togglePreview: () => {
-      const store = window.CustomUtils.userSelectState.store;
-      if (store.selectEl) {
-        const value = store.selectEl.select2("data");
-        store.photoChooser.querySelector(".chooser__image").src = value.item.avatar
-          ? value.item.avatar
-          : "#";
-        if (!store.photoChooser.classList.contains("blank") || value.item.avatar) {
-          store.photoChooser.classList.toggle("blank");
-        }
-      }
+      return store.templateSelection(item);
     },
     toggleForm: () => {
       const store = window.CustomUtils.userSelectState.store;
-      const value = store.selectEl.select2("data");
-      if (value) {
-        store.nameField.value = value.item.name;
-      } else {
-        store.nameField.value = "";
-      }
-      store.togglePreview();
+      const value = store.selectEl.select2("data")[0];
+      store.nameField.value = value ? value.name : "";
+      store.avatarPreview.innerHTML = store.avatarUrl ? store.getAvatarHTML(store.avatarUrl) : store.iconPlaceholder;
+      store.avatarButton.innerHTML = store.avatarUrl ? "Remove avatar" : "Upload avatar";
     },
+    avatarAction: (e) => {
+      const store = window.CustomUtils.userSelectState.store;
+      const action = e.target.innerHTML;
+      const checkbox = document.getElementById("avatar-clear_id");
+      const input = document.getElementById("id_avatar");
+      if (action === "Upload avatar") {
+        input.addEventListener("change", (e) => {
+          if (e.target.files[0]) {
+            store.avatarUrl = URL.createObjectURL(e.target.files[0]);
+            checkbox.checked = false;
+            store.toggleForm();
+          };
+        });
+        input.click();
+      } else {
+        store.avatarUrl = "";
+        checkbox.checked = true;
+        store.toggleForm();
+      }
+    }
   },
-  queryAPI: (options) => {
+  queryAPI: (params, callback) => {
     const store = window.CustomUtils.userSelectState.store;
-    const url = options.term ? `${store.baseApiUrl}?name=${options.term}` : store.baseApiUrl;
-    store.fetchResults(url, (results) => {
-      options.callback({
-        results: results,
+    const url = params.term ? `${store.baseApiUrl}?name=${params.term}` : store.baseApiUrl;
+    fetch(url)
+    .then(response => response.json())
+    .then(data => callback({
+        results: data,
         more: false,
         context: null,
-      });
-    });
-  },
-  initialFormatter: (el, callback) => {
-    const store = window.CustomUtils.userSelectState.store;
-    const id_list = store.getIdList(el.val());
-    if (id_list.length) {
-      el.val(id_list);
-      store.fetchResults(`${store.baseApiUrl}?id__in=${id_list}`, (results) => {
-        callback(el.data("multiple") !== "undefined" ? results : results[0]);
-        store.togglePreview();
-      });
-    }
+      })
+    );
   },
   connectCallback: (selectEl) => {
     const store = window.CustomUtils.userSelectState.store;
     store.handleFormFields = typeof selectEl.data("handle-form-fields") !== "undefined";
     if (store.handleFormFields) {
       store.selectEl = selectEl;
-      store.photoChooser = document.getElementById("id_photo-chooser");
+      store.avatarPreview = document.getElementById("avatar-image-container");
+      store.avatarButton = document.getElementById("avatar-file-input-button");
       store.nameField = document.getElementById("id_name");
       selectEl.on("change", store.toggleForm);
+      store.avatarButton.addEventListener("click", store.avatarAction);
     }
   },
   disconnectCallback: (_selectEl) => {

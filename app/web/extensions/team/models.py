@@ -4,6 +4,7 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.fields import RichTextField
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.functions import Lower
 from django.template.defaultfilters import slugify
@@ -94,13 +95,13 @@ class BylineMixin(models.Model):
                         placeholder='Select authors...',
                         sortable=True,
                         api_state='userSelectState',
+                        queryset=get_user_model().objects.all(),
                     ),
                 ),
                 FieldPanel('byline_text'),
             ],
             heading='Byline',
             icon='users-line',
-            classname='collapsed',
             help_text='This section allows you to customize the byline for this page (by default, the user who created it will be shown as the author).',
         )
     ]
