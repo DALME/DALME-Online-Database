@@ -11,10 +11,11 @@ from domain.api.resources.attachments import AttachmentSerializer
 from domain.api.resources.comments import CommentSerializer
 from domain.api.resources.tags import TagSerializer
 from domain.api.resources.users import UserSerializer
+from domain.api.serializers import DynamicSerializer
 from domain.models import Attachment, Tag, Ticket
 
 
-class TicketSerializer(serializers.ModelSerializer):
+class TicketSerializer(DynamicSerializer):
     """Serializer for tickets."""
 
     tags = TagSerializer(many=True, required=False)
@@ -66,7 +67,7 @@ class TicketSerializer(serializers.ModelSerializer):
         return ticket
 
 
-class TicketDetailSerializer(serializers.ModelSerializer):
+class TicketDetailSerializer(DynamicSerializer):
     """Serializer for single instance tickets."""
 
     tags = TagSerializer(many=True, required=False)

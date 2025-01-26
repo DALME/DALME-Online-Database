@@ -13,7 +13,7 @@ from domain.api.serializers import DynamicSerializer
 from domain.models import Attribute, AttributeType, ContentAttributes, ContentTypeExtended
 
 
-class AttributeTypeSerializer(serializers.ModelSerializer):
+class AttributeTypeSerializer(DynamicSerializer):
     """Serializer for attribute types."""
 
     class Meta:

@@ -90,7 +90,7 @@ class AttributeTypes(BaseViewSet):
     def options(self, request, *args, **kwargs):  # noqa: ARG002
         """Return options for attribute type."""
         atype = self.get_object()
-        options = atype.options.get_values(public=self.is_public)
+        options = atype.options.get_values(public=self.is_public, serialize=False)
         if options is not None:
             return Response(options, 200)
         return Response({'error': 'No options could be retrieved.'}, 400)
@@ -134,7 +134,7 @@ class Attributes(BaseViewSet):
             for name in names:
                 try:
                     atype = AttributeType.objects.get(name=name)
-                    options[name] = atype.options.get_values(public=self.is_public)
+                    options[name] = atype.options.get_values(public=self.is_public, serialize=False)
                 except AttributeType.DoesNotExist:
                     options[name] = 'Attribute Type does not exist.'
                 except AttributeError:

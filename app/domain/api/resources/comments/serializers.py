@@ -1,13 +1,12 @@
 """Serializers for comment data."""
 
-from rest_framework import serializers
-
 from domain.api.resources.tenants import TenantSerializer
 from domain.api.resources.users import UserSerializer
+from domain.api.serializers import DynamicSerializer
 from domain.models import Comment
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(DynamicSerializer):
     """Serializer for comments."""
 
     creation_user = UserSerializer(field_set='attribute', required=False)

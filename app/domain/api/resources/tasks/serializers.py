@@ -1,16 +1,15 @@
 """Serializers for task data."""
 
-from rest_framework import serializers
-
 from domain.api.resources.attachments import AttachmentSerializer
 from domain.api.resources.collections import CollectionSerializer
 from domain.api.resources.groups import GroupSerializer
 from domain.api.resources.tenants import TenantSerializer
 from domain.api.resources.users import UserSerializer
+from domain.api.serializers import DynamicSerializer
 from domain.models import Task, TaskList
 
 
-class TaskListSerializer(serializers.ModelSerializer):
+class TaskListSerializer(DynamicSerializer):
     """Serializer for task lists."""
 
     creation_user = UserSerializer(field_set='attribute', required=False)
@@ -37,7 +36,7 @@ class TaskListSerializer(serializers.ModelSerializer):
         ]
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(DynamicSerializer):
     """Serializer for tasks."""
 
     task_list = TaskListSerializer(required=True)
