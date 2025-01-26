@@ -12,16 +12,6 @@ class ReferenceSource extends window.React.Component {
       const urlParams = {};
       let entityId = null;
 
-      if (entity) {
-        entityId = entity.getData().id;
-        urlParams.id = entityId;
-        urlParams.biblio = entity.getData().biblio;
-        urlParams.reference = entity.getData().reference;
-        urlParams.mode = "edit";
-      }
-
-      $(document.body).on("hidden.bs.modal", this.onClose);
-
       const processAPIResults = (data) => {
         return {results: data.map((entry) => {
           const citation = new window.cite(entry);
@@ -37,7 +27,7 @@ class ReferenceSource extends window.React.Component {
         })};
       };
 
-      const getInitialValue = (el, callback) => {
+      const setInitialValue = (entityId) => {
         fetch(`${window.APIURL}/library/${entityId}/?content=csljson&format=json`)
         .then(response => response.json())
         .then(data => {
@@ -47,9 +37,21 @@ class ReferenceSource extends window.React.Component {
             template: "apa",
             lang: "en-US"
           });
-          callback({id: entityId, text:text});
+          const option = new Option(text, entityId, true, true);
+          $("#id_reference-id").append(option).trigger("change");
         });
       };
+
+      if (entity) {
+        entityId = entity.getData().id;
+        urlParams.id = entityId;
+        urlParams.biblio = entity.getData().biblio;
+        urlParams.reference = entity.getData().reference;
+        urlParams.mode = "edit";
+        setInitialValue(entityId);
+      }
+
+      $(document.body).on("hidden.bs.modal", this.onClose);
 
       const onload = {
         enter_reference: function(modal, _jsonData) {
@@ -58,26 +60,24 @@ class ReferenceSource extends window.React.Component {
               placeholder: "Select reference or type to search...",
               width: "100%",
               dropdownParent: $(".modal"),
-              containerCssClass: "select-reference",
               ajax: {
                 url: `${window.APIURL}/library/`,
                 dataType: "json",
-                quietMillis: 500,
-                results: processAPIResults,
-                data: (term, _page) => ({
-                  search: term,
+                delay: 500,
+                processResults: processAPIResults,
+                data: (params) => ({
+                  search: params.term,
                   limit: 10,
                   content: "csljson",
                   format: "json"
                 }),
               },
-              initSelection: getInitialValue,
-              formatResult: (entry) => entry.html,
-              formatSelection: (entry) => entry.text,
+              templateResult: (entry) => entry.html,
+              templateSelection: (entry) => entry.text,
             });
 
             $("form", modal.body).on("submit", function(_evt) {
-                $("#id_reference-reference").val(selectEl.select2("data").text);
+                $("#id_reference-reference").val(selectEl.select2("data")[0].text);
                 modal.postForm(this.action, $(this).serialize());
                 return false;
             });
@@ -195,7 +195,6 @@ class ReferenceDecorator extends window.draftail.TooltipEntity {
       ]);
   }
 }
-
 
 // Register the plugin directly on script execution so the editor loads it when initialising.
 window.draftail.registerPlugin({

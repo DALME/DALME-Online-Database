@@ -1,3 +1,5 @@
+/*import admin.css to get relevant rules e.g. select2 */
+@import "../css/admin.css";
 /* bibliography chooser */
 .w-field--zotero_collection_chooser_widget .w-field__input {
   width: fit-content;
@@ -7,62 +9,6 @@
 }
 .reference-modal .csl-bib-body {
   margin-bottom: .5rem;
-}
-.reference-modal .select2-container.select-reference a.select2-choice {
-  border: 1px solid var(--w-color-border-field-default);
-  color: var(--w-color-text-context) !important;
-  background-color: var(--w-color-surface-field);
-  background-image: none;
-  box-shadow: none !important;
-  font-size: 1.1875rem;
-  font-weight: 400;
-  line-height: 2.2;
-  border-radius: .3125rem;
-  max-width: 100%;
-  min-height: 2.625rem;
-  padding: 0 1.25rem;
-  padding-inline-end: 2.625rem;
-  height: 44px;
-}
-.reference-modal .select2-container.select-reference a.select2-choice:hover {
-  border-color: var(--w-color-border-field-hover);
-}
-.reference-modal .select2-container.select-reference.select2-dropdown-open a.select2-choice {
-  outline: 3px solid var(--w-color-focus) !important;
-}
-.reference-modal .select2-container.select-reference a.select2-choice .select2-arrow {
-  border-left: none;
-  background-image: none;
-  background-color: unset;
-  width: 42px;
-}
-.reference-modal .select2-container.select-reference a.select2-choice .select2-arrow b {
-  border: none;
-  left: unset;
-  margin: 0;
-  top: unset;
-  background-image: linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
-    linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background-position-x: calc(100% - 1.5rem), calc(100% - 1.125rem);
-  background-position-y: 1.125rem, 1.125rem;
-  background-repeat: no-repeat !important;
-  background-size: .375rem .375rem, .375rem .375rem !important;
-}
-.reference-modal .select2-container.select-reference.select2-dropdown-open a.select2-choice .select2-arrow b {
-  border: none;
-  background-image: linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%),
-    linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%) !important;
-  background-position-x: calc(100% - 1.375rem), calc(100% - 1.125rem);
-}
-.select2-search input.select2-input:focus {
-  outline: 0 !important;
-}
-.select2-drop ul.select2-results li.select2-result {
-  border-bottom: 1px dotted var(--w-color-border-field-default);
 }
 .tooltip-entity-reference-icon {
   height: .8em !important;
