@@ -27,6 +27,9 @@
   height: 15px;
   min-width: 200px;
 }
+td.gradient_as_html {
+  display: flex;
+}
 td.gradient_as_html > div.title-wrapper > a {
   width: 100%;
 }

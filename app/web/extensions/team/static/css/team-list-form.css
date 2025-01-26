@@ -3,7 +3,6 @@ div[data-contentpath="role"] .w-field__input {
 }
 div[data-contentpath="role"] .w-field__input select {
   height: 42px;
-  width: auto;
 }
 .list-by-role {
   padding-left: 15px;

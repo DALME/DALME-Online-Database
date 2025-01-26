@@ -25,7 +25,7 @@ class BannersViewSet(ModelViewSet):
                 FieldPanel('show_title', classname='col1'),
                 FieldPanel('color', classname='col3'),
             ],
-            classname='field-row-panel',
+            classname='field-row-panel collapse-help',
         ),
         FieldPanel('info'),
         FieldPanel('page'),
