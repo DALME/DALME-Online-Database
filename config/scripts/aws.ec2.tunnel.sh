@@ -44,11 +44,13 @@ if [ -z "$jump_host" ] || [ -z "$profile" ] || [ -z "$region" ] || [ -z "$host" 
   exit 1
 fi
 
-filter="Name=tag:Name,Values=\"${jump_host}\""
-query="Reservations[0].Instances[0].InstanceId"
+filter1="Name=tag:Name,Values=\"${jump_host}\""
+filter2="Name=instance-state-name,Values=running"
+query="Reservations[*].Instances[*].InstanceId"
 instance_id=$( \
   aws ec2 describe-instances \
-  --filter "${filter}" \
+  --filter "${filter1}" \
+  --filter "${filter2}" \
   --query "${query}" \
   --output text \
 )
