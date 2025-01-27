@@ -49,16 +49,6 @@ variable "monitoring" {
   default     = true
 }
 
-variable "network_interfaces" {
-  description = "Attach one or more network interfaces to the instance."
-  type = list(object({
-    associate_public_ip_address = bool,
-    delete_on_termination       = bool,
-    security_groups             = optional(list(string)),
-    subnet_id                   = optional(string),
-  }))
-}
-
 variable "metadata_options" {
   description = "Metadata configuration for the instance."
   type = object({
@@ -67,6 +57,17 @@ variable "metadata_options" {
     http_protocol_ipv6          = optional(string),
     instance_metadata_tags      = string
   })
+}
+
+variable "network_interfaces" {
+  description = "Attach one or more network interfaces to the instance."
+  type = list(object({
+    associate_public_ip_address = bool,
+    delete_on_termination       = bool,
+    security_groups             = optional(list(string)),
+    subnet_id                   = optional(string),
+  }))
+  default = null
 }
 
 variable "namespace" {

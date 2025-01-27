@@ -44,7 +44,7 @@
 | <a name="input_monitoring"></a> [monitoring](#input\_monitoring) | Should the EC2 instance have detailed monitoring enabled. | `bool` | `true` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the launch template. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
-| <a name="input_network_interfaces"></a> [network\_interfaces](#input\_network\_interfaces) | Attach one or more network interfaces to the instance. | <pre>list(object({<br>    associate_public_ip_address = bool,<br>    delete_on_termination       = bool,<br>    security_groups             = optional(list(string)),<br>    subnet_id                   = optional(string),<br>  }))</pre> | n/a | yes |
+| <a name="input_network_interfaces"></a> [network\_interfaces](#input\_network\_interfaces) | Attach one or more network interfaces to the instance. | <pre>list(object({<br>    associate_public_ip_address = bool,<br>    delete_on_termination       = bool,<br>    security_groups             = optional(list(string)),<br>    subnet_id                   = optional(string),<br>  }))</pre> | `null` | no |
 | <a name="input_update_default_version"></a> [update\_default\_version](#input\_update\_default\_version) | Bump the default version of the instance on each update. | `bool` | `true` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | Identifier for the VPC. | `string` | n/a | yes |
 
@@ -54,5 +54,5 @@
 |------|-------------|
 | <a name="output_launch_template_id"></a> [launch\_template\_id](#output\_launch\_template\_id) | Identifier for the ec2 launch template. |
 | <a name="output_launch_template_latest_version"></a> [launch\_template\_latest\_version](#output\_launch\_template\_latest\_version) | Latest version of the ec2 launch template. |
-| <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | Identifier for the ec2 instance's security group (if created). |
+| <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | Identifier for the ec2 instance's security group. |
 <!-- END_TF_DOCS -->
