@@ -297,7 +297,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/${{ env.TFLINT_PLUGIN_CACHE }}
-          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('**/.tflint.hcl') }}
+          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('tf/.tflint.hcl') }}
 
       - uses: actions/setup-python@v4
         with:
