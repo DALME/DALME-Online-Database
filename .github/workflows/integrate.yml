@@ -28,7 +28,7 @@ env:
     ruff,ruff-format,eslint,prettier,docs
   SKIP_UI: |
     ruff,ruff-format,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
-  TFLINT_PLUGIN_CACHE: .tflint.d/plugins
+  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache/.tflint.d/plugins
   TF_ROOT: ./tf
   TF_VERSION: 1.6
   TG_VERSION: 0.67.16
