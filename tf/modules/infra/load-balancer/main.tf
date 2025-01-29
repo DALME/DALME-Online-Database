@@ -79,39 +79,31 @@ module "alb" {
   vpc_id             = data.aws_vpc.this.id
 }
 
-resource "aws_security_group_rule" "alb_ingress_http" {
+resource "aws_vpc_security_group_ingress_rule" "alb_ingress_https" {
+  description       = "Allow incoming HTTPS traffic to the ALB from Cloudfront only."
   security_group_id = module.alb.security_group_id
-  description       = "Inbound HTTP to the ALB."
-  type              = "ingress"
-  protocol          = var.protocol
-  from_port         = var.proxy_port
-  to_port           = var.proxy_port
-  cidr_blocks       = [var.cidr_blocks]
-  ipv6_cidr_blocks  = [var.ipv6_cidr_blocks]
-}
 
-resource "aws_security_group_rule" "alb_ingress_https" {
-  security_group_id = module.alb.security_group_id
-  description       = "Inbound HTTPS to the ALB."
-  type              = "ingress"
-  protocol          = var.protocol
-  from_port         = var.ssl_port
-  to_port           = var.ssl_port
-  cidr_blocks       = [var.cidr_blocks]
-  ipv6_cidr_blocks  = [var.ipv6_cidr_blocks]
+  ip_protocol = var.protocol
+  from_port   = var.ssl_port
+  to_port     = var.ssl_port
+
+  prefix_list_id = data.aws_ec2_managed_prefix_list.cloudfront.id
+
+  tags = module.alb_sg_ingress_https_label.tags
 }
 
 # NOTE: AWS makes these rules by default for any security group but terraform
-# disables them, so I am not sure why tfsec considers this an issue.
-resource "aws_security_group_rule" "alb_egress" {
-  security_group_id = module.alb.security_group_id
-  type              = "egress"
+# disables them by default. I am not sure why tfsec considers this an issue.
+resource "aws_vpc_security_group_egress_rule" "alb_egress" {
   description       = "Explicit ALLOW ALL outbound rule."
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  security_group_id = module.alb.security_group_id
+
+  ip_protocol = "-1"
+  from_port   = 0
+  to_port     = 0
+
   # tfsec:ignore:aws-ec2-no-public-egress-sgr
-  cidr_blocks = ["0.0.0.0/0"]
-  # tfsec:ignore:aws-ec2-no-public-egress-sgr
-  ipv6_cidr_blocks = ["::/0"]
+  cidr_ipv4 = var.cidr_blocks
+
+  tags = module.alb_sg_egress_label.tags
 }
