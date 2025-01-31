@@ -22,7 +22,11 @@
 | <a name="module_opensearch_alarm_label"></a> [opensearch\_alarm\_label](#module\_opensearch\_alarm\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_alarm_sns_label"></a> [opensearch\_alarm\_sns\_label](#module\_opensearch\_alarm\_sns\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_master_user_secret"></a> [opensearch\_master\_user\_secret](#module\_opensearch\_master\_user\_secret) | ../..//_reusable/secret/ | n/a |
+| <a name="module_opensearch_sg_ingress_vpc_label"></a> [opensearch\_sg\_ingress\_vpc\_label](#module\_opensearch\_sg\_ingress\_vpc\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_postgres"></a> [postgres](#module\_postgres) | ../..//_reusable/rds/ | n/a |
+| <a name="module_postgres_sg_egress_jump_host_label"></a> [postgres\_sg\_egress\_jump\_host\_label](#module\_postgres\_sg\_egress\_jump\_host\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_postgres_sg_ingress_jump_host_label"></a> [postgres\_sg\_ingress\_jump\_host\_label](#module\_postgres\_sg\_ingress\_jump\_host\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_postgres_sg_label"></a> [postgres\_sg\_label](#module\_postgres\_sg\_label) | cloudposse/label/null | 0.25.0 |
 
 ## Resources
 
@@ -33,12 +37,10 @@
 | [aws_cloudwatch_metric_alarm.opensearch_cluster_status](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.opensearch_cpu_usage](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.opensearch_free_space](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_metric_alarm) | resource |
-| [aws_security_group_rule.jump_host_egress_postgres](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.opensearch_egress](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.opensearch_ingress](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.postgres_ingress_jump_host](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group_rule) | resource |
 | [aws_sns_topic.opensearch_alarm](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/sns_topic) | resource |
 | [aws_sns_topic_subscription.opensearch_alarm](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/sns_topic_subscription) | resource |
+| [aws_vpc_security_group_egress_rule.jump_host_egress_postgres](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.postgres_ingress_jump_host](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/vpc_security_group_ingress_rule) | resource |
 | [aws_kms_alias.global](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/kms_alias) | data source |
 | [aws_security_group.tunnel](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/security_group) | data source |
 | [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/subnets) | data source |

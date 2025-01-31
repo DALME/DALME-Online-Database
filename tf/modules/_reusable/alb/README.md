@@ -65,4 +65,5 @@
 | Name | Description |
 |------|-------------|
 | <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | Identify the security group controlling access to the ALB. |
+| <a name="output_security_group_label_context"></a> [security\_group\_label\_context](#output\_security\_group\_label\_context) | Label data for the ALB security group. |
 <!-- END_TF_DOCS -->

@@ -87,4 +87,5 @@ No requirements.
 | <a name="output_endpoint"></a> [endpoint](#output\_endpoint) | Domain-specific endpoint to submit OpenSearch requests. |
 | <a name="output_label_context"></a> [label\_context](#output\_label\_context) | The root label context. |
 | <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | Identify the security group controlling access to Opensearch. |
+| <a name="output_security_group_label_context"></a> [security\_group\_label\_context](#output\_security\_group\_label\_context) | Label data for the Opensearch security group. |
 <!-- END_TF_DOCS -->

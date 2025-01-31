@@ -20,11 +20,9 @@
 |------|--------|---------|
 | <a name="module_alb"></a> [alb](#module\_alb) | ../..//_reusable/alb/ | n/a |
 | <a name="module_alb_access_logs"></a> [alb\_access\_logs](#module\_alb\_access\_logs) | ../..//_reusable/bucket/ | n/a |
-| <a name="module_alb_label"></a> [alb\_label](#module\_alb\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_alb_sg_egress_label"></a> [alb\_sg\_egress\_label](#module\_alb\_sg\_egress\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_alb_sg_ingress_https_label"></a> [alb\_sg\_ingress\_https\_label](#module\_alb\_sg\_ingress\_https\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_alb_sg_ingress_label"></a> [alb\_sg\_ingress\_label](#module\_alb\_sg\_ingress\_label) | cloudposse/label/null | 0.25.0 |
-| <a name="module_alb_sg_label"></a> [alb\_sg\_label](#module\_alb\_sg\_label) | cloudposse/label/null | 0.25.0 |
 
 ## Resources
 

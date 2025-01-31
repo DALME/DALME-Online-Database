@@ -47,4 +47,5 @@
 | <a name="output_arn"></a> [arn](#output\_arn) | The ARN of the ECS cluster. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the ecs cluster. |
 | <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | Identify the security group controlling access to the ECS cluster. |
+| <a name="output_security_group_label_context"></a> [security\_group\_label\_context](#output\_security\_group\_label\_context) | Label data for the ECS cluster security group. |
 <!-- END_TF_DOCS -->

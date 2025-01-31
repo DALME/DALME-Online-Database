@@ -125,6 +125,18 @@ resource "aws_cloudwatch_log_resource_policy" "log_policy" {
   policy_name     = module.opensearch_log_policy_label.id
 }
 
+resource "aws_security_group" "this" {
+  description = "Security group for the OpenSearch instance."
+  name_prefix = module.opensearch_sg_label.id
+  vpc_id      = var.vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = module.opensearch_sg_label.tags
+}
+
 data "aws_secretsmanager_secret_version" "master_user" {
   secret_id = var.master_user_secret_arn
 }
@@ -229,16 +241,4 @@ resource "aws_opensearch_domain" "this" {
 CONFIG
 
   tags = module.opensearch_label.tags
-}
-
-resource "aws_security_group" "this" {
-  description = "Security group for the OpenSearch instance."
-  name_prefix = module.opensearch_sg_label.id
-  vpc_id      = var.vpc_id
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = module.opensearch_sg_label.tags
 }

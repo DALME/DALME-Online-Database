@@ -34,7 +34,7 @@ locals {
     web        = 8080
   }
   postgres_version                   = 16
-  opensearch_version                 = "Elasticsearch_7_7_R20241003-P1"
+  opensearch_version                 = "Elasticsearch_7.7"
   opensearch_master_user_secret_name = "OPENSEARCH-MASTER-USER"
   unmanaged_suffix                   = "UNMANAGED"
 

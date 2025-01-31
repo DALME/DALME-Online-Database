@@ -77,9 +77,6 @@ locals {
     http_put_response_hop_limit = 1,
     instance_metadata_tags      = "enabled",
   }
-  network_interfaces = [
-    { associate_public_ip_address = false, delete_on_termination = true },
-  ]
 }
 
 module "jump_host" {
@@ -91,8 +88,8 @@ module "jump_host" {
   metadata_options          = local.metadata_options
   name                      = "jump-host"
   namespace                 = var.namespace
-  network_interfaces        = local.network_interfaces
   vpc_id                    = module.vpc.vpc_id
+  network_interfaces        = []
 
   ami_filters = [
     { name = "architecture", values = ["x86_64"] }
