@@ -5,140 +5,112 @@ import { API as apiInterface, requests } from "@/api";
 import notifier from "@/notifier";
 import { nully } from "@/utils";
 import { preferenceListSchema, UserElementSetsSchema } from "@/schemas";
-import { filter as rFilter, forEach, sortBy, prop } from "ramda";
+import { filter as rFilter, sortBy, prop, groupBy } from "ramda";
 
 export const useSettingsStore = defineStore(
   "settings",
   () => {
     // state
-    const preferenceData = ref({});
-    const teiElementSetData = ref({});
-    const teiElementData = ref({});
-    const teiTagData = ref({});
+    const preferenceData = ref([]);
+    const teiElementSetData = ref([]);
+    const teiElementData = ref([]);
+    const teiTagData = ref([]);
     const currentSetId = ref("");
-    const teiReady = ref(false);
+    const teiReady = computed(() => teiElementData.value.length > 0);
+    const options = {
+      themeOptions: [
+        { value: "atomone", label: "AtomOne (dark)" },
+        { value: "bbedit", label: "BBEdit (light)" },
+        { value: "duotoneDark", label: "Duotone (dark)" },
+        { value: "duotoneLight", label: "Duotone (light)" },
+        { value: "githubDark", label: "GitHub (dark)" },
+        { value: "githubLight", label: "GitHub (light)" },
+        { value: "oneDark", label: "OneDark (dark)" },
+        { value: "vscodeDark", label: "VSCode (dark)" },
+        { value: "vscodeLight", label: "VSCode (light)" },
+      ],
+      fontSizeOptions: { min: 10, max: 18 },
+    };
 
-    // getters
-    const preferences = computed(() =>
-      Object.fromEntries(preferenceData.value.map((x) => [x.name, x.value])),
-    );
-
-    const allSets = computed(() =>
-      Array.from(teiElementSetData.value, (x) =>
-        Object.assign(x, {
-          members: forEach(
-            (y) =>
-              Object.assign(
-                y,
-                teiElementData.value.find((z) => z.id == y.element),
-              ),
-            x.members,
-          ),
-        }),
-      ),
-    );
-    const userSets = computed(() => rFilter((x) => nully(x.value.project), allSets));
-    const currentSet = computed(() => allSets.value.find((x) => x.id == currentSetId.value));
-
+    // #region getters
+    // #region getters - preferences
+    const preferences = computed(() => {
+      return preferenceData.value
+        ? Object.fromEntries(
+            preferenceData.value.map((x) => [
+              x.name,
+              new Proxy(x, {
+                get(target, prop) {
+                  return prop === "value" ? target.value : Reflect.get(...arguments);
+                },
+                set(obj, prop, val) {
+                  if (prop === "value") {
+                    obj.value = Object.prototype.hasOwnProperty.call(val, "value")
+                      ? val.value
+                      : val;
+                    updateServer(obj.name, obj.value);
+                    return true;
+                  } else {
+                    return Reflect.get(...arguments);
+                  }
+                },
+              }),
+            ]),
+          )
+        : false;
+    });
+    // #endregion
+    // #region getter - sets
     const sets = computed(() => ({
-      all: allSets,
-      user: userSets,
-      current: currentSet,
+      all: teiElementSetData.value,
+      user: rFilter((x) => nully(x.project), teiElementSetData.value),
+      current:
+        teiReady.value && currentSetId.value
+          ? teiElementSetData.value.find((x) => x.id == currentSetId.value)
+          : [],
       filter: filterSets,
     }));
-
-    const allElements = computed(() => teiElementData.value);
-    const currentSetAll = computed(() => currentSet.value.members);
-    const currentSetMenu = computed(() =>
-      rFilter((x) => x.inContextMenu == true, currentSetAll.value),
-    );
-    const currentSetToolbar = computed(() =>
-      rFilter((x) => x.inToolbar == true, currentSetAll.value),
-    );
-
+    // #endregion
+    // #region getters - elements
     const elements = computed(() => ({
-      all: allElements,
-      current: currentSetAll,
-      menu: currentSetMenu,
-      toolbar: currentSetToolbar,
+      all: teiElementData.value.map((x) => Object.assign(x, getElement(x.element))),
+      current: sets.value.current.members.map((x) => Object.assign(x, getElement(x.element))),
+      menu: rFilter((x) => x.inContextMenu == true, sets.value.current.members),
+      toolbar: groupBy(
+        prop("section"),
+        rFilter((x) => x.inToolbar == true, sets.value.current.members),
+      ),
       filter: filterElements,
       get: getElement,
     }));
-
-    const allTags = computed(() => teiTagData.value);
-    const currentSetTags = computed(() =>
-      rFilter((x) => currentSetAll.value.flatMap((x) => x.tags).includes(x.id), teiTagData.value),
-    );
-    const tagNames = computed(() => allTags.value.map((x) => x.name));
-
+    // #endregion
+    // #region getters - tags
     const tags = computed(() => ({
-      all: allTags,
-      current: currentSetTags,
-      names: tagNames,
+      all: teiTagData.value,
+      current: rFilter(
+        (x) => elements.value.current.flatMap((x) => getElement(x.element).tags).includes(x.id),
+        teiTagData.value,
+      ),
+      names: teiTagData.value.map((x) => x.name),
       filter: filterTags,
       get: getTag,
     }));
-
-    // actions
-    const get = (key, defaultValue = null) => {
-      if (key in preferences.value) {
-        return preferences.value[key];
-      } else if (defaultValue !== null) {
-        return defaultValue;
-      } else {
-        return null;
-      }
+    // #endregion
+    // #endregion
+    // #region actions - getters
+    const getOptions = (target) => {
+      return options[`${target}Options`] || [];
     };
 
-    const update = (key, value) => {
-      if (key && (value || value === false)) {
-        preferenceData.value.find((x) => x.name == key).value = value;
-        updateServer(key, value);
-      }
+    const getElement = (id) => {
+      return rFilter((x) => x.id == id, teiElementData.value)[0];
     };
 
-    const updateServer = async (key, value) => {
-      const { fetchAPI, success } = apiInterface();
-      await fetchAPI(requests.preferences.updatePreferences(key, value));
-      if (!success.value) {
-        notifier.users.prefUpdateFailed();
-      }
+    const getTag = (id) => {
+      return rFilter((x) => x.id == id, teiTagData.value)[0];
     };
-
-    const fetchPreferences = async () => {
-      const { data, fetchAPI, success } = apiInterface();
-      await fetchAPI(requests.preferences.getPreferences());
-      if (success.value) {
-        preferenceListSchema.validate(data.value, { stripUnknown: true }).then((value) => {
-          preferenceData.value = value;
-        });
-      } else {
-        notifier.settings.prefRetrievalFailed();
-      }
-    };
-
-    const fetchTeiElements = () => {
-      return new Promise((resolve) => {
-        const { data, fetchAPI, success } = apiInterface();
-        fetchAPI(requests.teiElements.getElementSets()).then(() => {
-          if (success.value) {
-            UserElementSetsSchema.validate(data.value, { stripUnknown: true }).then((value) => {
-              console.log(value.sets);
-              teiElementSetData.value = value.sets;
-              teiElementData.value = value.elements;
-              teiTagData.value = value.tags;
-              // temp workaround - this should be set by the UI
-              currentSetId.value = value.sets[0].id;
-              return resolve(true);
-            });
-          } else {
-            notifier.settings.teiElementSetsRetrievalFailed();
-            return resolve(false);
-          }
-        });
-      });
-    };
-
+    // #endregion
+    // #region actions - filters
     const filterSets = (value, attribute = "all") => {
       let filter;
       if (attribute == "all") {
@@ -149,12 +121,12 @@ export const useSettingsStore = defineStore(
       } else {
         filter = (x) => x[attribute] == value;
       }
-      return rFilter(filter, allSets);
+      return rFilter(filter, sets.value.all);
     };
 
     const filterElements = (value, attribute = "all", sort = "label", target = "current") => {
       if (nully(value)) {
-        return sortBy(prop(sort), elements.value[target].value);
+        return sortBy(prop(sort), elements.value[target]);
       } else {
         let filter;
         if (attribute == "all") {
@@ -165,12 +137,8 @@ export const useSettingsStore = defineStore(
         } else {
           filter = (x) => x[attribute] == value;
         }
-        return rFilter(filter, sortBy(prop(sort), elements.value[target].value));
+        return rFilter(filter, sortBy(prop(sort), elements.value[target]));
       }
-    };
-
-    const getElement = (id) => {
-      return rFilter((x) => x.id == id, teiElementData.value)[0];
     };
 
     const filterTags = (tag, attributes) => {
@@ -223,18 +191,82 @@ export const useSettingsStore = defineStore(
       };
       return rFilter(filter, teiTagData.value);
     };
-
-    const getTag = (id) => {
-      return rFilter((x) => x.id == id, teiTagData.value)[0];
+    // #endregion
+    // #region actions - fetchers
+    const updateServer = async (key, value) => {
+      const { fetchAPI, success } = apiInterface();
+      await fetchAPI(requests.preferences.updatePreferences(key, value));
+      if (!success.value) {
+        notifier.settings.prefUpdateFailed();
+      }
     };
 
+    const fetchPreferences = async () => {
+      const { data, fetchAPI, success } = apiInterface();
+      await fetchAPI(requests.preferences.getPreferences());
+      if (success.value) {
+        preferenceListSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          preferenceData.value = value;
+        });
+      } else {
+        notifier.settings.prefRetrievalFailed();
+      }
+    };
+
+    const fetchTeiElements = () => {
+      return new Promise((resolve) => {
+        const { data, fetchAPI, success } = apiInterface();
+        fetchAPI(requests.teiElements.getElementSets()).then(() => {
+          if (success.value) {
+            UserElementSetsSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+              return resolve(value);
+            });
+          } else {
+            notifier.settings.teiElementSetsRetrievalFailed();
+            return resolve(false);
+          }
+        });
+      });
+    };
+    // #endregion
+    // #region actions - utilities
+    const getElementAttributes = (el, actual = []) => {
+      if ("element" in el) el = getElement(el.element);
+      const editing = actual.length > 0;
+      const results = {};
+      const tags = el.tags.map((x) => getTag(x));
+      for (const tag of tags) {
+        let attributes = [];
+        const actualAttrs = actual.length > 0 ? actual.find((x) => x.name === tag.name) : false;
+        for (const attr of tag.attributes) {
+          if (editing && el.kind === "supplied" && attr.value === "text") continue;
+          let cValue;
+          if (attr.value in actualAttrs) {
+            cValue = structuredClone(actualAttrs[attr.value]);
+          } else if (attr.default) {
+            cValue = structuredClone(attr.default);
+          } else {
+            cValue = attr.kind === "multichoice" ? [] : "";
+          }
+          attributes.push({
+            default: attr.label || null,
+            description: attr.description,
+            editable: attr.editable,
+            required: attr.required,
+            kind: attr.kind,
+            label: attr.label,
+            value: attr.value,
+            options: attr.options || [],
+            currentValue: cValue,
+          });
+        }
+        results[tag.name] = attributes;
+      }
+      return results;
+    };
+    // #endregion
+
     return {
-      preferenceData,
-      teiElementSetData,
-      teiElementData,
-      teiTagData,
-      get,
-      update,
       sets,
       fetchPreferences,
       fetchTeiElements,
@@ -242,6 +274,13 @@ export const useSettingsStore = defineStore(
       elements,
       teiReady,
       tags,
+      preferences,
+      getOptions,
+      preferenceData,
+      teiElementSetData,
+      teiElementData,
+      teiTagData,
+      getElementAttributes,
     };
   },
   {

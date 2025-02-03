@@ -8,7 +8,7 @@ const transformField = (field) => S(field).underscore().s;
 
 export const usePagination = (fetchData, listName, defaults, embedded = false) => {
   const settings = useSettingsStore();
-  const lists = settings.get("listPreferences");
+  const lists = settings.preferences.listPreferences.value;
 
   if (nully(lists[listName])) {
     lists[listName] = {
