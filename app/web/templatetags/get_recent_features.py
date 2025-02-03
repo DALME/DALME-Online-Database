@@ -18,13 +18,13 @@ def get_recent_features(context):
     feature_type = context.get('feature_type')
     if feature_type == 'Essay':
         title = 'Essays'
-        objs = Essay.objects.live().specific().order_by('-last_published_at')[:24]
+        objs = Essay.objects.live().specific().order_by('-go_live_at')[:24]
     elif feature_type == 'Inventory':
         title = 'Inventories'
-        objs = FeaturedInventory.objects.live().specific().order_by('-last_published_at')[:24]
+        objs = FeaturedInventory.objects.live().specific().order_by('-go_live_at')[:24]
     elif feature_type == 'Object':
         title = 'Objects'
-        objs = FeaturedObject.objects.live().specific().order_by('-last_published_at')[:24]
+        objs = FeaturedObject.objects.live().specific().order_by('-go_live_at')[:24]
     else:
         return None
 
@@ -35,8 +35,8 @@ def get_recent_features(context):
     months = [month_name[i][:3] for i in range(1, 13)]
 
     for i, obj in enumerate(objs):
-        year = obj.last_published_at.strftime('%Y')
-        month = month_name[obj.last_published_at.month][:3]
+        year = obj.go_live_at.strftime('%Y')
+        month = month_name[obj.go_live_at.month][:3]
 
         if i == 0:
             year_control = year
