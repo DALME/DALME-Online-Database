@@ -22,20 +22,20 @@ const records = {
   //     method: "GET",
   //   };
   // },
-  // createSource(data) {
-  //   return {
-  //     url: `${endpoint}/`,
-  //     method: "POST",
-  //     data: data,
-  //   };
-  // },
-  // editSource(id, data) {
-  //   return {
-  //     url: `${endpoint}/${id}/`,
-  //     method: "PUT",
-  //     data: data,
-  //   };
-  // },
+  createRecord(data) {
+    return {
+      url: `${endpoint}/`,
+      method: "POST",
+      data: data,
+    };
+  },
+  editRecord(id, data) {
+    return {
+      url: `${endpoint}/${id}/`,
+      method: "PUT",
+      data: data,
+    };
+  },
   // getSourceManifest(id) {
   //   return {
   //     url: `${endpoint}/${id}/get_manifest/`,
