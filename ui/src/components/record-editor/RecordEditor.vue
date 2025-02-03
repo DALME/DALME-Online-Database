@@ -78,6 +78,7 @@
           <template v-slot:after>
             <div v-show="currentPageData.editOn" class="editor-box">
               <TeiEditor v-if="settings.teiReady" ref="editor" />
+              <AdaptiveSpinner type="bars" position="absolute" v-else />
             </div>
             <div
               v-show="!currentPageData.editOn"
@@ -96,13 +97,14 @@
 <script>
 import { computed, defineComponent, inject, nextTick, onMounted, provide, ref } from "vue";
 import { useEventHandling, useStores } from "@/use";
-import { IiifViewer, TeiRenderer } from "@/components";
+import { AdaptiveSpinner, IiifViewer, TeiRenderer } from "@/components";
 import TeiEditor from "./TeiEditor.vue";
 import { nully } from "@/utils";
 
 export default defineComponent({
   name: "RecordEditor",
   components: {
+    AdaptiveSpinner,
     IiifViewer,
     TeiEditor,
     TeiRenderer,
@@ -154,11 +156,9 @@ export default defineComponent({
     const editorHeight = computed(() =>
       view.value.splitterHorizontal
         ? currentPageData.value.editOn
-          ? Math.round(containerHeight.value - view.value.editorSplitter - 60)
+          ? Math.round(containerHeight.value - view.value.editorSplitter - 48)
           : Math.round(containerHeight.value - view.value.editorSplitter - 8)
-        : currentPageData.value.editOn
-        ? Math.round(containerHeight.value - 54)
-        : containerHeight.value,
+        : containerHeight.value - 40,
     );
     /* eslint-enable */
     const editorWidth = computed(() => {
@@ -248,7 +248,16 @@ export default defineComponent({
 
     onMounted(async () => {
       if (!settings.teiReady) {
-        settings.teiReady = await settings.fetchTeiElements();
+        const data = await settings.fetchTeiElements();
+        if (data) {
+          console.log("fetchTeiElements", data);
+          settings.teiElementSetData = data.sets;
+          settings.teiElementData = data.elements;
+          settings.teiTagData = data.tags;
+          // temp workaround - this should be set by the UI
+          settings.currentSetId = data.sets[0].id;
+        }
+        console.log("settings.teiReady", settings.teiReady);
       }
     });
 

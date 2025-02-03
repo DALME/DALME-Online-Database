@@ -106,7 +106,7 @@
               </q-tab>
               <q-tab name="log" icon="o_work_history" label="Work Log" />
             </template>
-            <q-spinner-oval v-else size="sm" class="q-ml-md" />
+            <AdaptiveSpinner v-else type="bars" size="sm" class="q-ml-md" />
           </q-tabs>
         </div>
       </div>
