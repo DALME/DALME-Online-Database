@@ -238,7 +238,7 @@
 
 <script>
 import { useDialogPluginComponent, format, openURL } from "quasar";
-import { computed, provide, onMounted, ref, watch } from "vue";
+import { computed, provide, onMounted, ref } from "vue";
 import { formatDate as fDate, nully } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTasks } from "@/stores/tasks";
@@ -330,15 +330,6 @@ export default {
     provide("attachment", attachment);
     provide("model", "Task");
     provide("id", id);
-
-    watch(
-      () => openDrawer.value,
-      () => {
-        if (!tm.listsReady) {
-          tm.init("lists");
-        }
-      },
-    );
 
     onMounted(() => {
       if (!tm.viewing) {
