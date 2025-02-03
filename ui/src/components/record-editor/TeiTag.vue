@@ -1,138 +1,50 @@
 <template>
-  <template v-if="!type.close">
-    <div
-      :class="`cm-tag-widget ${type.open ? 'open' : 'self-close'} ${section}`"
-      @click="showEditor = true"
-    >
-      <div class="tag-marker">
-        <CustomIcon :size="10" :icon="icon" />
-        <div class="tag-text" v-if="tagMsg" v-text="tagMsg"></div>
-      </div>
-      <q-menu class="cm-tag-menu" anchor="center middle" self="center middle">
-        <q-card class="q-pa-sm">
-          <div>
-            <div class="flex no-wrap">
-              <div class="column">
-                <div class="cm-tag-label items-center row">
-                  <CustomIcon :icon="icon" class="q-mr-sm" />
-                  <div v-html="`${label}`"></div>
-                </div>
-                <div class="cm-tag-description" v-html="description"></div>
-              </div>
-              <div class="cm-tag-remove column items-center q-ml-md">
-                <q-btn
-                  flat
-                  dense
-                  v-close-popup
-                  color="primary"
-                  size="md"
-                  icon="mdi-tag-remove"
-                  @click="deleteTag"
-                />
-              </div>
-            </div>
-            <div class="tag-attributes q-py-sm">
-              <template v-for="(attr, index) in attributes" :key="index">
-                <div v-if="attr.editable">
-                  <template v-if="['string', 'textarea'].includes(attr.kind)">
-                    <q-input
-                      dense
-                      :bottom-slots="!nully(attr.description)"
-                      v-model="attr.currentValue"
-                      :label="attr.label"
-                      :autogrow="attr.kind === 'textarea'"
-                      :type="attr.kind === 'string' ? 'text' : 'textarea'"
-                      :clearable="!attr.required"
-                    >
-                      <template v-slot:hint v-if="!nully(attr.description)">
-                        <span v-html="attr.description"></span>
-                      </template>
-                    </q-input>
-                  </template>
-                  <template v-if="['choice', 'multichoice'].includes(attr.kind)">
-                    <q-select
-                      dense
-                      options-dense
-                      map-options
-                      :bottom-slots="!nully(attr.description)"
-                      v-model="attr.currentValue"
-                      :options="attr.options"
-                      :multiple="attr.kind === 'multichoice'"
-                      :label="attr.label"
-                      :clearable="!attr.required"
-                    >
-                      <template v-slot:hint v-if="!nully(attr.description)">
-                        <span v-html="attr.description"></span>
-                      </template>
-                    </q-select>
-                  </template>
-                  <template v-if="attr.kind === 'compound'">Stand by...</template>
-                </div>
-              </template>
-            </div>
-          </div>
-        </q-card>
-      </q-menu>
+  <div
+    :class="`cm-tag-widget ${type === 'OpenTag' ? 'open' : 'self-close'} ${section}`"
+    @click="showEditor = true"
+  >
+    <div class="tag-marker">
+      <CustomIcon :size="10" :icon="icon" />
+      <div class="tag-text" v-if="tagMsg" v-text="tagMsg"></div>
     </div>
-  </template>
-  <template v-else>
-    <div :class="`cm-tag-widget close ${section}`">
-      <CustomIcon :size="10" :icon="icon" class="q-mx-auto" />
-    </div>
-  </template>
+    <TeiTagMenu
+      :tag="tag"
+      :attributes="attributes"
+      :icon="icon"
+      :label="label"
+      :description="description"
+    />
+  </div>
 </template>
 
 <script>
-import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
+import { computed, defineComponent, onBeforeUnmount, ref } from "vue";
 import { nully } from "@/utils";
-import { useSettingsStore } from "@/stores/settings";
 import { CustomIcon } from "@/components";
+import TeiTagMenu from "./TeiTagMenu.vue";
 
 export default defineComponent({
   name: "TeiTag",
   emits: ["update"],
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    tag: {
-      type: String,
-      required: true,
-    },
+    id: String,
+    widgetId: String,
+    tag: String,
     attributes: Object,
-    type: {
-      type: Object,
-      required: true,
-    },
-    from: {
-      type: Number,
-      required: true,
-    },
-    to: {
-      type: Number,
-      required: true,
-    },
-    section: {
-      type: String,
-      required: true,
-    },
+    type: String,
+    from: Number,
+    to: Number,
+    section: String,
     label: String,
     description: String,
-    icon: {
-      type: String,
-      required: true,
-    },
-    domEl: {
-      type: Object,
-      required: true,
-    },
+    icon: String,
+    domEl: Object,
   },
   components: {
     CustomIcon,
+    TeiTagMenu,
   },
-  setup(props, ctx) {
-    const settings = useSettingsStore();
+  setup(props) {
     const showEditor = ref(false);
     const msgAttrs = ["xml:id", "target", "columns", "n"];
     const tagMsg = computed(() => {
@@ -161,60 +73,14 @@ export default defineComponent({
       return null;
     });
 
-    const getAttributeValue = (kind, value) => {
-      if (["choice", "multichoice"].includes(kind)) {
-        return value.value;
-      } else if (kind === "compound") {
-        return value;
-      } else {
-        return value;
-      }
-    };
-
-    const tagAsText = computed(() => {
-      let tag = `<${props.tag}`;
-      for (const attr of props.attributes) {
-        if (attr.required && !attr.editable) {
-          tag += ` ${attr.value}="${attr.default}"`;
-        } else if (!nully(attr.currentValue)) {
-          tag += ` ${attr.value}="${getAttributeValue(attr.kind, attr.currentValue)}"`;
-        }
-      }
-      tag += ">";
-      return tag;
-    });
-
-    const deleteTag = () => {
-      const changes = [{ from: props.from, to: props.to }];
-      // if (pairedEntry) {
-      //   changes.push({ from: pairedFrom.value, to: pairedTo.value });
-      // }
-      ctx.emit("update", changes);
-    };
-
-    watch(
-      () => props.attributes,
-      () => {
-        console.log("attributes changed", props.attributes);
-        const changes = {
-          from: props.from,
-          to: props.to,
-          insert: tagAsText.value,
-        };
-        ctx.emit("update", changes);
-      },
-      { deep: true },
-    );
-
     onBeforeUnmount(() => {
+      console.log("component destroyed:", props.id);
       props.domEl.removeAttribute("id");
     });
 
     return {
       showEditor,
       nully,
-      deleteTag,
-      settings,
       tagMsg,
     };
   },
@@ -263,6 +129,9 @@ export default defineComponent({
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   border-left: none;
+}
+.cm-tag-widget.close i {
+  font-size: 10px;
 }
 .cm-tag-widget.annotation {
   border-color: #684545;

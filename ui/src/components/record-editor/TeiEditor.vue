@@ -1,6 +1,7 @@
 <template>
   <div class="bg-grey-2 q-px-sm row justify-between items-center">
     <div class="column q-pt-xs">
+      <!--q-btn @click="test" label="Test" /-->
       <q-tabs
         v-model="view.editorTab"
         dense
@@ -19,21 +20,9 @@
         <q-tab name="preview" label="Preview" :disable="disabled" />
       </q-tabs>
     </div>
+    <q-btn @click="parse" label="parse" />
     <div class="column">
-      <div class="row text-grey-7">
-        <q-btn flat icon="text_decrease" class="md-editor-button" />
-        <q-btn flat icon="text_increase" class="md-editor-button" />
-        <q-btn flat icon="undo" class="md-editor-button" />
-        <q-btn flat icon="redo" class="md-editor-button" />
-        <q-btn flat icon="settings" class="md-editor-button" />
-        <q-btn
-          flat
-          class="md-editor-button"
-          icon="code"
-          :icon-right="view.showTagMenu ? 'arrow_drop_up' : 'arrow_drop_down'"
-          @click="view.showTagMenu = !view.showTagMenu"
-        />
-      </div>
+      <ToolBar />
     </div>
   </div>
   <q-separator />
@@ -49,14 +38,7 @@
   >
     <q-tab-panel name="write" class="row q-pa-none">
       <div class="col">
-        <Codemirror
-          v-model="editorContent"
-          placeholder="Start transcription..."
-          :style="{ height: `${editorHeight}px`, width: `${editorWidth}px` }"
-          :extensions="extensions"
-          :options="options"
-          @ready="editorReady"
-        />
+        <div class="v-codemirror editor-container" ref="container"></div>
       </div>
       <TeiSidebar />
       <ContextMenu />
@@ -75,100 +57,153 @@ import {
   inject,
   nextTick,
   getCurrentInstance,
-  // h,
+  onBeforeUnmount,
   onMounted,
-  // render,
-  // ref,
+  ref,
   shallowRef,
   watch,
 } from "vue";
 import { useStores } from "@/use";
 import { TeiRenderer } from "@/components";
-import { Codemirror } from "./codemirror.js";
 import {
-  EditorView,
-  keymap,
-  highlightSpecialChars,
-  drawSelection,
-  highlightActiveLine,
-  dropCursor,
-  rectangularSelection,
-  crosshairCursor,
-  lineNumbers,
-  highlightActiveLineGutter,
-} from "@codemirror/view";
-import {
-  defaultHighlightStyle,
-  syntaxHighlighting,
-  indentOnInput,
-  bracketMatching,
-  foldGutter,
-} from "@codemirror/language";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { autocompletion, closeBrackets } from "@codemirror/autocomplete";
-import { xml } from "@codemirror/lang-xml";
-import { oneDark } from "@codemirror/theme-one-dark";
+  createEditorState,
+  createEditorView,
+  destroyEditorView,
+  getEditorTools,
+} from "./codemirror-utils.js";
+import { EditorState } from "@codemirror/state";
+import { EditorView, lineNumbers, tooltips } from "@codemirror/view";
+import { highlightSelectionMatches } from "@codemirror/search";
+import { autocompletion } from "@codemirror/autocomplete";
 import TeiSidebar from "./TeiSidebar.vue";
 import ContextMenu from "./ContextMenu.vue";
-import { tagPlugin } from "./tei-tag-plugin.js";
+import ToolBar from "./ToolBar.vue";
+import { tagDecoratorPlugin } from "./tag-decorator.js";
+import * as themes from "./themes.js";
+import { syntaxTree } from "@codemirror/language";
 
 export default defineComponent({
   name: "TeiEditor",
   components: {
-    Codemirror,
     ContextMenu,
     TeiRenderer,
     TeiSidebar,
+    ToolBar,
   },
   setup() {
-    const { currentPageData, view } = useStores();
+    const { currentPageData, view, settings, preferences } = useStores();
     const { editorHeight, editorWidth } = inject("editorDimensions");
     const disabled = computed(() => isEmpty(currentPageData.value.tei));
     const currentInstance = getCurrentInstance();
-    const editor = shallowRef();
-    const editorContent = currentPageData.value.tei;
+    const container = shallowRef();
+    const editorState = shallowRef();
+    const editorView = shallowRef();
 
-    const editorReady = (payload) => (editor.value = payload.view);
+    const widgetRegistry = ref({});
+    const componentRegistry = ref({});
+    const currentTheme = computed(() =>
+      preferences.value.theme.value ? themes[preferences.value.theme.value] : themes["oneDark"],
+    );
 
+    // editorView.value.updateState: 0 = Idle, 1 = Measuring, 2 = Updating
+    // eslint-disable-next-line unused-imports/no-unused-vars
     const updateTag = (changes) => {
-      console.log("updateTag", changes);
-      editor.value.dispatch({ changes });
+      console.log("updateTag", changes, editorView.value.updateState);
+      if (editorView.value.updateState !== 0) {
+        Promise.resolve().then(() => editorView.value.dispatch({ changes }));
+      } else {
+        editorView.value.dispatch({ changes });
+      }
     };
 
-    const extensions = [
-      xml(),
-      oneDark,
-      tagPlugin(currentInstance, updateTag),
-      EditorView.lineWrapping,
-      lineNumbers(),
-      highlightActiveLineGutter(),
-      highlightSpecialChars(),
-      history(),
-      foldGutter(),
-      drawSelection(),
-      dropCursor(),
-      indentOnInput(),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-      bracketMatching(),
-      closeBrackets(),
-      autocompletion(),
-      rectangularSelection(),
-      crosshairCursor(),
-      highlightActiveLine(),
-      highlightSelectionMatches(),
-      keymap.of([...defaultKeymap, ...searchKeymap, ...historyKeymap]),
-    ];
-
-    const options = {
-      lineWrapping: true,
+    const cleanUp = (evt) => {
+      console.log("cleanUp", evt, evt.detail, editorView.value.updateState);
+      const paired = document.querySelectorAll(`[data-id="${evt.detail.id}"]`);
+      console.log("paired", paired);
+      if (paired.length) {
+        paired.forEach((node) => {
+          if (node.hasAttribute("id")) {
+            const from = node.getAttribute("data-from");
+            const to = node.getAttribute("data-to");
+            console.log("contents", editorState.value.doc.sliceString(from, to));
+            updateTag({ from, to });
+          }
+        });
+      }
     };
+
+    const parse = () => {
+      syntaxTree(editorState.value).iterate({
+        enter: (node) => {
+          // if (cursor.name === "MissingCloseTag") {
+          if (node.node.name === "OpenTag") {
+            console.log(node.node.node);
+          }
+        },
+      });
+    };
+
+    const tagPlugin = tagDecoratorPlugin(
+      currentInstance,
+      updateTag,
+      widgetRegistry,
+      componentRegistry,
+    );
+
+    window.testPlug = tagPlugin;
+
+    const extensions = computed(() => {
+      console.log("generating extensions");
+      const payload = [];
+      payload.push(currentTheme.value);
+      if (preferences.value.visualTags.value) {
+        payload.push(tagPlugin);
+      }
+      if (preferences.value.lineNumbers.value) payload.push(lineNumbers());
+      if (preferences.value.lineWrapping.value) payload.push(EditorView.lineWrapping);
+      if (preferences.value.autoCompletion.value) payload.push(autocompletion());
+      if (preferences.value.highlightSelection.value) payload.push(highlightSelectionMatches());
+      if (preferences.value.allowMultipleSelections.value) {
+        payload.push(EditorState.allowMultipleSelections.of(true));
+      }
+      if (preferences.value.editorTooltips.value) payload.push(tooltips());
+      return payload;
+    });
+
+    const style = computed(() => ({
+      height: `${editorHeight}px`,
+      width: `${editorWidth}px`,
+      "font-size": `${preferences.value.fontSize.value}px`,
+    }));
 
     const onTabSwitch = (value) => {
       // if (value === "preview") currentPageData.value.tei = editor.getValue();
       console.log(`Switching tab to ${value}`);
     };
 
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const insertTag = (el, evt) => {
+      console.log("insertTag", el, evt);
+      const selection = editorView.value.state.selection.main;
+      const selectionText = editorView.value.state.doc.sliceString(selection.from, selection.to);
+      const isCompound = el.compound;
+      const label = el.label;
+      const tags = el.tags.map((x) => settings.tags.get(x));
+      const changes = [];
+      if (!isCompound && tags.length === 1) {
+        const tag = tags[0];
+        let result = `<${tag.name}`;
+        for (const attr of tag.attributes) {
+          if (attr.required && !attr.editable) {
+            result += ` ${attr.value}="${attr.default}"`;
+          }
+        }
+        result += `>${selectionText}</${tag.name}>`;
+        changes.push({ from: selection.from, to: selection.to, insert: result });
+      }
+      console.log(selection, selectionText, changes, isCompound, tags, label);
+      editorView.value.dispatch({ changes });
+    };
     // const insertTag = (type, tag, attributes) => {
     //   let tagAtt = [];
     //   let spAtt = {};
@@ -263,51 +298,84 @@ export default defineComponent({
 
     watch([editorHeight, editorWidth], async () => {
       await nextTick();
-      if (!isNil(editor)) {
-        editor.value.requestMeasure();
+      if (!isNil(editorView)) {
+        editorView.value.requestMeasure();
       }
     });
 
-    // watch(
-    //   changeQueue,
-    //   async () => {
-    //     if (changeQueue.value.length) {
-    //       await nextTick();
-    //       console.log("watch changeQueue", changeQueue.value);
-    //       changeQueue.value.forEach((change) => {
-    //         updateTag(change);
-    //       });
-    //       changeQueue.value = [];
-    //     }
-    //   },
-    //   { deep: true },
-    // );
-
     onMounted(async () => {
+      console.log("mounted TEIeditor");
       view.value.editorTab = "write";
       currentPageData.value.editOn = true;
-      window.testEditor = editor.value;
+      window.testEditor = currentInstance;
+      // window.testEditor = editorView.value;
+      editorState.value = createEditorState(currentPageData.value.tei);
+
+      editorView.value = createEditorView({
+        state: editorState.value,
+        parent: container.value,
+      });
+
+      const editorTools = getEditorTools(editorView.value);
+      editorTools.focus();
+
+      container.value.addEventListener("widgetDestroyed", cleanUp);
+
+      watch(
+        () => currentPageData.value.tei,
+        (newValue) => {
+          if (newValue !== editorTools.getDoc()) {
+            editorTools.setDoc(newValue);
+          }
+        },
+      );
+
+      watch(
+        () => extensions.value,
+        (extensions) => {
+          console.log("watcher: props.extensions", extensions);
+          editorTools.reExtensions(extensions || []);
+        },
+        { immediate: true },
+      );
+
+      watch(
+        () => disabled.value,
+        (disabled) => editorTools.toggleDisabled(disabled),
+        { immediate: true },
+      );
+
+      watch(
+        () => style.value,
+        (style) => editorTools.setStyle(style),
+        { immediate: true },
+      );
+    });
+
+    onBeforeUnmount(() => {
+      if (editorView.value) {
+        destroyEditorView(editorView.value);
+      }
     });
 
     return {
-      editor,
-      editorReady,
-      extensions,
-      editorContent,
+      container,
       currentPageData,
       disabled,
       editorHeight,
       editorWidth,
       onTabSwitch,
       view,
-      options,
-      // insertTag,
+      parse,
     };
   },
 });
 </script>
 
 <style lang="scss">
+.editor-container {
+  display: contents;
+}
 .editor-panel {
   padding: 0;
   background: linear-gradient(120deg, #fefefe, #efefef) no-repeat 0px/40px 100%;
