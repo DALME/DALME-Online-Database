@@ -144,14 +144,13 @@ const fetchRefresh = fromCallback(({ input: { clientId }, sendBack }) => {
   };
   const params = new URLSearchParams(changeKeys.snakeCase(body));
   const { data, fetchAPI } = apiInterface();
-
   fetchAPI(requests.auth.token(params))
     .then(() => {
       const payload = changeKeys.camelCase(data.value);
       accessToken.value = payload.accessToken;
       sendBack({ type: "REFRESHED" });
     })
-    .error(() => {
+    .catch((_error) => {
       sendBack({ type: "FAILED", error: { message: "Unable to refresh token" } });
     });
 });
