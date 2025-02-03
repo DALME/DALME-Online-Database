@@ -1,42 +1,48 @@
 <template>
   <q-expansion-item
     :label="label"
-    default-opened
+    :default-opened="defaultOpened"
     header-class="drawer_expansion_header"
     expand-icon="mdi-plus-box-outline"
     expanded-icon="mdi-minus-box-outline"
   >
-    <template v-if="!loading">
-      <CollectionTile
-        v-for="(collection, idx) in collections"
-        :key="idx"
-        :collection="collection"
-        :in-drawer="inDrawer"
-      />
-      <div class="flex">
-        <q-btn
-          v-if="totalCount > currentCount"
-          flat
-          no-caps
-          label="Show more..."
-          class="drawer-show-more"
-          @click="limit = limit + 5"
+    <q-scroll-area
+      dark
+      :style="`height: ${scrollHeight}px; width: ${width}px; min-width: ${width}px`"
+      class="scroll-area"
+    >
+      <template v-if="!loading">
+        <CollectionTile
+          v-for="(collection, idx) in collections"
+          :key="idx"
+          :collection="collection"
+          :in-drawer="inDrawer"
         />
-      </div>
-    </template>
-    <template v-if="loading">
-      <template v-for="idx in limit" :key="idx">
-        <q-item dense>
-          <q-item-section avatar>
-            <q-skeleton type="rect" height="18px" width="18px" />
-          </q-item-section>
-          <q-item-section>
-            <q-skeleton type="text" height="18px" width="85%" />
-            <q-skeleton type="text" height="14px" width="65%" />
-          </q-item-section>
-        </q-item>
+        <div class="flex">
+          <q-btn
+            v-if="totalCount > currentCount"
+            flat
+            no-caps
+            label="Show more..."
+            class="drawer-show-more"
+            @click="limit = limit + 5"
+          />
+        </div>
       </template>
-    </template>
+      <template v-if="loading">
+        <template v-for="idx in limit" :key="idx">
+          <q-item dense>
+            <q-item-section avatar>
+              <q-skeleton type="rect" height="18px" width="18px" />
+            </q-item-section>
+            <q-item-section>
+              <q-skeleton type="text" height="18px" width="85%" />
+              <q-skeleton type="text" height="14px" width="65%" />
+            </q-item-section>
+          </q-item>
+        </template>
+      </template>
+    </q-scroll-area>
   </q-expansion-item>
 </template>
 
@@ -62,10 +68,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    defaultOpened: Boolean,
     label: {
       type: String,
       default: "Collections",
     },
+    scrollHeight: Number,
+    width: String,
   },
   components: {
     CollectionTile,

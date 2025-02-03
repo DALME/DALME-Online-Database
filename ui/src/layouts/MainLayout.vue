@@ -3,7 +3,6 @@
   <q-layout id="layout" view="lHr lpR lFr" :class="{ 'login-background': showMap }">
     <template v-if="render">
       <NavBar />
-      <EditPanel />
       <AppDrawer />
       <UserDrawer />
       <q-page-container>
@@ -26,7 +25,7 @@
 import { computed, defineComponent, provide, ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { find, isNotNil, propEq } from "ramda";
-import { EditPanel, LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
+import { LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
 import {
   provideAPI,
   provideEditing,
@@ -38,7 +37,6 @@ import {
 export default defineComponent({
   name: "MainLayout",
   components: {
-    EditPanel,
     LoginModal,
     NavBar,
     UserDrawer,
@@ -51,7 +49,8 @@ export default defineComponent({
     const userDrawerEl = ref(null);
     const pageBackdrop = ref(null);
 
-    const render = computed(() => auth.authorized || auth.reauthenticate);
+    // const render = computed(() => auth.authorized || auth.reauthenticate);
+    const render = computed(() => auth.authorized && !auth.reauthenticate);
     const originPage = window.localStorage.getItem("origin_background");
     const showMap = computed(() => auth.authenticate && !originPage);
     const pageBackdropLoaded = ref(originPage ? false : true);
@@ -71,6 +70,7 @@ export default defineComponent({
     provide("pageBackdropLoaded", pageBackdropLoaded);
 
     onMounted(() => {
+      console.log("auth.currentState main mounted", auth.authorized, auth.reauthenticate);
       if ($route.query.logout) {
         auth.logout();
       }
@@ -78,6 +78,7 @@ export default defineComponent({
       ui.resizeListener();
 
       document.addEventListener("click", outsideDrawerClick);
+
       if (!render.value && originPage) {
         pageBackdrop.value.onload = () => {
           pageBackdropLoaded.value = true;

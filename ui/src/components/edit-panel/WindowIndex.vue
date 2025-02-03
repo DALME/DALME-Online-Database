@@ -59,6 +59,7 @@
 </template>
 
 <script>
+// eslint-disable-next-line unused-imports/no-unused-imports
 import { all, keys, map as rMap, none, values } from "ramda";
 import { defineComponent, ref } from "vue";
 import { useActor } from "@xstate/vue";
@@ -80,6 +81,7 @@ export default defineComponent({
       mouseoverSubmit,
       recenter,
       showAll,
+      // eslint-disable-next-line unused-imports/no-unused-vars
       machine: { send, actorRef },
     } = useEditing();
     const { windowIndexShow } = useStores();
@@ -99,10 +101,12 @@ export default defineComponent({
     const disableShowAll = ref(null);
 
     actorRef.subscribe((snapshot) => {
+      // console.log(snapshot);
       const modals = snapshot.context.modals;
       windowIndexShow.value = keys(modals).length > 0;
       // TODO: I'm sure all this can be optimized to only traverse once.
       actors.value = rMap(({ actor }) => useActor(actor).state, modals);
+      // console.log(actors.value);
       const visibility = values(rMap((actor) => actor.context.visible, actors.value));
       disableHideAll.value = none(Boolean)(visibility);
       disableShowAll.value = all(Boolean)(visibility);

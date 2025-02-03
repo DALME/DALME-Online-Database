@@ -43,12 +43,12 @@ export const provideEditing = () => {
         validated: false, // TODO: This should be a state!
         visible: true,
       },
-      on: {
-        SAVE: { target: "saving" },
-        HIDE: { actions: "hide", internal: true },
-        SHOW: { actions: "show", internal: true },
-        VALIDATE: { actions: "validate", internal: true },
-      },
+      // on: {
+      //   SAVE: { target: "saving" },
+      //   HIDE: { actions: "hide", internal: true },
+      //   SHOW: { actions: "show", internal: true },
+      //   VALIDATE: { actions: "validate", internal: true },
+      // },
       states: {
         editing: {},
         saving: {

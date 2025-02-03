@@ -1,7 +1,12 @@
 <template>
   <q-header class="no-shadow">
     <div class="main-toolbar row flex-center q-px-lg q-py-xs">
-      <q-btn icon="mdi-menu" class="tb-button q-mr-md" @click="appDrawerOpen = !appDrawerOpen">
+      <q-btn
+        icon="mdi-menu"
+        class="tb-button q-mr-md"
+        :class="{ 'edit-on': ongoingEdit }"
+        @click="appDrawerOpen = !appDrawerOpen"
+      >
         <TooltipWidget>Open App menu.</TooltipWidget>
       </q-btn>
 
@@ -148,11 +153,15 @@
 
         <q-btn
           size="12px"
-          :text-color="showTips ? 'green-7' : 'grey-7'"
-          :icon="showTips ? 'mdi-tooltip-remove-outline' : 'mdi-tooltip-check-outline'"
+          :text-color="preferences.tooltipsOn.value ? 'green-7' : 'grey-7'"
+          :icon="
+            preferences.tooltipsOn.value
+              ? 'mdi-tooltip-remove-outline'
+              : 'mdi-tooltip-check-outline'
+          "
           class="mc-button"
-          :class="{ 'bg-green-1': showTips }"
-          @click="showTips = !showTips"
+          :class="{ 'bg-green-1': preferences.tooltipsOn.value }"
+          @click="preferences.tooltipsOn.value = !preferences.tooltipsOn.value"
         >
           <TooltipWidget>Tooltips</TooltipWidget>
         </q-btn>
@@ -168,11 +177,6 @@
         </q-btn>
       </q-toolbar>
     </div>
-    <div
-      class="strip-approach"
-      @mouseenter="stripApproachHover = true"
-      @mouseleave="stripApproachHover = false"
-    />
   </q-header>
 </template>
 
@@ -197,15 +201,22 @@ export default defineComponent({
       globalLoading,
       isFullscreen,
       ui,
-      stripApproachHover,
       userDrawerOpen,
       appDrawerOpen,
-      showTips,
+      preferences,
+      pageIndexShow,
+      inlineIndexShow,
+      windowIndexShow,
     } = useStores();
 
     const submitting = ref(false);
     const searchQuery = ref("");
     const currentSubsection = ref(ui.currentSubsection);
+    const ongoingEdit = computed(
+      () => pageIndexShow.value || inlineIndexShow.value || windowIndexShow.value,
+    );
+
+    window.test = preferences;
 
     const openKB = () => {
       openURL("https://kb.dalme.org/", null, { target: "_blank" });
@@ -236,13 +247,12 @@ export default defineComponent({
     return {
       auth,
       breadcrumbs,
-      stripApproachHover,
       darkMode: $q.dark,
       globalLoading,
       menuRoutes: navRoutes("menu"),
       topRoutes: navRoutes("top"),
       ui,
-      showTips,
+      preferences,
       submitting,
       isFullscreen,
       isNil,
@@ -254,6 +264,7 @@ export default defineComponent({
       userDrawerOpen,
       appDrawerOpen,
       nully,
+      ongoingEdit,
     };
   },
 });
@@ -453,14 +464,14 @@ export default defineComponent({
 .mc-button::before {
   box-shadow: none;
 }
-.strip-approach {
-  position: absolute;
-  right: 0;
-  top: 95px;
-  width: 80px;
-  height: 65px;
+.main-toolbar .tb-button.edit-on {
+  color: #745050;
+  border-color: #543333;
+  background-color: rgba(70, 29, 29, 0.29);
 }
-.strip-approach {
-  top: 49px;
+.main-toolbar .tb-button.edit-on:hover {
+  border-color: rgb(125 71 71);
+  color: rgb(195 132 132);
+  background-color: #461d1d9c;
 }
 </style>

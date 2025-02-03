@@ -7,7 +7,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { useUiStore } from "@/stores/ui";
+import { useSettingsStore } from "@/stores/settings";
 
 export default defineComponent({
   name: "TooltipWidget",
@@ -29,8 +29,8 @@ export default defineComponent({
     },
   },
   setup() {
-    const ui = useUiStore();
-    return { showTips: ui.showTips };
+    const settings = useSettingsStore();
+    return { showTips: settings.preferences.tooltipsOn };
   },
 });
 </script>
