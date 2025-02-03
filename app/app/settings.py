@@ -594,6 +594,18 @@ class Development(Base, Configuration):
         },
     }
 
+    # GHP: I had to add this after upgrading from 6.3.1 to 6.3.2
+    # otherwise the data migrations would fail at step 8 (records)
+    # when the saving of records would trigger the internal wagtail
+    # autoupdate signals, which would try to update the search index
+    # wagtailsearch_indexentry while on the wrong db connection/schema
+    WAGTAILSEARCH_BACKENDS = {
+        'default': {
+            'BACKEND': 'wagtail.search.backends.database',
+            'AUTO_UPDATE': False,
+        }
+    }
+
     # Jupyter notebook setup
     SHELL_PLUS = 'ipython'
     SHELL_PLUS_PRINT_SQL = True
