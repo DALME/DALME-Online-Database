@@ -56,6 +56,7 @@ provider "registry.terraform.io/hashicorp/random" {
     "h1:Fnaec9vA8sZ8BXVlN3Xn9Jz3zghSETIKg7ch8oXhxno=",
     "h1:In4XBRMdhY89yUoTUyar3wDF28RJlDpQzdjahp59FAk=",
     "h1:f6jXn4MCv67kgcofx9D49qx1ZEBv8oyvwKDMPBr0A24=",
+    "h1:pOGQpbmnPGqPkBYSnZUGxbtVmp+jr7xisPOSVGO/23g=",
     "h1:zG9uFP8l9u+yGZZvi5Te7PV62j50azpgwPunq2vTm1E=",
     "zh:04ceb65210251339f07cd4611885d242cd4d0c7306e86dda9785396807c00451",
     "zh:448f56199f3e99ff75d5c0afacae867ee795e4dfda6cb5f8e3b2a72ec3583dd8",
