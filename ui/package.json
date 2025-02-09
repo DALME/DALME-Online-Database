@@ -36,6 +36,8 @@
     "@quasar/extras": "^1.16.4",
     "@vueuse/components": "^11.1.0",
     "@vueuse/core": "^11.1.0",
+    "vue-chartjs": "^5.3.2",
+    "chart.js": "^4.4.7",
     "@xstate/vue": "^3.1.4",
     "CETEIcean": "^1.9.2",
     "axios": "^1.7.1",
