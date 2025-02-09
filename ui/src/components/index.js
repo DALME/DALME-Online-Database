@@ -42,3 +42,4 @@ export { default as TaskManager } from "./task-manager";
 export { default as UserDetail } from "./user-detail";
 export { default as UserDrawer } from "./user-drawer";
 export { default as AppDrawer } from "./app-drawer";
+export { default as DashChart } from "./dash-chart";
