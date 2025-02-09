@@ -25,7 +25,7 @@
                 size="xs"
                 color="grey-6"
                 icon="close"
-                @click="context.emit('clearFilters')"
+                @click="$emit('clearFilters')"
               />
             </q-item-section>
           </q-item>
@@ -34,12 +34,7 @@
               clickable
               v-close-popup
               dense
-              @click="
-                context.emit('changeFilters', {
-                  field: filter.field,
-                  value: filter.value,
-                })
-              "
+              @click="$emit('changeFilters', filter)"
               :class="
                 activeFilters[filter.field] && activeFilters[filter.field] === filter.value
                   ? 'text-weight-bold bg-indigo-1 text-indigo-5'
@@ -102,10 +97,10 @@
         class="btn-icon table-toolbar-button"
         @click="isEditModeOn = !isEditModeOn"
       >
-        <TooltipWidget v-if="editable">
+        <ToolTip v-if="editable">
           Click on this button to enable editing data in place for supported columns (marked with
           this same icon).
-        </TooltipWidget>
+        </ToolTip>
       </q-btn>
       <q-btn-dropdown
         v-if="!showGrid"
@@ -142,7 +137,7 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <TooltipWidget>Select which columns should be displayed.</TooltipWidget>
+        <ToolTip>Select which columns should be displayed.</ToolTip>
       </q-btn-dropdown>
       <q-btn-dropdown
         unelevated
@@ -176,7 +171,7 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <TooltipWidget>Select how many records to display per page.</TooltipWidget>
+        <ToolTip>Select how many records to display per page.</ToolTip>
       </q-btn-dropdown>
       <q-btn
         v-if="grid"
@@ -188,7 +183,7 @@
         class="btn-icon table-toolbar-button"
         @click="showGrid = !showGrid"
       >
-        <TooltipWidget>Switch between table and grid view.</TooltipWidget>
+        <ToolTip>Switch between table and grid view.</ToolTip>
       </q-btn>
     </div>
   </div>
@@ -201,42 +196,21 @@
     <q-space />
     <slot name="tableToolbar-filtersets" />
     <template v-if="filterList && filterList.filters">
-      <q-btn-dropdown
-        v-for="(filterSet, idx) in filterList.filters"
-        :key="idx"
-        flat
-        dense
-        :label="filterSet.dropDownLabel"
-        menu-anchor="bottom right"
-        menu-self="top right"
-        class="text-capitalize"
-        content-class="menu-shadow"
-      >
-        <q-list bordered separator class="text-grey-9">
-          <q-item dense class="q-pr-sm">
-            <q-item-section class="text-weight-bold">
-              Filter by {{ filterSet.dropDownLabel }}
-            </q-item-section>
-            <q-item-section avatar>
-              <q-btn
-                flat
-                dense
-                size="xs"
-                color="grey-6"
-                icon="close"
-                @click="context.emit('clearFilters')"
-              />
-            </q-item-section>
-          </q-item>
-          <template v-for="(filter, idx) in filterSet.menuItems" :key="idx">
-            <q-item clickable v-close-popup dense>
-              <q-item-section>
-                {{ filter.label }}
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-list>
-      </q-btn-dropdown>
+      <template v-for="(filterSet, idx) in filterList.filters" :key="idx">
+        <FilterChooser
+          v-bind="filterSet"
+          @item-chosen="
+            (v) =>
+              $emit('changeFilters', {
+                field: filterSet.field,
+                value: v,
+                selection: filterSet.selection,
+                isolation: filterSet.isolation,
+              })
+          "
+          @clear-filters="$emit('clearFilters')"
+        />
+      </template>
     </template>
     <q-btn-dropdown
       v-if="sortList"
@@ -262,7 +236,7 @@
                 ? 'text-no-wrap text-weight-bold bg-indigo-1 text-indigo-5'
                 : 'text-no-wrap text-grey-8'
             "
-            @click="context.emit('changeSort', item.value)"
+            @click="$emit('changeSort', item.value)"
           >
             <q-item-section>
               {{ item.label }}
@@ -278,7 +252,7 @@
 import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
 import { computed, defineComponent, inject, ref, watch } from "vue";
-import { TooltipWidget } from "@/components";
+import { ToolTip, FilterChooser } from "@/components";
 
 export default defineComponent({
   name: "TableToolbar",
@@ -318,7 +292,8 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget,
+    FilterChooser,
+    ToolTip,
   },
   emits: [
     "changeRowsPerPage",
@@ -380,16 +355,16 @@ export default defineComponent({
 
       return `Showing ${rangeStart.toLocaleString("en-US")}-${rangeEnd.toLocaleString(
         "en-US",
-      )} out of a total of ${pagination.value.rowsNumber.toLocaleString("en-US")} ${resource}.`;
+      )} out of a total of ${pagination.value.rowsTotal.toLocaleString("en-US")} ${resource}.`;
     });
 
     watch(isEditModeOn, (newValue) => {
-      context.emit("changeEditMode", newValue);
+      console.log("watcher: isEditModeOn", newValue);
+      context.emit("changeFilters", newValue);
     });
 
     return {
       activeFilters,
-      context,
       columns,
       currentRpP,
       searchValue,

@@ -2,23 +2,27 @@ export const filterList = (userId) => ({
   preset: [
     {
       field: "completed",
-      value: 1,
+      value: true,
       label: "Completed tasks",
+      isolation: false,
     },
     {
       field: "completed",
-      value: 0,
+      value: false,
       label: "Uncompleted tasks",
+      isolation: false,
     },
     {
       field: "creation_user",
       value: userId,
       label: "Tasks you created",
+      isolation: false,
     },
     {
       field: "assigned_to",
       value: userId,
       label: "Tasks assigned to you",
+      isolation: false,
     },
   ],
 });

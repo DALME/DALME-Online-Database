@@ -237,41 +237,6 @@ export default defineComponent({
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap), props.embedded);
 
-    const setAuthor = (value) => {
-      onChangeFilters({
-        field: "creation_user",
-        value: value,
-      });
-    };
-
-    const setAssignee = (value) => {
-      onChangeFilters({
-        field: "assigned_to",
-        value: value,
-      });
-    };
-
-    const onChangeFilterTags = (value) => {
-      let targetValue = "";
-      if ("tags" in activeFilters.value) {
-        let tags = activeFilters.value["tags"].split(",");
-        if (tags.includes(value)) {
-          tags = tags.slice(tags.indexOf(value), 1);
-        } else {
-          tags.push(value);
-        }
-        tagsFilter.value = tags;
-        targetValue = tags.join(",");
-      } else {
-        tagsFilter.value.push(value);
-        targetValue = value;
-      }
-      onChangeFilters({
-        field: "tags",
-        value: targetValue,
-      });
-    };
-
     provide("pagination", { pagination, fetchDataPaginated });
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
@@ -293,12 +258,9 @@ export default defineComponent({
       onChangeRowsPerPage,
       onChangeFilters,
       onClearFilters,
-      onChangeFilterTags,
       onRequest,
       pagination,
       rows,
-      setAuthor,
-      setAssignee,
       search,
       sortList: sortList(),
       tagsFilter,
