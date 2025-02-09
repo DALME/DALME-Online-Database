@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { DateTime } from "luxon";
 
 export const attachmentSchema = yup.object().shape({
   filename: yup.string().required(),
@@ -16,5 +17,5 @@ export const optionsSchema = yup.array().of(
 );
 
 export const timeStampSchema = yup
-  .date()
-  .transform((value) => (value == null ? null : new Date(value)));
+  .string()
+  .transform((value) => DateTime.fromISO(value).toLocaleString(DateTime.DATETIME_MED));
