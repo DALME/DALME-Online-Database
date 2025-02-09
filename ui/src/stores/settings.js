@@ -5,7 +5,7 @@ import { API as apiInterface, requests } from "@/api";
 import notifier from "@/notifier";
 import { nully } from "@/utils";
 import { preferenceListSchema, UserElementSetsSchema } from "@/schemas";
-import { filter as rFilter, sortBy, prop, groupBy } from "ramda";
+import { filter as rFilter, sortBy, prop } from "ramda";
 
 export const useSettingsStore = defineStore(
   "settings",
@@ -76,10 +76,7 @@ export const useSettingsStore = defineStore(
       all: teiElementData.value.map((x) => Object.assign(x, getElement(x.element))),
       current: sets.value.current.members.map((x) => Object.assign(x, getElement(x.element))),
       menu: rFilter((x) => x.inContextMenu == true, sets.value.current.members),
-      toolbar: groupBy(
-        prop("section"),
-        rFilter((x) => x.inToolbar == true, sets.value.current.members),
-      ),
+      toolbar: rFilter((x) => x.inToolbar == true, sets.value.current.members),
       filter: filterElements,
       get: getElement,
     }));
