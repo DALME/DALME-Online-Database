@@ -18,7 +18,7 @@ import {
 import { lintGutter } from "@codemirror/lint";
 import { indentWithTab, defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { searchKeymap } from "@codemirror/search";
-import { closeBrackets } from "@codemirror/autocomplete";
+import { closeBrackets, completionKeymap } from "@codemirror/autocomplete";
 import { xml } from "@codemirror/lang-xml";
 
 export const baseExtensions = [
@@ -34,14 +34,28 @@ export const baseExtensions = [
   lintGutter(),
   drawSelection(),
   placeholder("Start transcription..."),
-  keymap.of([...defaultKeymap, ...searchKeymap, ...historyKeymap]),
+  keymap.of([...defaultKeymap, ...searchKeymap, ...historyKeymap, ...completionKeymap]),
 ];
 
-export const createEditorState = (doc) => {
+export const createEditorState = ({ doc, onUpdate, onChange, onFocus, onBlur }) => {
   console.log("creation editor state");
   return EditorState.create({
     doc: doc,
-    extensions: baseExtensions,
+    extensions: [
+      ...baseExtensions,
+      EditorView.updateListener.of((viewUpdate) => {
+        // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395/11
+        onUpdate(viewUpdate);
+        // doc changed
+        if (viewUpdate.docChanged) {
+          onChange(viewUpdate.state.doc.toString(), viewUpdate);
+        }
+        // focus state change
+        if (viewUpdate.focusChanged) {
+          viewUpdate.view.hasFocus ? onFocus(viewUpdate) : onBlur(viewUpdate);
+        }
+      }),
+    ],
   });
 };
 
@@ -144,179 +158,3 @@ export const getEditorTools = (view) => {
     setStyle,
   };
 };
-
-// const VueCodemirror = defineComponent({
-//   name: "VueCodemirror",
-//   props: {
-//     autofocus: {
-//       type: Boolean,
-//       default: true,
-//     },
-//     disabled: {
-//       type: Boolean,
-//       default: false,
-//     },
-//     indentWithTab: {
-//       type: Boolean,
-//       default: true,
-//     },
-//     tabSize: {
-//       type: Number,
-//       default: 4,
-//     },
-//     placeholder: {
-//       type: String,
-//       default: "",
-//     },
-//     autoDestroy: {
-//       type: Boolean,
-//       default: true,
-//     },
-//     extensions: Array,
-//     lineNumbers: Boolean,
-//     lineWrapping: Boolean,
-//     visualTags: Boolean,
-//     autoCompletion: Boolean,
-//     highlightSelection: Boolean,
-//     allowMultipleSelections: Boolean,
-//     editorTooltips: Boolean,
-//     style: Object,
-//     phrases: Object,
-//     // codemirror options
-//     root: Object,
-//     selection: Object,
-//     modelValue: {
-//       type: String,
-//       default: "",
-//     },
-//   },
-//   emits: ["change", "update", "focus", "blur", "ready", "update:modelValue"],
-//   setup(props, context) {
-//     const container = shallowRef();
-//     const state = shallowRef();
-//     const view = shallowRef();
-//     const config = computed(() =>
-//       Object.keys(toRaw(props))
-//         .filter((key) => key !== "modelValue")
-//         .reduce((obj, key) => {
-//           obj[key] = props[key];
-//           return obj;
-//         }, {}),
-//     );
-
-//     onMounted(() => {
-//       state.value = createEditorState({
-//         doc: props.modelValue,
-//         selection: config.value.selection,
-//         // initialize base extensions only
-//         extensions: baseExtensions,
-//         onFocus: (viewUpdate) => context.emit("focus", viewUpdate),
-//         onBlur: (viewUpdate) => context.emit("blur", viewUpdate),
-//         onUpdate: (viewUpdate) => context.emit("update", viewUpdate),
-//         onChange: (newDoc, viewUpdate) => {
-//           if (newDoc !== props.modelValue) {
-//             context.emit("change", newDoc, viewUpdate);
-//             context.emit("update:modelValue", newDoc, viewUpdate);
-//           }
-//         },
-//       });
-
-//       view.value = createEditorView({
-//         state: state.value,
-//         parent: container.value,
-//         root: config.value.root,
-//       });
-
-//       const editorTools = getEditorTools(view.value);
-
-//       // watch prop.modelValue
-//       watch(
-//         () => props.modelValue,
-//         (newValue) => {
-//           if (newValue !== editorTools.getDoc()) {
-//             editorTools.setDoc(newValue);
-//           }
-//         },
-//       );
-
-//       // watch prop.extensions
-//       watch(
-//         () => props.extensions,
-//         (extensions) => {
-//           console.log("watcher: props.extensions", extensions);
-//           editorTools.reExtensions(extensions || []);
-//         },
-//         { immediate: true },
-//       );
-
-//       // watch prop.disabled
-//       watch(
-//         () => config.value.disabled,
-//         (disabled) => editorTools.toggleDisabled(disabled),
-//         { immediate: true },
-//       );
-
-//       // watch prop.indentWithTab
-//       watch(
-//         () => config.value.indentWithTab,
-//         (iwt) => editorTools.toggleIndentWithTab(iwt),
-//         { immediate: true },
-//       );
-
-//       // watch prop.tabSize
-//       watch(
-//         () => config.value.tabSize,
-//         (tabSize) => editorTools.setTabSize(tabSize),
-//         { immediate: true },
-//       );
-
-//       // watch prop.phrases
-//       watch(
-//         () => config.value.phrases,
-//         (phrases) => editorTools.setPhrases(phrases || {}),
-//         { immediate: true },
-//       );
-
-//       // watch prop.placeholder
-//       watch(
-//         () => config.value.placeholder,
-//         (placeholder) => editorTools.setPlaceholder(placeholder),
-//         { immediate: true },
-//       );
-
-//       // watch prop.style
-//       watch(
-//         () => config.value.style,
-//         (style) => editorTools.setStyle(style),
-//         { immediate: true },
-//       );
-
-//       // immediate autofocus
-//       if (config.value.autofocus) {
-//         editorTools.focus();
-//       }
-
-//       context.emit("ready", {
-//         state: state.value,
-//         view: view.value,
-//         container: container.value,
-//       });
-//     });
-
-//     onBeforeUnmount(() => {
-//       if (config.value.autoDestroy && view.value) {
-//         destroyEditorView(view.value);
-//       }
-//     });
-
-//     return () => {
-//       return h("div", {
-//         class: "v-codemirror",
-//         style: { display: "contents" },
-//         ref: container,
-//       });
-//     };
-//   },
-// });
-
-// export const Codemirror = VueCodemirror;

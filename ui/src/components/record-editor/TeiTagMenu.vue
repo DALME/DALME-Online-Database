@@ -6,9 +6,9 @@
           <div class="column">
             <div class="cm-tag-label items-center row">
               <CustomIcon :icon="icon" class="q-mr-sm" />
-              <div v-html="`${label}`"></div>
+              <div v-html="`${elData.label}`"></div>
             </div>
-            <div class="cm-tag-description" v-html="description"></div>
+            <div class="cm-tag-description" v-html="elData.description"></div>
           </div>
           <div v-if="action == 'edit'" class="cm-tag-remove column items-center q-ml-md">
             <q-btn
@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="tag-attributes q-py-sm">
-          <template v-for="(attr, index) in attributes" :key="index">
+          <template v-for="(attr, index) in data" :key="index">
             <div v-if="attr.editable">
               <template v-if="['string', 'textarea'].includes(attr.kind)">
                 <q-input
@@ -61,33 +61,43 @@
             </div>
           </template>
         </div>
-        <q-btn v-if="action == 'create'" flat size="xs" label="Insert" class="editor-tb-button" />
+        <q-btn
+          v-if="action === 'create'"
+          flat
+          size="xs"
+          label="Insert"
+          class="editor-tb-button"
+          @click="insertTag"
+        />
       </div>
     </q-card>
   </q-menu>
 </template>
 
 <script>
-import { computed, defineComponent, watch } from "vue";
+import { computed, defineComponent, ref, onMounted, watch } from "vue";
 import { nully } from "@/utils";
 import { useSettingsStore } from "@/stores/settings";
 import { CustomIcon } from "@/components";
+import { filter as rFilter, groupBy, prop } from "ramda";
 
 export default defineComponent({
   name: "TeiTagMenu",
-  emits: ["update"],
+  emits: ["update", "insert"],
   props: {
-    tag: {
-      type: String,
+    tagData: {
+      type: Object,
+      required: true,
+    },
+    elData: {
+      type: Object,
       required: true,
     },
     attributes: Object,
     label: String,
     description: String,
-    icon: {
-      type: String,
-      required: true,
-    },
+    from: Number,
+    to: Number,
     action: {
       type: String,
       default: "edit",
@@ -98,24 +108,21 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const settings = useSettingsStore();
-
-    const getAttributeValue = (kind, value) => {
-      if (["choice", "multichoice"].includes(kind)) {
-        return value.value;
-      } else if (kind === "compound") {
-        return value;
-      } else {
-        return value;
-      }
-    };
+    const isCompound = props.elData.compound;
+    const icon = props.tagData.icon || props.elData.icon;
+    const data = ref({});
 
     const tagAsText = computed(() => {
-      let tag = `<${props.tag}`;
-      for (const attr of props.attributes) {
+      let tag = `<${props.tagData.name}`;
+      const attributes = isCompound ? rFilter((x) => x.group === props.tagData.name) : data.value;
+      for (const attr of attributes) {
         if (attr.required && !attr.editable) {
           tag += ` ${attr.value}="${attr.default}"`;
         } else if (!nully(attr.currentValue)) {
-          tag += ` ${attr.value}="${getAttributeValue(attr.kind, attr.currentValue)}"`;
+          const val = ["choice", "multichoice"].includes(attr.kind)
+            ? attr.currentValue.value
+            : attr.currentValue;
+          tag += ` ${attr.value}="${val}"`;
         }
       }
       tag += ">";
@@ -123,115 +130,107 @@ export default defineComponent({
     });
 
     const deleteTag = () => {
-      const changes = [{ from: props.from, to: props.to }];
-      // if (pairedEntry) {
-      //   changes.push({ from: pairedFrom.value, to: pairedTo.value });
-      // }
-      ctx.emit("update", changes);
+      ctx.emit("update", { from: props.from, to: props.to });
     };
 
-    watch(
-      () => props.attributes,
-      () => {
-        console.log("attributes changed", props.attributes);
-        const changes = {
-          from: props.from,
-          to: props.to,
-          insert: tagAsText.value,
-        };
-        ctx.emit("update", changes);
-      },
-      { deep: true },
-    );
+    const insertTag = () => {
+      ctx.emit("insert", groupBy(prop("group"), data.value));
+    };
+
+    const generateTagAttributes = (refAttrs, localAttrs, kind, action, group) => {
+      console.log("generating from", refAttrs);
+      const result = [];
+      for (const attr of refAttrs) {
+        if (action !== "create" && kind === "supplied" && attr.value === "text") {
+          continue;
+        } else {
+          let cValue;
+          if (localAttrs && attr.value in localAttrs) {
+            cValue = structuredClone(localAttrs[attr.value]);
+          } else if (attr.default) {
+            cValue = structuredClone(attr.default);
+          } else {
+            cValue = attr.kind === "multichoice" ? [] : "";
+          }
+          result.push({
+            group: group,
+            default: attr.label || null,
+            description: attr.description,
+            editable: attr.editable,
+            required: attr.required,
+            kind: attr.kind,
+            label: attr.label,
+            value: attr.value,
+            options: attr.options || [],
+            currentValue: cValue,
+          });
+        }
+      }
+      console.log("result = ", result);
+      return result;
+    };
+
+    const generateData = () => {
+      let result = generateTagAttributes(
+        props.tagData.attributes,
+        props.attributes,
+        props.tagData.kind,
+        props.action,
+        props.tagData.name,
+      );
+      if (props.action === "create" && props.elData.label === "Gloss") {
+        console.log("og result", data.value);
+      }
+      if (props.action === "create" && isCompound) {
+        for (const tag of props.elData.tags) {
+          if (tag.attributes.length) {
+            result = result.concat(
+              generateTagAttributes(tag.attributes, null, tag.kind, props.action, tag.name),
+            );
+          }
+        }
+      }
+      if (props.action === "create" && props.elData.label === "Gloss") {
+        console.log("final result", data.value);
+      }
+      return result;
+    };
+
+    onMounted(() => {
+      data.value = generateData();
+      if (props.action === "create" && props.elData.label === "Gloss") {
+        console.log("data", data.value);
+      }
+
+      if (props.action === "edit") {
+        watch(
+          () => data.value,
+          () => {
+            console.log("data updated");
+            ctx.emit("update", {
+              from: props.from,
+              to: props.to,
+              insert: tagAsText.value,
+            });
+          },
+          { deep: true },
+        );
+      }
+    });
 
     return {
       nully,
       deleteTag,
+      insertTag,
       settings,
+      icon,
+      data,
     };
   },
 });
 </script>
 
 <style lang="scss">
-.cm-tag-widget-container {
-  display: inline-block;
-  margin: 0 5px;
-  vertical-align: middle;
-}
-// .cm-widgetBuffer:first-child + .cm-tag-widget-container {
-//   margin-left: 0;
-// }
-.cm-tag-widget {
-  border: 2px solid rgb(171 178 191);
-  border-radius: 6px;
-  height: 20px;
-  min-width: 22px;
-  display: flex;
-  align-items: center;
-}
-.cm-tag-widget .tag-marker {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding-left: 2px;
-  padding-right: 2px;
-}
-.cm-tag-widget .tag-marker .tag-text {
-  font-size: 10px;
-  font-family: "Roboto";
-  font-weight: 400;
-}
-.cm-tag-widget.open {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right: none;
-}
-.cm-tag-widget.close {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: none;
-}
-.cm-tag-widget.annotation {
-  border-color: #684545;
-  color: #b08181;
-  // background-color: #342828;
-}
-.cm-tag-widget.editorial {
-  border-color: #3c7072;
-  color: #749ba5;
-  // background-color: #253335;
-}
-.cm-tag-widget.formatting {
-  border-color: #4b6391;
-  color: #9eb5e7;
-  // background-color: #2b343b;
-}
-.cm-tag-widget.layout {
-  border-color: #3d7746;
-  color: #71b572;
-  // background-color: #273124;
-}
-.cm-tag-widget.marks {
-  border-color: #704b91;
-  color: #9e73ae;
-  // background-color: #362b3b;
-}
-.cm-tag-widget.other {
-  border-color: #615f5f;
-  color: #9c9797;
-  // background-color: #2d2c2c;
-}
-.cm-tag-widget.self-close:hover,
-.cm-tag-widget.open:hover {
-  // background-color: #ffffff1a;
-  border-color: #ffffffc9;
-  color: #e7e3e3;
-}
 .cm-tag-menu {
   max-width: 300px;
 }

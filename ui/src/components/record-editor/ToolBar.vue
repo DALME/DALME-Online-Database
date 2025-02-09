@@ -1,17 +1,10 @@
 <template>
   <div class="row text-grey-7 toolbar">
-    <template v-for="(els, section) in settings.elements.toolbar" :key="section">
+    <template v-for="(els, section) in buttons" :key="section">
       <q-btn-group flat class="editor-tb-group">
         <template v-for="(el, idx) in els" :key="idx">
           <q-btn flat size="xs" :icon="el.icon" class="editor-tb-button">
-            <TeiTagMenu
-              action="create"
-              :tag="el.tags[0]"
-              :attributes="el.tags[0].attributes"
-              :icon="el.icon"
-              :label="el.label"
-              :description="el.description"
-            />
+            <TeiTagMenu action="create" :tagData="el.tags[0]" :elData="el" @insert="insertTag" />
           </q-btn>
         </template>
       </q-btn-group>
@@ -76,9 +69,10 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { computed, defineComponent, inject } from "vue";
 import { useStores } from "@/use";
 import TeiTagMenu from "./TeiTagMenu.vue";
+import { prop, groupBy } from "ramda";
 
 export default defineComponent({
   name: "ToolBar",
@@ -86,10 +80,22 @@ export default defineComponent({
 
   setup() {
     const { view, settings } = useStores();
+    const insertTag = inject("insertTag");
+    const buttons = computed(() => {
+      return groupBy(
+        prop("section"),
+        settings.elements.toolbar.map((x) => {
+          const tags = x.tags;
+          return Object.assign(x, { tags: tags.map((y) => settings.tags.get(y)) });
+        }),
+      );
+    });
 
     return {
       view,
       settings,
+      insertTag,
+      buttons,
     };
   },
 });

@@ -1,78 +1,128 @@
 import { h, render } from "vue";
 import { Decoration, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
-import { syntaxTree } from "@codemirror/language";
+import { matchBrackets, ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { useSettingsStore } from "@/stores/settings";
-import TeiTag from "./TeiTag.vue";
-import { range, intersection, difference } from "ramda";
+import TeiTagMenu from "./TeiTagMenu.vue";
 
 const tagPattern = /<(\/)?([a-z]+)([^>]+?)?(\/)?>/gi;
 const tagAttributePattern = /([a-z0-9-:]+)=(".+?")/gi;
 
 const deconstructTag = (text) => {
-  tagPattern.lastIndex = 0;
-  let match = tagPattern.exec(text);
-  match = match.filter(Boolean);
-  const tag = match.at(1);
-  const attributes = {};
-  let m;
-  while ((m = tagAttributePattern.exec(match.at(2)))) {
-    attributes[m[1]] = m[2].replace(/"/g, "");
+  if (text) {
+    tagPattern.lastIndex = 0;
+    let match = tagPattern.exec(text);
+    match = match.filter(Boolean);
+    const tag = match.at(1);
+    const attributes = {};
+    let m;
+    while ((m = tagAttributePattern.exec(match.at(2)))) {
+      attributes[m[1]] = m[2].replace(/"/g, "");
+    }
+    return { tag, attributes };
   }
-  return { tag, attributes };
+  return null;
 };
 
-// const getPairedTag = (view, range, type) => {
-//   console.log("called getPairedTag", range, type);
-//   if (type.selfClose) return null;
-//   try {
-//     const dir = type.open ? 1 : -1;
-//     const pos = type.open ? range.from : range.to;
-//     const childType = type.open ? "CloseTag" : "OpenTag";
-//     const match = matchBrackets(view.state, pos, dir);
-//     const tree = ensureSyntaxTree(view.state, view.state.doc.length, 5000);
-//     const node = tree.resolveInner(match.end.from).getChild(childType);
-//     const { tag, attributes } = deconstructTag(view.state.doc.sliceString(node.from, node.to));
-//     // console.log(match, node.name, view.state.doc.sliceString(node.from, node.to));
-//     return { node, tag, attributes };
-//   } catch (error) {
-//     return error;
-//   }
-// };
+const getPairedTag = (state, node, type) => {
+  // console.log("called getPairedTag", node, type);
+  if (type.selfClose) return node;
+  const dir = type.open ? 1 : -1;
+  const pos = type.open ? node.from : node.to;
+  const childType = type.open ? "CloseTag" : "OpenTag";
+  const match = matchBrackets(state, pos, dir);
+  if (match.matched) {
+    const tree = ensureSyntaxTree(state, state.doc.length, 5000);
+    const node = tree.resolve(type.close ? match.end.from : match.end.to).getChild(childType);
+    return node;
+  }
+  return null;
+};
 
-class TagWidget extends WidgetType {
-  constructor(data) {
-    super();
-    this.id = data.id;
-    this.tag = data.tag;
-    this.type = data.type;
-    this.attributes = data.attributes || [];
-    this.from = data.from;
-    this.to = data.to;
-    this.section = data.section;
-    this.label = data.label;
-    this.description = data.description || "";
-    this.icon = data.icon;
-    this.widgets = data.widgets;
-    this.components = data.components;
-    this.container = document.createElement("div");
-    this.container.className = "cm-tag-widget-container";
-    this.container.setAttribute("data-from", this.from);
-    this.container.setAttribute("data-to", this.to);
-    this.container.setAttribute("data-tag", this.tag);
-    this.container.setAttribute("data-id", this.id);
-    if (this.type == "CloseTag") {
-      const tagDiv = document.createElement("div");
-      tagDiv.className = `cm-tag-widget close ${this.section}`;
-      const icon = document.createElement("i");
-      icon.className = `q-icon ${this.icon} q-mx-auto`;
-      tagDiv.appendChild(icon);
-      this.container.appendChild(tagDiv);
-    } else {
-      this.widgets.value[this.id] = this;
+const getTagDetail = (tag, attributes) => {
+  if (tag === "table") {
+    const rows = attributes.rows || null;
+    const cols = attributes.cols || null;
+    return rows && cols ? `${rows}x${cols}` : null;
+  } else if (tag === "row" && attributes.role === "label") {
+    return "H";
+  } else if (tag === "num") {
+    return attributes.value || null;
+  } else if (tag === "g") {
+    return attributes.ref ? String.fromCodePoint(`0x${attributes.ref}`) : null;
+  } else {
+    for (const attr of ["xml:id", "target", "columns", "n"]) {
+      if (attr in attributes) {
+        return attributes[attr];
+      }
     }
   }
+  return null;
+};
 
-  toDOM() {
+class TagPill extends WidgetType {
+  constructor({ tagData, elData, type, attributes, from, to, instance, handler }) {
+    super();
+    this.tagData = tagData;
+    this.elData = elData;
+    this.type = type;
+    this.attributes = attributes;
+    this.from = from;
+    this.to = to;
+    this.icon = tagData.icon || elData.icon;
+    this.detail = getTagDetail(tagData.name, attributes);
+    this.container = this.getElement();
+    this.menu = this.type.close ? null : this.getMenu(instance, handler);
+  }
+
+  getElement() {
+    const container = document.createElement("div");
+    container.className = "cm-tag-widget-container";
+
+    const tagDiv = document.createElement("div");
+    const typeClass = this.type.open ? "open" : this.type.selfClose ? "self-close" : "close";
+    tagDiv.className = `cm-tag-widget ${typeClass} ${this.elData.section}`;
+
+    const icon = document.createElement("i");
+    icon.className = `q-icon ${this.icon} q-mx-auto`;
+    icon.setAttribute("aria-hidden", true);
+    icon.setAttribute("role", "presentation");
+
+    if (this.type.close) {
+      tagDiv.appendChild(icon);
+      container.appendChild(tagDiv);
+    } else {
+      const marker = document.createElement("div");
+      marker.className = "tag-marker";
+      marker.appendChild(icon);
+      if (this.detail) {
+        const detailContainer = document.createElement("div");
+        detailContainer.className = "tag-text";
+        detailContainer.textContent = this.detail;
+        marker.appendChild(detailContainer);
+      }
+      tagDiv.appendChild(marker);
+      container.appendChild(tagDiv);
+    }
+    return container;
+  }
+
+  getMenu(instance, handler) {
+    const component = h(TeiTagMenu, {
+      tagData: this.tagData,
+      elData: this.elData,
+      attributes: this.attributes,
+      from: this.from,
+      to: this.to,
+      onUpdate: handler,
+    });
+    component.appContext = instance.appContext.app._context;
+    return component;
+  }
+
+  toDOM(_view) {
+    if (!this.type.close) {
+      render(this.menu, this.container);
+    }
     return this.container;
   }
 
@@ -81,14 +131,9 @@ class TagWidget extends WidgetType {
       return true;
     } else if (other.tag === this.tag) {
       // this = in place, other = newly generated
-      console.log(`merging widgets this:${this.id} and other:${other.id}`);
-      // console.log("this", this.id, this.from, this.to);
-      // console.log("other", other.id, other.from, other.to);
-      // this.id = other.id;
+      console.log(`merging widgets ${this.from}-${this.to} and ${other.from}-${other.to}`);
       this.from = other.from;
       this.to = other.to;
-      this.container.setAttribute("data-from", this.from);
-      this.container.setAttribute("data-to", this.to);
       return false;
     } else {
       return false;
@@ -96,312 +141,105 @@ class TagWidget extends WidgetType {
   }
 
   destroy() {
-    console.log(`destroying widget ${this.id}`);
-    // delete this.widgets.value[this.id];
-    // this.container.dispatchEvent(
-    //   new CustomEvent("widgetDestroyed", {
-    //     bubbles: true,
-    //     detail: { id: this.id },
-    //   }),
-    // );
-    // return true;
+    console.log(`destroying widget ${this.from}-${this.to}`);
   }
 
-  updateDOM(elt, _view) {
-    console.log("updateDOM called", this.from, this.to, this.id);
-    elt.setAttribute("data-from", this.from);
-    elt.setAttribute("data-to", this.to);
+  updateDOM(_elt, _view) {
+    console.log("updateDOM called", this.from, this.to);
+    // elt.setAttribute("data-from", this.from);
+    // elt.setAttribute("data-to", this.to);
     return true;
   }
 }
 
-class TagDecorator {
-  constructor(widgets, components) {
-    this.settings = useSettingsStore();
-    this.widgets = widgets;
-    this.components = components;
-    this.viewport_from = 0;
-    this.viewport_to = 0;
-  }
-
-  createDeco(view) {
-    this.viewport_from = view.viewport.from;
-    this.viewport_to = view.viewport.to;
-    const { ranges, changes } = this.getDecorations(view, this.viewport_from, this.viewport_to);
-    return { decoration: Decoration.set(ranges, true), changes: changes };
-  }
-
-  updateDeco(update, decorations) {
-    console.log("updateDeco called", update);
-    let changeFrom = 1e9;
-    let changeTo = update.view.viewport.to;
-    if (update.docChanged) {
-      // the document has changed - map the changes to the decorations
-      decorations = decorations.map(update.changes);
-      // determine the range the combined changes
-      update.changes.iterChanges((_f, _t, from, to) => {
-        if (to >= update.view.viewport.from && from <= update.view.viewport.to) {
-          changeFrom = Math.min(from, changeFrom);
-          changeTo = Math.max(to, changeTo);
-          console.log(`docChanged: changeFrom=${changeFrom}, changeTo=${changeTo}`);
-        }
-      });
-    }
-
-    if (!update.docChanged && update.viewportChanged) {
-      // the document has not changed, but the viewport has
-      try {
-        // range of line numbers of the previous viewport
-        const startRng = range(
-          update.view.state.doc.lineAt(this.viewport_from).number,
-          update.view.state.doc.lineAt(this.viewport_to).number + 1,
-        );
-        // range of line numbers of the updated viewport
-        const endRng = range(
-          update.view.state.doc.lineAt(update.view.viewport.from).number,
-          update.view.state.doc.lineAt(update.view.viewport.to).number + 1,
-        );
-        // overlap of the two ranges
-        const overlapRng = intersection(startRng, endRng);
-        if (overlapRng.length) {
-          // range of new lines visible after update -i.e. non-overlapping
-          const targetRng = difference(endRng, overlapRng);
-          const startLine = update.view.state.doc.line(targetRng.at(0)) || null;
-          const endLine = update.view.state.doc.line(targetRng.at(-1)) || null;
-          if (startLine) changeFrom = Math.min(startLine.from, changeFrom);
-          if (endLine) changeTo = Math.max(endLine.to, changeTo);
-        } else {
-          // there is no overlap, so the entire viewport has changed
-          changeFrom = update.view.viewport.from;
-          changeTo = update.view.viewport.to;
-        }
-      } catch {
-        changeFrom = update.view.viewport.from;
-        changeTo = update.view.viewport.to;
-      }
-      console.log(`viewportMoved: changeFrom=${changeFrom}, changeTo=${changeTo}`);
-    }
-
-    if (changeTo - changeFrom > 10000) {
-      console.log("changeTo - changeFrom > 1000");
-      return this.createDeco(update.view);
-    }
-
-    if (changeTo > -1) {
-      console.log("changeTo > -1");
-      return this.updateRange(update.view, decorations, changeFrom, changeTo);
-    }
-
-    return { decoration: decorations, changes: [] };
-  }
-
-  updateRange(view, decorations, updateFrom, updateTo) {
-    let changes = [];
-    for (let r of view.visibleRanges) {
-      let from = Math.max(r.from, updateFrom);
-      let to = Math.min(r.to, updateTo);
-      console.log(`updateRange from=${from}, to=${to}`);
-      if (to > from) {
-        let fromLine = view.state.doc.lineAt(from);
-        let toLine = fromLine.to < to ? view.state.doc.lineAt(to) : fromLine;
-        let start = Math.max(r.from, fromLine.from);
-        let end = Math.min(r.to, toLine.to);
-        console.log(`updateRange start=${start}, end=${end}`);
-        let result = this.getDecorations(view, start, end);
-        decorations = decorations.update({
-          filterFrom: start,
-          filterTo: end,
-          filter: (from, to) => from < start || to > end,
-          add: result.ranges,
-          sort: true,
-        });
-        changes = result.changes;
-      }
-    }
-    return { decoration: decorations, changes: changes || [] };
-  }
-
-  getDecorations(view, from, to) {
-    const ranges = [];
-    const changes = [];
-    // const tree = ensureSyntaxTree(view.state, view.state.doc.length, 5000);
-    // https://discuss.codemirror.net/t/efficient-way-to-get-current-syntax-tree-to-extract-headers/3975/5
-    syntaxTree(view.state).iterate({
-      from,
-      to,
-      enter: (cursor) => {
-        if (cursor.name === "Element") {
-          // console.log("found element", cursor.node, cursor.from, cursor.to);
-          if (cursor.node.firstChild.name !== "SelfClosingTag") {
-            if (cursor.node.firstChild.name === "⚠" && cursor.node.lastChild.name === "CloseTag") {
-              changes.push({ from: cursor.node.lastChild.from, to: cursor.node.lastChild.to });
-              return true;
-            } else if (
-              cursor.node.firstChild.name === "OpenTag" &&
-              cursor.node.lastChild.name === "⚠"
-            ) {
-              changes.push({ from: cursor.node.firstChild.from, to: cursor.node.firstChild.to });
-              return true;
-            }
-          }
-          const oTag = cursor.node.firstChild;
-          const { tag, attributes, tagData, elData } = this.getTagData(view, oTag);
-          if (this.settings.tags.names.includes(tag)) {
-            const widgetId = crypto.randomUUID().replace(/-/g, "");
-            const oWidget = new TagWidget({
-              id: widgetId,
-              tag: tag,
-              type: oTag.name,
-              attributes: this.generateAttributes(tagData.attributes, attributes, tagData.kind),
-              from: oTag.from,
-              to: oTag.to,
-              section: elData.section,
-              label: elData.label,
-              description: elData.description,
-              icon: tagData.icon || elData.icon,
-              widgets: this.widgets,
-              components: this.components,
-            });
-            if (oTag.name === "OpenTag") {
-              const cTag = cursor.node.lastChild;
-              console.log("found closing tag", cTag);
-              const cWidget = new TagWidget({
-                id: widgetId,
-                tag: tag,
-                type: cTag.name,
-                from: cTag.from,
-                to: cTag.to,
-                section: elData.section,
-                label: elData.label,
-                icon: tagData.icon || elData.icon,
-                widgets: this.widgets,
-                components: this.components,
-              });
-              ranges.push(Decoration.replace({ widget: oWidget }).range(oTag.from, oTag.to));
-              ranges.push(Decoration.replace({ widget: cWidget }).range(cTag.from, cTag.to));
-            } else {
-              ranges.push(Decoration.replace({ widget: oWidget }).range(oTag.from, oTag.to));
-            }
-          }
-        }
-      },
-    });
-    return { ranges, changes };
-  }
-
-  getTagData(view, node) {
-    const { tag, attributes } = deconstructTag(view.state.doc.sliceString(node.from, node.to));
-    const tagData = this.settings.tags.filter(tag, attributes);
-    return {
-      tag: tag,
-      attributes: attributes,
-      tagData: tagData.length ? tagData[0] : null,
-      elData: tagData.length ? this.settings.elements.get(tagData[0].element) : null,
-    };
-  }
-
-  generateAttributes(ref_attrs, attrs, kind) {
-    let attributes = [];
-    for (const attr of ref_attrs) {
-      if (!(kind === "supplied" && attr.value === "text")) {
-        let cValue;
-        if (attr.value in attrs) {
-          cValue = structuredClone(attrs[attr.value]);
-        } else if (attr.default) {
-          cValue = structuredClone(attr.default);
-        } else {
-          cValue = attr.kind === "multichoice" ? [] : "";
-        }
-        attributes.push({
-          default: attr.label || null,
-          description: attr.description,
-          editable: attr.editable,
-          required: attr.required,
-          kind: attr.kind,
-          label: attr.label,
-          value: attr.value,
-          options: attr.options || [],
-          currentValue: cValue,
-        });
-      }
-    }
-    return attributes;
-  }
-}
-
-export const tagDecoratorPlugin = (
-  currentInstance,
-  updateTag,
-  widgetRegistry,
-  componentRegistry,
-) => {
+export const tagDecoratorPlugin = (currentInstance, updateTag) => {
   return ViewPlugin.fromClass(
     class {
       constructor(view) {
         console.log("creating tagPlugin");
-        this.widgets = widgetRegistry;
-        this.components = componentRegistry;
+        this.settings = useSettingsStore();
+        this.compInstance = currentInstance;
         this.updateTag = updateTag;
-        this.tagMatcher = new TagDecorator(this.widgets, this.components);
-        const { ranges, _changes } = this.tagMatcher.createDeco(view);
-        this.tags = ranges;
-        // if (changes.length) this.updateTag(changes);
-        this.renderWidgets(this.tags);
+        this.tags = this.getDecorations(view.state);
       }
 
-      destroy() {
-        console.log("destroying tagPlugin");
+      getDecorations(state) {
+        const ranges = [];
+        const changes = [];
+        // const tree = ensureSyntaxTree(view.state, view.state.doc.length, 5000);
+        // https://discuss.codemirror.net/t/efficient-way-to-get-current-syntax-tree-to-extract-headers/3975/5
+        syntaxTree(state).iterate({
+          enter: (node) => {
+            if (node.name === "MismatchedCloseTag") {
+              console.log("MISMATCHED TAG", node.name, node.from, node.to);
+              changes.push({ from: node.from, to: node.to });
+            } else if (["OpenTag", "CloseTag", "SelfClosingTag"].includes(node.name)) {
+              const type = {
+                open: node.name === "OpenTag",
+                close: node.name === "CloseTag",
+                selfClose: node.name === "SelfClosingTag",
+              };
+              const pairedTag = getPairedTag(state, node, type);
+              // console.log("parser: node|paired", node.name, pairedTag);
+              if (pairedTag !== null) {
+                const { tag, attributes, tagData, elData } = this.getTagData(
+                  state,
+                  type.close ? pairedTag : node,
+                );
+                // only continue if this is a TEI tag
+                if (this.settings.tags.names.includes(tag)) {
+                  const deco = Decoration.replace({
+                    widget: new TagPill({
+                      tagData: tagData,
+                      elData: elData,
+                      type: type,
+                      attributes: attributes,
+                      from: node.from,
+                      to: node.to,
+                      instance: this.compInstance,
+                      handler: this.updateTag,
+                    }),
+                  });
+                  ranges.push(deco.range(node.from, node.to));
+                }
+              } else {
+                console.log("ORPHAN TAG", node.name, node.from, node.to);
+                changes.push({ from: node.from, to: node.to });
+              }
+            }
+          },
+        });
+        if (changes.length) {
+          this.updateTag(changes);
+        }
+        return Decoration.set(ranges);
+      }
+
+      getTagData(state, node) {
+        // console.log("getTagData", node);
+        const { tag, attributes } = deconstructTag(state.doc.sliceString(node.from, node.to));
+        const tagData = this.settings.tags.filter(tag, attributes);
+        return {
+          tag: tag,
+          attributes: attributes,
+          tagData: tagData.length ? tagData[0] : null,
+          elData: tagData.length ? this.settings.elements.get(tagData[0].element) : null,
+        };
       }
 
       update(update) {
-        console.log("update called", update);
         if (
           update.docChanged ||
           update.viewportChanged ||
           syntaxTree(update.startState) != syntaxTree(update.state)
         ) {
-          const { ranges, _changes } = this.tagMatcher.updateDeco(update, this.tags);
-          this.tags = ranges;
-          // if (changes.length) this.updateTag(changes);
-          this.renderWidgets(this.tags);
+          console.log("update called", update);
+          this.tags = this.getDecorations(update.state);
         }
       }
 
-      renderWidgets(decorations) {
-        if (decorations) {
-          for (let iter = decorations.iter(); iter.value !== null; iter.next()) {
-            const widget = iter.value.widget;
-            if (widget.type !== "CloseTag") {
-              if (!widget.container.getAttribute("id")) {
-                const compId = crypto.randomUUID().replace(/-/g, "");
-                const component = h(TeiTag, {
-                  id: compId,
-                  widgetId: widget.id,
-                  tag: widget.tag,
-                  attributes: widget.attributes,
-                  type: widget.type,
-                  from: widget.from,
-                  to: widget.to,
-                  section: widget.section,
-                  label: widget.label,
-                  description: widget.description,
-                  icon: widget.icon,
-                  domEl: widget.container,
-                  onUpdate: updateTag,
-                });
-                component.key = compId;
-                component.ref = compId;
-                component.appContext = currentInstance.appContext.app._context;
-                widget.container.setAttribute("id", compId);
-                widget.container.setAttribute("ref", compId);
-                // console.log(`rendering ${compId}`);
-                render(component, widget.container);
-              } else {
-                console.log(`component ${widget.container.getAttribute("id")} already rendered`);
-              }
-            }
-          }
-        }
+      destroy() {
+        console.log("destroying tagPlugin");
       }
     },
     {

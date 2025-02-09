@@ -1,7 +1,6 @@
 <template>
   <div class="bg-grey-2 q-px-sm row justify-between items-center">
     <div class="column q-pt-xs">
-      <!--q-btn @click="test" label="Test" /-->
       <q-tabs
         v-model="view.editorTab"
         dense
@@ -59,7 +58,7 @@ import {
   getCurrentInstance,
   onBeforeUnmount,
   onMounted,
-  ref,
+  provide,
   shallowRef,
   watch,
 } from "vue";
@@ -81,6 +80,7 @@ import ToolBar from "./ToolBar.vue";
 import { tagDecoratorPlugin } from "./tag-decorator.js";
 import * as themes from "./themes.js";
 import { syntaxTree } from "@codemirror/language";
+import { getCompletions } from "./transcription-tools.js";
 
 export default defineComponent({
   name: "TeiEditor",
@@ -91,7 +91,7 @@ export default defineComponent({
     ToolBar,
   },
   setup() {
-    const { currentPageData, view, settings, preferences } = useStores();
+    const { currentPageData, view, preferences } = useStores();
     const { editorHeight, editorWidth } = inject("editorDimensions");
     const disabled = computed(() => isEmpty(currentPageData.value.tei));
     const currentInstance = getCurrentInstance();
@@ -99,14 +99,13 @@ export default defineComponent({
     const editorState = shallowRef();
     const editorView = shallowRef();
 
-    const widgetRegistry = ref({});
-    const componentRegistry = ref({});
     const currentTheme = computed(() =>
       preferences.value.theme.value ? themes[preferences.value.theme.value] : themes["oneDark"],
     );
 
+    window.testText = currentPageData.value.tei;
+
     // editorView.value.updateState: 0 = Idle, 1 = Measuring, 2 = Updating
-    // eslint-disable-next-line unused-imports/no-unused-vars
     const updateTag = (changes) => {
       console.log("updateTag", changes, editorView.value.updateState);
       if (editorView.value.updateState !== 0) {
@@ -116,41 +115,24 @@ export default defineComponent({
       }
     };
 
-    const cleanUp = (evt) => {
-      console.log("cleanUp", evt, evt.detail, editorView.value.updateState);
-      const paired = document.querySelectorAll(`[data-id="${evt.detail.id}"]`);
-      console.log("paired", paired);
-      if (paired.length) {
-        paired.forEach((node) => {
-          if (node.hasAttribute("id")) {
-            const from = node.getAttribute("data-from");
-            const to = node.getAttribute("data-to");
-            console.log("contents", editorState.value.doc.sliceString(from, to));
-            updateTag({ from, to });
-          }
-        });
+    const onEditorUpdate = (_update) => {
+      console.log("Editor update:");
+    };
+    const onEditorFocus = (_update) => {
+      console.log("Editor focus:");
+    };
+    const onEditorBlur = (_update) => {
+      console.log("Editor blur:");
+    };
+    const onEditorChange = (newDoc, _update) => {
+      // console.log("Editor change:", newDoc, update);
+      console.log("Is text the same?", newDoc === currentPageData.value.tei);
+      if (newDoc !== currentPageData.value.tei) {
+        currentPageData.value.tei = newDoc;
       }
     };
 
-    const parse = () => {
-      syntaxTree(editorState.value).iterate({
-        enter: (node) => {
-          // if (cursor.name === "MissingCloseTag") {
-          if (node.node.name === "OpenTag") {
-            console.log(node.node.node);
-          }
-        },
-      });
-    };
-
-    const tagPlugin = tagDecoratorPlugin(
-      currentInstance,
-      updateTag,
-      widgetRegistry,
-      componentRegistry,
-    );
-
-    window.testPlug = tagPlugin;
+    const tagPlugin = tagDecoratorPlugin(currentInstance, updateTag);
 
     const extensions = computed(() => {
       console.log("generating extensions");
@@ -161,12 +143,21 @@ export default defineComponent({
       }
       if (preferences.value.lineNumbers.value) payload.push(lineNumbers());
       if (preferences.value.lineWrapping.value) payload.push(EditorView.lineWrapping);
-      if (preferences.value.autoCompletion.value) payload.push(autocompletion());
+      if (preferences.value.editorTooltips.value) {
+        payload.push(
+          tooltips({
+            position: "absolute",
+            parent: container.value,
+          }),
+        );
+      }
+      if (preferences.value.autoCompletion.value) {
+        payload.push(autocompletion({ override: [getCompletions] }));
+      }
       if (preferences.value.highlightSelection.value) payload.push(highlightSelectionMatches());
       if (preferences.value.allowMultipleSelections.value) {
         payload.push(EditorState.allowMultipleSelections.of(true));
       }
-      if (preferences.value.editorTooltips.value) payload.push(tooltips());
       return payload;
     });
 
@@ -184,25 +175,25 @@ export default defineComponent({
     // eslint-disable-next-line unused-imports/no-unused-vars
     const insertTag = (el, evt) => {
       console.log("insertTag", el, evt);
-      const selection = editorView.value.state.selection.main;
-      const selectionText = editorView.value.state.doc.sliceString(selection.from, selection.to);
-      const isCompound = el.compound;
-      const label = el.label;
-      const tags = el.tags.map((x) => settings.tags.get(x));
-      const changes = [];
-      if (!isCompound && tags.length === 1) {
-        const tag = tags[0];
-        let result = `<${tag.name}`;
-        for (const attr of tag.attributes) {
-          if (attr.required && !attr.editable) {
-            result += ` ${attr.value}="${attr.default}"`;
-          }
-        }
-        result += `>${selectionText}</${tag.name}>`;
-        changes.push({ from: selection.from, to: selection.to, insert: result });
-      }
-      console.log(selection, selectionText, changes, isCompound, tags, label);
-      editorView.value.dispatch({ changes });
+      // const selection = editorView.value.state.selection.main;
+      // const selectionText = editorView.value.state.doc.sliceString(selection.from, selection.to);
+      // const isCompound = el.compound;
+      // const label = el.label;
+      // const tags = el.tags.map((x) => settings.tags.get(x));
+      // const changes = [];
+      // if (!isCompound && tags.length === 1) {
+      //   const tag = tags[0];
+      //   let result = `<${tag.name}`;
+      //   for (const attr of tag.attributes) {
+      //     if (attr.required && !attr.editable) {
+      //       result += ` ${attr.value}="${attr.default}"`;
+      //     }
+      //   }
+      //   result += `>${selectionText}</${tag.name}>`;
+      //   changes.push({ from: selection.from, to: selection.to, insert: result });
+      // }
+      // console.log(selection, selectionText, changes, isCompound, tags, label);
+      // editorView.value.dispatch({ changes });
     };
     // const insertTag = (type, tag, attributes) => {
     //   let tagAtt = [];
@@ -303,27 +294,32 @@ export default defineComponent({
       }
     });
 
-    onMounted(async () => {
+    onMounted(() => {
       console.log("mounted TEIeditor");
       view.value.editorTab = "write";
       currentPageData.value.editOn = true;
-      window.testEditor = currentInstance;
-      // window.testEditor = editorView.value;
-      editorState.value = createEditorState(currentPageData.value.tei);
+      editorState.value = createEditorState({
+        doc: currentPageData.value.tei,
+        onUpdate: onEditorUpdate,
+        onChange: onEditorChange,
+        onFocus: onEditorFocus,
+        onBlur: onEditorBlur,
+      });
 
       editorView.value = createEditorView({
         state: editorState.value,
         parent: container.value,
       });
 
+      window.testEditor = editorView.value;
+
       const editorTools = getEditorTools(editorView.value);
       editorTools.focus();
-
-      container.value.addEventListener("widgetDestroyed", cleanUp);
 
       watch(
         () => currentPageData.value.tei,
         (newValue) => {
+          console.log("currentPageData.value.tei changed");
           if (newValue !== editorTools.getDoc()) {
             editorTools.setDoc(newValue);
           }
@@ -358,6 +354,30 @@ export default defineComponent({
       }
     });
 
+    provide("insertTag", insertTag);
+
+    const test = () => {
+      console.log("test");
+      currentPageData.value.tei = "BOO!";
+    };
+
+    const parse = () => {
+      // const tree = ensureSyntaxTree(editorState.value, editorState.value.doc.length, 5000);
+      // const from = editorView.value.viewport.from;
+      // const to = editorView.value.viewport.to;
+      // console.log("PARSING:", from, to);
+      syntaxTree(editorState.value).iterate({
+        enter: (node) => {
+          // if (cursor.name === "MissingCloseTag") {
+          console.log(
+            node.node.name,
+            editorState.value.doc.sliceString(node.node.from, node.node.to),
+            node.node,
+          );
+        },
+      });
+    };
+
     return {
       container,
       currentPageData,
@@ -366,6 +386,7 @@ export default defineComponent({
       editorWidth,
       onTabSwitch,
       view,
+      test,
       parse,
     };
   },
@@ -383,5 +404,86 @@ export default defineComponent({
 .ͼ1 .cm-scroller {
   line-height: 2;
   font-family: "Menlo", "Consolas", "Monaco", monospace;
+}
+.cm-tag-widget-container {
+  display: inline-block;
+  margin: 0 5px;
+  vertical-align: middle;
+}
+// .cm-widgetBuffer:first-child + .cm-tag-widget-container {
+//   margin-left: 0;
+// }
+.cm-tag-widget {
+  border: 2px solid rgb(171 178 191);
+  border-radius: 6px;
+  height: 20px;
+  min-width: 22px;
+  display: flex;
+  align-items: center;
+}
+.cm-tag-widget .tag-marker {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.cm-tag-widget .tag-marker .tag-text {
+  font-size: 10px;
+  font-family: "Roboto";
+  font-weight: 400;
+}
+.cm-tag-widget.open {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+.cm-tag-widget.close {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
+}
+.cm-tag-widget.annotation {
+  border-color: #684545;
+  color: #b08181;
+  // background-color: #342828;
+}
+.cm-tag-widget.editorial {
+  border-color: #3c7072;
+  color: #749ba5;
+  // background-color: #253335;
+}
+.cm-tag-widget.formatting {
+  border-color: #4b6391;
+  color: #9eb5e7;
+  // background-color: #2b343b;
+}
+.cm-tag-widget.layout {
+  border-color: #3d7746;
+  color: #71b572;
+  // background-color: #273124;
+}
+.cm-tag-widget.marks {
+  border-color: #704b91;
+  color: #9e73ae;
+  // background-color: #362b3b;
+}
+.cm-tag-widget.other {
+  border-color: #615f5f;
+  color: #9c9797;
+  // background-color: #2d2c2c;
+}
+.cm-tag-widget.self-close:hover,
+.cm-tag-widget.open:hover {
+  // background-color: #ffffff1a;
+  border-color: #ffffffc9;
+  color: #e7e3e3;
+}
+.cm-tag-widget i {
+  font-size: 10px;
 }
 </style>
