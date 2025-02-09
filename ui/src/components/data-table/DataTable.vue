@@ -117,7 +117,7 @@
               :props="props"
             >
               <slot :name="`render-cell-${column.field}`" v-bind="props">
-                <template v-if="isObj(props.row[column.field])">
+                <template v-if="isObject(props.row[column.field])">
                   {{ props.row[column.field].name }}
                 </template>
                 <template v-else>
@@ -217,6 +217,7 @@ import TablePager from "./TablePager.vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useActor } from "@xstate/vue";
 import { useAPI, useEditing, useStores, useTransport } from "@/use";
+import { isObject, isNumber } from "@/utils";
 
 export default defineComponent({
   name: "DataTable",
@@ -343,12 +344,6 @@ export default defineComponent({
     const editMode = ref(false);
 
     const expanded = ref(props.columns.map((value) => value.id));
-
-    const isNumber = (val) => !isNaN(parseFloat(val)) && isFinite(val);
-    const isObj = (obj) => {
-      const type = typeof obj;
-      return type === "function" || (type === "object" && !!obj);
-    };
 
     const schemaTypes = () => {
       if (props.schema) {
@@ -488,7 +483,7 @@ export default defineComponent({
       isDirty,
       isEmpty,
       isFocussed,
-      isObj,
+      isObject,
       mouseoverSubmit,
       onChangeEditMode,
       onChangeSort,
