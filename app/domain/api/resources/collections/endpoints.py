@@ -7,9 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from app.access_policies import BaseAccessPolicy
-from domain.api.resources.records import RecordSerializer
+from domain.api.resources.records import RecordFilter, RecordSerializer
 from domain.api.viewsets import BaseViewSet
-from domain.filters import RecordFilter
 from domain.models import Collection, CollectionMembership, Record
 
 from .filters import CollectionFilter

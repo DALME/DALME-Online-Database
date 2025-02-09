@@ -1,4 +1,4 @@
-"""Define core forms."""
+"""Interface for the domain.api.resources.records.forms module."""
 
 from django import forms
 

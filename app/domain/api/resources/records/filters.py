@@ -1,9 +1,12 @@
-"""Interface for the domain.filters.records module."""
+"""Interface for the domain.api.resources.records.filters module."""
 
 import django_filters as filters
 
-from domain.forms import RecordFilterForm
-from domain.models import AttributeType, Collection, Record
+from django.db.models import Exists, OuterRef
+
+from domain.models import AttributeType, Collection, Permission, Record
+
+from .forms import RecordFilterForm
 
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 
@@ -65,7 +68,6 @@ class RecordFilter(filters.FilterSet):
     parsing_done = filters.BooleanFilter(field_name='workflow__parsing_done')
 
     name = filters.CharFilter(label='Name', lookup_expr='icontains')
-    record_type = filters.MultipleChoiceFilter(label='Type', choices=record_type_choices, method='filter_type')
     date_range = filters.DateFromToRangeFilter(label='Date Range', method='filter_date_range')
 
     corpus = filters.ChoiceFilter(label='Corpus', choices=corpus_choices, method='filter_corpus')
@@ -74,7 +76,10 @@ class RecordFilter(filters.FilterSet):
     has_transcription = filters.ChoiceFilter(
         label='Has Transcription', method='filter_transcription', choices=BOOLEAN_CHOICES
     )
+    record_type = filters.MultipleChoiceFilter(label='Type', choices=record_type_choices, method='filter_type')
     locale = filters.ChoiceFilter(label='Locale', choices=locale_choices, method='filter_locale')
+
+    is_private = filters.BooleanFilter(method='filter_private')
 
     order_by = RecordOrderingFilter()
 
@@ -91,6 +96,8 @@ class RecordFilter(filters.FilterSet):
             'has_image',
             'locale',
             'order_by',
+            'owner',
+            'is_private',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -100,6 +107,11 @@ class RecordFilter(filters.FilterSet):
 
     def filter_type(self, queryset, name, value):  # noqa: ARG002
         return queryset.filter(record_type__id__in=value)
+
+    def filter_private(self, queryset, name, value):  # noqa: ARG002
+        perms = Permission.objects.filter(object_id=OuterRef('pk'), is_default=True, can_view=False)
+        queryset = queryset.annotate(private=Exists(perms))
+        return queryset.filter(private=True)
 
     def filter_date_range(self, queryset, name, value):  # noqa: ARG002
         queryset = queryset.filter(attributes__attribute_type__name__in=['date', 'start_date', 'end_date']).distinct()

@@ -16,9 +16,9 @@ from django.http import HttpResponseRedirect
 from app.access_policies import RecordAccessPolicy, WebAccessPolicy
 from domain.api.paginators import CustomPageNumberPagination
 from domain.api.viewsets import BaseViewSet
-from domain.filters import RecordFilter
 from domain.models import PublicRegister, Record
 
+from .filters import RecordFilter
 from .serializers import RecordSerializer
 
 with pathlib.Path(f'{settings.PROJECT_ROOT}/app/static/snippets/iiif_manifest.json').open() as fp:
