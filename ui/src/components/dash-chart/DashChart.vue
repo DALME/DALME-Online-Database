@@ -105,7 +105,6 @@ export default defineComponent({
 
     const styles = computed(() => {
       if (!container.value) return;
-      console.log("styles", container.value.$el.offsetWidth);
       return {
         // width: `${container.value.$el.offsetWidth}px`,
         height: `${container.value.$el.offsetHeight}px`,
