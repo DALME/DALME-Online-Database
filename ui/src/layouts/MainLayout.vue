@@ -12,7 +12,7 @@
     <template v-else>
       <iframe
         id="login-background-page"
-        ref="pageBackdrop"
+        ref="page-backdrop"
         :class="{ 'q-transparent': !pageBackdropLoaded }"
         :src="originPage"
       >
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, provide, ref, onMounted } from "vue";
+import { computed, defineComponent, provide, ref, onMounted, useTemplateRef } from "vue";
 import { useRoute } from "vue-router";
 import { find, isNotNil, propEq } from "ramda";
 import { LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
@@ -46,10 +46,8 @@ export default defineComponent({
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
     const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
-    const userDrawerEl = ref(null);
-    const pageBackdrop = ref(null);
+    const pageBackdrop = useTemplateRef("page-backdrop");
 
-    // const render = computed(() => auth.authorized || auth.reauthenticate);
     const render = computed(() => auth.authorized && !auth.reauthenticate);
     const originPage = window.localStorage.getItem("origin_background");
     const showMap = computed(() => auth.authenticate && !originPage);
@@ -66,11 +64,9 @@ export default defineComponent({
     provideAPI();
     provideEditing();
     provideTransport();
-    provide("userDrawerEl", userDrawerEl);
     provide("pageBackdropLoaded", pageBackdropLoaded);
 
     onMounted(() => {
-      console.log("auth.currentState main mounted", auth.authorized, auth.reauthenticate);
       if ($route.query.logout) {
         auth.logout();
       }
@@ -93,6 +89,7 @@ export default defineComponent({
       originPage,
       pageBackdrop,
       pageBackdropLoaded,
+      onWindowResize: ui.onWindowResize,
     };
   },
 });
