@@ -15,6 +15,14 @@ const attributeTypes = {
       method: "GET",
     };
   },
+  getAttributeOptions(target, serialize = false) {
+    let url = `${endpoint}/${target}/options/`;
+    if (serialize) url += "?serialize=True";
+    return {
+      url: url,
+      method: "GET",
+    };
+  },
 };
 
 export default attributeTypes;
