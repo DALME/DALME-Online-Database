@@ -57,14 +57,17 @@ class CustomQuerySet(models.QuerySet):
             except ObjectDoesNotExist:
                 is_unique = True  # True is default value for is_unique
 
-            qs = qs.annotate(
-                **{
-                    attr: ExpressionWrapper(
-                        Case(When(Exists(attr_sq), then=ArraySubquery(attr_sq.values_list('value', flat=True)))),
-                        output_field=ListField(AttributeField(), is_unique=is_unique),
-                    )
-                }
-            )
+            if is_unique:
+                qs = qs.annotate(**{attr: attr_sq.values_list('value', flat=True)})
+            else:
+                qs = qs.annotate(
+                    **{
+                        attr: ExpressionWrapper(
+                            Case(When(Exists(attr_sq), then=ArraySubquery(attr_sq.values_list('value', flat=True)))),
+                            output_field=ListField(AttributeField(), is_unique=is_unique),
+                        )
+                    }
+                )
 
         return qs
 
