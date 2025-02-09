@@ -2,18 +2,24 @@
 
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
-from app.access_policies import GeneralAccessPolicy
+from app.access_policies import BaseAccessPolicy
 from domain.api.viewsets import BaseViewSet
 from domain.models import LanguageReference
 
 from .serializers import LanguageReferenceSerializer
 
 
+class LanguageAccessPolicy(BaseAccessPolicy):
+    """Access policies for the Languages endpoint."""
+
+    id = 'languages-policy'
+
+
 class Languages(BaseViewSet):
     """API endpoint for managing languages."""
 
-    permission_classes = [GeneralAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope & GeneralAccessPolicy]
+    permission_classes = [LanguageAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope & LanguageAccessPolicy]
 
     queryset = LanguageReference.objects.all()
     serializer_class = LanguageReferenceSerializer
