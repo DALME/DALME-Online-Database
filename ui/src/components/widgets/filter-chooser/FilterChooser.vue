@@ -9,7 +9,7 @@
     @click="show = !show"
   >
     <ToolTip v-if="tooltip">{{ tooltip }}</ToolTip>
-    <q-menu anchor="bottom middle" self="top middle">
+    <q-menu anchor="bottom right" self="top right">
       <q-list bordered separator class="text-grey-9 choser-menu">
         <template v-if="ready">
           <q-item dense class="q-pr-sm">
@@ -84,7 +84,7 @@
                   <q-item-section side>
                     <q-icon name="mdi-chevron-right" size="xs" color="grey-6" />
                   </q-item-section>
-                  <q-menu>
+                  <q-menu anchor="top right" self="top left">
                     <q-list bordered separator class="text-grey-9">
                       <template v-for="(opt, oidx) in item.options" :key="oidx">
                         <component
@@ -161,6 +161,7 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    field: String,
     tooltip: String,
     returnField: String,
     class: {

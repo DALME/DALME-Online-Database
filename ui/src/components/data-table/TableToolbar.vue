@@ -36,7 +36,7 @@
               dense
               @click="$emit('changeFilters', filter)"
               :class="
-                activeFilters[filter.field] && activeFilters[filter.field] === filter.value
+                filter.field in activeFilters && activeFilters[filter.field] == filter.value
                   ? 'text-weight-bold bg-indigo-1 text-indigo-5'
                   : 'text-grey-8'
               "
@@ -60,11 +60,7 @@
         autocorrect="off"
         autocapitalize="off"
         spellcheck="false"
-        :class="
-          filterList && filterList.preset
-            ? 'table-toolbar-searchbox strong-focus table-toolbar-button col-grow'
-            : 'table-toolbar-searchbox strong-focus table-toolbar-button col-grow'
-        "
+        class="table-toolbar-searchbox strong-focus table-toolbar-button col-grow"
         @update:modelValue="onChangeSearchValue"
       >
         <template v-slot:append>

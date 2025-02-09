@@ -113,24 +113,28 @@ export const usePagination = (fetchData, listName, defaults, embedded = false) =
     }
     // update filters
     if (filter.field in activeFilters.value) {
-      if (activeFilters.value[filter.field] === filter.value) {
-        // is single and already set: remove
-        delete activeFilters.value[filter.field];
-      } else if (isInList(activeFilters.value[filter.field], filter.value)) {
-        // is multiple and already set: remove
-        activeFilters.value[filter.field] = removeFromList(
-          activeFilters.value[filter.field],
-          filter.value,
-        );
-      } else if (filter.selection === "multiple") {
-        // is multiple but not already set: append
-        activeFilters.value[filter.field] = addToList(
-          activeFilters.value[filter.field],
-          filter.value,
-        );
+      if (filter.selection === "multiple") {
+        if (isInList(activeFilters.value[filter.field], filter.value)) {
+          // is already set: remove
+          activeFilters.value[filter.field] = removeFromList(
+            activeFilters.value[filter.field],
+            filter.value,
+          );
+        } else {
+          // is not already set: append
+          activeFilters.value[filter.field] = addToList(
+            activeFilters.value[filter.field],
+            filter.value,
+          );
+        }
       } else {
-        // is single and not already set: set
-        activeFilters.value[filter.field] = filter.value;
+        if (activeFilters.value[filter.field] === filter.value) {
+          // is already set: remove
+          delete activeFilters.value[filter.field];
+        } else {
+          // is not already set: set
+          activeFilters.value[filter.field] = filter.value;
+        }
       }
     } else {
       activeFilters.value[filter.field] = filter.value;
