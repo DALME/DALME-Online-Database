@@ -8,7 +8,7 @@ from domain.models import Ticket
 class TicketFilter(filters.FilterSet):
     """Filter for Tickets endpoint."""
 
-    # tags = filters.CharFilter(field_name='tags__tag', lookup_expr='icontains')
+    tags = filters.CharFilter(field_name='tags__tag', lookup_expr='icontains')
 
     class Meta:
         model = Ticket
