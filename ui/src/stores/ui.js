@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useViewStore } from "@/stores/views";
-import { EventBus } from "quasar";
+import { EventBus, debounce } from "quasar";
 
 export const useUiStore = defineStore(
   "ui",
@@ -78,7 +78,7 @@ export const useUiStore = defineStore(
     };
 
     const resizeListener = () => {
-      window.addEventListener("resize", onWindowResize);
+      window.addEventListener("resize", debounce(onWindowResize, 30));
     };
 
     const setUiState = () => {
