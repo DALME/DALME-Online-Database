@@ -1,5 +1,5 @@
 <template>
-  <div ref="el" :class="`spinner-container ${position}`" :style="style">
+  <div ref="el" :class="`spinner-container ${position}`" :style="style" v-if="showing">
     <q-spinner-facebook v-if="type === 'facebook'" :thickness="thickness" :color="color" />
     <q-spinner-audio
       v-else-if="type === 'audio'"
@@ -67,6 +67,10 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 export default defineComponent({
   name: "AdaptiveSpinner",
   props: {
+    showing: {
+      type: Boolean,
+      default: true,
+    },
     adaptive: {
       type: Boolean,
       default: true,
@@ -146,6 +150,12 @@ export default defineComponent({
 }
 .spinner-container.absolute {
   position: absolute;
+  background: inherit;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 999;
 }
 .spinner-container .q-spinner {
   display: block;
