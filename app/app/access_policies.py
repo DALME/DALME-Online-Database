@@ -7,7 +7,7 @@ from rest_access_policy import AccessPolicy, AccessPolicyException
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 
 from domain.models import Permission
 
@@ -204,6 +204,9 @@ class RecordAccessPolicy(BaseAccessPolicy):
         if request.user.is_superuser:
             return queryset
 
+        queryset.annotate(
+            is_private=Exists(Permission.objects.filter(object_id=OuterRef('pk'), is_default=True, can_view=False))
+        )
         return queryset.filter(is_private=False)
 
 
