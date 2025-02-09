@@ -7,7 +7,7 @@
         :class="{ 'edit-on': ongoingEdit }"
         @click="appDrawerOpen = !appDrawerOpen"
       >
-        <TooltipWidget>Open App menu.</TooltipWidget>
+        <ToolTip>Open App menu.</ToolTip>
       </q-btn>
 
       <q-icon :name="pageIcon" color="grey-4" size="26px" />
@@ -40,7 +40,7 @@
         no-caps
         class="tb-button q-mx-md tb-search-button"
       >
-        <TooltipWidget>Search DALME.</TooltipWidget>
+        <ToolTip>Search DALME.</ToolTip>
       </q-btn>
 
       <q-separator vertical dark class="q-mr-md" />
@@ -56,14 +56,14 @@
             :icon="route.meta.icon"
             :disable="ui.currentSection === route.children[0].name"
           >
-            <TooltipWidget>{{ route.label }}</TooltipWidget>
+            <ToolTip>{{ route.label }}</ToolTip>
           </q-btn>
           <q-btn
             icon="mdi-plus"
             class="btn-dropdown-like"
             :disable="ui.currentSection === route.children[0].name"
           >
-            <TooltipWidget>Create new issue ticket.</TooltipWidget>
+            <ToolTip>Create new issue ticket.</ToolTip>
           </q-btn>
         </q-btn-group>
 
@@ -108,7 +108,7 @@
               : ui.currentSection === route.children[0].name
           "
         >
-          <TooltipWidget>{{ route.label }}</TooltipWidget>
+          <ToolTip>{{ route.label }}</ToolTip>
         </q-btn>
       </template>
 
@@ -163,7 +163,7 @@
           :class="{ 'bg-green-1': preferences.tooltipsOn.value }"
           @click="preferences.tooltipsOn.value = !preferences.tooltipsOn.value"
         >
-          <TooltipWidget>Tooltips</TooltipWidget>
+          <ToolTip>Tooltips</ToolTip>
         </q-btn>
         <q-btn
           size="13px"
@@ -173,7 +173,7 @@
           :class="{ 'bg-indigo-1': isFullscreen }"
           @click="toggleFullscreen"
         >
-          <TooltipWidget>Full screen</TooltipWidget>
+          <ToolTip>Full screen</ToolTip>
         </q-btn>
       </q-toolbar>
     </div>
@@ -185,14 +185,14 @@ import { openURL, useQuasar } from "quasar";
 import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { navRoutes } from "@/router";
-import { TooltipWidget } from "@/components";
+import { ToolTip } from "@/components";
 import { useStores } from "@/use";
 import { nully } from "@/utils";
 
 export default defineComponent({
   name: "NavBar",
   components: {
-    TooltipWidget,
+    ToolTip,
   },
   setup() {
     const $q = useQuasar();

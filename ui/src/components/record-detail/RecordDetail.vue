@@ -8,7 +8,7 @@
               <div class="row items-center text-h5">
                 <template v-if="!ui.globalLoading">
                   {{ record.name }}
-                  <TagWidget
+                  <TagPill
                     v-if="record.hasInventory"
                     name="list"
                     colour="green-1"
@@ -114,14 +114,14 @@
         <div v-if="resource === 'record'" class="col-auto record-actions">
           <div class="row transition-all">
             <div class="row q-mr-sm">
-              <BooleanWidget
+              <BooleanValue
                 v-if="resource === 'record'"
                 :value="record && !record.workflow.isPublic"
                 :onlyTrue="true"
                 trueIcon="public"
                 trueColour="light-green-7"
               />
-              <BooleanWidget
+              <BooleanValue
                 v-if="resource === 'record'"
                 :value="record && !record.workflow.helpFlag"
                 :onlyTrue="true"
@@ -163,7 +163,7 @@
               </div>
             </q-tab-panel>
             <q-tab-panel name="comments" class="q-pt-md q-px-lg">
-              <CommentWidget @on-count-changed="updateCommentCount" />
+              <CommentBox @on-count-changed="updateCommentCount" />
             </q-tab-panel>
             <q-tab-panel name="log" class="q-pt-md q-px-lg">
               <LogViewer :data="record.workflow" />
@@ -184,11 +184,11 @@ import { requests } from "@/api";
 import { useAPI, useEditing, useStores } from "@/use";
 import {
   AdaptiveSpinner,
-  BooleanWidget,
-  CommentWidget,
+  BooleanValue,
+  CommentBox,
   DetailPopover,
   LogViewer,
-  TagWidget,
+  TagPill,
   WorkflowManager,
 } from "@/components";
 import { formatDate, nully } from "@/utils";
@@ -202,16 +202,16 @@ export default defineComponent({
   name: "RecordDetail",
   components: {
     AdaptiveSpinner,
-    BooleanWidget,
+    BooleanValue,
     DetailPopover,
-    CommentWidget,
+    CommentBox,
     LogViewer,
     RecordAttributes,
     RecordAgents,
     RecordChildren,
     RecordPages,
     RecordPlaces,
-    TagWidget,
+    TagPill,
     WorkflowManager,
   },
   setup() {

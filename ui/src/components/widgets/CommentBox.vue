@@ -83,7 +83,7 @@ import { useAuthStore } from "@/stores/auth";
 import notifier from "@/notifier";
 
 export default defineComponent({
-  name: "CommentWidget",
+  name: "CommentBox",
   props: {
     author: {
       type: Number,

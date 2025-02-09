@@ -10,7 +10,7 @@ import { defineComponent } from "vue";
 import { useSettingsStore } from "@/stores/settings";
 
 export default defineComponent({
-  name: "TooltipWidget",
+  name: "ToolTip",
   props: {
     anchor: {
       type: String,

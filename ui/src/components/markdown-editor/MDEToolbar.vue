@@ -2,23 +2,23 @@
   <div class="mde-toolbar">
     <q-resize-observer @resize="setWidth" debounce="1000" />
     <q-btn icon="mdi-format-header-pound" @click="$emit('insertEnclosure', ['### ', ''])">
-      <TooltipWidget>Add heading</TooltipWidget>
+      <ToolTip>Add heading</ToolTip>
     </q-btn>
     <q-btn icon="mdi-format-bold" @click="$emit('insertEnclosure', ['**', '**'])">
-      <TooltipWidget>Add bold text</TooltipWidget>
+      <ToolTip>Add bold text</ToolTip>
     </q-btn>
     <q-btn icon="mdi-format-italic" @click="$emit('insertEnclosure', ['*', '*'])">
-      <TooltipWidget>Add italic text</TooltipWidget>
+      <ToolTip>Add italic text</ToolTip>
     </q-btn>
     <q-btn icon="mdi-format-strikethrough" @click="$emit('insertEnclosure', ['~~', '~~'])">
-      <TooltipWidget>Add strike-through text</TooltipWidget>
+      <ToolTip>Add strike-through text</ToolTip>
     </q-btn>
     <q-separator vertical spaced />
     <q-btn v-if="width >= 300" icon="mdi-format-quote-close" @click="$emit('insertPrefix', '> ')">
-      <TooltipWidget>Insert a quote</TooltipWidget>
+      <ToolTip>Insert a quote</ToolTip>
     </q-btn>
     <q-btn v-if="width >= 300" icon="mdi-code-braces">
-      <TooltipWidget>Insert code</TooltipWidget>
+      <ToolTip>Insert code</ToolTip>
       <q-menu cover class="popup-menu" :class="dark ? 'dark' : ''">
         <q-list>
           <q-item
@@ -37,50 +37,48 @@
       </q-menu>
     </q-btn>
     <q-btn v-if="width >= 300" icon="mdi-link" @click="$emit('insertEnclosure', ['[', '](url)'])">
-      <TooltipWidget>Insert a link</TooltipWidget>
+      <ToolTip>Insert a link</ToolTip>
     </q-btn>
     <q-btn
       v-if="width >= 300"
       icon="mdi-note"
       @click="$emit('insertEnclosure', [':::\n', '\n:::'])"
     >
-      <TooltipWidget>Insert a note</TooltipWidget>
+      <ToolTip>Insert a note</ToolTip>
     </q-btn>
     <q-separator v-if="width >= 300" vertical spaced />
     <q-btn v-if="width >= 395" icon="mdi-format-list-bulleted" @click="$emit('insertPrefix', '- ')">
-      <TooltipWidget>Add a bulleted list</TooltipWidget>
+      <ToolTip>Add a bulleted list</ToolTip>
     </q-btn>
     <q-btn
       v-if="width >= 395"
       icon="mdi-format-list-numbered"
       @click="$emit('insertPrefix', 'numbered')"
     >
-      <TooltipWidget>Add a numbered list</TooltipWidget>
+      <ToolTip>Add a numbered list</ToolTip>
     </q-btn>
     <q-btn
       v-if="width >= 395"
       icon="mdi-format-list-checks"
       @click="$emit('insertPrefix', '- [ ] ')"
     >
-      <TooltipWidget>Add a task list</TooltipWidget>
+      <ToolTip>Add a task list</ToolTip>
     </q-btn>
     <q-separator v-if="width >= 395" vertical spaced />
-    <ChooserWidget
+    <UserChooserWidget
       v-if="width >= 420"
       :dark="dark"
       icon="mdi-account-multiple-plus"
       header="Users"
       return-field="username"
       tooltip="Mention another user"
-      target="users"
       @item-chosen="onUserSelected"
     />
-    <ChooserWidget
+    <TicketChooserWidget
       v-if="width >= 420"
       :dark="dark"
       icon="mdi-bug"
       tooltip="Reference a ticket"
-      target="tickets"
       @item-chosen="onTicketSelected"
     />
 
@@ -192,24 +190,22 @@
 
           <q-separator spaced v-if="width < 395" />
 
-          <ChooserWidget
+          <UserChooserWidget
             v-if="width < 420"
             item
             :dark="dark"
             icon="mdi-account-multiple-plus"
             return-field="username"
             label="Mention another user"
-            target="users"
             @item-chosen="onUserSelected"
           />
 
-          <ChooserWidget
+          <TicketChooserWidget
             v-if="width < 420"
             item
             :dark="dark"
             icon="mdi-bug"
             label="Reference a ticket"
-            target="tickets"
             @item-chosen="onTicketSelected"
           />
         </q-list>
@@ -220,7 +216,7 @@
 
 <script>
 import { defineComponent, inject, ref } from "vue";
-import { ChooserWidget, TooltipWidget } from "@/components/widgets";
+import { UserChooserWidget, TicketChooserWidget, ToolTip } from "@/components/widgets";
 
 export default defineComponent({
   name: "MDEToolbar",
@@ -232,8 +228,9 @@ export default defineComponent({
     },
   },
   components: {
-    ChooserWidget,
-    TooltipWidget,
+    UserChooserWidget,
+    TicketChooserWidget,
+    ToolTip,
   },
   emits: ["insertEnclosure", "insertPrefix"],
   setup() {

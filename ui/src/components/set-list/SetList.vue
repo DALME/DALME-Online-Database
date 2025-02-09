@@ -20,23 +20,21 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:toolbar-filtersets>
-      <ChooserWidget
+      <UserChooserWidget
         showHeader
         toggleIcon
         showSelectedItem
         label="Author"
         headerText="Filter by Author"
-        target="users"
-        :clearFilters="onClearFilters"
+        @clear-filters="onClearFilters"
       />
-      <ChooserWidget
+      <UserChooserWidget
         showHeader
         toggleIcon
         showSelectedItem
         label="Assignee"
         headerText="Filter by Assignee"
-        target="users"
-        :clearFilters="onClearFilters"
+        @clear-filters="onClearFilters"
       />
     </template>
 
@@ -102,11 +100,11 @@
     </template>
 
     <template v-slot:render-cell-isPublic="props">
-      <BooleanWidget :value="props.row.isPublic" :onlyTrue="true" trueIcon="public" />
+      <BooleanValue :value="props.row.isPublic" :onlyTrue="true" trueIcon="public" />
     </template>
 
     <template v-slot:render-cell-hasLanding="props">
-      <BooleanWidget :value="props.row.hasLanding" :onlyTrue="true" trueIcon="check_circle" />
+      <BooleanValue :value="props.row.hasLanding" :onlyTrue="true" trueIcon="check_circle" />
     </template>
 
     <template v-slot:render-cell-endpoint="props">
@@ -130,7 +128,7 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { BooleanWidget, ChooserWidget, DataTable, DetailPopover } from "@/components";
+import { BooleanValue, UserChooserWidget, DataTable, DetailPopover } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI, usePagination, useStores } from "@/use";
@@ -146,9 +144,9 @@ export default defineComponent({
     },
   },
   components: {
-    ChooserWidget,
+    UserChooserWidget,
     DataTable,
-    BooleanWidget,
+    BooleanValue,
     DetailPopover,
   },
   setup(props, context) {

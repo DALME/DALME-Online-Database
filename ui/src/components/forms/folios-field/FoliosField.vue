@@ -16,7 +16,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <TooltipWidget> Add a folio </TooltipWidget>
+        <ToolTip> Add a folio </ToolTip>
       </q-btn>
 
       <q-btn
@@ -26,14 +26,14 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <TooltipWidget>
+        <ToolTip>
           {{ showing ? "Hide folios" : "Show folios" }}
-        </TooltipWidget>
+        </ToolTip>
       </q-btn>
 
-      <TooltipWidget v-if="description">
+      <ToolTip v-if="description">
         {{ description }}
-      </TooltipWidget>
+      </ToolTip>
     </div>
 
     <template v-if="showing">
@@ -73,7 +73,7 @@
                   :disable="!data.damId || !data.hasImage"
                   @click.stop="() => handlePreview(data.damId)"
                 >
-                  <TooltipWidget> Preview folio </TooltipWidget>
+                  <ToolTip> Preview folio </ToolTip>
                 </q-btn>
               </div>
             </div>
@@ -163,7 +163,7 @@ export default defineComponent({
   components: {
     InputField,
     SelectField,
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props, context) {
     const {

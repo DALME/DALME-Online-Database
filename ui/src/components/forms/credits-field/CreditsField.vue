@@ -16,7 +16,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <TooltipWidget> Add a credit </TooltipWidget>
+        <ToolTip> Add a credit </ToolTip>
       </q-btn>
 
       <q-btn
@@ -26,14 +26,14 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <TooltipWidget>
+        <ToolTip>
           {{ showing ? "Hide credits" : "Show credits" }}
-        </TooltipWidget>
+        </ToolTip>
       </q-btn>
 
-      <TooltipWidget v-if="description">
+      <ToolTip v-if="description">
         {{ description }}
-      </TooltipWidget>
+      </ToolTip>
     </div>
 
     <template v-if="showing">
@@ -110,7 +110,7 @@
                     </template>
                   </q-popup-edit>
 
-                  <TooltipWidget> Add note </TooltipWidget>
+                  <ToolTip> Add note </ToolTip>
                 </q-btn>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default defineComponent({
   },
   components: {
     SelectField,
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props, context) {
     const { fields, replace } = useFieldArray("credits");

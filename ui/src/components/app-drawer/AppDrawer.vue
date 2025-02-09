@@ -24,7 +24,7 @@
               size="10px"
               @click="appDrawerOpen = !appDrawerOpen"
             >
-              <TooltipWidget>Close app drawer.</TooltipWidget>
+              <ToolTip>Close app drawer.</ToolTip>
             </q-btn>
           </q-item-section>
         </q-item>
@@ -70,14 +70,14 @@
 import { computed, defineComponent } from "vue";
 import { useStores } from "@/use";
 import { navRoutes } from "@/router";
-import { CollectionsManager, EditPanel, TooltipWidget } from "@/components";
+import { CollectionsManager, EditPanel, ToolTip } from "@/components";
 
 export default defineComponent({
   name: "AppDrawer",
   components: {
     CollectionsManager,
     EditPanel,
-    TooltipWidget,
+    ToolTip,
   },
   setup() {
     const { appDrawerOpen, ui, windowHeight } = useStores();

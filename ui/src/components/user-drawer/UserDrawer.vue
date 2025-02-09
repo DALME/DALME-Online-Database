@@ -30,7 +30,7 @@
               size="10px"
               @click="userDrawerOpen = !userDrawerOpen"
             >
-              <TooltipWidget>Close user drawer.</TooltipWidget>
+              <ToolTip>Close user drawer.</ToolTip>
             </q-btn>
           </q-item-section>
         </q-item>
@@ -89,13 +89,13 @@ import { computed, defineComponent, ref, onMounted } from "vue";
 import { isEmpty, isNil } from "ramda";
 import { useStores } from "@/use";
 import { useTasks } from "@/stores/tasks";
-import { CustomDialog, TooltipWidget, TaskManager } from "@/components";
+import { CustomDialog, ToolTip, TaskManager } from "@/components";
 import { nully } from "@/utils";
 
 export default defineComponent({
   name: "UserDrawer",
   components: {
-    TooltipWidget,
+    ToolTip,
     TaskManager,
   },
   setup() {

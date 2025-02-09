@@ -31,7 +31,7 @@
     @mouseover="showStrip = true"
     @mouseleave="showStrip = false"
   >
-    <TooltipWidget anchor="center left" self="center right" text="Editing tools" :offset="[5, 0]" />
+    <ToolTip anchor="center left" self="center right" text="Editing tools" :offset="[5, 0]" />
     <q-icon name="more_vert" />
     <q-btn
       :icon="stripKeepOpen ? 'lock' : 'lock_open'"

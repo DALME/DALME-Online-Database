@@ -72,7 +72,7 @@
                 </q-item-section>
               </q-item>
             </div>
-            <CommentWidget>
+            <CommentBox>
               <template v-if="ticket.status" v-slot:comment-stream-end>
                 <div class="comment_thread row items-center q-mt-none q-pb-lg">
                   <div class="closing-dot bg-deep-purple-6">
@@ -84,7 +84,7 @@
                   </div>
                 </div>
               </template>
-            </CommentWidget>
+            </CommentBox>
           </q-card-section>
         </q-card>
       </div>
@@ -98,7 +98,7 @@
         <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Tags</div>
         <div class="q-mb-sm text-13">
           <template v-if="!isEmpty(cleanTags(ticket.tags))">
-            <TagWidget
+            <TagPill
               v-for="(tag, idx) in cleanTags(ticket.tags)"
               :key="idx"
               :name="tag.tag"
@@ -137,11 +137,11 @@ import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import {
   AttachmentWidget,
-  CommentWidget,
+  CommentBox,
   DetailPopover,
   MarkdownEditor,
   OpaqueSpinner,
-  TagWidget,
+  TagPill,
 } from "@/components";
 import { formatDate } from "@/utils";
 import { ticketDetailSchema } from "@/schemas";
@@ -151,11 +151,11 @@ export default defineComponent({
   name: "TicketDetail",
   components: {
     AttachmentWidget,
-    CommentWidget,
+    CommentBox,
     DetailPopover,
     MarkdownEditor,
     OpaqueSpinner,
-    TagWidget,
+    TagPill,
   },
   setup() {
     const { notifier } = useEventHandling();

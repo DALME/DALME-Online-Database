@@ -71,9 +71,9 @@
                 class="q-ml-auto q-mr-xs strong-focus outlined-item"
                 @click.stop="handleEdit(taskList)"
               >
-                <TooltipWidget anchor="center left" self="center right" :offset="[10, 10]">
+                <ToolTip anchor="center left" self="center right" :offset="[10, 10]">
                   Edit task list
-                </TooltipWidget>
+                </ToolTip>
               </q-btn>
 
               <q-btn
@@ -87,14 +87,14 @@
                 :disable="taskList.taskCount > 0"
                 @click.stop="handleDelete(taskList)"
               >
-                <TooltipWidget
+                <ToolTip
                   v-if="taskList.taskCount === 0"
                   anchor="center left"
                   self="center right"
                   :offset="[10, 10]"
                 >
                   Delete task list
-                </TooltipWidget>
+                </ToolTip>
               </q-btn>
             </div>
           </q-item-section>
@@ -127,12 +127,12 @@ import { useActor } from "@xstate/vue";
 import { requests } from "@/api";
 import forms from "@/forms";
 import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
-import { TooltipWidget } from "@/components";
+import { ToolTip } from "@/components";
 
 export default defineComponent({
   name: "TasklistList",
   components: {
-    TooltipWidget,
+    ToolTip,
   },
   emits: ["onReload"],
   setup(_, context) {

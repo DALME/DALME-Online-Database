@@ -49,12 +49,11 @@
                     <q-item dense clickable v-close-popup class="inset-item">
                       <q-item-section>Completed by</q-item-section>
                     </q-item>
-                    <ChooserWidget
+                    <UserChooserWidget
                       item
                       dark
                       return-field="username"
                       label="Author"
-                      target="users"
                       @item-chosen="$emit('userSelected')"
                     />
                   </q-list>
@@ -210,7 +209,7 @@
           </div>
         </div>
         <q-scroll-area dark class="scroll-area q-px-lg" v-if="tm.viewing">
-          <CommentWidget dark :author="tm.viewing.creationUser.id">
+          <CommentBox dark :author="tm.viewing.creationUser.id">
             <template v-if="tm.viewing.completed" v-slot:comment-stream-end>
               <q-item class="comment-box" :class="tm.viewing.completedByAuthor ? 'op-post' : ''">
                 <q-item-section v-if="tm.viewing.completedByAuthor" avatar>
@@ -229,7 +228,7 @@
                 </q-item-section>
               </q-item>
             </template>
-          </CommentWidget>
+          </CommentBox>
         </q-scroll-area>
       </div>
     </div>
@@ -246,21 +245,21 @@ import TasklistManager from "./TasklistManager.vue";
 import TaskList from "./TaskList.vue";
 import {
   AttachmentIconWidget,
-  CommentWidget,
+  CommentBox,
   DetailPopover,
   MarkdownEditor,
-  ChooserWidget,
+  UserChooserWidget,
 } from "@/components";
 
 export default {
   components: {
     AttachmentIconWidget,
-    CommentWidget,
+    CommentBox,
     DetailPopover,
     MarkdownEditor,
     TasklistManager,
     TaskList,
-    ChooserWidget,
+    UserChooserWidget,
   },
   emits: [...useDialogPluginComponent.emits],
   setup() {

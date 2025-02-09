@@ -20,7 +20,7 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:grid-avatar="props">
-      <TagWidget
+      <TagPill
         mini
         module="workflow"
         size="22px"
@@ -41,7 +41,7 @@
         </div>
       </DetailPopover>
       <template>
-        <TagWidget
+        <TagPill
           v-if="props.row.workflow.isPublic"
           name="public"
           colour="light-blue-1"
@@ -50,7 +50,7 @@
           module="standalone"
           class="q-ml-sm"
         />
-        <TagWidget
+        <TagPill
           v-if="props.row.isPrivate"
           name="private"
           colour="deep-orange-1"
@@ -155,7 +155,7 @@
     </template> -->
 
     <template v-slot:render-cell-status="props">
-      <TagWidget
+      <TagPill
         :name="props.row.workflow.status"
         :type="props.row.workflow.status"
         module="workflow"
@@ -183,7 +183,7 @@
     </template>
 
     <template v-slot:render-cell-isPrivate="props">
-      <BooleanWidget
+      <BooleanValue
         :value="props.row.isPrivate"
         :onlyTrue="true"
         :onlyTrueGreen="false"
@@ -192,24 +192,8 @@
     </template>
 
     <template v-slot:render-cell-isPublic="props">
-      <BooleanWidget :value="props.row.workflow.isPublic" :onlyTrue="true" trueIcon="public" />
+      <BooleanValue :value="props.row.workflow.isPublic" :onlyTrue="true" trueIcon="public" />
     </template>
-
-    <!-- <template v-slot:render-cell-authority="props">
-      {{ props.row.attributes.authority }}
-    </template>
-
-    <template v-slot:render-cell-format="props">
-      {{ props.row.attributes.format }}
-    </template>
-
-    <template v-slot:render-cell-support="props">
-      {{ props.row.attributes.support }}
-    </template>
-
-    <template v-slot:render-cell-zoteroKey="props">
-      {{ props.row.attributes.zoteroKey }}
-    </template> -->
   </DataTable>
 </template>
 
@@ -220,7 +204,7 @@ import { defineComponent, provide, ref } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import { getColumns, getDefaults } from "@/utils";
-import { BooleanWidget, DataTable, DetailPopover, TagWidget } from "@/components";
+import { BooleanValue, DataTable, DetailPopover, TagPill } from "@/components";
 import { useAPI, usePagination, useStores } from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
@@ -229,10 +213,10 @@ import { recordListSchema } from "@/schemas";
 export default defineComponent({
   name: "RecordList",
   components: {
-    BooleanWidget,
+    BooleanValue,
     DetailPopover,
     DataTable,
-    TagWidget,
+    TagPill,
   },
   setup() {
     const $route = useRoute();

@@ -71,7 +71,7 @@
                 </q-item-section>
               </q-item>
             </div>
-            <CommentWidget>
+            <CommentBox>
               <template v-if="task.completed" v-slot:comment-stream-end>
                 <div class="comment_thread row items-center q-mt-none q-pb-lg">
                   <div class="closing-dot bg-deep-purple-6">
@@ -82,7 +82,7 @@
                   </div>
                 </div>
               </template>
-            </CommentWidget>
+            </CommentBox>
           </q-card-section>
         </q-card>
       </div>
@@ -118,7 +118,7 @@ import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import {
   AttachmentWidget,
-  CommentWidget,
+  CommentBox,
   DetailPopover,
   MarkdownEditor,
   OpaqueSpinner,
@@ -131,7 +131,7 @@ export default defineComponent({
   name: "TaskDetail",
   components: {
     AttachmentWidget,
-    CommentWidget,
+    CommentBox,
     DetailPopover,
     MarkdownEditor,
     OpaqueSpinner,

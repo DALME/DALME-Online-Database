@@ -35,7 +35,7 @@
           {{ props.row.username }}
         </div>
       </DetailPopover>
-      <TagWidget
+      <TagPill
         v-if="props.row.isActive"
         name="active"
         colour="light-green-1"
@@ -44,7 +44,7 @@
         module="standalone"
         class="q-ml-sm"
       />
-      <TagWidget
+      <TagPill
         v-if="props.row.isStaff"
         name="staff"
         colour="light-blue-1"
@@ -53,7 +53,7 @@
         module="standalone"
         class="q-ml-sm"
       />
-      <TagWidget
+      <TagPill
         v-if="props.row.isSuperuser"
         name="super"
         colour="orange-1"
@@ -106,11 +106,11 @@
     </template>
 
     <template v-slot:render-cell-isActive="props">
-      <BooleanWidget :value="props.row.isActive" :onlyTrue="true" trueIcon="check_circle" />
+      <BooleanValue :value="props.row.isActive" :onlyTrue="true" trueIcon="check_circle" />
     </template>
 
     <template v-slot:render-cell-isStaff="props">
-      <BooleanWidget :value="props.row.isStaff" :onlyTrue="true" trueIcon="check_circle" />
+      <BooleanValue :value="props.row.isStaff" :onlyTrue="true" trueIcon="check_circle" />
     </template>
   </DataTable>
 </template>
@@ -121,7 +121,7 @@ import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { formatDate, getColumns, getDefaults, nully } from "@/utils";
-import { BooleanWidget, DataTable, DetailPopover, TagWidget } from "@/components";
+import { BooleanValue, DataTable, DetailPopover, TagPill } from "@/components";
 import { userListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";
@@ -130,10 +130,10 @@ import { filterList, sortList } from "./filters";
 export default defineComponent({
   name: "UserList",
   components: {
-    BooleanWidget,
+    BooleanValue,
     DetailPopover,
     DataTable,
-    TagWidget,
+    TagPill,
   },
   setup() {
     useMeta({ title: "Users" });

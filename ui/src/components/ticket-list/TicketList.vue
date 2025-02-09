@@ -19,72 +19,6 @@
     :title="title"
     :visibleColumns="visibleColumns"
   >
-    <template v-slot:toolbar-filtersets>
-      <q-btn-dropdown
-        flat
-        dense
-        label="Tags"
-        no-caps
-        menu-anchor="bottom right"
-        menu-self="top right"
-        content-class="menu-shadow"
-      >
-        <q-list bordered separator class="text-grey-9">
-          <q-item dense class="q-pr-sm">
-            <q-item-section class="text-weight-bold"> Filter by Tag </q-item-section>
-            <q-item-section avatar>
-              <q-btn
-                flat
-                dense
-                size="xs"
-                color="grey-6"
-                icon="close"
-                @click="context.emit('clearFilters')"
-              />
-            </q-item-section>
-          </q-item>
-          <template v-for="(tag, idx) in tagList" :key="idx">
-            <q-item
-              clickable
-              v-close-popup
-              dense
-              :class="
-                tagsFilter.includes(tag)
-                  ? 'text-weight-bold bg-indigo-1 text-indigo-5'
-                  : 'text-grey-8'
-              "
-              @click="onChangeFilterTags(tag)"
-            >
-              <q-item-section side>
-                <q-icon name="circle" :color="ticketTagColours[tag]['text']" size="xs" />
-              </q-item-section>
-              <q-item-section>
-                {{ tag }}
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-list>
-      </q-btn-dropdown>
-      <ChooserWidget
-        header="Filter by Author"
-        toggle
-        show-selected
-        label="Author"
-        target="users"
-        @item-chosen="setAuthor"
-        :clear-filters="onClearFilters"
-      />
-      <ChooserWidget
-        header="Filter by Assignee"
-        toggle
-        show-selected
-        label="Assignee"
-        target="users"
-        @item-chosen="setAssignee"
-        :clear-filters="onClearFilters"
-      />
-    </template>
-
     <template v-slot:grid-avatar="props">
       <q-icon
         :name="props.row.status ? 'check_circle_outline' : 'error_outline'"
@@ -111,7 +45,7 @@
           {{ props.row.description }}
         </div>
       </DetailPopover>
-      <TagWidget
+      <TagPill
         v-for="(tag, idx) in cleanTags(props.row.tags)"
         :key="idx"
         :name="tag.tag"
@@ -173,7 +107,7 @@
     </template>
 
     <template v-slot:render-cell-tags="props">
-      <TagWidget
+      <TagPill
         v-for="(tag, idx) in cleanTags(props.row.tags)"
         :key="idx"
         :name="tag.tag"
@@ -236,7 +170,7 @@ import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
 import { defineComponent, provide, ref } from "vue";
 import { requests } from "@/api";
-import { ChooserWidget, DataTable, DetailPopover, TagWidget } from "@/components";
+import { DataTable, DetailPopover, TagPill } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { ticketListSchema } from "@/schemas";
 import { useAPI, useConstants, useEditing, usePagination, useStores } from "@/use";
@@ -252,10 +186,9 @@ export default defineComponent({
     },
   },
   components: {
-    ChooserWidget,
     DetailPopover,
     DataTable,
-    TagWidget,
+    TagPill,
   },
   setup(props, context) {
     if (!props.embedded) useMeta({ title: "Issue Tickets" });

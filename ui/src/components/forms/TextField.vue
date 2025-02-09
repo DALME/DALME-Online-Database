@@ -8,9 +8,9 @@
     :error="errorMessage && meta.touched"
     @blur="handleBlur"
   >
-    <TooltipWidget v-if="description">
+    <ToolTip v-if="description">
       {{ description }}
-    </TooltipWidget>
+    </ToolTip>
 
     <template v-slot:error>
       <div>{{ errorMessage }}</div>
@@ -39,7 +39,7 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props) {
     const { errorMessage, handleBlur, meta, value } = useField(props.field, props.validation);
