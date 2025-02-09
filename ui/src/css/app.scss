@@ -73,6 +73,10 @@ main {
   margin-left: auto;
 }
 
+main.main-max-width {
+  max-width: unset;
+}
+
 a, a:visited {
   text-decoration: none;
 }
