@@ -20,22 +20,8 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:toolbar-filtersets>
-      <UserChooserWidget
-        showHeader
-        toggleIcon
-        showSelectedItem
-        label="Author"
-        headerText="Filter by Author"
-        @clear-filters="onClearFilters"
-      />
-      <UserChooserWidget
-        showHeader
-        toggleIcon
-        showSelectedItem
-        label="Assignee"
-        headerText="Filter by Assignee"
-        @clear-filters="onClearFilters"
-      />
+      <GeneralChooser showSelected type="users" label="Author" @clear-filters="onClearFilters" />
+      <GeneralChooser showSelected type="users" label="Assignee" @clear-filters="onClearFilters" />
     </template>
 
     <template v-slot:grid-avatar="props">
@@ -128,7 +114,7 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { BooleanValue, UserChooserWidget, DataTable, DetailPopover } from "@/components";
+import { BooleanValue, GeneralChooser, DataTable, DetailPopover } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI, usePagination, useStores } from "@/use";
@@ -144,7 +130,7 @@ export default defineComponent({
     },
   },
   components: {
-    UserChooserWidget,
+    GeneralChooser,
     DataTable,
     BooleanValue,
     DetailPopover,

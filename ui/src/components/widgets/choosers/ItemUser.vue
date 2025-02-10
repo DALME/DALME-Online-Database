@@ -1,10 +1,10 @@
 <template>
-  <q-item clickable v-close-popup dense :class="itemClass" @click="$emit('itemChosen', item)">
+  <q-item clickable v-close-popup dense :class="cls" @click="$emit('itemChosen', item)">
     <q-item-section v-if="showAvatar" side>
       <q-avatar v-if="!nully(item.avatar)" size="34px">
         <img :src="item.avatar" class="chooser-avatar-image" />
       </q-avatar>
-      <q-icon v-else size="34px" name="mdi-account-circle" color="grey-4" />
+      <q-icon v-else size="34px" name="mdi-account-circle" :color="dark ? 'grey-9' : 'grey-4'" />
     </q-item-section>
     <q-item-section class="text-roboto">
       <q-item-label>{{ item.fullName }}</q-item-label>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import { nully } from "@/utils";
 
 export default defineComponent({
@@ -38,8 +38,18 @@ export default defineComponent({
     },
   },
   emits: ["itemChosen"],
-  setup() {
-    return { nully };
+  setup(props) {
+    const cls = computed(() => {
+      const classes = [];
+      if (props.dark) classes.push("dark");
+      if (props.itemClass) classes.push(props.itemClass);
+      return classes.length ? classes.join(" ") : "";
+    });
+
+    return {
+      nully,
+      cls,
+    };
   },
 });
 </script>

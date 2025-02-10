@@ -1,5 +1,5 @@
 <template>
-  <q-item clickable v-close-popup dense :class="itemClass" @click="$emit('itemChosen', item)">
+  <q-item clickable v-close-popup dense :class="cls" @click="$emit('itemChosen', item)">
     <q-item-section side>
       <q-icon
         :name="ticketIcon(item.status)"
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 
 export default defineComponent({
   name: "ItemTicket",
@@ -43,12 +43,22 @@ export default defineComponent({
   },
   emits: ["itemChosen"],
   setup(props) {
+    const cls = computed(() => {
+      const classes = [];
+      if (props.dark) classes.push("dark");
+      if (props.itemClass) classes.push(props.itemClass);
+      return classes.length ? classes.join(" ") : "";
+    });
+
     const ticketIcon = (status) => {
       let name = status == 0 ? "record" : "check";
       return props.dark ? `mdi-${name}-circle` : `mdi-${name}-circle-outline`;
     };
 
-    return { ticketIcon };
+    return {
+      ticketIcon,
+      cls,
+    };
   },
 });
 </script>

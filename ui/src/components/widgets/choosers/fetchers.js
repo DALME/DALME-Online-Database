@@ -31,8 +31,8 @@ export const optionFetcher = (request, validationSchema, cls, clsSel, icn) => {
 export const ticketFetcher = (filter) => {
   return new Promise((resolve) => {
     const query = nully(filter)
-      ? "?ordering=id&limit=10&offset=0"
-      : `?ordering=id&search=${filter}&limit=10&offset=0`;
+      ? "ordering=id&limit=10&offset=0"
+      : `ordering=id&search=${filter}&limit=10&offset=0`;
     fetcher(ticketRequests.getTickets(query)).then((response) => {
       if (response.status === 200) {
         ticketListSchema.validate(response.data.data, { stripUnknown: true }).then((value) => {
@@ -46,8 +46,8 @@ export const ticketFetcher = (filter) => {
 export const userFetcher = (filter) => {
   return new Promise((resolve) => {
     const query = nully(filter)
-      ? "?ordering=id&limit=10&offset=0"
-      : `?ordering=id&search=${filter}&limit=10&offset=0`;
+      ? "ordering=id&limit=10&offset=0"
+      : `ordering=id&search=${filter}&limit=10&offset=0`;
     fetcher(userRequests.getUsers(query)).then((response) => {
       if (response.status === 200) {
         userListSchema.validate(response.data.data, { stripUnknown: true }).then((value) => {

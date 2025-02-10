@@ -49,9 +49,10 @@
                     <q-item dense clickable v-close-popup class="inset-item">
                       <q-item-section>Completed by</q-item-section>
                     </q-item>
-                    <UserChooserWidget
+                    <GeneralChooser
                       item
                       dark
+                      type="users"
                       return-field="username"
                       label="Author"
                       @item-chosen="$emit('userSelected')"
@@ -248,7 +249,7 @@ import {
   CommentBox,
   DetailPopover,
   MarkdownEditor,
-  UserChooserWidget,
+  GeneralChooser,
 } from "@/components";
 
 export default {
@@ -259,7 +260,7 @@ export default {
     MarkdownEditor,
     TasklistManager,
     TaskList,
-    UserChooserWidget,
+    GeneralChooser,
   },
   emits: [...useDialogPluginComponent.emits],
   setup() {

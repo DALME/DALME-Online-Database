@@ -1,5 +1,5 @@
 <template>
-  <q-item clickable v-close-popup dense :class="itemClass" @click="$emit('itemChosen', item)">
+  <q-item clickable v-close-popup dense :class="cls" @click="$emit('itemChosen', item)">
     <q-item-section v-if="item.icon" side>
       <q-icon :name="item.icon.name" :color="item.icon.color" :size="item.icon.size" />
     </q-item-section>
@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 
 export default defineComponent({
   name: "ItemGeneric",
@@ -29,8 +29,15 @@ export default defineComponent({
     },
   },
   emits: ["itemChosen"],
-  setup() {
-    return {};
+  setup(props) {
+    const cls = computed(() => {
+      const classes = [];
+      if (props.dark) classes.push("dark");
+      if (props.itemClass) classes.push(props.itemClass);
+      return classes.length ? classes.join(" ") : "";
+    });
+
+    return { cls };
   },
 });
 </script>

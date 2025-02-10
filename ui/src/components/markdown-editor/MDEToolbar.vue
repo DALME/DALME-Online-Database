@@ -65,19 +65,23 @@
       <ToolTip>Add a task list</ToolTip>
     </q-btn>
     <q-separator v-if="width >= 395" vertical spaced />
-    <UserChooserWidget
+    <GeneralChooser
       v-if="width >= 420"
       :dark="dark"
+      :toggle="false"
+      type="users"
       icon="mdi-account-multiple-plus"
-      header="Users"
       return-field="username"
       tooltip="Mention another user"
       @item-chosen="onUserSelected"
     />
-    <TicketChooserWidget
+    <GeneralChooser
       v-if="width >= 420"
       :dark="dark"
+      :toggle="false"
+      type="tickets"
       icon="mdi-bug"
+      return-field="id"
       tooltip="Reference a ticket"
       @item-chosen="onTicketSelected"
     />
@@ -190,20 +194,22 @@
 
           <q-separator spaced v-if="width < 395" />
 
-          <UserChooserWidget
+          <GeneralChooser
             v-if="width < 420"
             item
             :dark="dark"
+            type="users"
             icon="mdi-account-multiple-plus"
             return-field="username"
             label="Mention another user"
             @item-chosen="onUserSelected"
           />
 
-          <TicketChooserWidget
+          <GeneralChooser
             v-if="width < 420"
             item
             :dark="dark"
+            type="tickets"
             icon="mdi-bug"
             label="Reference a ticket"
             @item-chosen="onTicketSelected"
@@ -216,7 +222,7 @@
 
 <script>
 import { defineComponent, inject, ref } from "vue";
-import { UserChooserWidget, TicketChooserWidget, ToolTip } from "@/components/widgets";
+import { GeneralChooser, ToolTip } from "@/components/widgets";
 
 export default defineComponent({
   name: "MDEToolbar",
@@ -228,8 +234,7 @@ export default defineComponent({
     },
   },
   components: {
-    UserChooserWidget,
-    TicketChooserWidget,
+    GeneralChooser,
     ToolTip,
   },
   emits: ["insertEnclosure", "insertPrefix"],
