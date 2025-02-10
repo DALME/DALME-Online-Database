@@ -24,18 +24,22 @@
               size="10px"
               @click="appDrawerOpen = !appDrawerOpen"
             >
-              <TooltipWidget>Close app drawer.</TooltipWidget>
+              <ToolTip>Close app drawer.</ToolTip>
             </q-btn>
           </q-item-section>
         </q-item>
-        <q-scroll-area dark :style="`min-height: ${minScrollHeight}px;`" class="scroll-area">
-          <CollectionsManager userCollectionsOnly inDrawer defaultOpened label="Your collections" />
-        </q-scroll-area>
-
+        <EditPanel />
+        <CollectionsManager
+          userCollectionsOnly
+          inDrawer
+          :scrollHeight="minScrollHeight"
+          width="319"
+          :defaultOpened="false"
+          label="Your collections"
+        />
         <template v-for="(route, idx) in appRoutes" :key="idx">
           <q-expansion-item
             :label="route.name"
-            default-opened
             header-class="drawer_expansion_header"
             expand-icon="mdi-plus-box-outline"
             expanded-icon="mdi-minus-box-outline"
@@ -66,21 +70,21 @@
 import { computed, defineComponent } from "vue";
 import { useStores } from "@/use";
 import { navRoutes } from "@/router";
-import { CollectionsManager, TooltipWidget } from "@/components";
+import { CollectionsManager, EditPanel, ToolTip } from "@/components";
 
 export default defineComponent({
   name: "AppDrawer",
   components: {
     CollectionsManager,
-    TooltipWidget,
+    EditPanel,
+    ToolTip,
   },
   setup() {
-    const { appDrawerOpen, ui, windowHeight, showTips } = useStores();
+    const { appDrawerOpen, ui, windowHeight } = useStores();
     const minScrollHeight = computed(() => windowHeight.value - 450);
     const appRoutes = navRoutes("app");
 
     return {
-      showTips,
       appDrawerOpen,
       minScrollHeight,
       ui,
@@ -96,8 +100,11 @@ export default defineComponent({
   border-bottom-right-radius: 18px;
 }
 .custom-drawer.app-drawer .scroll-area {
-  margin-bottom: 0;
-  border-bottom: none;
+  margin: 0;
+  border: none;
+}
+.custom-drawer.app-drawer .q-list .q-expansion-item:nth-child(2) {
+  margin-top: 8px;
 }
 .custom-drawer.app-drawer .q-expansion-item:last-of-type .q-item:last-of-type {
   margin-bottom: 12px;

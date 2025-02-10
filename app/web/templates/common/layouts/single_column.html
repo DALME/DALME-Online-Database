@@ -1,0 +1,12 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+  <article class="main-column u-flex">
+    {% block main_column %}{% endblock %}
+    {% if page.has_footnotes and not page.has_placemarker %}
+      <div class="content">
+        {% include "footnote_container.html" %}
+      </div>
+    {% endif %}
+  </article>
+{% endblock %}

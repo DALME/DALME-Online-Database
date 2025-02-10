@@ -33,10 +33,13 @@ export const useTasklistStore = defineStore("tasklistStore", () => {
   };
 
   const init = () => {
-    $reset();
-    fetchData(getRequest("user", 50)).then((response) => {
-      lists.value = response;
-      loading.value = false;
+    return new Promise((resolve) => {
+      $reset();
+      fetchData(getRequest("user", 50)).then((response) => {
+        lists.value = response;
+        loading.value = false;
+        resolve();
+      });
     });
   };
 

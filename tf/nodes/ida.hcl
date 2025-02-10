@@ -49,7 +49,7 @@ locals {
 inputs = {
   admins                             = local.admins
   allowed_hosts                      = local.tenant_domains
-  web_port                           = local.ports.web
+  app_port                           = local.ports.app
   assign_public_ip                   = true
   cpu_scale_in_cooldown              = 300
   cpu_scale_out_cooldown             = 300
@@ -61,7 +61,7 @@ inputs = {
   force_new_deployment               = false
   gunicorn_config                    = "ida.gunicorn"
   health_check_grace_period          = 60
-  images                             = ["web", "proxy"]
+  images                             = ["app", "proxy"]
   keepers                            = local.keepers
   launch_type                        = "FARGATE"
   log_level                          = "INFO"

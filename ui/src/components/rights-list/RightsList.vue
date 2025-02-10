@@ -50,7 +50,7 @@
           <b>Notice:</b> {{ props.row.rightsNotice }}
         </div>
       </DetailPopover>
-      <TagWidget
+      <TagPill
         v-if="props.row.licence"
         name="licence"
         colour="orange-1"
@@ -59,7 +59,7 @@
         module="standalone"
         class="q-ml-sm"
       />
-      <TagWidget
+      <TagPill
         v-if="props.row.publicDisplay"
         :name="props.row.noticeDisplay ? 'display+notice' : 'display'"
         colour="light-blue-1"
@@ -114,7 +114,7 @@
     </template>
 
     <template v-slot:render-cell-publicDisplay="props">
-      <BooleanWidget
+      <BooleanValue
         :value="!props.row.publicDisplay"
         :onlyTrue="true"
         :onlyTrueGreen="false"
@@ -123,7 +123,7 @@
     </template>
 
     <template v-slot:render-cell-noticeDisplay="props">
-      <BooleanWidget :value="props.row.noticeDisplay" :onlyTrue="true" trueIcon="verified" />
+      <BooleanValue :value="props.row.noticeDisplay" :onlyTrue="true" trueIcon="verified" />
     </template>
 
     <template v-slot:render-cell-attachments="props">
@@ -146,7 +146,7 @@ import { openURL } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { BooleanWidget, DetailPopover, TagWidget, DataTable } from "@/components";
+import { BooleanValue, DetailPopover, TagPill, DataTable } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { rightsListSchema } from "@/schemas";
 import { useAPI, useConstants, usePagination, useStores } from "@/use";
@@ -157,9 +157,9 @@ export default defineComponent({
   name: "RightsList",
   components: {
     DetailPopover,
-    BooleanWidget,
+    BooleanValue,
     DataTable,
-    TagWidget,
+    TagPill,
   },
   setup() {
     const $route = useRoute();

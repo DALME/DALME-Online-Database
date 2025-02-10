@@ -11,9 +11,9 @@
     @blur="handleBlur"
     @filter="handleOptions"
   >
-    <TooltipWidget v-if="description">
+    <ToolTip v-if="description">
       {{ description }}
-    </TooltipWidget>
+    </ToolTip>
 
     <template v-slot:option="scope">
       <q-item v-bind="scope.itemProps">
@@ -74,7 +74,7 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props) {
     const options = ref(null);

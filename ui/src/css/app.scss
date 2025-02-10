@@ -73,6 +73,10 @@ main {
   margin-left: auto;
 }
 
+main.main-max-width {
+  max-width: unset;
+}
+
 a, a:visited {
   text-decoration: none;
 }
@@ -539,11 +543,17 @@ pre {
 }
 .popup-menu .q-item {
   color: var(--menu-text);
+  background-color: var(--bg);
   padding: 2px 16px 2px 8px;
   border-radius: 6px;
 }
 .popup-menu .q-item.disabled {
   opacity: 1 !important;
+}
+.popup-menu .q-item.header {
+  color: var(--menu-text);
+  background-color: var(--bg);
+  border-bottom-style: inherit;
 }
 .popup-menu .q-item.disabled:after {
   content: "";

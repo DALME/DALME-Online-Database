@@ -21,6 +21,8 @@ import rights from "./rights";
 import tasks from "./tasks";
 import tickets from "./tickets";
 import users from "./users";
+import preferences from "./preferences";
+import teiElements from "./tei-elements";
 
 const requests = {
   agents,
@@ -31,6 +33,7 @@ const requests = {
   comments,
   countries,
   collections,
+  teiElements,
   groups,
   images,
   languages,
@@ -38,6 +41,7 @@ const requests = {
   locales,
   pages,
   places,
+  preferences,
   publications,
   rights,
   recordGroups,

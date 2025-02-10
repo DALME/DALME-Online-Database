@@ -3,9 +3,7 @@
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
         {{
-          !showing && modelValue !== [empty()]
-            ? `Named persons (${modelValue.length})`
-            : "Named persons"
+          !showing && !empty(modelValue) ? `Named persons (${modelValue.length})` : "Named persons"
         }}
       </div>
 
@@ -20,7 +18,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <TooltipWidget> Add a named person </TooltipWidget>
+        <ToolTip> Add a named person </ToolTip>
       </q-btn>
 
       <q-btn
@@ -30,14 +28,14 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <TooltipWidget>
+        <ToolTip>
           {{ showing ? "Hide named persons" : "Show named persons" }}
-        </TooltipWidget>
+        </ToolTip>
       </q-btn>
 
-      <TooltipWidget v-if="description">
+      <ToolTip v-if="description">
         {{ description }}
-      </TooltipWidget>
+      </ToolTip>
     </div>
 
     <template v-if="showing">
@@ -121,7 +119,7 @@ export default defineComponent({
   },
   components: {
     SelectField,
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props, context) {
     const { fields, replace } = useFieldArray("agents");
@@ -190,7 +188,8 @@ export default defineComponent({
 
 <style lang="scss">
 .agents-field {
-  will-transform: auto;
+  will-change: auto;
+  // will-transform: auto;
 }
 .agents-field .q-field__after,
 .agents-field .q-field__append {

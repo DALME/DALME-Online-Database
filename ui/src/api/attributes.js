@@ -1,14 +1,8 @@
 import { apiUrl } from "./config";
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 const endpoint = `${apiUrl}/attributes`;
 
-const attributes = {
-  getAttributeOptions(id) {
-    return {
-      url: `${endpoint}/${id}/options/`,
-      method: "GET",
-    };
-  },
-};
+const attributes = {};
 
 export default attributes;

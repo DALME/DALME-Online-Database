@@ -30,13 +30,13 @@
 | <a name="module_ida_ecs_task_policy_label"></a> [ida\_ecs\_task\_policy\_label](#module\_ida\_ecs\_task\_policy\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_ecs_task_role_label"></a> [ida\_ecs\_task\_role\_label](#module\_ida\_ecs\_task\_role\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_label"></a> [ida\_label](#module\_ida\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_ida_log_group_app_label"></a> [ida\_log\_group\_app\_label](#module\_ida\_log\_group\_app\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_log_group_label"></a> [ida\_log\_group\_label](#module\_ida\_log\_group\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_log_group_proxy_label"></a> [ida\_log\_group\_proxy\_label](#module\_ida\_log\_group\_proxy\_label) | cloudposse/label/null | 0.25.0 |
-| <a name="module_ida_log_group_web_label"></a> [ida\_log\_group\_web\_label](#module\_ida\_log\_group\_web\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_log_label"></a> [ida\_log\_label](#module\_ida\_log\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_ida_log_stream_app_label"></a> [ida\_log\_stream\_app\_label](#module\_ida\_log\_stream\_app\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_log_stream_label"></a> [ida\_log\_stream\_label](#module\_ida\_log\_stream\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_log_stream_proxy_label"></a> [ida\_log\_stream\_proxy\_label](#module\_ida\_log\_stream\_proxy\_label) | cloudposse/label/null | 0.25.0 |
-| <a name="module_ida_log_stream_web_label"></a> [ida\_log\_stream\_web\_label](#module\_ida\_log\_stream\_web\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_sfn_ecs_scheduled_task_cleartokens_label"></a> [ida\_sfn\_ecs\_scheduled\_task\_cleartokens\_label](#module\_ida\_sfn\_ecs\_scheduled\_task\_cleartokens\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_sfn_ecs_scheduled_task_label"></a> [ida\_sfn\_ecs\_scheduled\_task\_label](#module\_ida\_sfn\_ecs\_scheduled\_task\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_ida_sfn_ecs_scheduled_task_publish_label"></a> [ida\_sfn\_ecs\_scheduled\_task\_publish\_label](#module\_ida\_sfn\_ecs\_scheduled\_task\_publish\_label) | cloudposse/label/null | 0.25.0 |
@@ -49,10 +49,10 @@
 
 | Name | Type |
 |------|------|
+| [aws_cloudwatch_log_group.app_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.proxy_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_group) | resource |
-| [aws_cloudwatch_log_group.web_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_stream.app_log_stream](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_stream) | resource |
 | [aws_cloudwatch_log_stream.proxy_log_stream](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_stream) | resource |
-| [aws_cloudwatch_log_stream.web_log_stream](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudwatch_log_stream) | resource |
 | [aws_ecs_task_definition.cleartokens](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_task_definition) | resource |
 | [aws_ecs_task_definition.publish](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_task_definition) | resource |
 | [aws_ecs_task_definition.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_task_definition) | resource |
@@ -89,6 +89,7 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_admins"></a> [admins](#input\_admins) | Project admin email addresses. | `list(string)` | n/a | yes |
 | <a name="input_allowed_hosts"></a> [allowed\_hosts](#input\_allowed\_hosts) | Permitted domains for requests. | `list(string)` | n/a | yes |
+| <a name="input_app_port"></a> [app\_port](#input\_app\_port) | The port exposed by the app container. | `number` | n/a | yes |
 | <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Should the service be exposed. | `bool` | n/a | yes |
 | <a name="input_cpu_scale_in_cooldown"></a> [cpu\_scale\_in\_cooldown](#input\_cpu\_scale\_in\_cooldown) | How long (secs) after a CPU scale-in completes before another can start. | `number` | n/a | yes |
 | <a name="input_cpu_scale_out_cooldown"></a> [cpu\_scale\_out\_cooldown](#input\_cpu\_scale\_out\_cooldown) | How long (secs) after a CPU scale-out completes before another can start. | `number` | n/a | yes |
@@ -103,7 +104,7 @@
 | <a name="input_images"></a> [images](#input\_images) | Container repository names for this service. | `list(string)` | n/a | yes |
 | <a name="input_keepers"></a> [keepers](#input\_keepers) | Arbitrary key/value pairs that force secret regeneration on change. | <pre>object({<br>    admin_user_version          = number<br>    django_secret_key_version   = number<br>    oauth_client_secret_version = number<br>  })</pre> | n/a | yes |
 | <a name="input_launch_type"></a> [launch\_type](#input\_launch\_type) | What ECS mode the service should run in. | `string` | n/a | yes |
-| <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Set the severity of the web logger. | `string` | n/a | yes |
+| <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Set the severity of the app logger. | `string` | n/a | yes |
 | <a name="input_log_retention_in_days"></a> [log\_retention\_in\_days](#input\_log\_retention\_in\_days) | How long to keep cloudwatch records. | `number` | n/a | yes |
 | <a name="input_max_capacity"></a> [max\_capacity](#input\_max\_capacity) | Maximum number for scaling targets. | `number` | n/a | yes |
 | <a name="input_max_percent"></a> [max\_percent](#input\_max\_percent) | The upper limit of running tasks in a service during a deployment. | `number` | n/a | yes |
@@ -130,7 +131,6 @@
 | <a name="input_tenant_domains"></a> [tenant\_domains](#input\_tenant\_domains) | The tenanted origin(s) of the service. | `list(string)` | n/a | yes |
 | <a name="input_threads"></a> [threads](#input\_threads) | Number of gunicorn threads. | `number` | n/a | yes |
 | <a name="input_unmanaged_suffix"></a> [unmanaged\_suffix](#input\_unmanaged\_suffix) | Label that indicates some resource is unmanaged (rare). | `string` | n/a | yes |
-| <a name="input_web_port"></a> [web\_port](#input\_web\_port) | The port exposed by the web container. | `number` | n/a | yes |
 | <a name="input_worker"></a> [worker](#input\_worker) | The gunicorn worker type. | `string` | n/a | yes |
 | <a name="input_worker_tmp"></a> [worker\_tmp](#input\_worker\_tmp) | The gunicorn worker tmp directory. | `string` | n/a | yes |
 | <a name="input_workers"></a> [workers](#input\_workers) | How many gunicorn workers to spawn. | `number` | n/a | yes |

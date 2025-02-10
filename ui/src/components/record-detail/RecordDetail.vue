@@ -8,7 +8,7 @@
               <div class="row items-center text-h5">
                 <template v-if="!ui.globalLoading">
                   {{ record.name }}
-                  <TagWidget
+                  <TagPill
                     v-if="record.hasInventory"
                     name="list"
                     colour="green-1"
@@ -106,7 +106,7 @@
               </q-tab>
               <q-tab name="log" icon="o_work_history" label="Work Log" />
             </template>
-            <q-spinner-oval v-else size="sm" class="q-ml-md" />
+            <AdaptiveSpinner v-else type="bars" size="sm" class="q-ml-md" />
           </q-tabs>
         </div>
       </div>
@@ -114,14 +114,14 @@
         <div v-if="resource === 'record'" class="col-auto record-actions">
           <div class="row transition-all">
             <div class="row q-mr-sm">
-              <BooleanWidget
+              <BooleanValue
                 v-if="resource === 'record'"
                 :value="record && !record.workflow.isPublic"
                 :onlyTrue="true"
                 trueIcon="public"
                 trueColour="light-green-7"
               />
-              <BooleanWidget
+              <BooleanValue
                 v-if="resource === 'record'"
                 :value="record && !record.workflow.helpFlag"
                 :onlyTrue="true"
@@ -163,7 +163,7 @@
               </div>
             </q-tab-panel>
             <q-tab-panel name="comments" class="q-pt-md q-px-lg">
-              <CommentWidget @on-count-changed="updateCommentCount" />
+              <CommentBox @on-count-changed="updateCommentCount" />
             </q-tab-panel>
             <q-tab-panel name="log" class="q-pt-md q-px-lg">
               <LogViewer :data="record.workflow" />
@@ -184,14 +184,14 @@ import { requests } from "@/api";
 import { useAPI, useEditing, useStores } from "@/use";
 import {
   AdaptiveSpinner,
-  BooleanWidget,
-  CommentWidget,
+  BooleanValue,
+  CommentBox,
   DetailPopover,
   LogViewer,
-  TagWidget,
+  TagPill,
   WorkflowManager,
 } from "@/components";
-import { formatDate, notNully } from "@/utils";
+import { formatDate, nully } from "@/utils";
 import RecordAttributes from "./RecordAttributes.vue";
 import RecordAgents from "./RecordAgents.vue";
 import RecordChildren from "./RecordChildren.vue";
@@ -202,16 +202,16 @@ export default defineComponent({
   name: "RecordDetail",
   components: {
     AdaptiveSpinner,
-    BooleanWidget,
+    BooleanValue,
     DetailPopover,
-    CommentWidget,
+    CommentBox,
     LogViewer,
     RecordAttributes,
     RecordAgents,
     RecordChildren,
     RecordPages,
     RecordPlaces,
-    TagWidget,
+    TagPill,
     WorkflowManager,
   },
   setup() {
@@ -222,11 +222,11 @@ export default defineComponent({
     const { success, data, fetchAPI } = apiInterface();
     const record = ref({});
     const id = ref($route.params.id);
-    const hasAttributes = computed(() => notNully(record.value.attributes));
-    const hasAgents = computed(() => notNully(record.value.agents));
-    const hasChildren = computed(() => notNully(record.value.children));
-    const hasPlaces = computed(() => notNully(record.value.places));
-    const hasPages = computed(() => notNully(record.value.pages));
+    const hasAttributes = computed(() => !nully(record.value.attributes));
+    const hasAgents = computed(() => !nully(record.value.agents));
+    const hasChildren = computed(() => !nully(record.value.children));
+    const hasPlaces = computed(() => !nully(record.value.places));
+    const hasPages = computed(() => !nully(record.value.pages));
     const entityCount = computed(() => {
       let agentsCount = hasAgents.value ? record.value.agents.length : 0;
       let placesCount = hasPlaces.value ? record.value.places.length : 0;

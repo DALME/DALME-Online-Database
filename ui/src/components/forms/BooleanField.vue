@@ -9,9 +9,9 @@
     :popup-content-style="{ zIndex: '9999 !important' }"
     @blur="handleBlur"
   >
-    <TooltipWidget v-if="description">
+    <ToolTip v-if="description">
       {{ description }}
-    </TooltipWidget>
+    </ToolTip>
 
     <template v-slot:error>
       <div>{{ errorMessage }}</div>
@@ -41,7 +41,7 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props) {
     const options = booleanOptions;

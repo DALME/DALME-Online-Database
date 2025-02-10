@@ -27,9 +27,8 @@ inputs = {
     timeout             = 10
     unhealthy_threshold = 3
   }
-  internal         = false
-  ipv6_cidr_blocks = "::/0",
-  protocol         = "tcp",
-  proxy_port       = local.ports.proxy
-  ssl_port         = local.ports.ssl
+  internal   = false
+  protocol   = "tcp",
+  proxy_port = local.ports.proxy
+  ssl_port   = local.ports.ssl
 }

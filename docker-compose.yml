@@ -13,19 +13,19 @@ services:
       - "5335:5335/tcp"
       - "5335:5335/udp"
 
-  ida.web:
-    image: ida.web:dev
-    container_name: ida.web
+  ida.app:
+    image: ida.app:dev
+    container_name: ida.app
     build:
       context: ./
-      dockerfile: ./config/docker/Dockerfile.web
+      dockerfile: ./config/docker/Dockerfile.app
       target: "development"
     environment:
-      ENV_FILE: /opt/web/.env
+      ENV_FILE: /opt/app/.env
       LOG_LEVEL: ERROR
       OAUTH_CLIENT_ID: oauth.ida.development
       OAUTH_CLIENT_SECRET: django-insecure-development-environment-oauth-client-secret
-      OIDC_RSA_PRIVATE_KEY: /opt/web/oidc.key
+      OIDC_RSA_PRIVATE_KEY: /opt/app/oidc.key
       POSTGRES_DB: ida
       POSTGRES_HOST: ida.db
       POSTGRES_PASSWORD: ida
@@ -39,17 +39,17 @@ services:
     networks:
       - app-network
     volumes:
-      - ./ida:/opt/web/ida
-      - ./api:/opt/web/api
-      - ./purl:/opt/web/purl
-      - ./tests:/opt/web/tests
-      - ./public:/opt/web/public
-      - ./static:/opt/web/static
-      - ./tenants/:/opt/web/tenants
-      - ./templates:/opt/web/templates
-      - ./media/media:/opt/web/www/media
-      - ./pyproject.toml:/opt/web/pyproject.toml
-      - ./notebooks:/opt/web/notebooks
+      - ./app/app:/opt/app/app
+      - ./app/domain:/opt/app/domain
+      - ./app/oauth/:/opt/app/oauth
+      - ./app/search/:/opt/app/search
+      - ./app/tenants/:/opt/app/tenants
+      - ./app/tests:/opt/app/tests
+      - ./app/web:/opt/app/web
+      - ./app/manage.py:/opt/app/manage.py
+      - ./app/pyproject.toml:/opt/app/pyproject.toml
+      - ./app/app/media:/opt/app/www/media
+      - ./notebooks:/opt/app/notebooks
       - ./notebooks/ipython:/root/.ipython/profile_default
     restart: unless-stopped
     stdin_open: true
@@ -101,7 +101,7 @@ services:
     container_name: ida.proxy
     command: [ nginx-debug, "-g", "daemon off;" ]
     depends_on:
-      - ida.web
+      - ida.app
     volumes:
       - "./config/nginx/development/nginx.conf:/etc/nginx/nginx.conf:ro"
     networks:
@@ -149,7 +149,7 @@ services:
       dockerfile: "./config/docker/Dockerfile.docs"
       target: "serve"
     depends_on:
-      - ida.web
+      - ida.app
     volumes:
       - ./docs:/opt/docs
     networks:

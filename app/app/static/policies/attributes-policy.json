@@ -1,0 +1,18 @@
+[
+    {
+        "action": ["options", "retrieve", "list"],
+        "principal": ["authenticated"],
+        "effect": "allow"
+    },
+    {
+        "action": ["create", "partial_update", "update", "destroy"],
+        "principal": ["group:Administrators"],
+        "effect": "allow"
+    },
+    {
+        "action": ["create", "partial_update", "update", "destroy"],
+        "principal": ["authenticated"],
+        "effect": "allow",
+        "condition": ["parent_as_proxy"]
+    }
+  ]

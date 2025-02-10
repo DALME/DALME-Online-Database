@@ -1,0 +1,45 @@
+.user-option {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+li.select2-results__option .user-option {
+  height: 40px;
+}
+.user-option .avatar-bg,
+.user-option .user-placeholder {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  margin-left: 5px;
+}
+.user-option .user-placeholder {
+  padding: 5px;
+}
+.user-option .user-label {
+  display: flex;
+  flex-direction: column;
+}
+.user-option .user-label span {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+.user-option .user-label span.user-username {
+  font-size: 12px;
+  font-weight: 300;
+}
+#panel-child-general-roles_and_photo-content .w-field-row .w-panel__wrapper:first-of-type .w-field__input,
+#panel-child-citation-panel-content .w-field-row .w-panel__wrapper:nth-of-type(2) .w-field__input {
+  align-items: flex-start;
+}
+.select-user .select2-container--default span.select2-search.select2-search--inline {
+  margin-top: 0 !important;
+}
+.select-user .select2-container--default .select2-search--inline textarea.select2-search__field {
+  min-height: 36px !important;
+  min-width: 80px !important;
+  padding: 0 10px !important;
+  line-height: 36px !important;
+}

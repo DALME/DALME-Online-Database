@@ -2,7 +2,9 @@
 .DS_Store
 .thumbs.db
 _extra
-/notebooks
+*.ipynb
+*.ipynb_checkpoints
+notebooks
 
 # local environment
 env
@@ -37,7 +39,6 @@ ssl-certs*
 staticfiles
 media
 www
-dalme/media
 
 # BEX related directories and files
 /src-bex/www
@@ -59,3 +60,4 @@ __pycache__/
 .infracost/
 apply-perms.temp
 *.diff
+.ruff_cache

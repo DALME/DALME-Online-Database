@@ -8,7 +8,7 @@
           </div>
         </template>
       </q-img>
-      <SimpleSpinner :showing="!url" />
+      <AdaptiveSpinner type="facebook" v-else thickness="3" />
     </template>
   </BaseModal>
 </template>
@@ -17,14 +17,14 @@
 import { defineComponent, onMounted, ref } from "vue";
 import { useSelector } from "@xstate/vue";
 import { requests } from "@/api";
-import { BaseModal, SimpleSpinner } from "@/components";
+import { BaseModal, AdaptiveSpinner } from "@/components";
 import { useAPI, useEditing } from "@/use";
 
 export default defineComponent({
   name: "FormModal",
   components: {
     BaseModal,
-    SimpleSpinner,
+    AdaptiveSpinner,
   },
   props: {
     cuid: {

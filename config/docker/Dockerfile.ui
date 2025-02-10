@@ -2,7 +2,7 @@
 # vim: set ft=dockerfile:
 FROM node:20-bookworm-slim AS base
 WORKDIR /opt/build
-COPY ./ui/package.json ./ui/yarn.lock .
+COPY ./ui/package.json ./ui/yarn.lock ./
 RUN yarn install --silent
 
 FROM node:20-bookworm-slim AS reqs

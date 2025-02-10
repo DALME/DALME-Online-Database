@@ -17,6 +17,7 @@ locals {
   # against whatever SSO profile you are using to invoke terraform.
   allowed_roles = [
     "arn:aws:sts::905418315284:assumed-role/AWSReservedSSO_AWSAdministratorAccess_f0b0802c3e187d9c/jhrr",
+    "arn:aws:sts::905418315284:assumed-role/AWSReservedSSO_AWSAdministratorAccess_f0b0802c3e187d9c/gpizzorno",
   ]
 
   # General infrastructure data
@@ -30,7 +31,7 @@ locals {
     postgres   = 5432
     proxy      = 80
     ssl        = 443
-    web        = 8080
+    app        = 8080
   }
   postgres_version                   = 16
   opensearch_version                 = "Elasticsearch_7.7"

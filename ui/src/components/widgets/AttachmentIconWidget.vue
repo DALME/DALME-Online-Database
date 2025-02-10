@@ -1,6 +1,6 @@
 <template>
   <q-icon :name="icon" class="attachment-icon">
-    <TooltipWidget>{{ attachment.filename }}</TooltipWidget>
+    <ToolTip>{{ attachment.filename }}</ToolTip>
   </q-icon>
 </template>
 
@@ -17,7 +17,7 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props) {
     const { attachmentIcons } = useConstants();

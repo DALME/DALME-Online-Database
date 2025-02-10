@@ -7,9 +7,9 @@
     @blur="handleBlur"
     @update:modelValue="onUpdate"
   >
-    <TooltipWidget v-if="description">
+    <ToolTip v-if="description">
       {{ description }}
-    </TooltipWidget>
+    </ToolTip>
 
     <template v-slot:error>
       <div>{{ errorMessage }}</div>
@@ -42,7 +42,7 @@ import { defineComponent, defineAsyncComponent } from "vue";
 export default defineComponent({
   name: "DateField",
   components: {
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   props: {
     field: {

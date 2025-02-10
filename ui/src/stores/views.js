@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { isEmpty, mergeDeepLeft } from "ramda";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 import { useUiStore } from "@/stores/ui";
 
 class ViewState {
@@ -38,7 +38,7 @@ export const useViewStore = defineStore(
     const pageCount = computed(() => ("pages" in view.value ? view.value.pages.length : false));
 
     const currentPageData = computed(() => {
-      if (notNully(view.value.pages) && notNully(view.value.currentPageRef)) {
+      if (!nully(view.value.pages) && !nully(view.value.currentPageRef)) {
         return view.value.pages[view.value.currentPageRef];
       } else {
         return {};

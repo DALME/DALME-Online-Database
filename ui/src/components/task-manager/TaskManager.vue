@@ -3,6 +3,7 @@
     <TaskList
       add-new-button
       :data="tm.created"
+      :loading="tm.loading"
       label="Your tasks"
       in-user-drawer
       :no-data-message="createdNoData"
@@ -13,6 +14,7 @@
     />
     <TaskList
       :data="tm.assigned"
+      :loading="tm.loading"
       label="Tasks assigned to you"
       in-user-drawer
       :no-data-message="assignedNoData"
@@ -23,6 +25,7 @@
     />
     <TaskList
       :data="tm.completed"
+      :loading="tm.loading"
       label="Tasks you completed"
       in-user-drawer
       no-data-message="You have not completed any tasks yet."
@@ -35,7 +38,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent } from "vue";
 import { useTasks } from "@/stores/tasks";
 import TaskList from "./TaskList.vue";
 
@@ -67,8 +70,6 @@ export default defineComponent({
         return "You have not been assigned any tasks yet.";
       }
     });
-
-    onMounted(async () => await tm.init("tasks"));
 
     return {
       tm,

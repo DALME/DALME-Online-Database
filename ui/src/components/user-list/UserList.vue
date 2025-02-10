@@ -19,7 +19,7 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:grid-avatar="props">
-      <q-avatar v-if="notNully(props.row.avatar)" size="24px">
+      <q-avatar v-if="!nully(props.row.avatar)" size="24px">
         <img :src="props.row.avatar" />
       </q-avatar>
       <q-icon v-else name="account_circle" size="sm" />
@@ -35,7 +35,7 @@
           {{ props.row.username }}
         </div>
       </DetailPopover>
-      <TagWidget
+      <TagPill
         v-if="props.row.isActive"
         name="active"
         colour="light-green-1"
@@ -44,7 +44,7 @@
         module="standalone"
         class="q-ml-sm"
       />
-      <TagWidget
+      <TagPill
         v-if="props.row.isStaff"
         name="staff"
         colour="light-blue-1"
@@ -53,7 +53,7 @@
         module="standalone"
         class="q-ml-sm"
       />
-      <TagWidget
+      <TagPill
         v-if="props.row.isSuperuser"
         name="super"
         colour="orange-1"
@@ -106,11 +106,11 @@
     </template>
 
     <template v-slot:render-cell-isActive="props">
-      <BooleanWidget :value="props.row.isActive" :onlyTrue="true" trueIcon="check_circle" />
+      <BooleanValue :value="props.row.isActive" :onlyTrue="true" trueIcon="check_circle" />
     </template>
 
     <template v-slot:render-cell-isStaff="props">
-      <BooleanWidget :value="props.row.isStaff" :onlyTrue="true" trueIcon="check_circle" />
+      <BooleanValue :value="props.row.isStaff" :onlyTrue="true" trueIcon="check_circle" />
     </template>
   </DataTable>
 </template>
@@ -120,8 +120,8 @@ import { useMeta } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { formatDate, getColumns, getDefaults, notNully } from "@/utils";
-import { BooleanWidget, DataTable, DetailPopover, TagWidget } from "@/components";
+import { formatDate, getColumns, getDefaults, nully } from "@/utils";
+import { BooleanValue, DataTable, DetailPopover, TagPill } from "@/components";
 import { userListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";
@@ -130,10 +130,10 @@ import { filterList, sortList } from "./filters";
 export default defineComponent({
   name: "UserList",
   components: {
-    BooleanWidget,
+    BooleanValue,
     DetailPopover,
     DataTable,
-    TagWidget,
+    TagPill,
   },
   setup() {
     useMeta({ title: "Users" });
@@ -183,7 +183,7 @@ export default defineComponent({
       filterList,
       formatDate,
       noData,
-      notNully,
+      nully,
       onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,

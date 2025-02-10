@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="notNully(pageList)"
+    v-if="!nully(pageList)"
     class="container q-py-sm"
     :class="{
       focussed: isFocus,
@@ -31,7 +31,7 @@
 import { filter as rFilter } from "ramda";
 import { computed, defineComponent, watch } from "vue";
 import { useEditing, useEventHandling, useStores, useTransport } from "@/use";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "PageIndex",
@@ -59,7 +59,7 @@ export default defineComponent({
     const handleFocus = () => send({ type: "SET_FOCUS", value: "inline" });
 
     watch(pageList, () => {
-      pageIndexShow.value = notNully(pageList.value);
+      pageIndexShow.value = !nully(pageList.value);
     });
 
     return {
@@ -67,7 +67,7 @@ export default defineComponent({
       eventBus,
       focus,
       handleFocus,
-      notNully,
+      nully,
       isFocus,
       mouseoverSubmit,
       transport,

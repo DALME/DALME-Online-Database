@@ -1,0 +1,19 @@
+.code-block textarea {
+  font-size: 14px;
+}
+.code-block pre[class*=language-]:after,
+.code-block pre[class*=language-]:before {
+  box-shadow: none !important;
+}
+.struct-block.code-block select {
+  width: fit-content;
+}
+.struct-block.code-block [data-contentpath="language"] .w-field__input {
+  width: fit-content;
+}
+.code-block pre[class*=language-] > code {
+  box-shadow: none;
+  border-radius: .3125rem;
+  border: 1px solid var(--w-color-border-field-default);
+  padding: 0.5em 1em;
+}

@@ -13,10 +13,10 @@
           <div class="title">{{ modalTitle }}</div>
           <div class="header-button-group">
             <q-btn icon="o_visibility_off" @click.stop="handleMinimize">
-              <TooltipWidget> Minimize </TooltipWidget>
+              <ToolTip> Minimize </ToolTip>
             </q-btn>
             <q-btn icon="close" @click.stop="confirm">
-              <TooltipWidget> Close </TooltipWidget>
+              <ToolTip> Close </ToolTip>
             </q-btn>
           </div>
         </q-card-section>
@@ -38,7 +38,7 @@ import { computed, defineComponent, ref } from "vue";
 import { useDraggable, useStorage } from "@vueuse/core";
 import { useActor, useSelector } from "@xstate/vue";
 import { useEditing } from "@/use";
-import { CustomDialog, TooltipWidget } from "@/components";
+import { CustomDialog, ToolTip } from "@/components";
 
 export default defineComponent({
   name: "BaseModal",
@@ -57,7 +57,7 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget,
+    ToolTip,
   },
   setup(props) {
     const $q = useQuasar();

@@ -1,0 +1,10 @@
+<div id="avatar-image-container">
+    {% if widget.value != None %}
+        <div class="avatar-bg" style="background: center/cover url({{ widget.value.url }});"></div>
+    {% else %}
+        <svg class="icon icon-user user-placeholder" aria-hidden="true"><use href="#icon-user"></use></svg>
+    {% endif %}
+</div>
+<button class="button button-small button-secondary chooser__choose-button" id="avatar-file-input-button" type="button">{% if widget.value != None %}Remove avatar{% else %}Upload avatar{% endif %}</button>
+<input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}{% if widget.attrs.checked %} checked{% endif %} style="display: none;">
+<input type="{{ widget.type }}" name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %} style="display: none;">

@@ -10,8 +10,8 @@ variable "allowed_hosts" {
   type        = list(string)
 }
 
-variable "web_port" {
-  description = "The port exposed by the web container."
+variable "app_port" {
+  description = "The port exposed by the app container."
   type        = number
 }
 
@@ -90,7 +90,7 @@ variable "launch_type" {
 }
 
 variable "log_level" {
-  description = "Set the severity of the web logger."
+  description = "Set the severity of the app logger."
   type        = string
 }
 

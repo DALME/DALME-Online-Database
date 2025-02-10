@@ -10,6 +10,14 @@ const languages = {
       method: "GET",
     };
   },
+  getCompletions(language, data) {
+    const url = `${endpoint}/${language}/completions/`;
+    return {
+      url: url,
+      method: "POST",
+      data: data,
+    };
+  },
 };
 
 export default languages;

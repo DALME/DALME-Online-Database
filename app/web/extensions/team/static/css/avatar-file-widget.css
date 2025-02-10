@@ -1,0 +1,31 @@
+.w-field[data-contentpath="avatar"] .w-field__input {
+  align-items: flex-start;
+  flex-direction: column;
+}
+#avatar-image-container {
+  height: 150px;
+  width: 150px;
+  border: 1px solid var(--w-color-border-field-default);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#avatar-file-input-button {
+  margin-top: 5px;
+  width: 150px;
+  height: 32px;
+  font-size: 13px;
+  justify-content: center;
+}
+#avatar-image-container .user-placeholder,
+#avatar-image-container .avatar-bg {
+  width: 146px;
+  height: 146px;
+  border-radius: 5px;
+}
+.user-placeholder {
+  background: var(--w-color-surface-header);
+  color: var(--w-color-border-field-default);
+  padding: 10px;
+}

@@ -145,6 +145,7 @@ export default defineComponent({
   font-weight: 500;
   user-select: auto;
   text-align: center;
+  appearance: textfield;
   -moz-appearance: textfield;
   color: #616161;
 }

@@ -12,15 +12,12 @@ resource "aws_security_group" "this" {
   tags = module.ec2_label_sg.tags
 }
 
-locals {
-  default_security_group_id = aws_security_group.this.id
-}
-
 resource "aws_launch_template" "this" {
   name_prefix            = "${module.ec2_label.id}-"
   image_id               = data.aws_ami.this.id
   instance_type          = var.instance_type
   update_default_version = var.update_default_version
+  vpc_security_group_ids = [aws_security_group.this.id]
 
   monitoring {
     enabled = var.monitoring
@@ -29,13 +26,13 @@ resource "aws_launch_template" "this" {
   # NOTE: There are multiple options here, we can add any as they become needed.
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template#network-interfaces
   dynamic "network_interfaces" {
-    for_each = var.network_interfaces
+    for_each = var.network_interfaces != null ? var.network_interfaces : []
     iterator = ni
 
     content {
       associate_public_ip_address = ni.value.associate_public_ip_address
       delete_on_termination       = ni.value.delete_on_termination
-      security_groups             = try(ni.value.security_groups, [local.default_security_group_id])
+      security_groups             = try(ni.value.security_groups, [])
       subnet_id                   = try(ni.value.subnet_id, null)
     }
   }

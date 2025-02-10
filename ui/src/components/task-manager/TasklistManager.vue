@@ -54,9 +54,9 @@
           </q-item-section>
           <q-item-section side class="actions">
             <q-btn v-if="isAdmin" flat dense size="sm" icon="mdi-pencil-outline">
-              <TooltipWidget anchor="center left" self="center right" :offset="[10, 10]">
+              <ToolTip anchor="center left" self="center right" :offset="[10, 10]">
                 Edit task list
-              </TooltipWidget>
+              </ToolTip>
             </q-btn>
 
             <q-btn
@@ -67,14 +67,14 @@
               icon="mdi-delete-forever-outline"
               :disable="taskList.taskCount > 0"
             >
-              <TooltipWidget
+              <ToolTip
                 v-if="taskList.taskCount === 0"
                 anchor="center left"
                 self="center right"
                 :offset="[10, 10]"
               >
                 Delete task list
-              </TooltipWidget>
+              </ToolTip>
             </q-btn>
           </q-item-section>
         </q-item>
@@ -92,7 +92,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { TooltipWidget } from "@/components";
+import { ToolTip } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { useTasks } from "@/stores/tasks";
 
@@ -105,7 +105,7 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget,
+    ToolTip,
   },
   emits: ["onReload"],
   setup() {

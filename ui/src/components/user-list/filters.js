@@ -2,18 +2,21 @@ export const filterList = {
   preset: [
     {
       field: "is_active",
-      value: 1,
+      value: true,
       label: "Active users",
+      isolation: false,
     },
     {
       field: "is_active",
-      value: 0,
+      value: false,
       label: "Inactive users",
+      isolation: false,
     },
     {
       field: "is_staff",
-      value: 1,
+      value: true,
       label: "Staff members",
+      isolation: false,
     },
   ],
 };

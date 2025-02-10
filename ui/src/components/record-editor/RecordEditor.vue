@@ -47,7 +47,7 @@
     </q-drawer>
 
     <q-page-container>
-      <q-page :class="!view.pageDrawerMini ? 'q-pl-sm' : ''">
+      <q-page :class="!view.pageDrawerMini ? 'q-pl-sm' : 'q-pa-none'">
         <q-splitter
           v-model="view.editorSplitter"
           unit="px"
@@ -77,7 +77,8 @@
 
           <template v-slot:after>
             <div v-show="currentPageData.editOn" class="editor-box">
-              <TeiEditor ref="editor" />
+              <TeiEditor v-if="settings.teiReady" ref="editor" />
+              <AdaptiveSpinner type="bars" position="absolute" v-else />
             </div>
             <div
               v-show="!currentPageData.editOn"
@@ -94,36 +95,23 @@
 </template>
 
 <script>
-import {
-  computed,
-  defineComponent,
-  inject,
-  nextTick,
-  provide,
-  ref,
-  // watch,
-} from "vue";
+import { computed, defineComponent, inject, nextTick, onMounted, provide, ref } from "vue";
 import { useEventHandling, useStores } from "@/use";
-import { IiifViewer, TeiEditor, TeiRenderer } from "@/components";
-import { notNully } from "@/utils";
+import { AdaptiveSpinner, IiifViewer, TeiRenderer } from "@/components";
+import TeiEditor from "./TeiEditor.vue";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "RecordEditor",
   components: {
+    AdaptiveSpinner,
     IiifViewer,
     TeiEditor,
     TeiRenderer,
   },
   setup() {
-    const {
-      currentPageData,
-      containerHeight,
-      containerWidth,
-      pageCount,
-      // ui,
-      views,
-      view,
-    } = useStores();
+    const { currentPageData, containerHeight, containerWidth, pageCount, settings, views, view } =
+      useStores();
     const { eventBus } = useEventHandling();
     const columns = inject("columns");
     const pages = inject("pages");
@@ -134,7 +122,6 @@ export default defineComponent({
         page.ref = idx;
         page.editorTab = "write";
         page.editOn = false;
-        page.editorSession = null;
         page.tei = page.transcription.transcription;
         page.hasChanges = false;
         page.viewerZoom = 0;
@@ -155,9 +142,9 @@ export default defineComponent({
 
     const drawer = ref(pageCount.value > 1);
     const pageChooser = computed(() => pageCount.value > 1);
-    // const tagMenuDrawer = computed(() => {
-    //   return view.value.showTagMenu ? 250 : 0;
-    // });
+    const tagMenuDrawer = computed(() => {
+      return view.value.showTagMenu ? 300 : 0;
+    });
 
     const editor = ref(null);
 
@@ -169,20 +156,16 @@ export default defineComponent({
     const editorHeight = computed(() =>
       view.value.splitterHorizontal
         ? currentPageData.value.editOn
-          ? Math.round(containerHeight.value - view.value.editorSplitter - 60)
+          ? Math.round(containerHeight.value - view.value.editorSplitter - 48)
           : Math.round(containerHeight.value - view.value.editorSplitter - 8)
-        : currentPageData.value.editOn
-        ? Math.round(containerHeight.value - 54)
-        : containerHeight.value,
+        : containerHeight.value - 40,
     );
     /* eslint-enable */
-    const editorWidth = computed(() =>
-      view.value.splitterHorizontal
-        ? containerWidth.value - view.value.tagMenuDrawer - 2
-        : Math.round(containerWidth.value - view.value.editorSplitter) -
-          view.value.tagMenuDrawer -
-          8,
-    );
+    const editorWidth = computed(() => {
+      return view.value.splitterHorizontal
+        ? containerWidth.value - tagMenuDrawer.value - 2
+        : Math.round(containerWidth.value - view.value.editorSplitter) - tagMenuDrawer.value - 8;
+    });
 
     const viewerHeight = computed(() =>
       view.value.splitterHorizontal ? view.value.editorSplitter : containerHeight.value,
@@ -263,8 +246,23 @@ export default defineComponent({
     provide("viewerDimensions", { viewerHeight, viewerWidth });
     provide("pageDrawerOpen", drawer);
 
+    onMounted(async () => {
+      if (!settings.teiReady) {
+        const data = await settings.fetchTeiElements();
+        if (data) {
+          console.log("fetchTeiElements", data);
+          settings.teiElementSetData = data.sets;
+          settings.teiElementData = data.elements;
+          settings.teiTagData = data.tags;
+          // temp workaround - this should be set by the UI
+          settings.currentSetId = data.sets[0].id;
+        }
+        console.log("settings.teiReady", settings.teiReady);
+      }
+    });
+
     return {
-      notNully,
+      nully,
       changePage,
       currentPageData,
       columns,
@@ -279,6 +277,7 @@ export default defineComponent({
       pagination,
       separatorHeight,
       separatorWidth,
+      settings,
       splitterLimits,
       toggleEditor,
       toggleMini,

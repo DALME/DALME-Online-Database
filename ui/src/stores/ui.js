@@ -1,20 +1,15 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useViewStore } from "@/stores/views";
-import { useAuthStore } from "@/stores/auth";
-import { EventBus } from "quasar";
+import { EventBus, debounce } from "quasar";
 
 export const useUiStore = defineStore(
   "ui",
   () => {
-    // stores
-    const auth = useAuthStore();
-
     // event bus
     const eventBus = new EventBus();
 
     // state
-    // const eventBus = ref(new EventBus());
     const previousPath = ref("");
     const currentPath = ref("");
     const currentSection = ref("");
@@ -27,14 +22,11 @@ export const useUiStore = defineStore(
     const appDrawerOpen = ref(false);
     const windowHeight = ref(window.innerHeight);
     const windowWidth = ref(window.innerWidth);
-    const stripExpanded = ref(false);
-    const stripKeepOpen = ref(false);
     const drawerExpanded = ref(false);
     const pageIndexShow = ref(false);
     const inlineIndexShow = ref(false);
     const windowIndexShow = ref(false);
     const currentPageEdit = ref(false);
-    const stripApproachHover = ref(false);
 
     // getters
     const breadcrumb = computed(() => {
@@ -53,18 +45,9 @@ export const useUiStore = defineStore(
 
     const containerWidth = computed(() => {
       const views = useViewStore();
-      let chrome = 84;
+      let chrome = 152;
       if ("pageDrawerMini" in views.view && views.view.pageDrawerMini.value) chrome = chrome + 149;
       return windowWidth.value - chrome;
-    });
-
-    const showTips = computed({
-      get() {
-        return auth.preferences.general.tooltipsOn;
-      },
-      set(newValue) {
-        auth.preferences.general.tooltipsOn = newValue;
-      },
     });
 
     // actions
@@ -82,14 +65,11 @@ export const useUiStore = defineStore(
       appDrawerOpen.value = false;
       windowHeight.value = window.innerHeight;
       windowWidth.value = window.innerWidth;
-      stripExpanded.value = false;
-      stripKeepOpen.value = false;
       drawerExpanded.value = false;
       pageIndexShow.value = false;
       inlineIndexShow.value = false;
       windowIndexShow.value = false;
       currentPageEdit.value = false;
-      stripApproachHover.value = false;
     };
 
     const onWindowResize = () => {
@@ -98,11 +78,10 @@ export const useUiStore = defineStore(
     };
 
     const resizeListener = () => {
-      window.addEventListener("resize", onWindowResize);
+      window.addEventListener("resize", debounce(onWindowResize, 30));
     };
 
     const setUiState = () => {
-      stripExpanded.value = stripKeepOpen.value ? true : false;
       drawerExpanded.value = isSameRoute.value ? drawerExpanded.value : false;
       currentPageEdit.value = isSameRoute.value ? currentPageEdit.value : false;
     };
@@ -136,14 +115,11 @@ export const useUiStore = defineStore(
       appDrawerOpen,
       windowHeight,
       windowWidth,
-      stripExpanded,
-      stripKeepOpen,
       drawerExpanded,
       pageIndexShow,
       inlineIndexShow,
       windowIndexShow,
       currentPageEdit,
-      stripApproachHover,
       breadcrumb,
       isSameRoute,
       containerHeight,
@@ -154,7 +130,6 @@ export const useUiStore = defineStore(
       resetBreadcrumbTail,
       setPageState,
       $reset,
-      showTips,
     };
   },
   {

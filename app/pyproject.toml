@@ -1,0 +1,135 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = 'app.settings'
+DJANGO_CONFIGURATION = 'Development'
+addopts = "--strict-markers"
+markers = [
+  "integration: marks integration tests",
+  "property: marks property tests",
+  "unit: marks unit tests",
+]
+
+[tool.coverage.run]
+omit = [
+  "*/migrations/*",
+  "app/tenants/management/commands/custom_createcachetable.py",
+  "manage.py*",
+  "*/tests/*",
+]
+
+# https://github.com/charliermarsh/ruff#configuration
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+
+[tool.ruff.lint]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+ignore = [
+  "A005",    # shadowing standard librery modules
+  "COM812",  # Recommended disable by the rust format.
+  "D101",
+  "D102",
+  "D103",
+  "D105",
+  "D106",
+  "D107",
+  "D203",
+  "D213",
+  "DJ001",   # Worth doing, but not right now.
+  "E501",
+  "FBT002",
+  "ISC001",  # Recommended disable by the rust format.
+  "PLC1901", # Too many false positives.
+  "RUF012",  # Typing related.
+  "TD002",
+  "TD003",
+]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "BLE",
+  "C4",
+  "C90",
+  "COM",
+  "D",
+  "DTZ",
+  "DJ",
+  "E",
+  "EM",
+  "F",
+  # "FBT",  # Worth doing, but not right now.
+  "FLY",
+  "G",
+  "I",
+  "ICN",
+  "INP",
+  "INT",
+  "ISC",
+  "N",
+  "PGH",
+  "PIE",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "PT",
+  # "PTH",  # Implies too much refactoring for the time being.
+  # "Q",  # Implies double-quotes.
+  "RET",
+  "RUF",
+  "RSE",
+  "SLF",
+  "SIM",
+  "T",
+  "T10",
+  "T20",
+  # "TD", # Crashing for GHP.
+  "TID",
+  "TRY",
+  "UP",
+  "W",
+]
+# This will warn but not autofix defined rules. For example, I've turned off
+# autofixing of unused variables here (F841) because there are moments during
+# refactoring when, if you temporarily remove a lone reference to a variable,
+# autofix clobbers the chunk of code that is bound to that variable!
+unfixable = ["F841"]
+
+[tool.ruff.lint.per-file-ignores]
+"*settings.py*" = [
+  "RUF012", # mutable-class-default
+  "N802",   # invalid-function-name
+]
+"*migrations*" = [
+  "ARG001", # flake8-unused-arguments
+  "D100",   # missing-docstring
+  "E501",   # line-too-long
+  "N806",   # non-lowercase-variable-in-function
+  "RUF012", # mutable-class-default
+]
+"*tests*" = [
+  "D103",    # undocumented-public-function
+  "B018",    # useless-expression
+  "INP001",  # implicit-namespace-package
+  "PLR0913", # too-many-arguments
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "domain", "oauth", "search", "tenants", "web"]
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "django",
+  "first-party",
+  "local-folder",
+  "tests",
+]
+
+[tool.ruff.lint.isort.sections]
+django = ["django"]
+tests = ["tests"]

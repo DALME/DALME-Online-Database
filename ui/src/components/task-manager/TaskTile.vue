@@ -17,7 +17,7 @@
     <q-item-section :no-wrap="mini" @click="$emit('viewDetail')" class="cursor-pointer">
       <q-item-label lines="1">
         {{ task.title }}
-        <TagWidget
+        <TagPill
           v-if="task.overdue && !mini"
           outline
           name="overdue"
@@ -46,7 +46,7 @@
           />
           <DetailPopover v-if="task.completed" show-avatar :user-data="task.completedBy" />
         </template>
-        <TagWidget
+        <TagPill
           v-if="task.overdue && mini"
           outline
           name="overdue"
@@ -123,7 +123,7 @@
 import { openURL } from "quasar";
 import { defineComponent, inject, toRef } from "vue";
 import { formatDate } from "@/utils";
-import { DetailPopover, TagWidget } from "@/components";
+import { DetailPopover, TagPill } from "@/components";
 
 export default defineComponent({
   name: "TaskTile",
@@ -139,7 +139,7 @@ export default defineComponent({
   },
   components: {
     DetailPopover,
-    TagWidget,
+    TagPill,
   },
   emits: ["changeStatus", "viewDetail"],
   setup(props) {

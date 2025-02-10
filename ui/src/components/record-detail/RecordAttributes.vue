@@ -122,25 +122,34 @@
     </div>
 
     <div class="col-3 q-pl-md">
-      <template v-for="(value, name) in record.attributes" :key="name">
-        <template v-if="!isNil(value) && name !== 'description'">
+      <template v-for="(attr, label) in attributes" :key="label">
+        <template v-if="!isNil(attr) && label !== 'Description'">
           <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-            {{ getAttributeLabel(name) }}
+            {{ label }}
           </div>
-          <div v-if="name === 'url'" class="text-13">
-            <a :href="value" target="_blank">{{ value }}</a>
-          </div>
-          <div v-else-if="Array.isArray(value)" class="text-13">
-            {{ value[0].name }}
-          </div>
-          <div v-else-if="isObj(value)" class="text-13">
-            {{ value.name }}
-          </div>
-          <div v-else class="text-13">
-            {{ value }}
-          </div>
-          <q-separator class="q-my-md" />
+          <template v-if="attr.length > 1">
+            <div
+              v-if="isObject(attr[0].value)"
+              class="text-13"
+              v-text="attr.map((x) => x.value.label || x.value.name).join(', ')"
+            />
+            <div v-else class="text-13" v-text="attr.map((x) => x.value).join(', ')" />
+          </template>
+          <template v-else>
+            <div v-if="isObject(attr[0].value)" class="text-13">
+              {{ attr[0].value.label || attr[0].value.name }}
+            </div>
+            <div v-else class="text-13">
+              <BooleanValue
+                v-if="attr[0].dataType === 'BOOL'"
+                :value="attr[0].value"
+                trueIcon="check_circle"
+              />
+              <span v-else>{{ attr[0].value }}</span>
+            </div>
+          </template>
         </template>
+        <q-separator class="q-my-md" />
       </template>
       <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Unique Id</div>
       <div class="q-mb-sm text-13">{{ record.id }}</div>
@@ -149,51 +158,19 @@
 </template>
 
 <script>
-import { computed, defineComponent, inject } from "vue";
-import { filter as rFilter, isNil, map } from "ramda";
-import { DetailCard, MarkdownEditor } from "@/components";
+import { computed, defineComponent, inject, onMounted } from "vue";
+import { isNil, groupBy, prop } from "ramda";
+import { BooleanValue, DetailCard, MarkdownEditor } from "@/components";
 import RecordAgents from "./RecordAgents.vue";
 import RecordChildren from "./RecordChildren.vue";
 import RecordPages from "./RecordPages.vue";
 import RecordPlaces from "./RecordPlaces.vue";
-
-const getAttributeLabel = (attribute) => {
-  return {
-    url: "Web Address",
-    mk1Identifier: "Mk.I ID",
-    mk2Identifier: "Mk.II ID",
-    altIdentifier: "Alt ID",
-    archivalSeries: "Archival Series",
-    archivalNumber: "Archival Number",
-    recordType: "Record Type",
-    language: "Language",
-    recordTypePhrase: "Record Type Phrase",
-    namedPersons: "Named Persons",
-    description: "Description",
-    debtPhrase: "Debt Phrase",
-    debtAmount: "Debt Amount",
-    debtUnit: "Debt Unit",
-    debtSource: "Debt Source",
-    date: "Date",
-    startDate: "Start Date",
-    endDate: "End Date",
-    locale: "Locale",
-    defaultRights: "Default Rights",
-    authority: "Authority",
-    format: "Format",
-    support: "Support",
-    zoteroKey: "Zotero Key",
-  }[attribute];
-};
-
-const isObj = (obj) => {
-  const type = typeof obj;
-  return type === "function" || (type === "object" && !!obj);
-};
+import { isObject } from "@/utils";
 
 export default defineComponent({
   name: "RecordAttributes",
   components: {
+    BooleanValue,
     DetailCard,
     MarkdownEditor,
     RecordAgents,
@@ -211,27 +188,23 @@ export default defineComponent({
 
     const hasDescription = computed(() => !isNil(record.value.attributes.description));
 
-    // TODO: Could use a transducer at some point.
-    const attributes = computed(() =>
-      rFilter(
-        (attribute) => !["description"].includes(attribute.key),
-        map(
-          (key) => ({ key, value: record.value.attributes[key] }),
-          Object.keys(record.value.attributes).reverse(),
-        ),
-      ),
-    );
+    const attributes = computed(() => {
+      return groupBy(prop("label"), record.value.attributes);
+    });
+
+    onMounted(() => {
+      console.log("RecordAttributes", attributes.value);
+    });
 
     return {
       attributes,
-      getAttributeLabel,
       hasAttributes,
       hasAgents,
       hasChildren,
       hasDescription,
       hasPages,
       hasPlaces,
-      isObj,
+      isObject,
       isNil,
       record,
     };

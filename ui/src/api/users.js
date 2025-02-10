@@ -16,19 +16,6 @@ const users = {
       method: "GET",
     };
   },
-  getUserPreferences(userId_or_username) {
-    return {
-      url: `${endpoint}/${userId_or_username}/get_preferences/`,
-      method: "GET",
-    };
-  },
-  updateUserPreferences(userId_or_username, section, key, value) {
-    return {
-      url: `${endpoint}/${userId_or_username}/update_preferences/`,
-      method: "POST",
-      data: { section, key, value },
-    };
-  },
 };
 
 export default users;

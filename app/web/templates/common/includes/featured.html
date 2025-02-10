@@ -1,0 +1,55 @@
+{% load get_snippet wagtailcore_tags wagtailimages_tags %}
+
+{% if featured_object or featured_inventory or featured_essay %}
+  <section class="featured u-flex">
+
+    <div class="u-flex">
+      {% if featured_object or featured_inventory %}
+
+        {% if featured_object %}
+          <a href="{% pageurl featured_object %}">
+            <div class="monthly source object u-flex">
+              {% if featured_object.front_image %}
+                {% image featured_object.front_image fill-230x230-c50 %}
+              {% endif %}
+              <div class="u-flex">
+                <h2>{{ featured_object.title }}</h2>
+                <h3>Object of the Month</h3>
+                <p class="line-clamp seven-lines">{% get_snippet featured_object 500 %}</p>
+              </div>
+            </div>
+          </a>
+        {% endif %}
+
+        {% if featured_inventory %}
+          <a href="{% pageurl featured_inventory %}">
+            <div class="monthly source u-flex">
+              {% if featured_inventory.front_image %}
+                {% image featured_inventory.front_image fill-230x230-c50 %}
+              {% endif %}
+              <div class="u-flex">
+                <h2>{{ featured_inventory.title }}</h2>
+                <h3>Inventory of the Month</h3>
+                <p class="line-clamp seven-lines">{% get_snippet featured_inventory 500 %}</p>
+              </div>
+            </div>
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    {% if essay %}
+      <div class="monthly essay u-flex">
+        {% if essay.front_image %}
+          {% image essay.front_image fill-311x200-c50 %}
+        {% endif %}
+        <div class="u-flex essay-content">
+          <h3>{{ essay.title }}</h3>
+          <p class="line-clamp eight-lines">{% get_snippet essay 500 %}</p>
+          <a class="u-button" href="{% pageurl essay %}">READ MORE</a>
+        </div>
+      </div>
+    {% endif %}
+
+  </section>
+{% endif %}

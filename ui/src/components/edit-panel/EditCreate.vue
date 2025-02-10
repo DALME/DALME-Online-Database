@@ -18,9 +18,9 @@
         icon="villa"
         push
       >
-        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Archive
-        </TooltipWidget>
+        </ToolTip>
       </q-fab-action>
 
       <q-fab-action
@@ -30,9 +30,9 @@
         icon="inventory"
         push
       >
-        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Archival File
-        </TooltipWidget>
+        </ToolTip>
       </q-fab-action>
 
       <q-fab-action
@@ -42,9 +42,9 @@
         icon="library_books"
         push
       >
-        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Bibliography
-        </TooltipWidget>
+        </ToolTip>
       </q-fab-action>
 
       <q-fab-action
@@ -54,9 +54,9 @@
         icon="format_list_numbered"
         push
       >
-        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Record
-        </TooltipWidget>
+        </ToolTip>
       </q-fab-action>
     </q-fab>
 
@@ -74,9 +74,7 @@
         icon="local_library"
         push
       >
-        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
-          Create Corpus
-        </TooltipWidget>
+        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]"> Create Corpus </ToolTip>
       </q-fab-action>
 
       <q-fab-action
@@ -86,9 +84,9 @@
         icon="apps"
         push
       >
-        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
+        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Collection
-        </TooltipWidget>
+        </ToolTip>
       </q-fab-action>
 
       <q-fab-action
@@ -98,9 +96,7 @@
         icon="schema"
         push
       >
-        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
-          Create Dataset
-        </TooltipWidget>
+        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]"> Create Dataset </ToolTip>
       </q-fab-action>
 
       <q-fab-action
@@ -110,9 +106,7 @@
         icon="work"
         push
       >
-        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
-          Create Workset
-        </TooltipWidget>
+        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]"> Create Workset </ToolTip>
       </q-fab-action>
     </q-fab>
 
@@ -123,9 +117,7 @@
       icon="assignment"
       push
     >
-      <TooltipWidget anchor="center left" self="center right" :offset="[10, 10]">
-        Create Task
-      </TooltipWidget>
+      <ToolTip anchor="center left" self="center right" :offset="[10, 10]"> Create Task </ToolTip>
     </q-fab-action>
 
     <q-fab-action
@@ -135,9 +127,7 @@
       icon="task"
       push
     >
-      <TooltipWidget anchor="center left" self="center right" :offset="[10, 10]">
-        Create Ticket
-      </TooltipWidget>
+      <ToolTip anchor="center left" self="center right" :offset="[10, 10]"> Create Ticket </ToolTip>
     </q-fab-action>
   </q-fab>
 </template>
@@ -146,12 +136,12 @@
 import { createId as cuid } from "@paralleldrive/cuid2";
 import { defineComponent, ref } from "vue";
 import { useEditing } from "@/use";
-import { TooltipWidget } from "@/components";
+import { ToolTip } from "@/components";
 
 export default defineComponent({
   name: "EditCreate",
   components: {
-    TooltipWidget,
+    ToolTip,
   },
   setup() {
     const mode = "create";

@@ -20,7 +20,7 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:grid-avatar="props">
-      <TagWidget
+      <TagPill
         mini
         module="workflow"
         size="22px"
@@ -41,7 +41,7 @@
         </div>
       </DetailPopover>
       <template>
-        <TagWidget
+        <TagPill
           v-if="props.row.workflow.isPublic"
           name="public"
           colour="light-blue-1"
@@ -50,7 +50,7 @@
           module="standalone"
           class="q-ml-sm"
         />
-        <TagWidget
+        <TagPill
           v-if="props.row.isPrivate"
           name="private"
           colour="deep-orange-1"
@@ -64,8 +64,8 @@
 
     <template v-slot:grid-detail="props">
       <span class="text-detail text-weight-medium text-grey-8">
-        {{ props.row.attributes.recordType.value }} |
-        <span v-html="renderDate(props.row.attributes)" />
+        {{ props.row.attributes.recordType.value.label }}
+        <span v-if="props.row.date"> | {{ props.row.date.text }}</span>
       </span>
     </template>
 
@@ -100,7 +100,7 @@
       </router-link>
     </template>
 
-    <!-- <template v-slot:render-cell-defaultRights="props">
+    <template v-slot:render-cell-defaultRights="props">
       <router-link
         v-if="props.row.attributes.defaultRights"
         class="text-link"
@@ -113,18 +113,7 @@
       >
         {{ props.row.attributes.defaultRights.name }}
       </router-link>
-    </template> -->
-
-    <!-- <template v-slot:render-cell-url="props">
-      <a
-        v-if="props.row.attributes.url"
-        :href="props.row.attributes.url"
-        class="text-link"
-        target="_blank"
-      >
-        Visit Website
-      </a>
-    </template> -->
+    </template>
 
     <template v-slot:render-cell-owner="props">
       <router-link
@@ -138,24 +127,27 @@
       </router-link>
     </template>
 
-    <!-- <template v-slot:render-cell-locale="props">
-      {{ getLocale(props.row.attributes.locale) }}
-    </template> -->
+    <template v-slot:render-cell-locale="props">
+      {{ props.row.locale.name
+      }}<span v-if="props.row.locale.administrativeRegion"
+        >, {{ props.row.locale.administrativeRegion }}</span
+      ><span v-if="props.row.locale.country"> ({{ props.row.locale.country.name }})</span>
+    </template>
 
-    <!-- <template v-slot:render-cell-recordType="props">
-      {{ props.row.attributes.recordType }}
-    </template> -->
+    <template v-slot:render-cell-recordType="props">
+      {{ props.row.attributes.recordType.value.label }}
+    </template>
 
-    <!-- <template v-slot:render-cell-date="props">
-      <span v-html="renderDate(props.row.attributes)"></span>
-    </template> -->
+    <template v-slot:render-cell-date="props">
+      {{ props.row.date?.text }}
+    </template>
 
-    <!-- <template v-slot:render-cell-language="props">
-      {{ props.row.attributes.language[0].name }}
-    </template> -->
+    <template v-slot:render-cell-language="props">
+      <span v-text="getLanguage(props.row.language)" />
+    </template>
 
     <template v-slot:render-cell-status="props">
-      <TagWidget
+      <TagPill
         :name="props.row.workflow.status"
         :type="props.row.workflow.status"
         module="workflow"
@@ -175,7 +167,7 @@
             params: { username: props.row.workflow.lastUser.username },
           }"
         >
-          {{ props.row.workflow.lastUser.profile.fullName }}
+          {{ props.row.workflow.lastUser.fullName }}
         </router-link>
         <br />
         {{ props.row.workflow.lastModified }}
@@ -183,7 +175,7 @@
     </template>
 
     <template v-slot:render-cell-isPrivate="props">
-      <BooleanWidget
+      <BooleanValue
         :value="props.row.isPrivate"
         :onlyTrue="true"
         :onlyTrueGreen="false"
@@ -192,24 +184,8 @@
     </template>
 
     <template v-slot:render-cell-isPublic="props">
-      <BooleanWidget :value="props.row.workflow.isPublic" :onlyTrue="true" trueIcon="public" />
+      <BooleanValue :value="props.row.workflow.isPublic" :onlyTrue="true" trueIcon="public" />
     </template>
-
-    <!-- <template v-slot:render-cell-authority="props">
-      {{ props.row.attributes.authority }}
-    </template>
-
-    <template v-slot:render-cell-format="props">
-      {{ props.row.attributes.format }}
-    </template>
-
-    <template v-slot:render-cell-support="props">
-      {{ props.row.attributes.support }}
-    </template>
-
-    <template v-slot:render-cell-zoteroKey="props">
-      {{ props.row.attributes.zoteroKey }}
-    </template> -->
   </DataTable>
 </template>
 
@@ -220,7 +196,7 @@ import { defineComponent, provide, ref } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import { getColumns, getDefaults } from "@/utils";
-import { BooleanWidget, DataTable, DetailPopover, TagWidget } from "@/components";
+import { BooleanValue, DataTable, DetailPopover, TagPill } from "@/components";
 import { useAPI, usePagination, useStores } from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
@@ -229,10 +205,10 @@ import { recordListSchema } from "@/schemas";
 export default defineComponent({
   name: "RecordList",
   components: {
-    BooleanWidget,
+    BooleanValue,
     DetailPopover,
     DataTable,
-    TagWidget,
+    TagPill,
   },
   setup() {
     const $route = useRoute();
@@ -247,28 +223,21 @@ export default defineComponent({
     useMeta(() => ({ title: title.value }));
 
     const noData = "No records found.";
-    const renderDate = (attributes) => {
-      if (attributes.startDate && attributes.endDate) {
-        return `${attributes.startDate.value.text} – ${attributes.endDate.value.text}`;
-      }
-      if (attributes.startDate) {
-        return attributes.startDate.value.text;
-      }
-      if (attributes.date) {
-        return attributes.date.value.text;
-      }
-      return "-";
-    };
 
-    const getLocale = (data) => {
-      return !data ? "" : Array.isArray(data) ? data[0].name : data.name;
+    const getLanguage = (data) => {
+      if (data.length > 1) {
+        const langs = data.map((a) => a.name);
+        return langs.join(", ");
+      } else {
+        return data[0].name;
+      }
     };
 
     const fetchData = async (query) => {
       const request = requests.records.getRecords(query);
       await fetchAPI(request);
       if (success.value)
-        await recordListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
+        recordListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
           columns.value = getColumns(columnMap);
           pagination.value.rowsNumber = data.value.filtered;
           pagination.value.rowsTotal = data.value.count;
@@ -281,6 +250,13 @@ export default defineComponent({
           rows.value.splice(0, rows.value.length, ...value);
           loading.value = false;
         });
+    };
+
+    const setOwner = (value) => {
+      onChangeFilters({
+        field: "owner",
+        value: value,
+      });
     };
 
     const {
@@ -309,7 +285,7 @@ export default defineComponent({
     return {
       columns,
       currentPageIcon,
-      getLocale,
+      getLanguage,
       filterList: filterList(auth.user.userId),
       loading,
       noData,
@@ -320,12 +296,12 @@ export default defineComponent({
       onClearFilters,
       onRequest,
       pagination,
-      renderDate,
       rows,
       search,
       sortList: sortList(),
       title,
       visibleColumns,
+      setOwner,
     };
   },
 });

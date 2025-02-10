@@ -3,7 +3,6 @@
   <q-layout id="layout" view="lHr lpR lFr" :class="{ 'login-background': showMap }">
     <template v-if="render">
       <NavBar />
-      <EditPanel />
       <AppDrawer />
       <UserDrawer />
       <q-page-container>
@@ -13,7 +12,7 @@
     <template v-else>
       <iframe
         id="login-background-page"
-        ref="pageBackdrop"
+        ref="page-backdrop"
         :class="{ 'q-transparent': !pageBackdropLoaded }"
         :src="originPage"
       >
@@ -23,10 +22,10 @@
 </template>
 
 <script>
-import { computed, defineComponent, provide, ref, onMounted } from "vue";
+import { computed, defineComponent, provide, ref, onMounted, useTemplateRef } from "vue";
 import { useRoute } from "vue-router";
 import { find, isNotNil, propEq } from "ramda";
-import { EditPanel, LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
+import { LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
 import {
   provideAPI,
   provideEditing,
@@ -38,7 +37,6 @@ import {
 export default defineComponent({
   name: "MainLayout",
   components: {
-    EditPanel,
     LoginModal,
     NavBar,
     UserDrawer,
@@ -48,27 +46,12 @@ export default defineComponent({
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
     const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
-    const userDrawerEl = ref(null);
-    const pageBackdrop = ref(null);
+    const pageBackdrop = useTemplateRef("page-backdrop");
 
-    const render = computed(() => auth.authorized || auth.reauthenticate);
+    const render = computed(() => auth.authorized && !auth.reauthenticate);
     const originPage = window.localStorage.getItem("origin_background");
     const showMap = computed(() => auth.authenticate && !originPage);
     const pageBackdropLoaded = ref(originPage ? false : true);
-
-    const prefSubscription = (action) => {
-      let unsubscribe = () => {};
-      if (action === "subscribe") {
-        unsubscribe = auth.$subscribe(
-          (mutation) => {
-            auth.updatePreferences($route.name, mutation);
-          },
-          { detached: true },
-        );
-      } else {
-        unsubscribe();
-      }
-    };
 
     const outsideDrawerClick = (e) => {
       e.stopPropagation();
@@ -81,21 +64,17 @@ export default defineComponent({
     provideAPI();
     provideEditing();
     provideTransport();
-
-    provide("prefSubscription", prefSubscription);
-    provide("userDrawerEl", userDrawerEl);
     provide("pageBackdropLoaded", pageBackdropLoaded);
 
     onMounted(() => {
       if ($route.query.logout) {
-        prefSubscription();
         auth.logout();
       }
 
-      if (auth.authorized) prefSubscription("subscribe");
       ui.resizeListener();
 
       document.addEventListener("click", outsideDrawerClick);
+
       if (!render.value && originPage) {
         pageBackdrop.value.onload = () => {
           pageBackdropLoaded.value = true;
@@ -110,6 +89,7 @@ export default defineComponent({
       originPage,
       pageBackdrop,
       pageBackdropLoaded,
+      onWindowResize: ui.onWindowResize,
     };
   },
 });

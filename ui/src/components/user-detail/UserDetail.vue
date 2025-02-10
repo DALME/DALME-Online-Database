@@ -31,21 +31,21 @@
             <div class="row q-mt-xs">
               <div class="col-3 text-weight-medium text-right q-mr-lg">Staff</div>
               <div class="col-8">
-                <BooleanWidget :value="user.isStaff" size="20px" />
+                <BooleanValue :value="user.isStaff" size="20px" />
               </div>
             </div>
 
             <div class="row q-mt-xs">
               <div class="col-3 text-weight-medium text-right q-mr-lg">Superuser</div>
               <div class="col-8">
-                <BooleanWidget :value="user.isSuperuser" size="20px" />
+                <BooleanValue :value="user.isSuperuser" size="20px" />
               </div>
             </div>
 
             <div class="row q-mt-xs">
               <div class="col-3 text-weight-medium text-right q-mr-lg">Active</div>
               <div class="col-8">
-                <BooleanWidget :value="user.isActive" size="20px" />
+                <BooleanValue :value="user.isActive" size="20px" />
               </div>
             </div>
 
@@ -100,7 +100,7 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { requests } from "@/api";
-import { BooleanWidget, OpaqueSpinner } from "@/components";
+import { BooleanValue, OpaqueSpinner } from "@/components";
 import { userSchema } from "@/schemas";
 import { useAPI } from "@/use";
 import UserPreferences from "./UserPreferences.vue";
@@ -123,7 +123,7 @@ const getAttributeLabel = (attribute) => {
 export default defineComponent({
   name: "UserDetail",
   components: {
-    BooleanWidget,
+    BooleanValue,
     OpaqueSpinner,
     UserPreferences,
   },

@@ -6,7 +6,7 @@
     <q-item-section :no-wrap="inDrawer">
       <q-item-label lines="1">
         <div class="collection-name">{{ collection.name }}</div>
-        <TagWidget
+        <TagPill
           :name="collection.memberCount"
           outline
           text-colour="off-blue"
@@ -72,7 +72,7 @@
 import { openURL } from "quasar";
 import { computed, defineComponent } from "vue";
 import { formatDate } from "@/utils";
-import { TagWidget } from "@/components";
+import { TagPill } from "@/components";
 
 export default defineComponent({
   name: "CollectionTile",
@@ -87,7 +87,7 @@ export default defineComponent({
     },
   },
   components: {
-    TagWidget,
+    TagPill,
   },
   emits: ["changeStatus", "goToTask"],
   setup(props) {

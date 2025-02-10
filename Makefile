@@ -19,7 +19,7 @@ export VENV_BIN := $(abspath ${VENV})/bin
 -include Makefiles/Makefile.docs
 -include Makefiles/Makefile.infra
 -include Makefiles/Makefile.ui
--include Makefiles/Makefile.web
+-include Makefiles/Makefile.app
 
 help:
 	@echo "usage: make [option]"
@@ -36,19 +36,19 @@ help:
 	@$(MAKE) docs.help
 	@$(MAKE) infra.help
 	@$(MAKE) ui.help
-	@$(MAKE) web.help
+	@$(MAKE) app.help
 .PHONY: help
 
 dev: infra.start infra.log
 .PHONY: dev
 
-init: _infra.oidc.key _infra.env _web.init _ui.init _infra.hooks.install _infra.build
+init: _infra.oidc.key _infra.env _app.init _ui.init _infra.hooks.install _infra.build
 .PHONY: init
 
-sync: web.sync ui.sync docs.sync infra.hooks.update
+sync: app.sync ui.sync docs.sync infra.hooks.update
 .PHONY: sync
 
-test: web.test # ui.test
+test: app.test # ui.test
 .PHONY: test
 
 ### Private (non-interface) targets.

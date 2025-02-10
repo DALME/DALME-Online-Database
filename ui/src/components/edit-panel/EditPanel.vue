@@ -1,12 +1,37 @@
 <template>
-  <div
+  <q-expansion-item
+    label="Editing tools"
+    header-class="drawer_expansion_header"
+    expand-icon="mdi-plus-box-outline"
+    expanded-icon="mdi-minus-box-outline"
+    default-opened
+  >
+    <q-item dense>
+      <EditSubmit />
+      <q-btn
+        icon="edit_note"
+        :class="{ 'edit-on': currentPageEditOn }"
+        :disable="!showEditPageBtn"
+        square
+        @click="eventBus.emit('toggleEditor')"
+      />
+      <EditUpdate />
+      <EditCreate />
+    </q-item>
+    <div v-show="drawerExpanded" class="edit-content-holder">
+      <WindowIndex />
+      <PageIndex />
+      <InlineIndex />
+    </div>
+  </q-expansion-item>
+  <!--div
     class="edit-panel-strip"
     :class="{ 'edit-on': ongoingEdit }"
     :style="stripStyle"
     @mouseover="showStrip = true"
     @mouseleave="showStrip = false"
   >
-    <TooltipWidget anchor="center left" self="center right" text="Editing tools" :offset="[5, 0]" />
+    <ToolTip anchor="center left" self="center right" text="Editing tools" :offset="[5, 0]" />
     <q-icon name="more_vert" />
     <q-btn
       :icon="stripKeepOpen ? 'lock' : 'lock_open'"
@@ -41,11 +66,11 @@
       <PageIndex />
       <InlineIndex />
     </div>
-  </transition>
+  </transition-->
 </template>
 
 <script>
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent } from "vue";
 import { useEditing, useEventHandling, useStores } from "@/use";
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
@@ -53,7 +78,6 @@ import { default as EditUpdate } from "./EditUpdate.vue";
 import { default as PageIndex } from "./PageIndex.vue";
 import { default as InlineIndex } from "./InlineIndex.vue";
 import { default as WindowIndex } from "./WindowIndex.vue";
-import { TooltipWidget } from "@/components";
 
 export default defineComponent({
   name: "EditPanel",
@@ -64,7 +88,6 @@ export default defineComponent({
     PageIndex,
     InlineIndex,
     WindowIndex,
-    TooltipWidget,
   },
   setup() {
     const {
@@ -72,9 +95,6 @@ export default defineComponent({
       showEditPageBtn,
       currentPageEditOn,
       drawerExpanded,
-      stripExpanded,
-      stripKeepOpen,
-      stripApproachHover,
       pageIndexShow,
       inlineIndexShow,
       windowIndexShow,
@@ -82,41 +102,17 @@ export default defineComponent({
     const { eventBus } = useEventHandling();
     const { hideEditing, showEditing } = useEditing();
 
-    const showStrip = computed({
-      get: () => stripExpanded.value,
-      set: (value) => {
-        if (!stripKeepOpen.value) stripExpanded.value = value;
-      },
-    });
-
-    const right = computed(() => (showStrip.value ? 0 : stripApproachHover.value ? -223 : -250));
-    const stripStyle = computed(() => `top: 60px; right: ${right.value}px`);
-    const holderStyle = computed(() => {
-      let r = showStrip.value ? 0 : -250;
-      return `top: 60px; right: ${r}px`;
-    });
-
     const ongoingEdit = computed(
       () => pageIndexShow.value || inlineIndexShow.value || windowIndexShow.value,
     );
-
-    const openEditing = () => (showStrip.value = true);
-    const closeEditing = () => (showStrip.value = false);
-
-    onMounted(() => {
-      hideEditing.value = closeEditing;
-      showEditing.value = openEditing;
-    });
 
     return {
       showEditPageBtn,
       currentPageEditOn,
       drawerExpanded,
       isAdmin,
-      holderStyle,
-      showStrip,
-      stripStyle,
-      stripKeepOpen,
+      hideEditing,
+      showEditing,
       eventBus,
       ongoingEdit,
     };
@@ -302,8 +298,8 @@ export default defineComponent({
     1px 1px 0px 0px #5757572b inset,
     0px -1px 0px 0px #fffefe9c inset;
 }
-.edit-on {
-  background-color: #ffbfac;
-  color: #a80000;
-}
+// .edit-on {
+//   background-color: #ffbfac;
+//   color: #a80000;
+// }
 </style>

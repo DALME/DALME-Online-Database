@@ -14,6 +14,11 @@ variable "default_capacity_provider_strategy" {
   })
 }
 
+variable "opensearch_port" {
+  description = "Port for making OpenSearch connections."
+  type        = number
+}
+
 variable "postgres_port" {
   description = "Port for making PostgreSQL connections."
   type        = number

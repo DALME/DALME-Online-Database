@@ -48,15 +48,14 @@
       </q-td>
     </template>
   </q-table>
-
-  <SimpleSpinner :showing="loading" />
+  <AdaptiveSpinner type="facebook" :showing="loading" thickness="3" />
 </template>
 
 <script>
 import { keys, map } from "ramda";
 import { defineComponent, inject, ref } from "vue";
 import { requests } from "@/api";
-import { SimpleSpinner } from "@/components";
+import { AdaptiveSpinner } from "@/components";
 import { setMembersSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 
@@ -79,7 +78,7 @@ export default defineComponent({
     },
   },
   components: {
-    SimpleSpinner,
+    AdaptiveSpinner,
   },
   setup() {
     const { apiInterface } = useAPI();

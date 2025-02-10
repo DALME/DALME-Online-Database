@@ -3,7 +3,6 @@ import { isNil } from "ramda";
 import * as yup from "yup";
 
 import { agentsNormalizeInputSchema } from "@/components/forms/agents-field/normalize";
-import { creditsNormalizeInputSchema } from "@/components/forms/credits-field/normalize";
 import { foliosNormalizeInputSchema } from "@/components/forms/folios-field/normalize";
 import {
   attributeSchema,
@@ -24,6 +23,24 @@ export const recordSchema = yup.object().shape({
   owner: userAttributeSchema.required(),
   attributes: yup.array().of(attributeSchema).required(),
   noFolios: yup.number().required(),
+  isPrivate: yup.boolean().required(),
+  commentCount: yup.number().required(),
+  creationTimestamp: timeStampSchema.required(),
+  creationUser: userAttributeSchema.required(),
+  modificationTimestamp: timeStampSchema.required(),
+  modificationUser: userAttributeSchema.required(),
+  workflow: workflowSchema.nullable(),
+});
+
+export const recordListSchema = yup.array().of(recordSchema);
+
+export const recordDetailSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  name: yup.string().required(),
+  shortName: yup.string().required(),
+  owner: userAttributeSchema.required(),
+  attributes: yup.array().of(attributeSchema).required(),
+  noFolios: yup.number().required(),
   noImages: yup.number().required(),
   workflow: workflowSchema.nullable(),
   pages: yup.array().of(pageSchema).nullable(),
@@ -34,8 +51,6 @@ export const recordSchema = yup.object().shape({
   modificationTimestamp: timeStampSchema.required(),
   modificationUser: userAttributeSchema.required(),
 });
-
-export const recordListSchema = yup.array().of(recordSchema);
 
 // Field-level validation rules/schemas.
 export const recordFieldValidation = {
@@ -74,17 +89,17 @@ export const recordEditSchema = yup
     id: yup.string().uuid().required(),
     name: yup.string().required(),
     shortName: yup.string().required(),
-    hasInventory: yup.object().shape({
-      value: yup.boolean().required(),
-      label: yup.string().required(),
-    }),
-    parent: yup
-      .object()
-      .shape({
-        value: yup.string().uuid().required(),
-        label: yup.string().required(),
-      })
-      .nullable(),
+    // hasInventory: yup.object().shape({
+    //   value: yup.boolean().required(),
+    //   label: yup.string().required(),
+    // }),
+    // parent: yup
+    //   .object()
+    //   .shape({
+    //     value: yup.string().uuid().required(),
+    //     label: yup.string().required(),
+    //   })
+    //   .nullable(),
     // sets: yup.array().of(
     //   yup.object().shape({
     //     value: yup.string().uuid().required(),
@@ -95,20 +110,20 @@ export const recordEditSchema = yup
     // NOTE: Just minimal validation here for the attributes. We apply the full
     // transform elsewhere, as it's very complex and better suits a function.
     attributes: yup.mixed(),
-    credits: creditsNormalizeInputSchema,
+    // credits: creditsNormalizeInputSchema,
     pages: foliosNormalizeInputSchema,
   })
   .camelCase()
   .transform((data) => ({
     ...data,
-    hasInventory: {
-      value: data.hasInventory,
-      label: data.hasInventory ? "True" : "False",
-    },
-    parent: {
-      value: data.parent.id,
-      label: data.parent.name,
-    },
+    // hasInventory: {
+    //   value: data.hasInventory,
+    //   label: data.hasInventory ? "True" : "False",
+    // },
+    // parent: {
+    //   value: data.parent.id,
+    //   label: data.parent.name,
+    // },
     // sets: data.sets.map((item) => ({ value: item.id, label: item.name })),
     // TODO: Remove ALL camelcase hackage when we sort out the API renderer.
     // Until then, we camelize here because we run a function not a schema to

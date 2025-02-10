@@ -75,7 +75,7 @@
 
 <script>
 import { openURL } from "quasar";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 import { computed, defineComponent, onMounted, provide, ref } from "vue";
 import MDEToolbar from "./MDEToolbar.vue";
 
@@ -122,10 +122,10 @@ export default defineComponent({
     const textareaEl = ref(null);
     const input = ref(null);
     const buttonLabel = props.submitLabel || "Save";
-    const mdText = ref(notNully(props.text) ? props.text : "");
+    const mdText = ref(!nully(props.text) ? props.text : "");
     const pHolder = props.placeholder || "Enter text here...";
     const mdTab = ref("write");
-    const disabled = computed(() => !notNully(mdText.value));
+    const disabled = computed(() => nully(mdText.value));
 
     const containerClasses = computed(() => {
       let clss = props.dark

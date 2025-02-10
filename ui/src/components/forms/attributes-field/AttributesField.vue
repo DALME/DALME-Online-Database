@@ -2,9 +2,7 @@
   <div class="attributes-field column q-my-sm" :class="{ separator: !showing }">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
-        {{
-          !showing && modelValue !== [empty()] ? `Attributes (${modelValue.length})` : "Attributes"
-        }}
+        {{ !showing && !empty(modelValue) ? `Attributes (${modelValue.length})` : "Attributes" }}
       </div>
 
       <q-spinner v-if="loading" color="primary" size="xs" />
@@ -19,7 +17,7 @@
         :disable="modelValue.length === allowed.length"
         @click.stop="handleAddField"
       >
-        <TooltipWidget> Add an attribute </TooltipWidget>
+        <ToolTip> Add an attribute </ToolTip>
       </q-btn>
 
       <q-btn
@@ -29,14 +27,14 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <TooltipWidget>
+        <ToolTip>
           {{ showing ? "Hide attributes" : "Show attributes" }}
-        </TooltipWidget>
+        </ToolTip>
       </q-btn>
 
-      <TooltipWidget v-if="description">
+      <ToolTip v-if="description">
         {{ description }}
-      </TooltipWidget>
+      </ToolTip>
     </div>
 
     <template v-if="showing">
@@ -70,9 +68,9 @@
                 @filter="handleOptions"
                 @update:modelValue="(option) => handleUpdateAttribute(option, idx)"
               >
-                <TooltipWidget v-if="data.attribute && data.attribute.description">
+                <ToolTip v-if="data.attribute && data.attribute.description">
                   {{ data.attribute.description }}
-                </TooltipWidget>
+                </ToolTip>
               </q-select>
             </div>
 
@@ -166,9 +164,9 @@
                 :disable="isRequiredAttribute(data.attribute)"
                 @click.stop="handleRemoveField(idx)"
               >
-                <TooltipWidget v-if="isRequiredAttribute(data.attribute)">
+                <ToolTip v-if="isRequiredAttribute(data.attribute)">
                   Can't delete a required attribute
-                </TooltipWidget>
+                </ToolTip>
               </q-btn>
             </div>
           </div>
@@ -238,7 +236,7 @@ export default defineComponent({
     NumberField,
     SelectField,
     TextField,
-    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
   },
   setup(props, context) {
     const { apiInterface } = useAPI();
@@ -384,7 +382,8 @@ export default defineComponent({
 
 <style lang="scss">
 .attributes-field {
-  will-transform: auto;
+  will-change: auto;
+  //will-transform: auto;
 }
 .attributes-field .q-field__after,
 .attributes-field .q-field__append {

@@ -1,0 +1,48 @@
+.block-heading {
+  margin: 3rem 0 1rem 0;
+}
+.block-heading h1,
+.block-heading h2,
+.block-heading h3,
+.block-heading h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0;
+  line-height: 24px;
+}
+.block-heading h1,
+.block-heading h2 {
+  color: #3a5d82;
+  border-bottom: 1px dotted #000;
+  padding-bottom: 0.25rem;
+}
+.block-heading h1 {
+  font-weight: 650;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+.block-heading h2,
+.block-heading h3,
+.block-heading h4 {
+  letter-spacing: 0.05rem;
+  text-transform: capitalize;
+}
+.block-heading h2,
+.block-heading h3 {
+  font-weight: 700;
+}
+.block-heading h4 {
+  font-weight: 600;
+  font-style: oblique;
+}
+.block-text + .block-heading,
+.block-text_expandable + .block-heading {
+  margin-top: 1rem;
+}
+/* documents/publications/lectures */
+.block-heading + .block-document {
+  border-top: none;
+  padding-top: 0;
+}
+.content > .block-heading:first-of-type {
+  margin-top: 0;
+}

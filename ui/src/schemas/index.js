@@ -1,4 +1,5 @@
 // NOTE: Don't sort these, or imports will break.
+export * from "./options";
 export * from "./common";
 export * from "./tenants";
 export * from "./preferences";
@@ -29,3 +30,4 @@ export * from "./tickets";
 export * from "./worksets";
 export * from "./task-lists";
 export * from "./tasks";
+export * from "./tei-elements";

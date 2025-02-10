@@ -38,6 +38,7 @@ export const useTasks = defineStore("tasks", () => {
   });
 
   // getters
+  const loading = computed(() => _tasks.loading || _lists.loading);
   const tasksReady = computed(() => _tasks.isLoaded && !_tasks.loading);
   const listsReady = computed(() => _lists.isLoaded && !_lists.loading);
   const tasks = computed(() => _sortByCreationDate(filter().slice(0, show.value.all)));
@@ -70,9 +71,12 @@ export const useTasks = defineStore("tasks", () => {
       _lists.init();
     } else {
       _tasks.init().then(() => {
-        if (target == null) _lists.init();
-        if ("taskId" in state) setViewing(state.taskId, true);
-        if ("showTasks" in state) showTaskModal();
+        if (target == null) {
+          _lists.init().then(() => {
+            if ("taskId" in state) setViewing(state.taskId, true);
+            if ("showTasks" in state) showTaskModal();
+          });
+        }
       });
     }
   };
@@ -163,6 +167,7 @@ export const useTasks = defineStore("tasks", () => {
     assigned,
     completed,
     created,
+    loading,
     loadAssigned,
     loadCompleted,
     loadCreated,

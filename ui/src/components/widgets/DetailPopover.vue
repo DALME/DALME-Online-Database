@@ -20,7 +20,7 @@
           <q-item v-if="userData">
             <q-item-section v-if="showAvatar" avatar>
               <q-avatar size="32px">
-                <img v-if="notNully(userData.avatar)" :src="userData.avatar" />
+                <img v-if="!nully(userData.avatar)" :src="userData.avatar" />
                 <q-icon v-else size="32px" name="mdi-account-circle" />
               </q-avatar>
             </q-item-section>
@@ -41,7 +41,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "DetailPopover",
@@ -88,7 +88,7 @@ export default defineComponent({
       showPopover,
       target,
       text,
-      notNully,
+      nully,
     };
   },
 });

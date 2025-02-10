@@ -1,0 +1,5 @@
+<!--Temporarily fixes an issue with wagtail whereby select dropdowns are not getting selected correctly -->
+<!--due to a missing wrapping div-->
+<div id="{{ widget.attrs.id }}-wrapper" class="select-wrapper{% if widget.attrs.containerclasses %} {{ widget.attrs.containerclasses }}{% endif %}">
+    {% include "django/forms/widgets/select.html" %}
+</div>

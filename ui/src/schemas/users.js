@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { timeStampSchema, preferenceListSchema, groupSchema } from "@/schemas";
+import { timeStampSchema, groupSchema } from "@/schemas";
 
 export const userSchema = yup.object().shape({
   id: yup.number().required(),
@@ -15,7 +15,6 @@ export const userSchema = yup.object().shape({
   lastLogin: timeStampSchema.nullable(),
   groups: yup.array().of(groupSchema).default(null).nullable(),
   avatar: yup.string().default(null).nullable(),
-  preferences: preferenceListSchema.nullable(),
 });
 
 export const userListSchema = yup.array().of(userSchema);
@@ -43,6 +42,5 @@ export const userLoginSchema = yup.object().shape({
   email: yup.string().email().required(),
   avatar: yup.string().default(null).nullable(),
   isAdmin: yup.boolean().required(),
-  preferences: preferenceListSchema.nullable(),
   groups: yup.array().required(),
 });

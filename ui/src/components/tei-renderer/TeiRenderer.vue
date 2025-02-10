@@ -5,7 +5,7 @@
 <script>
 import { computed, defineComponent, nextTick, onMounted, ref, watch } from "vue";
 import { useConstants, useStores } from "@/use";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 import CETEI from "CETEIcean";
 import { idaTeiBehaviours } from "./behaviours.js";
 import { createPopper } from "@popperjs/core";
@@ -53,7 +53,7 @@ export default defineComponent({
     });
     /* eslint-disable */
     const generateTei = () => {
-      if (notNully(currentPageData.value))
+      if (!nully(currentPageData.value))
         teiRenderer.makeHTML5(teiDoc.value, processTei, addSpans);
     };
 

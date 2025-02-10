@@ -18,6 +18,14 @@ data "aws_security_group" "alb" {
   }
 }
 
+data "aws_security_group" "opensearch" {
+  tags = {
+    Environment = var.environment
+    Namespace   = var.namespace
+    Name        = "${var.namespace}-${var.environment}-opensearch-security-group"
+  }
+}
+
 data "aws_security_group" "postgres" {
   tags = {
     Environment = var.environment

@@ -5,6 +5,7 @@ import tasks from "./tasks";
 import tickets from "./tickets";
 import users from "./users";
 import transcriptions from "./transcriptions";
+import settings from "./settings";
 
 const notifier = {
   auth,
@@ -13,6 +14,7 @@ const notifier = {
   tasks,
   tickets,
   users,
+  settings,
   transcriptions,
 };
 

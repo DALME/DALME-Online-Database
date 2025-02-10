@@ -1,16 +1,16 @@
 import S from "string";
 import { equals, isEmpty } from "ramda";
 import { computed, ref, unref, watch } from "vue";
-import { notNully } from "@/utils";
-import { useAuthStore } from "@/stores/auth";
+import { nully, isObject, isInList, addToList, removeFromList } from "@/utils";
+import { useSettingsStore } from "@/stores/settings";
 
 const transformField = (field) => S(field).underscore().s;
 
 export const usePagination = (fetchData, listName, defaults, embedded = false) => {
-  const auth = useAuthStore();
-  const lists = auth.preferences.lists;
+  const settings = useSettingsStore();
+  const lists = settings.preferences.listPreferences.value;
 
-  if (!notNully(lists[listName])) {
+  if (nully(lists[listName])) {
     lists[listName] = {
       rowsPerPage: 20,
       visibleColumns: defaults.visibleColumns,
@@ -46,7 +46,6 @@ export const usePagination = (fetchData, listName, defaults, embedded = false) =
     if (search.value) {
       params.append("search", search.value);
     }
-
     if (!isEmpty(activeFilters.value)) {
       for (const field in activeFilters.value) {
         params.append(field, activeFilters.value[field]);
@@ -55,7 +54,6 @@ export const usePagination = (fetchData, listName, defaults, embedded = false) =
 
     params.append("offset", (pageData.page - 1) * pageData.rowsPerPage);
     params.append("limit", pageData.rowsPerPage);
-
     return params.toString();
   });
 
@@ -66,7 +64,9 @@ export const usePagination = (fetchData, listName, defaults, embedded = false) =
 
   // Provide a callback to the component in case it's necessary to call the
   // pagination-aware fetchData function from a watcher or something similar.
-  const fetchDataPaginated = async () => fetchData(query.value);
+  const fetchDataPaginated = () => {
+    return fetchData(query.value);
+  };
 
   const resetPagination = () => (pagination.value = defaultPagination);
 
@@ -86,8 +86,56 @@ export const usePagination = (fetchData, listName, defaults, embedded = false) =
   };
 
   const onChangeFilters = (filter) => {
-    if (filter.field in activeFilters.value && activeFilters.value[filter.field] === filter.value) {
-      delete activeFilters.value[filter.field];
+    // check isolation
+    if (filter.isolation) {
+      if (filter.isolation === true) {
+        // full isolation: clear filters
+        activeFilters.value = {};
+      } else if (isObject(filter.isolation)) {
+        // partial isolation: remove conflicting filters
+        for (const field in filter.isolation) {
+          if (field in activeFilters.value) {
+            if (filter.selection === "multiple") {
+              if (isInList(activeFilters.value[field], filter.isolation[field])) {
+                activeFilters.value[field] = removeFromList(
+                  activeFilters.value[field],
+                  filter.isolation[field],
+                );
+              }
+            } else {
+              if (activeFilters.value[field] === filter.isolation[field]) {
+                delete activeFilters.value[field];
+              }
+            }
+          }
+        }
+      }
+    }
+    // update filters
+    if (filter.field in activeFilters.value) {
+      if (filter.selection === "multiple") {
+        if (isInList(activeFilters.value[filter.field], filter.value)) {
+          // is already set: remove
+          activeFilters.value[filter.field] = removeFromList(
+            activeFilters.value[filter.field],
+            filter.value,
+          );
+        } else {
+          // is not already set: append
+          activeFilters.value[filter.field] = addToList(
+            activeFilters.value[filter.field],
+            filter.value,
+          );
+        }
+      } else {
+        if (activeFilters.value[filter.field] === filter.value) {
+          // is already set: remove
+          delete activeFilters.value[filter.field];
+        } else {
+          // is not already set: set
+          activeFilters.value[filter.field] = filter.value;
+        }
+      }
     } else {
       activeFilters.value[filter.field] = filter.value;
     }
@@ -95,7 +143,7 @@ export const usePagination = (fetchData, listName, defaults, embedded = false) =
   };
 
   const onClearFilters = () => {
-    activeFilters.value = [];
+    activeFilters.value = {};
     fetchDataPaginated();
   };
 

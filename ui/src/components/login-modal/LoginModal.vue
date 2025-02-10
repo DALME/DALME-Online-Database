@@ -100,13 +100,12 @@ import { useRoute } from "vue-router";
 export default defineComponent({
   name: "LoginModal",
   setup() {
-    const { auth } = useStores();
+    const { auth, settings } = useStores();
     const { notifier } = useEventHandling();
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { fetchAPI, status } = apiInterface();
 
-    const prefSubscription = inject("prefSubscription");
     const pageBackdropLoaded = inject("pageBackdropLoaded");
 
     const username = ref("");
@@ -120,7 +119,6 @@ export default defineComponent({
     const passwordRules = [(val) => (val && !isEmpty(val)) || "Password is required"];
 
     const logout = () => {
-      prefSubscription();
       auth.send({ type: "LOGOUT" });
     };
 
@@ -134,7 +132,7 @@ export default defineComponent({
       );
       if (status.value == 202) {
         auth.send({ type: "LOGIN" });
-        prefSubscription("subscribe");
+        await settings.fetchPreferences();
         if ($route.query.next) {
           window.location.href = $route.query.next;
         }

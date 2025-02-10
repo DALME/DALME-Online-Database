@@ -10,7 +10,7 @@
           <q-item-section avatar>
             <q-avatar size="40px" class="greyscale-50">
               <q-img
-                v-if="notNully(auth.user.avatar)"
+                v-if="!nully(auth.user.avatar)"
                 :src="auth.user.avatar"
                 fit="cover"
                 ratio="1"
@@ -30,7 +30,7 @@
               size="10px"
               @click="userDrawerOpen = !userDrawerOpen"
             >
-              <TooltipWidget>Close user drawer.</TooltipWidget>
+              <ToolTip>Close user drawer.</ToolTip>
             </q-btn>
           </q-item-section>
         </q-item>
@@ -85,23 +85,24 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { computed, defineComponent, inject, ref } from "vue";
+import { computed, defineComponent, ref, onMounted } from "vue";
 import { isEmpty, isNil } from "ramda";
 import { useStores } from "@/use";
-import { CustomDialog, TooltipWidget, TaskManager } from "@/components";
-import { notNully } from "@/utils";
+import { useTasks } from "@/stores/tasks";
+import { CustomDialog, ToolTip, TaskManager } from "@/components";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "UserDrawer",
   components: {
-    TooltipWidget,
+    ToolTip,
     TaskManager,
   },
   setup() {
     const $q = useQuasar();
-    const { auth, userDrawerOpen, windowHeight, showTips } = useStores();
+    const { auth, userDrawerOpen, windowHeight } = useStores();
     const submitting = ref(false);
-    const prefSubscription = inject("prefSubscription");
+    const tm = useTasks();
     const scrollHeight = computed(() => windowHeight.value - 181);
 
     const logout = () => {
@@ -116,20 +117,24 @@ export default defineComponent({
           okayButtonLabel: "Log out",
         },
       }).onOk(() => {
-        prefSubscription();
         auth.logout();
       });
     };
+
+    onMounted(() => {
+      if (!tm.tasksReady || !tm.listsReady) {
+        tm.init();
+      }
+    });
 
     return {
       auth,
       isEmpty,
       isNil,
-      showTips,
       userDrawerOpen,
       submitting,
       logout,
-      notNully,
+      nully,
       scrollHeight,
     };
   },

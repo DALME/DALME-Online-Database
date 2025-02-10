@@ -1,0 +1,119 @@
+{% load static get_header_image_styles get_citation_data footer wagtailimages_tags wagtailuserbar wagtailcore_tags %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    {% block meta %}
+      <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="description" content="" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="apple-touch-icon" sizes="180x180" href="{% static 'icons/apple-touch-icon-180x180.png' %}">
+      <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}">
+      <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16x16.png' %}">
+      <link rel="manifest" href="{% static 'icons/site_public.webmanifest' %}">
+      <link rel="mask-icon" href="{% static 'icons/safari-pinned-tab.svg' %}" color="#912643">
+      <link rel="shortcut icon" href="{% static 'icons/favicon.ico' %}">
+      <meta name="apple-mobile-web-app-title" content="{{ settings.web.Settings.short_form }}">
+      <meta name="application-name" content="{{ settings.web.Settings.short_form }}">
+      <meta name="msapplication-TileColor" content="#b91d47">
+      <meta name="msapplication-TileImage" content="{% static 'icons/mstile-144x144.png' %}">
+      <meta name="msapplication-config" content="{% static 'icons/browserconfig.xml' %}">
+      <meta name="theme-color" content="#ffffff">
+    {% endblock %}
+
+    <title>
+      {% block title %}
+        {{ settings.web.Settings.name }}
+      {% endblock %}
+    </title>
+
+    {% block styles %}
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+      <link rel="stylesheet" type="text/css" href="{% static 'common/css/vendor/bootstrap-vue.min.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'common/css/base.css' %}" />
+    {% endblock %}
+
+    {% block extension_styles %}
+      <link rel="stylesheet" type="text/css" href="{% static 'css/footnotes-frontend.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/extras-frontend.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/bibliography-frontend.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/images-frontend.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/team-frontend.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/records-frontend.css' %}" />
+    {% endblock %}
+
+    {% block extra_styles %}{% endblock %}
+
+    {% block js %}
+      <script async defer data-domain="{{ settings.web.Settings.analytics_domain }}" src="https://plausible.io/js/plausible.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+      <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+      <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"
+        integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw=="
+        crossorigin="anonymous"></script>
+      <script type="text/javascript" src="{% static 'common/js/wagtailUtils.js' %}"></script>
+
+      {% if page.citable and not records and not record and not search %}
+        <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js"
+        integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
+      {% endif %}
+
+    {% endblock %}
+  </head>
+
+  {% with page.get_verbose_name|lower as page_name %}
+  <body id="body" class="{{ page_name }} u-flex u-type-sans">
+
+    {% block banner %}{% endblock %}
+
+    <header class="{{ page_name }}" role="banner"
+      {% if header_image or page.header_image %}
+        {% if header_image %}
+          {% image header_image original as header_background %}
+          {% get_header_image_styles header_background header_position as styles %}
+        {% else %}
+          {% image page.header_image original as header_background %}
+          {% get_header_image_styles header_background page.header_position as styles %}
+        {% endif %}
+        style="{{ styles }}"
+      {% endif %}>
+      {% include "common/includes/nav.html" %}
+      {% block header_extra %}{% endblock %}
+    </header>
+
+    <main id="main" class="{{ page_name }} {{ page.title|slugify }}{% if records or record %} browser{% endif %}{% if record %} viewer{% endif %}" role="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% footer %}
+    {% include "lightbox_modal.html" %}
+
+    {% block js_foot %}
+      {% if page.citable and not records and not record and not search %}
+        {% get_citation_data as citation %}
+        {{ citation.2|safe }}
+        {{ citation|json_script:"citation_data" }}
+        <script type="text/javascript" src="{% static 'js/citation-app.js' %}"></script>
+      {% endif %}
+
+      <!-- EXTENSION SCRIPTS START -->
+      <script type="text/javascript" src="{% static 'js/extra-blocks.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/images.js' %}"></script>
+      <!-- EXTENSION SCRIPTS END -->
+
+    {% endblock %}
+  </body>
+{% endwith %}
+{% wagtailuserbar 'bottom-right' %}
+</html>

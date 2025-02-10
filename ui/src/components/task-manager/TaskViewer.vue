@@ -12,10 +12,10 @@
         <template v-if="openDrawer && tm.listsReady">
           <div class="q-mb-md">
             <div
-              v-if="notNully(tm.listGroups) || tm.tasks.length > 0 || tm.tasksMeta.user > 0"
+              v-if="!nully(tm.listGroups) || tm.tasks.length > 0 || tm.tasksMeta.user > 0"
               class="tasklist-toolbar"
             >
-              <TasklistManager v-if="notNully(tm.listGroups)" :lists="tm.listGroups" />
+              <TasklistManager v-if="!nully(tm.listGroups)" :lists="tm.listGroups" />
               <template v-if="tm.tasks.length > 0 || tm.tasksMeta.user > 0">
                 <q-btn-dropdown
                   label="Filter"
@@ -49,12 +49,12 @@
                     <q-item dense clickable v-close-popup class="inset-item">
                       <q-item-section>Completed by</q-item-section>
                     </q-item>
-                    <ChooserWidget
+                    <GeneralChooser
                       item
                       dark
+                      type="users"
                       return-field="username"
                       label="Author"
-                      target="users"
                       @item-chosen="$emit('userSelected')"
                     />
                   </q-list>
@@ -165,7 +165,7 @@
                     <div class="meta-label">Assignees</div>
                     <div class="meta-content">
                       <q-avatar v-for="(user, i) in tm.viewing.assignees" :key="i" size="30px">
-                        <img v-if="notNully(user.avatar)" :src="user.avatar" />
+                        <img v-if="!nully(user.avatar)" :src="user.avatar" />
                         <q-icon v-else size="38px" name="mdi-account-circle" />
                       </q-avatar>
                     </div>
@@ -210,7 +210,7 @@
           </div>
         </div>
         <q-scroll-area dark class="scroll-area q-px-lg" v-if="tm.viewing">
-          <CommentWidget dark :author="tm.viewing.creationUser.id">
+          <CommentBox dark :author="tm.viewing.creationUser.id">
             <template v-if="tm.viewing.completed" v-slot:comment-stream-end>
               <q-item class="comment-box" :class="tm.viewing.completedByAuthor ? 'op-post' : ''">
                 <q-item-section v-if="tm.viewing.completedByAuthor" avatar>
@@ -229,7 +229,7 @@
                 </q-item-section>
               </q-item>
             </template>
-          </CommentWidget>
+          </CommentBox>
         </q-scroll-area>
       </div>
     </div>
@@ -238,29 +238,29 @@
 
 <script>
 import { useDialogPluginComponent, format, openURL } from "quasar";
-import { computed, provide, onMounted, ref, watch } from "vue";
-import { formatDate as fDate, notNully } from "@/utils";
+import { computed, provide, onMounted, ref } from "vue";
+import { formatDate as fDate, nully } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTasks } from "@/stores/tasks";
 import TasklistManager from "./TasklistManager.vue";
 import TaskList from "./TaskList.vue";
 import {
   AttachmentIconWidget,
-  CommentWidget,
+  CommentBox,
   DetailPopover,
   MarkdownEditor,
-  ChooserWidget,
+  GeneralChooser,
 } from "@/components";
 
 export default {
   components: {
     AttachmentIconWidget,
-    CommentWidget,
+    CommentBox,
     DetailPopover,
     MarkdownEditor,
     TasklistManager,
     TaskList,
-    ChooserWidget,
+    GeneralChooser,
   },
   emits: [...useDialogPluginComponent.emits],
   setup() {
@@ -331,15 +331,6 @@ export default {
     provide("model", "Task");
     provide("id", id);
 
-    watch(
-      () => openDrawer.value,
-      () => {
-        if (!tm.listsReady) {
-          tm.init("lists");
-        }
-      },
-    );
-
     onMounted(() => {
       if (!tm.viewing) {
         openDrawer.value = true;
@@ -358,7 +349,7 @@ export default {
       openDrawer,
       tm,
       taskStatus,
-      notNully,
+      nully,
       openURL,
       changeDueDate,
       sortMenu,

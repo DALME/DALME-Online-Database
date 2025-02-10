@@ -47,11 +47,6 @@ variable "internal" {
   type        = bool
 }
 
-variable "ipv6_cidr_blocks" {
-  description = "IPv6 range for the ALB security groups."
-  type        = string
-}
-
 variable "protocol" {
   description = "Transport protocol for the security group."
   type        = string

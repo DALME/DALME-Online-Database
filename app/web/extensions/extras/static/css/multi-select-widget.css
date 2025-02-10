@@ -1,0 +1,70 @@
+.select2-container--default span.select2-selection--multiple {
+  padding-top: 2px;
+}
+.select2-container--default span.select2-selection--multiple.select2-selection--clearable {
+  padding-right: 35px;
+}
+.select2-container .select2-selection--multiple ul.select2-selection__rendered.ui-sortable {
+  display: flex;
+  flex-wrap: wrap;
+}
+.select2-container .select2-selection--multiple ul.select2-selection__rendered.ui-sortable span.select2-search.select2-search--inline {
+  display: flex;
+  align-self: flex-end;
+  margin-top: 0;
+  margin-bottom: 3px;
+  margin-left: 8px;
+}
+.select2-container--default .select2-selection--multiple li.select2-selection__choice {
+  border: 1px solid var(--w-color-border-field-default);
+  color: var(--w-color-text-context) !important;
+  background-color: var(--w-color-surface-field);
+  background-image: none;
+  box-shadow: none !important;
+  font-weight: 400;
+  border-radius: .3125rem;
+  max-width: 100%;
+  line-height: 1;
+  max-height: 42px;
+  padding-left: 18px;
+}
+.select2-container--default .select2-selection--multiple li.select2-selection__choice:hover {
+  border-color: var(--w-color-border-field-hover);
+}
+.select2-container--default .select2-selection--multiple span.select2-selection__choice__display {
+  display: block;
+  padding: 5px 10px 5px 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--w-color-text-meta);
+}
+.select2-container--default .select2-selection--multiple button.select2-selection__choice__remove {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  border-color: var(--w-color-border-field-default);
+}
+.select2-container--default span.select2-search.select2-search--inline {
+  display: inline-flex;
+  margin-top: 5px;
+  margin-bottom: 2px;
+  margin-left: 8px;
+}
+.select2-container--default .select2-search--inline textarea.select2-search__field {
+  min-height: 23px;
+  min-width: 50px;
+  padding: 0 5px;
+  margin: 0;
+  line-height: 23px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--w-color-text-meta);
+}
+.select2-container--default .select2-selection--multiple button.select2-selection__clear {
+  color: var(--w-color-border-field-default);
+  font-size: 20px;
+  line-height: 20px;
+}
+.select2-container--default .select2-selection--multiple button.select2-selection__clear:hover {
+  color: var(--w-color-focus);
+}

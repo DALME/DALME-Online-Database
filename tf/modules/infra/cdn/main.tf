@@ -208,26 +208,21 @@ module "cloudfront" {
   default_cache_behavior = {
     allowed_methods          = local.allowed_methods
     cached_methods           = ["GET", "HEAD"]
-    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
-    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
     target_origin_id         = local.origin_id_alb
     viewer_protocol_policy   = "redirect-to-https"
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
   }
 
   ordered_cache_behavior = [
     {
-      path_pattern           = "/db*"
-      allowed_methods        = local.allowed_methods
-      cached_methods         = ["GET", "HEAD"]
-      target_origin_id       = local.origin_id_assets
-      viewer_protocol_policy = "redirect-to-https"
-
-      forwarded_values = {
-        query_string = true
-        cookies = {
-          forward = "all"
-        }
-      }
+      path_pattern             = "/db*"
+      allowed_methods          = local.allowed_methods
+      cached_methods           = ["GET", "HEAD"]
+      target_origin_id         = local.origin_id_assets
+      viewer_protocol_policy   = "redirect-to-https"
+      cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+      origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
 
       function_association = [
         {

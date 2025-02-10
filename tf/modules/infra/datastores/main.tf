@@ -32,24 +32,30 @@ module "postgres" {
   vpc_id                                = data.aws_vpc.this.id
 }
 
-resource "aws_security_group_rule" "postgres_ingress_jump_host" {
-  description              = "Allow incoming traffic to postgres from the jump host."
-  security_group_id        = module.postgres.security_group_id
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = var.rds_postgres.port
-  to_port                  = var.rds_postgres.port
-  source_security_group_id = data.aws_security_group.tunnel.id
+resource "aws_vpc_security_group_ingress_rule" "postgres_ingress_jump_host" {
+  description       = "Allow incoming traffic to postgres from the jump host."
+  security_group_id = module.postgres.security_group_id
+
+  ip_protocol = "tcp"
+  from_port   = var.rds_postgres.port
+  to_port     = var.rds_postgres.port
+
+  referenced_security_group_id = data.aws_security_group.tunnel.id
+
+  tags = module.postgres_sg_ingress_jump_host_label.tags
 }
 
-resource "aws_security_group_rule" "jump_host_egress_postgres" {
-  description              = "Allow outgoing traffic to postgres from the jump host."
-  security_group_id        = data.aws_security_group.tunnel.id
-  type                     = "egress"
-  protocol                 = "tcp"
-  from_port                = var.rds_postgres.port
-  to_port                  = var.rds_postgres.port
-  source_security_group_id = module.postgres.security_group_id
+resource "aws_vpc_security_group_egress_rule" "jump_host_egress_postgres" {
+  description       = "Allow outgoing traffic to postgres from the jump host."
+  security_group_id = data.aws_security_group.tunnel.id
+
+  ip_protocol = "tcp"
+  from_port   = var.rds_postgres.port
+  to_port     = var.rds_postgres.port
+
+  referenced_security_group_id = module.postgres.security_group_id
+
+  tags = module.postgres_sg_egress_jump_host_label.tags
 }
 
 # Opensearch
@@ -106,31 +112,6 @@ module "opensearch" {
   vpc_id                   = data.aws_vpc.this.id
 }
 
-# Security group rules.
-resource "aws_security_group_rule" "opensearch_ingress" {
-  security_group_id = module.opensearch.security_group_id
-  type              = "ingress"
-  description       = "Inbound HTTP from the VPC."
-  protocol          = "tcp"
-  from_port         = var.opensearch.port
-  to_port           = var.opensearch.port
-  cidr_blocks       = [data.aws_vpc.this.cidr_block]
-}
-
-resource "aws_security_group_rule" "opensearch_egress" {
-  security_group_id = module.opensearch.security_group_id
-  type              = "egress"
-  description       = "Explicit ALLOW ALL outbound rule."
-  protocol          = "-1"
-  from_port         = 0
-  to_port           = 0
-  # tfsec:ignore:aws-ec2-no-public-egress-sgr
-  cidr_blocks = ["0.0.0.0/0"]
-  # tfsec:ignore:aws-ec2-no-public-egress-sgr
-  ipv6_cidr_blocks = ["::/0"]
-}
-
-# Monitoring/alarms.
 resource "aws_sns_topic" "opensearch_alarm" {
   name              = module.opensearch_alarm_sns_label.id
   kms_master_key_id = data.aws_kms_alias.global.target_key_arn

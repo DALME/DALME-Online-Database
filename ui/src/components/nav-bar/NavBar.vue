@@ -1,8 +1,13 @@
 <template>
   <q-header class="no-shadow">
     <div class="main-toolbar row flex-center q-px-lg q-py-xs">
-      <q-btn icon="mdi-menu" class="tb-button q-mr-md" @click="appDrawerOpen = !appDrawerOpen">
-        <TooltipWidget>Open App menu.</TooltipWidget>
+      <q-btn
+        icon="mdi-menu"
+        class="tb-button q-mr-md"
+        :class="{ 'edit-on': ongoingEdit }"
+        @click="appDrawerOpen = !appDrawerOpen"
+      >
+        <ToolTip>Open App menu.</ToolTip>
       </q-btn>
 
       <q-icon :name="pageIcon" color="grey-4" size="26px" />
@@ -35,7 +40,7 @@
         no-caps
         class="tb-button q-mx-md tb-search-button"
       >
-        <TooltipWidget>Search DALME.</TooltipWidget>
+        <ToolTip>Search DALME.</ToolTip>
       </q-btn>
 
       <q-separator vertical dark class="q-mr-md" />
@@ -51,14 +56,14 @@
             :icon="route.meta.icon"
             :disable="ui.currentSection === route.children[0].name"
           >
-            <TooltipWidget>{{ route.label }}</TooltipWidget>
+            <ToolTip>{{ route.label }}</ToolTip>
           </q-btn>
           <q-btn
             icon="mdi-plus"
             class="btn-dropdown-like"
             :disable="ui.currentSection === route.children[0].name"
           >
-            <TooltipWidget>Create new issue ticket.</TooltipWidget>
+            <ToolTip>Create new issue ticket.</ToolTip>
           </q-btn>
         </q-btn-group>
 
@@ -103,12 +108,12 @@
               : ui.currentSection === route.children[0].name
           "
         >
-          <TooltipWidget>{{ route.label }}</TooltipWidget>
+          <ToolTip>{{ route.label }}</ToolTip>
         </q-btn>
       </template>
 
       <q-btn dense round class="q-pr-none" @click="userDrawerOpen = !userDrawerOpen">
-        <q-avatar v-if="notNully(auth.user.avatar)" size="34px">
+        <q-avatar v-if="!nully(auth.user.avatar)" size="34px">
           <q-img :src="auth.user.avatar" fit="cover" ratio="1" />
         </q-avatar>
         <q-icon v-else name="mdi-account-circle" size="lg" color="blue-grey-5" />
@@ -148,13 +153,17 @@
 
         <q-btn
           size="12px"
-          :text-color="showTips ? 'green-7' : 'grey-7'"
-          :icon="showTips ? 'mdi-tooltip-remove-outline' : 'mdi-tooltip-check-outline'"
+          :text-color="preferences.tooltipsOn.value ? 'green-7' : 'grey-7'"
+          :icon="
+            preferences.tooltipsOn.value
+              ? 'mdi-tooltip-remove-outline'
+              : 'mdi-tooltip-check-outline'
+          "
           class="mc-button"
-          :class="{ 'bg-green-1': showTips }"
-          @click="showTips = !showTips"
+          :class="{ 'bg-green-1': preferences.tooltipsOn.value }"
+          @click="preferences.tooltipsOn.value = !preferences.tooltipsOn.value"
         >
-          <TooltipWidget>Tooltips</TooltipWidget>
+          <ToolTip>Tooltips</ToolTip>
         </q-btn>
         <q-btn
           size="13px"
@@ -164,15 +173,10 @@
           :class="{ 'bg-indigo-1': isFullscreen }"
           @click="toggleFullscreen"
         >
-          <TooltipWidget>Full screen</TooltipWidget>
+          <ToolTip>Full screen</ToolTip>
         </q-btn>
       </q-toolbar>
     </div>
-    <div
-      class="strip-approach"
-      @mouseenter="stripApproachHover = true"
-      @mouseleave="stripApproachHover = false"
-    />
   </q-header>
 </template>
 
@@ -181,14 +185,14 @@ import { openURL, useQuasar } from "quasar";
 import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { navRoutes } from "@/router";
-import { TooltipWidget } from "@/components";
+import { ToolTip } from "@/components";
 import { useStores } from "@/use";
-import { notNully } from "@/utils";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "NavBar",
   components: {
-    TooltipWidget,
+    ToolTip,
   },
   setup() {
     const $q = useQuasar();
@@ -197,15 +201,22 @@ export default defineComponent({
       globalLoading,
       isFullscreen,
       ui,
-      stripApproachHover,
       userDrawerOpen,
       appDrawerOpen,
-      showTips,
+      preferences,
+      pageIndexShow,
+      inlineIndexShow,
+      windowIndexShow,
     } = useStores();
 
     const submitting = ref(false);
     const searchQuery = ref("");
     const currentSubsection = ref(ui.currentSubsection);
+    const ongoingEdit = computed(
+      () => pageIndexShow.value || inlineIndexShow.value || windowIndexShow.value,
+    );
+
+    window.test = preferences;
 
     const openKB = () => {
       openURL("https://kb.dalme.org/", null, { target: "_blank" });
@@ -236,13 +247,12 @@ export default defineComponent({
     return {
       auth,
       breadcrumbs,
-      stripApproachHover,
       darkMode: $q.dark,
       globalLoading,
       menuRoutes: navRoutes("menu"),
       topRoutes: navRoutes("top"),
       ui,
-      showTips,
+      preferences,
       submitting,
       isFullscreen,
       isNil,
@@ -253,7 +263,8 @@ export default defineComponent({
       openKB,
       userDrawerOpen,
       appDrawerOpen,
-      notNully,
+      nully,
+      ongoingEdit,
     };
   },
 });
@@ -453,14 +464,14 @@ export default defineComponent({
 .mc-button::before {
   box-shadow: none;
 }
-.strip-approach {
-  position: absolute;
-  right: 0;
-  top: 95px;
-  width: 80px;
-  height: 65px;
+.main-toolbar .tb-button.edit-on {
+  color: #745050;
+  border-color: #543333;
+  background-color: rgba(70, 29, 29, 0.29);
 }
-.strip-approach {
-  top: 49px;
+.main-toolbar .tb-button.edit-on:hover {
+  border-color: rgb(125 71 71);
+  color: rgb(195 132 132);
+  background-color: #461d1d9c;
 }
 </style>
