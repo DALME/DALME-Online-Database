@@ -296,7 +296,7 @@ jobs:
         env:
           ECS_CLUSTER: ecs-cluster
           ECS_SERVICE: ecs-service
-          TASK_DEFINITION: ida-ecs-task-definition-web
+          TASK_DEFINITION: ida-ecs-task-definition-app
         with:
           args: >
             deploy
