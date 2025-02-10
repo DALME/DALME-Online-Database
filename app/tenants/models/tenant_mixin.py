@@ -33,12 +33,12 @@ class TenantMixin(models.Model):
     class Meta:
         abstract = True
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.is_tenanted = True
+
     def save(self, *args, **kwargs):
         """Add tenant when saving record."""
         if not hasattr(self, 'tenant') and not os.environ.get('DATA_MIGRATION'):
             self.tenant = get_current_tenant()
         super().save(*args, **kwargs)
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        cls.is_tenanted = True

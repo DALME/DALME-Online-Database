@@ -36,7 +36,7 @@ def get_record_details(context):
         result.update(
             {
                 'record_collection': record_collection,
-                'collection_url': f"/collections/{record_collection.name.replace(' ', '-').lower()}/",
+                'collection_url': f'/collections/{record_collection.name.replace(" ", "-").lower()}/',
             },
         )
 

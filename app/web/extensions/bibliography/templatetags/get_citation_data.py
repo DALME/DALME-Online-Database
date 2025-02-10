@@ -84,7 +84,7 @@ def get_citation_data(context):  # noqa: C901, PLR0912, PLR0915
             contributors = contributors + corrections
             if not authors:
                 try:
-                    authors = [f"The {context.get('request').tenant.project.name} Team"]
+                    authors = [f'The {context.get("request").tenant.project.name} Team']
                 except:  # noqa: E722
                     authors = 'The IDA Team'
             coins_list += [('rft.atitle', title), ('rft.identifier', purl)]

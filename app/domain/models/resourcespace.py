@@ -225,7 +225,7 @@ class rs_collection_resource(models.Model):  # noqa: N801
         in_db = 'dam'
 
     def __str__(self):
-        return f'{self.resource.ref-{self.collection.ref}}'
+        return f'{self.resource.ref - {self.collection.ref}}'
 
 
 class rs_user(models.Model):  # noqa: N801

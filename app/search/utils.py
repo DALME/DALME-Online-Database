@@ -127,7 +127,7 @@ class Search:
             if e.error == 'parsing_exception':
                 self.errors.append(f'There was an error parsing your query: {e.info}')
             else:
-                self.errors.append(f"Error ({e.error}): {e.info['error']['reason']}")
+                self.errors.append(f'Error ({e.error}): {e.info["error"]["reason"]}')
             return ({}, [])
 
     @staticmethod
@@ -303,7 +303,7 @@ class Search:
         """Process text-type data."""
         querystring = data['field_value'].strip()
         query = 'match_phrase_prefix' if data['query_type'] == 'prefix' and ' ' in querystring else data['query_type']
-        field = f"{data['field']}.keyword" if query == 'term' else data['field']
+        field = f'{data["field"]}.keyword' if query == 'term' else data['field']
         keyname = 'value' if query in ['term', 'prefix'] else 'query'
         query_object = {keyname: querystring}
 

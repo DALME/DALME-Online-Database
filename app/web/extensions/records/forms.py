@@ -15,7 +15,7 @@ class SavedSearchChooserForm(forms.Form):
     def __init__(self, *args, **kwargs):
         user = get_current_user()
         search_list = [
-            (i.id, f"{i.name}{' (shared)' if i.owner != user else ''}")
+            (i.id, f'{i.name}{" (shared)" if i.owner != user else ""}')
             for i in SavedSearch.objects.filter(Q(owner=user) | Q(shareable=True)).order_by('-creation_timestamp')
         ]
         self.has_saved_searches = len(search_list) > 0

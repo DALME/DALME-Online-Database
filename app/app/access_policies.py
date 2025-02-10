@@ -32,7 +32,7 @@ class BaseAccessPolicy(AccessPolicy):
                 if self.fail_target_string is None:
                     self.fail_target_string = 'one or more of these records' if len(self.targets) > 1 else 'this record'
 
-                action_string = f" ({action.replace('bulk_', '')})" if action is not None else ''
+                action_string = f' ({action.replace("bulk_", "")})' if action is not None else ''
 
                 self.message = f'You do not have permission to perform the requested action{action_string} on {self.fail_target_string}.'
         return result

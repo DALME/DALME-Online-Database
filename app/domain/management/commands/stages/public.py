@@ -206,7 +206,7 @@ class Stage(BaseStage):
                         columns.append('description')
                         values = values + ",''"
 
-                    sql = f"INSERT INTO dalme.{app}_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    sql = f'INSERT INTO dalme.{app}_{model_name} ({", ".join(columns)}) VALUES ({values});'
                     cursor.execute(sql)
 
         if banners_raw:
@@ -317,7 +317,7 @@ class Stage(BaseStage):
                         if idx < len(row) - 1:
                             values += ', '
 
-                    sql = f"INSERT INTO dalme.{new_app_name}_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    sql = f'INSERT INTO dalme.{new_app_name}_{model_name} ({", ".join(columns)}) VALUES ({values});'
                     cursor.execute(sql)
 
     @transaction.atomic
