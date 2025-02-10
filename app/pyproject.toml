@@ -28,6 +28,7 @@ indent-style = "space"
 [tool.ruff.lint]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 ignore = [
+  "A005",    # shadowing standard librery modules
   "COM812",  # Recommended disable by the rust format.
   "D101",
   "D102",
