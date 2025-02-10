@@ -4,7 +4,7 @@ import * as changeKeys from "change-case/keys";
 import cryptoRandomString from "crypto-random-string";
 import { defineStore } from "pinia";
 import { Notify } from "quasar";
-import { has, isNil } from "ramda";
+import { has, isNil, isNotNil } from "ramda";
 import { computed, ref, watch } from "vue";
 import { assign, fromCallback, fromPromise, setup } from "xstate";
 import { useSelector } from "@xstate/vue";
@@ -423,7 +423,9 @@ export const useAuthStore = defineStore(
     const error = useSelector(actor, ({ context: { error } }) => error);
 
     const currentState = computed(() => state.value.value);
-    const authorized = computed(() => has("yes")(currentState.value) && !isNil(user.value));
+    const authorized = computed(() => {
+      return has("yes")(currentState.value) && isAccessTokenSet.value && isNotNil(user.value);
+    });
     const unauthorized = computed(() => !authorized.value);
     const authenticate = computed(
       () => unauthorized.value && currentState.value.no === "authenticate",
@@ -431,6 +433,7 @@ export const useAuthStore = defineStore(
     const reauthenticate = computed(
       () => unauthorized.value && currentState.value.no === "reauthenticate",
     );
+    const isAccessTokenSet = computed(() => isNotNil(accessToken.value));
 
     const queue = ref([]);
     const processQueue = async () => {
@@ -474,6 +477,7 @@ export const useAuthStore = defineStore(
 
     return {
       accessToken,
+      isAccessTokenSet,
       actor,
       authenticate,
       authorized,
