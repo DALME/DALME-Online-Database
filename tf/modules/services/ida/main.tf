@@ -56,17 +56,17 @@ module "secret" {
 }
 
 # Logs
-resource "aws_cloudwatch_log_group" "web_log_group" {
-  name              = module.ida_log_group_web_label.id
+resource "aws_cloudwatch_log_group" "app_log_group" {
+  name              = module.ida_log_group_app_label.id
   kms_key_id        = data.aws_kms_alias.global.target_key_arn
   retention_in_days = var.log_retention_in_days
 
-  tags = module.ida_log_group_web_label.tags
+  tags = module.ida_log_group_app_label.tags
 }
 
-resource "aws_cloudwatch_log_stream" "web_log_stream" {
-  name           = module.ida_log_stream_web_label.id
-  log_group_name = aws_cloudwatch_log_group.web_log_group.name
+resource "aws_cloudwatch_log_stream" "app_log_stream" {
+  name           = module.ida_log_stream_app_label.id
+  log_group_name = aws_cloudwatch_log_group.app_log_group.name
 }
 
 resource "aws_cloudwatch_log_group" "proxy_log_group" {
@@ -174,7 +174,7 @@ resource "aws_ecs_task_definition" "this" {
         command = [
           "gunicorn",
           "--log-file=-",
-          "--bind=:${var.web_port}",
+          "--bind=:${var.app_port}",
           "--threads=${var.threads}",
           "--workers=${var.workers}",
           "--worker-class=${var.worker}",
@@ -187,7 +187,7 @@ resource "aws_ecs_task_definition" "this" {
         essential   = true
         healthCheck = {
           command = [
-            "CMD-SHELL", "curl -f http://localhost:${var.web_port}/api/healthcheck/ || exit 1"
+            "CMD-SHELL", "curl -f http://localhost:${var.app_port}/api/healthcheck/ || exit 1"
           ]
           interval = 30
           retries  = 3
@@ -197,7 +197,7 @@ resource "aws_ecs_task_definition" "this" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
             awslogs-region        = var.aws_region
             awslogs-stream-prefix = "ecs"
           }
@@ -206,8 +206,8 @@ resource "aws_ecs_task_definition" "this" {
         name        = var.namespace
         portMappings = [
           {
-            containerPort = var.web_port
-            hostPort      = var.web_port
+            containerPort = var.app_port
+            hostPort      = var.app_port
             protocol      = local.protocol
           }
         ]
@@ -224,7 +224,7 @@ resource "aws_ecs_task_definition" "this" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
             awslogs-region        = var.aws_region
             awslogs-stream-prefix = "ecs"
           }
@@ -248,7 +248,7 @@ resource "aws_ecs_task_definition" "this" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
             awslogs-region        = var.aws_region
             awslogs-stream-prefix = "ecs"
           }
@@ -272,7 +272,7 @@ resource "aws_ecs_task_definition" "this" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
             awslogs-region        = var.aws_region
             awslogs-stream-prefix = "ecs"
           }
@@ -296,7 +296,7 @@ resource "aws_ecs_task_definition" "this" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
             awslogs-region        = var.aws_region
             awslogs-stream-prefix = "ecs"
           }
@@ -320,7 +320,7 @@ resource "aws_ecs_task_definition" "this" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
             awslogs-region        = var.aws_region
             awslogs-stream-prefix = "ecs"
           }
@@ -423,7 +423,7 @@ resource "aws_ecs_task_definition" "cleartokens" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+          awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "ecs-scheduled-task"
         }
@@ -489,7 +489,7 @@ resource "aws_ecs_task_definition" "publish" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
+          awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "ecs-scheduled-task"
         }

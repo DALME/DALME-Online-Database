@@ -31,7 +31,7 @@ locals {
     postgres   = 5432
     proxy      = 80
     ssl        = 443
-    web        = 8080
+    app        = 8080
   }
   postgres_version                   = 16
   opensearch_version                 = "Elasticsearch_7.7"

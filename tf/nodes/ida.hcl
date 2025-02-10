@@ -49,7 +49,7 @@ locals {
 inputs = {
   admins                             = local.admins
   allowed_hosts                      = local.tenant_domains
-  web_port                           = local.ports.web
+  app_port                           = local.ports.app
   assign_public_ip                   = true
   cpu_scale_in_cooldown              = 300
   cpu_scale_out_cooldown             = 300

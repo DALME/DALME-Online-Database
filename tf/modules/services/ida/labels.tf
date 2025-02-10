@@ -102,7 +102,7 @@ module "ida_log_stream_label" {
   context = module.ida_log_label.context
 }
 
-module "ida_log_group_web_label" {
+module "ida_log_group_app_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
@@ -112,7 +112,7 @@ module "ida_log_group_web_label" {
   context = module.ida_log_group_label.context
 }
 
-module "ida_log_stream_web_label" {
+module "ida_log_stream_app_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 

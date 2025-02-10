@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "ecs_task_execution_policy" {
     ]
     # tfsec:ignore:aws-iam-no-policy-wildcards
     resources = [
-      "${aws_cloudwatch_log_group.web_log_group.arn}:log-stream:*",
+      "${aws_cloudwatch_log_group.app_log_group.arn}:log-stream:*",
       "${aws_cloudwatch_log_group.proxy_log_group.arn}:log-stream:*",
     ]
   }
