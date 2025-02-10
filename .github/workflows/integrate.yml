@@ -410,62 +410,62 @@ jobs:
   # the repository owner check below to suit your needs (we can't use an
   # env value in an if statement unfortunately to make this clearer). See:
   # https://www.infracost.io/docs/integrations/github_app/
-  infracost:
-    name: 'Infracost'
-    if: >
-      github.repository_owner != 'ocp' &&
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    needs: integrate_terraform
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: '${{ github.event.pull_request.base.ref }}'
+  # infracost:
+  #   name: 'Infracost'
+  #   if: >
+  #     github.repository_owner != 'ocp' &&
+  #     github.event_name == 'pull_request' &&
+  #     github.event.pull_request.draft == false
+  #   runs-on: ubuntu-latest
+  #   needs: integrate_terraform
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: '${{ github.event.pull_request.base.ref }}'
 
-      # If you use private modules, add an environment variable or secret
-      # called GIT_SSH_KEY with your private key, so Infracost can access
-      # private repositories.
-      # - name: add GIT_SSH_KEY
-      #   run: |
-      #     ssh-agent -a /tmp/ssh_agent.sock
-      #     mkdir -p ~/.ssh
-      #     echo '${{ secrets.GIT_SSH_KEY }}' | tr -d '\r' | ssh-add -
-      #     ssh-keyscan github.com >> ~/.ssh/known_hosts
+  #     # If you use private modules, add an environment variable or secret
+  #     # called GIT_SSH_KEY with your private key, so Infracost can access
+  #     # private repositories.
+  #     # - name: add GIT_SSH_KEY
+  #     #   run: |
+  #     #     ssh-agent -a /tmp/ssh_agent.sock
+  #     #     mkdir -p ~/.ssh
+  #     #     echo '${{ secrets.GIT_SSH_KEY }}' | tr -d '\r' | ssh-add -
+  #     #     ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-      - uses: infracost/actions/setup@v2
-        with:
-          api-key: ${{ secrets.INFRACOST_API_KEY }}
+  #     - uses: infracost/actions/setup@v2
+  #       with:
+  #         api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      - run: >
-          infracost breakdown
-          --path=${{ env.TF_ROOT }}
-          --format=json
-          --out-file=/tmp/infracost-base.json
+  #     - run: >
+  #         infracost breakdown
+  #         --path=${{ env.TF_ROOT }}
+  #         --format=json
+  #         --out-file=/tmp/infracost-base.json
 
-      - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v4
 
-      - run: >
-          infracost diff
-          --path=${{ env.TF_ROOT }}
-          --format=json
-          --compare-to=/tmp/infracost-base.json
-          --out-file=/tmp/infracost.json
+  #     - run: >
+  #         infracost diff
+  #         --path=${{ env.TF_ROOT }}
+  #         --format=json
+  #         --compare-to=/tmp/infracost-base.json
+  #         --out-file=/tmp/infracost.json
 
-      # Posts a comment to the PR using the 'update' behavior.
-      # This creates a single comment and updates it. The 'quietest' option.
-      # The other valid behaviors are:
-      #   delete-and-new - Delete previous comments and create a new one.
-      #   hide-and-new - Minimize previous comments and create a new one.
-      #   new - Create a new cost estimate comment on every push.
-      # See https://www.infracost.io/docs/features/cli_commands/#comment-on-pull-requests for other options.
-      - run: >
-          infracost comment github
-          --path=/tmp/infracost.json
-          --repo=$GITHUB_REPOSITORY
-          --github-token=${{ github.token }}
-          --pull-request=${{ github.event.pull_request.number }}
-          --behavior=hide-and-new
+  #     # Posts a comment to the PR using the 'update' behavior.
+  #     # This creates a single comment and updates it. The 'quietest' option.
+  #     # The other valid behaviors are:
+  #     #   delete-and-new - Delete previous comments and create a new one.
+  #     #   hide-and-new - Minimize previous comments and create a new one.
+  #     #   new - Create a new cost estimate comment on every push.
+  #     # See https://www.infracost.io/docs/features/cli_commands/#comment-on-pull-requests for other options.
+  #     - run: >
+  #         infracost comment github
+  #         --path=/tmp/infracost.json
+  #         --repo=$GITHUB_REPOSITORY
+  #         --github-token=${{ github.token }}
+  #         --pull-request=${{ github.event.pull_request.number }}
+  #         --behavior=hide-and-new
