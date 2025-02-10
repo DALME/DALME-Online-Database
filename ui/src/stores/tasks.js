@@ -71,9 +71,12 @@ export const useTasks = defineStore("tasks", () => {
       _lists.init();
     } else {
       _tasks.init().then(() => {
-        if (target == null) _lists.init();
-        if ("taskId" in state) setViewing(state.taskId, true);
-        if ("showTasks" in state) showTaskModal();
+        if (target == null) {
+          _lists.init().then(() => {
+            if ("taskId" in state) setViewing(state.taskId, true);
+            if ("showTasks" in state) showTaskModal();
+          });
+        }
       });
     }
   };
