@@ -15,7 +15,6 @@ module "ecr" {
 
 # Secrets
 locals {
-  app_container_name              = "app"
   postgres_master_user_secret_arn = data.aws_db_instance.postgres.master_user_secret[0].secret_arn
   # These are secrets that we generate here and manage entirely through
   # Terraform, as opposed to those secrets marked 'UNMANAGED' that require some
@@ -85,17 +84,18 @@ resource "aws_cloudwatch_log_stream" "proxy_log_stream" {
 
 # ECS task definition.
 locals {
-  registry = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com"
-  tag      = var.environment == "production" ? "latest" : "staging"
+  app_name   = "app"
+  proxy_name = "nginx"
+  registry   = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com"
+  tag        = var.environment == "production" ? "latest" : "staging"
 }
 
 locals {
   images = {
-    proxy = "${local.registry}/${var.namespace}.proxy:${local.tag}",
-    app   = "${local.registry}/${var.namespace}.app:${local.tag}",
+    proxy = "${local.registry}/${var.namespace}.${local.proxy_name}:${local.tag}",
+    app   = "${local.registry}/${var.namespace}.${local.app_name}:${local.tag}",
   }
-  protocol   = "tcp"
-  proxy_name = "nginx"
+  protocol = "tcp"
   app_env = [
     { name = "ALLOWED_HOSTS", value = jsonencode(var.allowed_hosts) },
     { name = "AWS_STORAGE_BUCKET_NAME", value = data.aws_s3_bucket.staticfiles.id },
@@ -204,7 +204,7 @@ resource "aws_ecs_task_definition" "this" {
           }
         }
         mountPoints = []
-        name        = local.app_container_name
+        name        = local.app_name
         portMappings = [
           {
             containerPort = var.app_port
@@ -241,7 +241,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "collectstatic_tenants"]
         cpu     = 0
         dependsOn = [
-          { containerName = local.app_container_name, condition = "HEALTHY" },
+          { containerName = local.app_name, condition = "HEALTHY" },
         ]
         environment = local.app_env
         essential   = false
@@ -265,7 +265,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "ensure_oauth"]
         cpu     = 0
         dependsOn = [
-          { containerName = local.app_container_name, condition = "HEALTHY" },
+          { containerName = local.app_name, condition = "HEALTHY" },
         ]
         environment = local.app_env
         essential   = false
@@ -289,7 +289,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "ensure_tenants"]
         cpu     = 0
         dependsOn = [
-          { containerName = local.app_container_name, condition = "HEALTHY" },
+          { containerName = local.app_name, condition = "HEALTHY" },
         ]
         environment = local.app_env
         essential   = false
@@ -313,7 +313,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "ensure_superuser"]
         cpu     = 0
         dependsOn = [
-          { containerName = local.app_container_name, condition = "HEALTHY" }
+          { containerName = local.app_name, condition = "HEALTHY" }
         ]
         environment = local.app_env
         essential   = false
