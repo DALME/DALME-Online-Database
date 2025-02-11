@@ -59,7 +59,7 @@ inputs = {
   fargate_memory                     = 1024
   force_delete                       = contains(["development", "staging"], local.environment)
   force_new_deployment               = false
-  gunicorn_config                    = "ida.gunicorn"
+  gunicorn_config                    = "app.gunicorn"
   health_check_grace_period          = 60
   images                             = ["app", "proxy"]
   keepers                            = local.keepers
@@ -95,5 +95,5 @@ inputs = {
   worker                             = "gthread"
   worker_tmp                         = "/dev/shm"
   workers                            = 3
-  wsgi                               = "ida.wsgi:application"
+  wsgi                               = "app.wsgi:application"
 }
