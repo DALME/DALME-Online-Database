@@ -27,6 +27,7 @@ class Stage(BaseStage):
         """Execute the stage."""
         self.migrate_attributes()
         self.remove_unused_attribute_types()
+        self.one_off_fixes()
 
     @transaction.atomic
     def migrate_attributes(self):  # noqa: C901, PLR0915, PLR0912
@@ -183,3 +184,13 @@ class Stage(BaseStage):
                 count += 1
 
         self.logger.warning('Removed %s unused attribute types.', count)
+
+    @transaction.atomic
+    def one_off_fixes(self):
+        """Perform one-off data cleaning."""
+        self.logger.info('Processing one-off fixes to attributes')
+        att_type = AttributeType.objects.get(name='record_type_phrase')
+        target = Attribute.objects.filter(
+            object_id='31ea1698-bcfc-434f-8172-72f8ed82eb91', attribute_type_id=att_type.id, value__value='not known'
+        )
+        target.delete()
