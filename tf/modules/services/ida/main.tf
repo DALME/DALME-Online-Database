@@ -15,6 +15,7 @@ module "ecr" {
 
 # Secrets
 locals {
+  app_container_name              = "app"
   postgres_master_user_secret_arn = data.aws_db_instance.postgres.master_user_secret[0].secret_arn
   # These are secrets that we generate here and manage entirely through
   # Terraform, as opposed to those secrets marked 'UNMANAGED' that require some
@@ -203,7 +204,7 @@ resource "aws_ecs_task_definition" "this" {
           }
         }
         mountPoints = []
-        name        = "app"
+        name        = local.app_container_name
         portMappings = [
           {
             containerPort = var.app_port
@@ -240,7 +241,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "collectstatic_tenants"]
         cpu     = 0
         dependsOn = [
-          { containerName = var.namespace, condition = "HEALTHY" },
+          { containerName = local.app_container_name, condition = "HEALTHY" },
         ]
         environment = local.app_env
         essential   = false
@@ -264,7 +265,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "ensure_oauth"]
         cpu     = 0
         dependsOn = [
-          { containerName = var.namespace, condition = "HEALTHY" },
+          { containerName = local.app_container_name, condition = "HEALTHY" },
         ]
         environment = local.app_env
         essential   = false
@@ -288,7 +289,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "ensure_tenants"]
         cpu     = 0
         dependsOn = [
-          { containerName = var.namespace, condition = "HEALTHY" },
+          { containerName = local.app_container_name, condition = "HEALTHY" },
         ]
         environment = local.app_env
         essential   = false
@@ -312,7 +313,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "ensure_superuser"]
         cpu     = 0
         dependsOn = [
-          { containerName = var.namespace, condition = "HEALTHY" }
+          { containerName = local.app_container_name, condition = "HEALTHY" }
         ]
         environment = local.app_env
         essential   = false
