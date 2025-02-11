@@ -271,10 +271,14 @@ class Stage(BaseStage):
                 self.logger.info('Created %s Tag instances', Tag.objects.count())
 
             # fix ticket ids
-            for comment in Comment.objects.filter(content_type=ticket_ct):
-                new_id = self.TICKET_REGISTER[comment.object_id]
-                comment.object_id = new_id
-                comment.save(update_fields=['object_id'])
+            for tag in Tag.objects.filter(content_type=ticket_ct):
+                try:
+                    new_id = Ticket.objects.get(number=tag.object_id).id
+                    tag.object_id = new_id
+                    tag.save(update_fields=['object_id'])
+                except KeyError:
+                    self.logger.warning('Ticket %s not found', tag.object_id)
+
             self.logger.info('Fixed Ticket ids in tags')
 
         else:
@@ -305,9 +309,13 @@ class Stage(BaseStage):
 
             # fix ticket ids
             for comment in Comment.objects.filter(content_type=ticket_ct):
-                new_id = self.TICKET_REGISTER[comment.object_id]
-                comment.object_id = new_id
-                comment.save(update_fields=['object_id'])
+                try:
+                    new_id = Ticket.objects.get(number=comment.object_id).id
+                    comment.object_id = new_id
+                    comment.save(update_fields=['object_id'])
+                except KeyError:
+                    self.logger.warning('Ticket %s not found', comment.object_id)
+
             self.logger.info('Fixed Ticket ids in comments')
 
         else:
