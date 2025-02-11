@@ -5,14 +5,14 @@ from django.db import models
 from django.db.models import options
 from django.urls import reverse
 
-from app.abstract import TrackingMixin
+from app.abstract import TrackingMixin, UuidMixin
 from domain.models.comment import CommentMixin
 from domain.models.tag import TagMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Ticket(TrackingMixin, CommentMixin, TagMixin):
+class Ticket(UuidMixin, TrackingMixin, CommentMixin, TagMixin):
     """Stores information about tickets."""
 
     OPEN = 0
@@ -22,6 +22,7 @@ class Ticket(TrackingMixin, CommentMixin, TagMixin):
         (CLOSED, 'Closed'),
     )
 
+    number = models.IntegerField(unique=True, null=True)
     subject = models.CharField(max_length=140)
     description = models.TextField(blank=True, null=True)
     status = models.IntegerField(choices=STATUS, default=0)

@@ -19,6 +19,7 @@ from domain.models import (
     ScopeType,
     Tag,
     Task,
+    Ticket,
 )
 from oauth.models import User
 from tenants.models import Tenant
@@ -250,6 +251,7 @@ class Stage(BaseStage):
         # -[ RECORD 1 ]
         # count | 88
         if Tag.objects.count() == 0:
+            ticket_ct = ContentType.objects.get_for_model(Ticket)
             with connection.cursor() as cursor:
                 self.logger.info('Migrating tags')
                 tenant_id = Tenant.objects.get(name='DALME').id
@@ -267,6 +269,14 @@ class Stage(BaseStage):
                 ]
                 Tag.objects.bulk_create(objs)
                 self.logger.info('Created %s Tag instances', Tag.objects.count())
+
+            # fix ticket ids
+            for comment in Comment.objects.filter(content_type=ticket_ct):
+                new_id = self.TICKET_REGISTER[comment.object_id]
+                comment.object_id = new_id
+                comment.save(update_fields=['object_id'])
+            self.logger.info('Fixed Ticket ids in tags')
+
         else:
             self.logger.warning('Tag data already exists')
 
@@ -274,6 +284,7 @@ class Stage(BaseStage):
     def migrate_comment(self):
         """Copy comment data."""
         if Comment.objects.count() == 0:
+            ticket_ct = ContentType.objects.get_for_model(Ticket)
             with connection.cursor() as cursor:
                 self.logger.info('Migrating comments')
                 tenant_id = Tenant.objects.get(name='DALME').id
@@ -291,6 +302,14 @@ class Stage(BaseStage):
                 ]
                 Comment.objects.bulk_create(objs)
                 self.logger.info('Created %s Comment instances', Comment.objects.count())
+
+            # fix ticket ids
+            for comment in Comment.objects.filter(content_type=ticket_ct):
+                new_id = self.TICKET_REGISTER[comment.object_id]
+                comment.object_id = new_id
+                comment.save(update_fields=['object_id'])
+            self.logger.info('Fixed Ticket ids in comments')
+
         else:
             self.logger.warning('Comment data already exists')
 

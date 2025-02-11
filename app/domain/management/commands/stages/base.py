@@ -40,6 +40,7 @@ class BaseStage(abc.ABC):
 
     FN_REGISTER = {}  # register to keep track of footnote indices
     FOOTNOTES = []  # storage for footnotes
+    TICKET_REGISTER = {}  # register to keep track of new ticket ids
 
     @abc.abstractmethod
     def apply(self):
