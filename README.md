@@ -29,3 +29,23 @@ Instructions on how to set up a development environment to run the DALME Online 
 ## License
 
 This software is licensed under a modified [BSD license](https://opensource.org/licenses/BSD-3-Clause). See the LICENSE file in the top distribution directory for the full license text.
+
+## Local Development Initialization
+
+Once your system is prepared with the dependencies, you can spin up the
+containers that run the services and migrate the application to the initial,
+required condition for development.
+
+```
+$ make init
+$ make db.migrate
+$ make app.manage command="ensure_oauth"
+$ make app.open
+```
+
+When you have completed the above bootstrapping sequence, you can just call the
+following command whenever you want to return to work.
+
+```
+make dev
+```

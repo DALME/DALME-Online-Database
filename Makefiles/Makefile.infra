@@ -4,7 +4,7 @@
 infra.help:
 	@echo "  infra.bootstrap          ready the development environment"
 	@echo "  infra.log                tail the container logs"
-	@echo "  infra.media          	  take a downloaded S3 bucket and create a local media folder in the new format"
+	@echo "  infra.media              take a downloaded S3 bucket and create a local media folder in the new format"
 	@echo "  infra.rebuild            rebuild the containers"
 	@echo "  infra.start              spin up the container network"
 	@echo "  infra.stop               stop the container network"

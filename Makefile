@@ -14,12 +14,12 @@ export PY := $(shell cat "$(ROOT)/.python-version")
 export VENV := $(ROOT)/.venv
 export VENV_BIN := $(abspath ${VENV})/bin
 
+-include Makefiles/Makefile.app
 -include Makefiles/Makefile.db
 -include Makefiles/Makefile.deploy
 -include Makefiles/Makefile.docs
 -include Makefiles/Makefile.infra
 -include Makefiles/Makefile.ui
--include Makefiles/Makefile.app
 
 help:
 	@echo "usage: make [option]"
@@ -31,12 +31,12 @@ help:
 	@echo "  sync                     update and rebuild the developer environment"
 	@echo "  test                     run the entire automated test suite"
 	@echo ""
+	@$(MAKE) app.help
 	@$(MAKE) db.help
 	@$(MAKE) deploy.help
 	@$(MAKE) docs.help
 	@$(MAKE) infra.help
 	@$(MAKE) ui.help
-	@$(MAKE) app.help
 .PHONY: help
 
 dev: infra.start infra.log
