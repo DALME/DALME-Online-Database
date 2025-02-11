@@ -203,7 +203,7 @@ resource "aws_ecs_task_definition" "this" {
           }
         }
         mountPoints = []
-        name        = var.namespace
+        name        = "app"
         portMappings = [
           {
             containerPort = var.app_port
