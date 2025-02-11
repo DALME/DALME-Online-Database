@@ -28,11 +28,11 @@ app.collectstatic:
 app.manage:
 ifndef args
 	$(error Call management commands with args. \
-		Usage: make app.manage args='collectstatic --no-input')
+		Usage: make app.manage command='collectstatic --no-input')
 else
 	docker compose exec \
 		$(NAMESPACE).app \
-		python manage.py $(args)
+		python manage.py $(command)
 endif
 .PHONY: app.manage
 
