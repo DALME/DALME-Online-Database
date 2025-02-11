@@ -26,7 +26,7 @@ from .fixtures import COLLECTIONS, DEFAULT_PREFERENCES, PEOPLE_PAGE_DATA
 class Stage(BaseStage):
     """Fixes after finishing all data migrations."""
 
-    name = '12 Content fixes'
+    name = '13 Content fixes'
 
     @transaction.atomic
     def apply(self):
