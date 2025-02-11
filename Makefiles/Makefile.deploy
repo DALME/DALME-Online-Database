@@ -11,8 +11,8 @@ JUMP_HOST := $(NAMESPACE)-$(ENVIRONMENT)-network-jump-host-asg
 
 # DAG order of infra module application.
 APPLY := authorization \
-	network \
 	security \
+	network \
 	firewall \
 	load-balancer \
 	cdn \

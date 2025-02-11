@@ -1,7 +1,7 @@
 bibtexparser==1.4.3
 boto3==1.35.86
 cuid2==2.0.1
-Django==5.1.4
+Django[argon2]==5.1.4
 django-configurations==2.5.1
 django-cors-headers==4.6.0
 django-currentuser @ https://github.com/zsoldosp/django-currentuser/archive/refs/heads/master.zip

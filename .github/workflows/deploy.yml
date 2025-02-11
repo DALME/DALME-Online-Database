@@ -250,7 +250,7 @@ jobs:
       - id: define-modules
         uses: mathiasvr/command-output@v2.0.0
         env:
-          GRAPH: '["authorization", "network", "security", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
+          GRAPH: '["authorization", "security", "network", "firewall", "load-balancer", "cdn", "datastores", "orchestration", "ida"]'
         with:
           run: >
             echo -n ${{ env.GRAPH }} |
@@ -296,7 +296,7 @@ jobs:
         env:
           ECS_CLUSTER: ecs-cluster
           ECS_SERVICE: ecs-service
-          TASK_DEFINITION: ida-ecs-task-definition-web
+          TASK_DEFINITION: ida-ecs-task-definition-app
         with:
           args: >
             deploy
