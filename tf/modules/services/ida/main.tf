@@ -92,8 +92,8 @@ locals {
 
 locals {
   images = {
-    proxy = "${local.registry}/${var.namespace}.${local.proxy_name}:${local.tag}",
-    app   = "${local.registry}/${var.namespace}.${local.app_name}:${local.tag}",
+    app   = "${local.registry}/${var.namespace}.app:${local.tag}",
+    proxy = "${local.registry}/${var.namespace}.proxy:${local.tag}",
   }
   protocol = "tcp"
   app_env = [
