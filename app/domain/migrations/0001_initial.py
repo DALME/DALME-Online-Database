@@ -939,6 +939,7 @@ class Migration(migrations.Migration):
                 ),
                 ('group', models.CharField(max_length=55)),
                 ('default', models.TextField()),
+                ('show_in_settings', models.BooleanField(default=True)),
             ],
             options={
                 'abstract': False,

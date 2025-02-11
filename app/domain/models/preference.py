@@ -15,6 +15,7 @@ class PreferenceKey(TrackingMixin, UuidMixin):
     data_type = models.CharField(choices=BASE_DATA_TYPES, max_length=15)
     group = models.CharField(max_length=55)
     default = models.TextField()
+    show_in_settings = models.BooleanField(default=True)
 
 
 class Preference(TrackingMixin):
