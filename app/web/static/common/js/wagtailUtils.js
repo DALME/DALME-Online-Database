@@ -44,7 +44,15 @@ window.CustomUtils = {
     menu.classList.toggle("u-flex");
     menu.classList.toggle("u-none");
   },
+  // this is just a temporary login function
+  // to send people directly to the CMS login during testing
   goToLogin: async () => {
+    window.location.assign("/cms/login/");
+  },
+  // this is the function for prod after the beta testing
+  // i.e. the one that redirects to the IDA db login
+  // TODO: rename back to goToLogin before final deployment to prod
+  goToLoginFinal: async () => {
     const screenshot = document.documentElement.cloneNode(true);
     const reader = new FileReader();
     screenshot.style.pointerEvents = "none";

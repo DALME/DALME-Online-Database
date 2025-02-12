@@ -45,8 +45,11 @@ cmsurls = [
 
 urlpatterns = [
     path('api/web/', api_router.urls, name='web_api_endpoints'),
-    path('cms/login/', to_ida_login, name='wagtailadmin_login'),
-    path('cms/logout/', to_ida_logout, name='wagtailadmin_logout'),
+    # redirects to IDS DB login
+    # temporarily disabled to send users directly to CMS login during testing
+    # TODO: re-enable before final prod deployment
+    # path('cms/login/', to_ida_login, name='wagtailadmin_login'),
+    # path('cms/logout/', to_ida_logout, name='wagtailadmin_logout'),
     path('cms/', include(cmsurls)),
     path('documents/', include(wagtaildocs_urls)),
 ]
