@@ -182,9 +182,12 @@ class Stage(BaseStage):
 
                 for row in rows:
                     file_id = row.pop('file_id')
+                    number = row.pop('id')
+                    row['number'] = number
                     # We need to populate the m2m field so we can't use bulk
                     # create here but it's only 87 records so not to worry.
                     ticket = Ticket.objects.create(**row)
+
                     if file_id:
                         ticket.files.add(file_id)
 

@@ -19,6 +19,7 @@ from domain.models import (
     ScopeType,
     Tag,
     Task,
+    Ticket,
 )
 from oauth.models import User
 from tenants.models import Tenant
@@ -29,7 +30,7 @@ from .base import BaseStage
 class Stage(BaseStage):
     """Data migration for leftover models."""
 
-    name = '10 Finalize'
+    name = '9 Finalize'
 
     @transaction.atomic
     def apply(self):
@@ -250,6 +251,7 @@ class Stage(BaseStage):
         # -[ RECORD 1 ]
         # count | 88
         if Tag.objects.count() == 0:
+            ticket_ct = ContentType.objects.get_for_model(Ticket)
             with connection.cursor() as cursor:
                 self.logger.info('Migrating tags')
                 tenant_id = Tenant.objects.get(name='DALME').id
@@ -267,6 +269,18 @@ class Stage(BaseStage):
                 ]
                 Tag.objects.bulk_create(objs)
                 self.logger.info('Created %s Tag instances', Tag.objects.count())
+
+            # fix ticket ids
+            for tag in Tag.objects.filter(content_type=ticket_ct):
+                try:
+                    new_id = Ticket.objects.get(number=tag.object_id).id
+                    tag.object_id = new_id
+                    tag.save(update_fields=['object_id'])
+                except KeyError:
+                    self.logger.warning('Ticket %s not found', tag.object_id)
+
+            self.logger.info('Fixed Ticket ids in tags')
+
         else:
             self.logger.warning('Tag data already exists')
 
@@ -274,6 +288,7 @@ class Stage(BaseStage):
     def migrate_comment(self):
         """Copy comment data."""
         if Comment.objects.count() == 0:
+            ticket_ct = ContentType.objects.get_for_model(Ticket)
             with connection.cursor() as cursor:
                 self.logger.info('Migrating comments')
                 tenant_id = Tenant.objects.get(name='DALME').id
@@ -291,6 +306,18 @@ class Stage(BaseStage):
                 ]
                 Comment.objects.bulk_create(objs)
                 self.logger.info('Created %s Comment instances', Comment.objects.count())
+
+            # fix ticket ids
+            for comment in Comment.objects.filter(content_type=ticket_ct):
+                try:
+                    new_id = Ticket.objects.get(number=comment.object_id).id
+                    comment.object_id = new_id
+                    comment.save(update_fields=['object_id'])
+                except KeyError:
+                    self.logger.warning('Ticket %s not found', comment.object_id)
+
+            self.logger.info('Fixed Ticket ids in comments')
+
         else:
             self.logger.warning('Comment data already exists')
 

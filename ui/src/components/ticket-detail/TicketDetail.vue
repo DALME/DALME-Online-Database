@@ -4,7 +4,7 @@
       <div class="col-grow">
         <div class="row items-center text-h5">
           {{ ticket.subject }}
-          <span class="q-ml-sm text-grey-7">#{{ id }}</span>
+          <span class="q-ml-sm text-grey-7">#{{ number }}</span>
         </div>
         <div class="row detail-row-subheading text-grey-8">
           <q-chip
@@ -168,15 +168,16 @@ export default defineComponent({
     const action = ref("");
     const attachment = ref(null);
     const ticket = ref({});
-    const id = computed(() => $route.params.id);
+    const id = ref(null);
+    const number = computed(() => $route.params.id);
     const buttonColours = computed(() =>
       action.value === "reopen ticket"
         ? { colour: "green-1", text: "green-7" }
         : { colour: "deep-purple-1", text: "deep-purple-6" },
     );
 
-    useMeta({ title: `Ticket #${id.value}` });
-    ui.breadcrumbTail.push(`#${id.value}`);
+    useMeta({ title: `Ticket #${number.value}` });
+    ui.breadcrumbTail.push(`#${number.value}`);
 
     provide("attachment", attachment);
     provide("model", model);
@@ -199,12 +200,13 @@ export default defineComponent({
     };
 
     const fetchData = async () => {
-      await fetchAPI(requests.tickets.getTicket(id.value));
+      await fetchAPI(requests.tickets.getTicket(number.value));
       if (success.value)
         await ticketDetailSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           action.value = value.status ? "reopen ticket" : "close ticket";
           ticket.value = value;
           attachment.value = value.file;
+          id.value = value.id;
           loading.value = false;
         });
     };
@@ -222,7 +224,7 @@ export default defineComponent({
       capitalize,
       cleanTags,
       formatDate,
-      id,
+      number,
       isAdmin,
       isEmpty,
       isNil,

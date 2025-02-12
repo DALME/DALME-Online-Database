@@ -18,7 +18,7 @@ from .fixtures import NAMED_AGENTS
 class Stage(BaseStage):
     """Data processing stage for named agents."""
 
-    name = '13 Named Agents'
+    name = '10 Named Agents'
 
     @transaction.atomic
     def apply(self):

@@ -41,11 +41,11 @@ STAGES = [
     AttributeOptionsStage,
     AttributesStage,
     RecordsStage,
-    CollectionsStage,
     FinalizeStage,
+    NamedAgentsStage,
+    CollectionsStage,
     PublicStage,
     ContentFixes,
-    NamedAgentsStage,
     PharmaStage,
     TeiElements,
 ]

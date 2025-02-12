@@ -286,4 +286,5 @@ CT_DATA = {
 
 CTA_PROPS = {
     ('record', 'language'): {'is_unique': False},
+    ('record', 'locale'): {'is_unique': False},
 }

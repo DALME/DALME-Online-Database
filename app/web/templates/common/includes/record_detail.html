@@ -15,7 +15,7 @@
             <span>| {{ data.language|get_string_list:'name' }}</span>
           {% endif %}
           {% if record_data.locale %}
-            <span>| {{ record_data.locale.name }} ({{ record_data.locale.administrative_region }}, {{ record_data.locale.country.name }})</span>
+            <span>| {{ record_data.locale|get_string_list:'name,administrative_region,country.name|{} ({}, {})' }}</span>
           {% endif %}
         </a>
       </div>
