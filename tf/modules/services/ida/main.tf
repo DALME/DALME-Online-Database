@@ -238,58 +238,10 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
-        command = ["python3", "manage.py", "collectstatic_tenants"]
-        cpu     = 0
-        dependsOn = [
-          { containerName = local.app_name, condition = "HEALTHY" },
-        ]
-        environment = local.app_env
-        essential   = false
-        image       = local.images.app
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
-            awslogs-region        = var.aws_region
-            awslogs-stream-prefix = "ecs"
-          }
-        }
-        mountPoints    = []
-        name           = "collectstatic"
-        portMappings   = []
-        secrets        = local.app_secrets
-        systemControls = []
-        volumesFrom    = []
-      },
-      {
-        command = ["python3", "manage.py", "ensure_oauth"]
-        cpu     = 0
-        dependsOn = [
-          { containerName = local.app_name, condition = "HEALTHY" },
-        ]
-        environment = local.app_env
-        essential   = false
-        image       = local.images.app
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
-            awslogs-region        = var.aws_region
-            awslogs-stream-prefix = "ecs"
-          }
-        }
-        mountPoints    = []
-        name           = "ensure_oauth"
-        portMappings   = []
-        secrets        = local.app_secrets
-        systemControls = []
-        volumesFrom    = []
-      },
-      {
         command = ["python3", "manage.py", "ensure_tenants"]
         cpu     = 0
         dependsOn = [
-          { containerName = local.app_name, condition = "HEALTHY" },
+          { containerName = "migrate", condition = "COMPLETE" },
         ]
         environment = local.app_env
         essential   = false
@@ -310,10 +262,34 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
+        command = ["python3", "manage.py", "ensure_oauth"]
+        cpu     = 0
+        dependsOn = [
+          { containerName = "ensure_tenants", condition = "COMPLETE" },
+        ]
+        environment = local.app_env
+        essential   = false
+        image       = local.images.app
+        logConfiguration = {
+          logDriver = "awslogs"
+          options = {
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
+            awslogs-region        = var.aws_region
+            awslogs-stream-prefix = "ecs"
+          }
+        }
+        mountPoints    = []
+        name           = "ensure_oauth"
+        portMappings   = []
+        secrets        = local.app_secrets
+        systemControls = []
+        volumesFrom    = []
+      },
+      {
         command = ["python3", "manage.py", "ensure_superuser"]
         cpu     = 0
         dependsOn = [
-          { containerName = local.app_name, condition = "HEALTHY" }
+          { containerName = "ensure_oauth", condition = "COMPLETE" },
         ]
         environment = local.app_env
         essential   = false
@@ -328,6 +304,30 @@ resource "aws_ecs_task_definition" "this" {
         }
         mountPoints    = []
         name           = "ensure_superuser"
+        portMappings   = []
+        secrets        = local.app_secrets
+        systemControls = []
+        volumesFrom    = []
+      },
+      {
+        command = ["python3", "manage.py", "collectstatic_tenants"]
+        cpu     = 0
+        dependsOn = [
+          { containerName = "ensure_superuser", condition = "COMPLETE" },
+        ]
+        environment = local.app_env
+        essential   = false
+        image       = local.images.app
+        logConfiguration = {
+          logDriver = "awslogs"
+          options = {
+            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
+            awslogs-region        = var.aws_region
+            awslogs-stream-prefix = "ecs"
+          }
+        }
+        mountPoints    = []
+        name           = "collectstatic"
         portMappings   = []
         secrets        = local.app_secrets
         systemControls = []
