@@ -4,7 +4,8 @@ import { attachmentSchema, userAttributeSchema } from "@/schemas";
 export const ticketDetailSchema = yup
   .object()
   .shape({
-    id: yup.number().required(),
+    id: yup.string().uuid().required(),
+    number: yup.number().required(),
     status: yup.boolean().required(),
     subject: yup.string().required(),
     description: yup
@@ -41,7 +42,8 @@ export const ticketDetailSchema = yup
 export const ticketSchema = yup
   .object()
   .shape({
-    id: yup.number().required(),
+    id: yup.string().uuid().required(),
+    number: yup.number().required(),
     status: yup.boolean().required(),
     subject: yup.string().required(),
     description: yup
@@ -111,7 +113,8 @@ export const ticketFieldValidation = {
 export const ticketEditSchema = yup
   .object()
   .shape({
-    id: yup.number().required(),
+    id: yup.string().uuid().required(),
+    number: yup.number().required(),
     subject: yup.string().required(),
     description: yup.string().required(),
     status: yup.object().shape({
@@ -161,7 +164,7 @@ const ticketPostSchema = yup.object().shape({
 });
 
 const ticketPutSchema = ticketPostSchema.shape({
-  id: yup.number().required(),
+  id: yup.string().uuid().required(),
 });
 
 export const ticketSubmitSchemas = {

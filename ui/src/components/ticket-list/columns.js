@@ -2,6 +2,17 @@ export const columnMap = {
   id: {
     label: "ID",
     align: "left",
+    sortable: false,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: false,
+    autoWidth: true,
+  },
+  number: {
+    label: "Number",
+    align: "center",
     sortable: true,
     sortOrder: "ad",
     isSortDefault: true,

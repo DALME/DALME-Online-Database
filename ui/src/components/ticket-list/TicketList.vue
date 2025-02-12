@@ -30,7 +30,7 @@
     <template v-slot:grid-main="props">
       <DetailPopover
         linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Ticket', params: { id: props.row.id } }"
+        :linkTarget="{ name: 'Ticket', params: { id: props.row.number } }"
         :linkText="props.row.subject"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
@@ -38,7 +38,7 @@
           {{ formatDate(props.row.creationTimestamp, false) }}
         </div>
         <div class="text-h8 q-mb-xs">
-          <span class="text-grey-7">#{{ props.row.id }}</span>
+          <span class="text-grey-7">#{{ props.row.number }}</span>
           {{ props.row.subject }}
         </div>
         <div class="text-detail ellipsis-3-lines">
@@ -59,7 +59,9 @@
     <template v-slot:grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
         <span
-          v-text="`#${props.row.id} opened ${formatDate(props.row.creationTimestamp, false)} by `"
+          v-text="
+            `#${props.row.number} opened ${formatDate(props.row.creationTimestamp, false)} by `
+          "
         />
         <DetailPopover showAvatar :userData="props.row.creationUser" />
         <template v-if="props.row.status && props.row.closingUser">
@@ -127,7 +129,7 @@
     <template v-slot:render-cell-subject="props">
       <router-link
         class="text-subtitle2 text-link"
-        :to="{ name: 'Ticket', params: { id: props.row.id } }"
+        :to="{ name: 'Ticket', params: { id: props.row.number } }"
       >
         {{ props.row.subject }}
       </router-link>

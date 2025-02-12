@@ -29,6 +29,7 @@ class TicketSerializer(DynamicSerializer):
         model = Ticket
         fields = [
             'id',
+            'number',
             'assigned_to',
             'subject',
             'description',
@@ -82,6 +83,7 @@ class TicketDetailSerializer(DynamicSerializer):
         model = Ticket
         fields = [
             'id',
+            'number',
             'subject',
             'description',
             'status',

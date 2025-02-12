@@ -4,6 +4,7 @@ from datetime import datetime
 
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from django.utils import timezone
@@ -34,6 +35,18 @@ class Tickets(BaseViewSet):
     search_fields = ['subject', 'description']
     ordering_fields = ['id', 'subject', 'description', 'status', 'creation_user', 'creation_timestamp', 'assigned_to']
     ordering = ['status', 'id']
+
+    def get_object(self):
+        """Return the object the view is displaying when requested by either id or number."""
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        if lookup_url_kwarg in self.kwargs:
+            lookup_value = self.kwargs[lookup_url_kwarg]
+            if str(lookup_value).isdigit():
+                filter_kwargs = {'number': lookup_value}
+                obj = get_object_or_404(self.queryset, **filter_kwargs)
+                self.check_object_permissions(self.request, obj)
+                return obj
+        return super().get_object()
 
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):  # noqa: ARG002
