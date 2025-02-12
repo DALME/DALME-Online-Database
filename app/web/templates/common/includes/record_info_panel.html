@@ -21,7 +21,7 @@
   {% endif %}
   {% if data.locale %}
     <li>
-      <span>Locale:</span> {{ data.locale.name }} ({{ data.locale.administrative_region }}, {{ data.locale.country.name }})
+      <span>Locale:</span> {{ data.locale|get_string_list:'name,administrative_region,country.name|{} ({}, {})' }}
     </li>
   {% endif %}
   {% if data.language %}

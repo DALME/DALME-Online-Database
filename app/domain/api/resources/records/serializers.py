@@ -101,7 +101,7 @@ class RecordSerializer(DynamicSerializer):
     # annotated fields
     description = serializers.ReadOnlyField()
     record_type = RecordTypeSerializer()
-    locale = LocaleReferenceSerializer()
+    locale = LocaleReferenceSerializer(many=True)
     language = LanguageReferenceSerializer(many=True)
     # method fields
     agents = AgentSerializer(many=True, required=False)
