@@ -19,7 +19,7 @@ else
 	@$(MAKE) db.migrate
 	@$(MAKE) app.manage args='ensure_tenants'
 	@$(MAKE) db.load dump='$(dump)'
-	@$(MAKE) -e app.migrate_data
+	@$(MAKE) app.migrate_data
 	@$(MAKE) app.manage args='ensure_oauth'
 	@$(MAKE) app.manage args='tenant_command update_index --schema=dalme'
 endif
