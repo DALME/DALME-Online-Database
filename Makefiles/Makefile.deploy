@@ -22,7 +22,6 @@ APPLY := authorization \
 
 deploy.help:
 	@echo "  deploy.apply             provision a single module"
-	@echo "  deploy.ecs               update the ecs service/task"
 	@echo "  deploy.destroy           delete a single module"
 	@echo "  deploy.init              initialize a single resource module"
 	@echo "  deploy.init.upgrade      re-init/upgrade terraform providers for a module"
@@ -69,14 +68,6 @@ else
 		--terragrunt-non-interactive
 endif
 .PHONY: deploy.destroy
-
-deploy.ecs:
-	docker compose run --rm \
-		-e AWS_PROFILE=$(AWS_PROFILE) \
-		$(NAMESPACE).deploy \
-		ecs deploy $(CLUSTER) $(SERVICE) \
-		--timeout -1
-.PHONY: deploy.ecs
 
 deploy.graph:
 	docker compose run -T --rm \
