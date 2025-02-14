@@ -22,7 +22,6 @@ APPLY := authorization \
 
 deploy.help:
 	@echo "  deploy.apply             provision a single module"
-	@echo "  deploy.ecs               update the ecs service/task"
 	@echo "  deploy.destroy           delete a single module"
 	@echo "  deploy.init              initialize a single resource module"
 	@echo "  deploy.init.upgrade      re-init/upgrade terraform providers for a module"
@@ -33,6 +32,7 @@ deploy.help:
 	@echo "  deploy.shell             shell into the deploy container"
 	@echo "  deploy.ssh               open a secure shell to a deploy environment"
 	@echo "  deploy.tunnel            forward ports via a secure tunnel into a deploy environment"
+	@echo "  deploy.unlock            force the release of a terraform module lock"
 	@echo "  deploy.update            update all terraform provider and third-party module versions"
 	@echo "  deploy.validate          validate all terraform modules and configuration."
 	@echo "  deploy.validate.module   validate a single terraform modules."
@@ -70,13 +70,21 @@ else
 endif
 .PHONY: deploy.destroy
 
-deploy.ecs:
+deploy.unlock: _confirm
+ifndef uuid
+	$(error Supply lock uuid. \
+		Usage: make deploy.unlock uuid=00000000-0000-0000-0000-000000000000)
+else
 	docker compose run --rm \
 		-e AWS_PROFILE=$(AWS_PROFILE) \
+		-e IAMLIVE=$(IAMLIVE) \
 		$(NAMESPACE).deploy \
-		ecs deploy $(CLUSTER) $(SERVICE) \
-		--timeout -1
-.PHONY: deploy.ecs
+		terragrunt force-unlock \
+		$(uuid) \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.unlock
 
 deploy.graph:
 	docker compose run -T --rm \

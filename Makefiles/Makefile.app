@@ -41,7 +41,7 @@ app.migrate_data:
 		-e DATA_MIGRATION=1 \
 		$(NAMESPACE).app \
 		python manage.py migrate_data
-.PHONY: app.manage
+.PHONY: app.migrate_data
 
 app.notebook:
 	docker compose exec \

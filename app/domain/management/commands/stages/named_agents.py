@@ -28,12 +28,16 @@ class Stage(BaseStage):
 
     @transaction.atomic
     def remove_named_persons(self):
-        self.logger.info('Removing named persons...')
-        atype = AttributeType.objects.get(name='named_persons')
-        Attribute.objects.filter(attribute_type=atype).delete()
-        self.logger.info('Attributes removed.')
-        atype.delete()
-        self.logger.info('Attribute type deleted.')
+        try:
+            atype = AttributeType.objects.get(name='named_persons')
+        except AttributeType.DoesNotExist:
+            pass
+        else:
+            self.logger.info('Removing named persons...')
+            Attribute.objects.filter(attribute_type=atype).delete()
+            self.logger.info('Attributes removed.')
+            atype.delete()
+            self.logger.info('Attribute type deleted.')
 
     @transaction.atomic
     def process_named_agents(self):

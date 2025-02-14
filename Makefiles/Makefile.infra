@@ -17,10 +17,8 @@ ifndef dump
 		Usage: make bootstrap dump='dalme-20231025-T1698276955.dump')
 else
 	@$(MAKE) db.migrate
-	@$(MAKE) app.manage args='ensure_tenants'
 	@$(MAKE) db.load dump='$(dump)'
-	@$(MAKE) -e app.migrate_data
-	@$(MAKE) app.manage args='ensure_oauth'
+	@$(MAKE) app.migrate_data
 	@$(MAKE) app.manage args='tenant_command update_index --schema=dalme'
 endif
 .PHONY: infra.bootstrap
