@@ -8,8 +8,9 @@ are able to maintain complete control and transparency during this procedure
 
 import structlog
 
+from django.conf import settings
 from django.core.management import call_command
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from .stages import (
     AttributeOptionsStage,
@@ -66,9 +67,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):  # noqa: ARG002
         """Migrate DALME data."""
-        # if not settings.IS_DEV:
-        #     err = 'This command should not be run outside of a development environment'
-        #     raise CommandError(err, returncode=1)
+        if not settings.IS_DEV:
+            err = 'This command should not be run outside of a development environment'
+            raise CommandError(err, returncode=1)
 
         logger.info('Initializing data migration')
         call_command('ensure_tenants')

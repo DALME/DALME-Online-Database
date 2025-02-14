@@ -26,7 +26,8 @@ class TenantTypes(str, enum.Enum):
 class TENANT:
     """Structure for defining application tenants."""
 
-    domain: list[str]
+    domain: str
+    additional_domains: list[str]
     name: str
     schema_name: str
     is_primary: bool
@@ -483,21 +484,24 @@ class Development(Base, Configuration):
 
     _TENANTS = {
         'IDA': {
-            'domain': ['ida.localhost'],
+            'domain': 'ida.localhost',
+            'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
-            'domain': ['dalme.localhost', 'dalme.org'],
+            'domain': 'dalme.localhost',
+            'additional_domains': [],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
-            'domain': ['pharmacopeias.localhost'],
+            'domain': 'pharmacopeias.localhost',
+            'additional_domains': [],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
@@ -846,6 +850,7 @@ class Staging(Production, Configuration):
     _TENANTS = {
         'IDA': {
             'domain': 'ida.ocp.systems',
+            'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
@@ -853,6 +858,7 @@ class Staging(Production, Configuration):
         },
         'DALME': {
             'domain': 'dalme.ocp.systems',
+            'additional_domains': [],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
@@ -860,6 +866,7 @@ class Staging(Production, Configuration):
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.ocp.systems',
+            'additional_domains': [],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
