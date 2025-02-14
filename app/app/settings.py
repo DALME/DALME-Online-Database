@@ -27,7 +27,7 @@ class TENANT:
     """Structure for defining application tenants."""
 
     domain: str
-    additional_domains: list[str] | None
+    additional_domains: list[str]
     name: str
     schema_name: str
     is_primary: bool
@@ -485,7 +485,7 @@ class Development(Base, Configuration):
     _TENANTS = {
         'IDA': {
             'domain': 'ida.localhost',
-            'additional_domains': None,
+            'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
@@ -493,7 +493,7 @@ class Development(Base, Configuration):
         },
         'DALME': {
             'domain': 'dalme.localhost',
-            'additional_domains': ['dalme.org'],
+            'additional_domains': [],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
@@ -501,7 +501,7 @@ class Development(Base, Configuration):
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.localhost',
-            'additional_domains': None,
+            'additional_domains': [],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
@@ -850,7 +850,7 @@ class Staging(Production, Configuration):
     _TENANTS = {
         'IDA': {
             'domain': 'ida.ocp.systems',
-            'additional_domains': None,
+            'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
@@ -858,7 +858,7 @@ class Staging(Production, Configuration):
         },
         'DALME': {
             'domain': 'dalme.ocp.systems',
-            'additional_domains': None,
+            'additional_domains': [],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
@@ -866,7 +866,7 @@ class Staging(Production, Configuration):
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.ocp.systems',
-            'additional_domains': None,
+            'additional_domains': [],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
