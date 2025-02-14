@@ -312,9 +312,9 @@ resource "aws_ecs_task_definition" "this" {
       {
         command = ["python3", "manage.py", "collectstatic_tenants"]
         cpu     = 0
-        dependsOn = [
-          { containerName = "ensure_superuser", condition = "COMPLETE" },
-        ]
+        # dependsOn = [
+        #   { containerName = "ensure_superuser", condition = "COMPLETE" },
+        # ]
         environment = local.app_env
         essential   = false
         image       = local.images.app
