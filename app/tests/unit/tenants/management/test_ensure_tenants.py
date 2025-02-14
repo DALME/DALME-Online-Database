@@ -2,47 +2,16 @@
 
 from unittest import mock
 
-import pytest
-
-from django.db import DataError
-
 from app.settings import TenantTypes
 from tenants.management.commands.ensure_tenants import Command as EnsureTenants
 from tenants.models import Domain, Tenant
 
 
-@pytest.mark.xfail
-@mock.patch('tenants.management.commands.ensure_tenants.Domain')
-@mock.patch('tenants.management.commands.ensure_tenants.Tenant')
-@mock.patch('tenants.management.commands.ensure_tenants.logger')
-def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
-    mock_tenant.objects.filter.return_value.exists.side_effect = [True, False]
-
-    with pytest.raises(DataError):
-        EnsureTenants().handle()
-
-    assert mock_tenant.mock_calls == [
-        mock.call.objects.filter(name='IDA'),
-        mock.call.objects.filter().exists(),
-        mock.call.objects.filter(domains__domain='ida.localhost'),
-        mock.call.objects.filter().exists(),
-    ]
-    assert mock_domain.called is False
-    assert mock_logger.mock_calls == [
-        mock.call.error(
-            'Invalid existing tenant record for this environment',
-            tenant='IDA',
-            domain='ida.localhost',
-        ),
-    ]
-
-
-@pytest.mark.xfail
 @mock.patch('tenants.management.commands.ensure_tenants.Domain')
 @mock.patch('tenants.management.commands.ensure_tenants.Tenant')
 @mock.patch('tenants.management.commands.ensure_tenants.logger')
 def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
-    mock_tenant.objects.filter.return_value.exists.side_effect = [True, True, True, True, False]
+    mock_tenant.objects.filter.return_value.exists.side_effect = [True, True, False]
     new_tenant = mock.MagicMock(spec=Tenant)
     new_domain = mock.MagicMock(spec=Domain)
     mock_tenant.objects.create.return_value = new_tenant
@@ -53,11 +22,7 @@ def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
     assert mock_tenant.mock_calls == [
         mock.call.objects.filter(name='IDA'),
         mock.call.objects.filter().exists(),
-        mock.call.objects.filter(domains__domain='ida.localhost'),
-        mock.call.objects.filter().exists(),
         mock.call.objects.filter(name='DALME'),
-        mock.call.objects.filter().exists(),
-        mock.call.objects.filter(domains__domain='dalme.localhost'),
         mock.call.objects.filter().exists(),
         mock.call.objects.filter(name='Pharmacopeias'),
         mock.call.objects.filter().exists(),

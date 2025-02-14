@@ -3,7 +3,6 @@
 import io
 from unittest import mock
 
-import pytest
 from oauth2_provider.models import Application
 
 from django.core.management import call_command
@@ -13,7 +12,6 @@ from oauth.management.commands.ensure_oauth import Command as EnsureOAuth
 EXPECTED_TENANTS = ['ida', 'dalme', 'pharmacopeias']
 
 
-@pytest.mark.xfail
 @mock.patch('oauth.management.commands.ensure_oauth.io.StringIO')
 @mock.patch('oauth.management.commands.ensure_oauth.call_command')
 @mock.patch('oauth.management.commands.ensure_oauth.Application')
@@ -51,7 +49,6 @@ def test_ensure_oauth_create_application_some_failure(mock_logger, mock_applicat
     ]
 
 
-@pytest.mark.xfail
 @mock.patch('oauth.management.commands.ensure_oauth.io.StringIO')
 @mock.patch('oauth.management.commands.ensure_oauth.call_command')
 @mock.patch('oauth.management.commands.ensure_oauth.Application')
