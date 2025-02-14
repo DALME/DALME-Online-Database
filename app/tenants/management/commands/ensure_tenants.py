@@ -18,7 +18,31 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):  # noqa: ARG002
         """Create application tenant records."""
-        tenants = settings.TENANTS()
+        # tenants = settings.TENANTS()
+        tenants = {
+            'IDA': {
+                'domain': 'ida.ocp.systems',
+                'name': 'IDA',
+                'schema_name': 'public',
+                'is_primary': True,
+                'tenant_type': settings.TenantTypes.PUBLIC,
+            },
+            'DALME': {
+                'domain': 'dalme.ocp.systems',
+                'name': 'DALME',
+                'schema_name': 'dalme',
+                'is_primary': False,
+                'tenant_type': settings.TenantTypes.PROJECT,
+            },
+            'PHARMACOPEIAS': {
+                'domain': 'pharmacopeias.ocp.systems',
+                'name': 'Pharmacopeias',
+                'schema_name': 'pharmacopeias',
+                'is_primary': False,
+                'tenant_type': settings.enantTypes.PROJECT,
+            },
+        }
+
         for tenant in tenants:
             domain, name, schema_name, is_primary, tenant_type = tenant.value
 
