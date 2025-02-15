@@ -5,20 +5,21 @@ data "aws_iam_policy_document" "oac_assets" {
       "s3:GetObject",
       "s3:GetObjectVersion",
     ]
-    resources = [
-      "${module.assets.bucket_arn}/*",
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
       values   = [module.cloudfront.arn]
     }
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    resources = [
+      "${module.assets.bucket_arn}/*",
+    ]
   }
 }
 
@@ -26,22 +27,26 @@ data "aws_iam_policy_document" "oac_staticfiles" {
   statement {
     actions = [
       "s3:GetObject",
+      "s3:GetObjectAcl",
       "s3:GetObjectVersion",
+      "s3:ListBucket",
     ]
-    resources = [
-      "${module.staticfiles.bucket_arn}/*",
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
       values   = [module.cloudfront.arn]
     }
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    resources = [
+      module.staticfiles.bucket_arn,
+      "${module.staticfiles.bucket_arn}/*",
+    ]
   }
 }
 

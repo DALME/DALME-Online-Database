@@ -691,8 +691,8 @@ class Production(Base, Configuration):
         return json.loads(os.environ['ALLOWED_HOSTS'])
 
     @property
-    def AWS_STORAGE_BUCKET_NAME(self):
-        return os.environ['AWS_STORAGE_BUCKET_NAME']
+    def AWS_S3_CUSTOM_DOMAIN(self):
+        return self.BASE_URL
 
     @property
     def CORS_ALLOWED_ORIGINS(self):
@@ -770,10 +770,6 @@ class Production(Base, Configuration):
     @property
     def SECRET_KEY(self):
         return os.environ['DJANGO_SECRET_KEY']
-
-    @property
-    def AWS_S3_CUSTOM_DOMAIN(self):
-        return self.BASE_URL
 
     @property
     def MEDIA_URL(self):
