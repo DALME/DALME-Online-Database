@@ -79,7 +79,6 @@ class Base(Configuration):
     @property
     def STATICFILES_DIRS(self):
         return [
-            (self.PROJECT_ROOT / 'app' / 'static').as_posix(),
             (self.PROJECT_ROOT / 'web' / 'static' / 'common').as_posix(),
         ]
 
@@ -846,6 +845,8 @@ class Production(Base, Configuration):
 
 class Staging(Production, Configuration):
     """Staging settings."""
+
+    DEBUG = True
 
     _TENANTS = {
         'IDA': {
