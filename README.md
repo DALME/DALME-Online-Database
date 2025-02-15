@@ -39,7 +39,8 @@ required condition for development.
 ```
 $ make init
 $ make db.migrate
-$ make app.manage command="ensure_oauth"
+$ make app.manage args="ensure_tenants"
+$ make app.manage args="ensure_oauth"
 $ make app.open
 ```
 

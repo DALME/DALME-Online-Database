@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     help = 'Create a superuser non-interactively.'
 
-    def handle(self, *args, **options):  # noqa: ARG002
+    def handle(self, *args, **options) -> None:  # noqa: ARG002
         """Create a superuser using credentials from the environment.
 
         This command only runs automated as part of an ecs task definition.

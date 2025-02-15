@@ -1,14 +1,16 @@
 """Management command to reset db sequences for a migration deploy."""
 
+import io
 import os
 
 import structlog
-from StringIO import StringIO
+from psycopg.errors import UndefinedTable
 
 from django.apps import apps
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import connection, transaction
+from django.db.utils import ProgrammingError
 
 os.environ['DJANGO_COLORS'] = 'nocolor'
 
@@ -20,11 +22,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):  # noqa: ARG002
         """Execute the SQL to reset db table sequences."""
-        commands = StringIO()
         cursor = connection.cursor()
 
         for app in apps.get_app_configs():
-            call_command('sqlsequencereset', app.label, stdout=commands)
+            command = io.StringIO()
+            call_command('sqlsequencereset', app.label, stdout=command)
             logger.info('Resetting sequences for app: %s', app=app.label)
 
-        cursor.execute(commands.getvalue())
+            with transaction.atomic():
+                try:
+                    cursor.execute(command.getvalue())
+                except (ProgrammingError, UndefinedTable):
+                    logger.exception('Unable to reset sequence for: %', app=app.label)

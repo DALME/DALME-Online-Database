@@ -237,30 +237,30 @@ resource "aws_ecs_task_definition" "this" {
         systemControls = []
         volumesFrom    = []
       },
-      {
-        command = ["python3", "manage.py", "reset_sequences"]
-        cpu     = 0
-        dependsOn = [
-          { containerName = "migrate", condition = "COMPLETE" },
-        ]
-        environment = local.app_env
-        essential   = false
-        image       = local.images.app
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
-            awslogs-region        = var.aws_region
-            awslogs-stream-prefix = "ecs"
-          }
-        }
-        mountPoints    = []
-        name           = "reset_sequences"
-        portMappings   = []
-        secrets        = local.app_secrets
-        systemControls = []
-        volumesFrom    = []
-      },
+      # {
+      #   command = ["python3", "manage.py", "reset_sequences"]
+      #   cpu     = 0
+      #   dependsOn = [
+      #     { containerName = "migrate", condition = "COMPLETE" },
+      #   ]
+      #   environment = local.app_env
+      #   essential   = false
+      #   image       = local.images.app
+      #   logConfiguration = {
+      #     logDriver = "awslogs"
+      #     options = {
+      #       awslogs-group         = aws_cloudwatch_log_group.app_log_group.name
+      #       awslogs-region        = var.aws_region
+      #       awslogs-stream-prefix = "ecs"
+      #     }
+      #   }
+      #   mountPoints    = []
+      #   name           = "reset_sequences"
+      #   portMappings   = []
+      #   secrets        = local.app_secrets
+      #   systemControls = []
+      #   volumesFrom    = []
+      # },
       # {
       #   command = ["python3", "manage.py", "ensure_tenants"]
       #   cpu     = 0
@@ -289,7 +289,7 @@ resource "aws_ecs_task_definition" "this" {
         command = ["python3", "manage.py", "ensure_oauth"]
         cpu     = 0
         dependsOn = [
-          { containerName = "reset_sequences", condition = "COMPLETE" },
+          { containerName = "migrate", condition = "COMPLETE" },
         ]
         environment = local.app_env
         essential   = false
