@@ -691,10 +691,6 @@ class Production(Base, Configuration):
         return json.loads(os.environ['ALLOWED_HOSTS'])
 
     @property
-    def AWS_S3_CUSTOM_DOMAIN(self):
-        return os.environ['CLOUDFRONT_DISTRIBUTION']
-
-    @property
     def AWS_STORAGE_BUCKET_NAME(self):
         return os.environ['AWS_STORAGE_BUCKET_NAME']
 
