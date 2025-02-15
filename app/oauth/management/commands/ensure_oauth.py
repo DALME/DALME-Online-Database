@@ -28,11 +28,11 @@ class Command(BaseCommand):
     help = 'Create an oauth application.'
 
     @property
-    def success(self):
+    def success(self) -> str:
         """The expected success message from the sub-command."""
         return f'New application {self.DEFAULTS["name"]} created successfully'
 
-    def handle(self, *args, **options):  # noqa: ARG002
+    def handle(self, *args, **options) -> None:  # noqa: ARG002
         """Create an oauth application record."""
         client_id = settings.OAUTH_CLIENT_ID
         client_secret = settings.OAUTH_CLIENT_SECRET

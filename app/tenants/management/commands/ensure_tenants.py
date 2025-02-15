@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     help = 'Create application tenant records.'
 
-    def handle(self, *args, **options):  # noqa: ARG002
+    def handle(self, *args, **options) -> None:  # noqa: ARG002
         """Create application tenant records."""
         tenants = settings.TENANTS()
 
