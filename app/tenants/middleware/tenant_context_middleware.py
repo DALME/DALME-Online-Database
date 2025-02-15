@@ -35,7 +35,11 @@ class TenantContextMiddleware:
             msg = 'Tenant not found'
             raise DisallowedHost(msg) from exc
 
-        settings.AWS_S3_CUSTOM_DOMAIN = domain
+        if not settings.IS_DEV and domain != settings.AWS_S3_CUSTOM_DOMAIN:
+            settings.AWS_S3_CUSTOM_DOMAIN = domain
+            settings.MEDIA_URL = f'https://{domain}/{settings.MEDIA_LOCATION}/'
+            settings.STATIC_URL = f'https://{domain}/{settings.STATIC_LOCATION}/'
+
         settings.CSRF_COOKIE_DOMAIN = f'.{domain}'
         settings.SESSION_COOKIE_DOMAIN = f'.{domain}'
         settings.WAGTAIL_SITE_NAME = request.tenant.name

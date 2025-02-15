@@ -772,6 +772,10 @@ class Production(Base, Configuration):
         return os.environ['DJANGO_SECRET_KEY']
 
     @property
+    def AWS_S3_CUSTOM_DOMAIN(self):
+        return self.BASE_URL
+
+    @property
     def MEDIA_URL(self):
         return f'https://{self.AWS_S3_CUSTOM_DOMAIN}/{self.MEDIA_LOCATION}/'
 
