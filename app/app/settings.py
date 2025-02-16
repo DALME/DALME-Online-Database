@@ -695,6 +695,10 @@ class Production(Base, Configuration):
         return self.BASE_URL
 
     @property
+    def AWS_STORAGE_BUCKET_NAME(self):
+        return os.environ['AWS_STORAGE_BUCKET_NAME']
+
+    @property
     def CORS_ALLOWED_ORIGINS(self):
         return [f'https://{domain}' for domain in self.TENANT_DOMAINS]
 
