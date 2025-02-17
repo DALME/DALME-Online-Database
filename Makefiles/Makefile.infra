@@ -31,21 +31,24 @@ infra.log:
 	docker compose logs --follow
 .PHONY: infra.log
 
+# Copy s3 assets from a local dump to the media (uploads) folder.
 infra.media:
 ifndef folder
 	$(error No local folder specified to process. \
 		Usage: make infra.media folder='media/media')
 else
-	rm -rf ./app/app/media
-	mkdir -p ./app/app/media/pharmacopeias/attachments
-	mkdir ./app/app/media/pharmacopeias/documents
-	mkdir ./app/app/media/pharmacopeias/images
-	mkdir ./app/app/media/pharmacopeias/original_images
-	mkdir -p ./app/app/media/dalme/images
-	cp -Rp $(folder)/avatar_images ./app/app/media/avatar_images
-	cp -Rp $(folder)/attachments ./app/app/media/dalme/attachments
-	cp -Rp $(folder)/documents ./app/app/media/dalme/documents
-	cp -Rp $(folder)/original_images ./app/app/media/dalme/original_images
+	rm -rf ./app/www/media
+	mkdir ./app/www/media/dalme
+	mkdir ./app/www/media/dalme/images
+	mkdir ./app/www/media/pharmacopeias
+	mkdir ./app/www/media/pharmacopeias/images
+	mkdir ./app/www/media/pharmacopeias/documents
+	mkdir ./app/www/media/pharmacopeias/attachments
+	mkdir ./app/www/media/pharmacopeias/original_images
+	cp -Rp $(folder)/documents ./app/www/media/dalme/documents
+	cp -Rp $(folder)/attachments ./app/www/media/dalme/attachments
+	cp -Rp $(folder)/original_images ./app/www/media/dalme/original_images
+	cp -Rp $(folder)/avatar_images ./app/www/media/avatar_images
 endif
 .PHONY: infra.media
 
