@@ -178,16 +178,6 @@ class Base(Configuration):
     }
     ROOT_URLCONF = ''  # NOTE: Don't change this! Multi-type tenants relies on it.
 
-    def INSTALLED_APPS(self):
-        installed_apps = ['django_tenants']
-        for schema in self.TENANT_TYPES:
-            installed_apps += [app for app in self.TENANT_TYPES[schema]['APPS'] if app not in installed_apps]
-
-        extra_apps = ['django_extensions'] if self.IS_DEV else ['storages']
-        installed_apps += [app for app in extra_apps if app not in installed_apps]
-
-        return installed_apps
-
     MIDDLEWARE = [
         'app.middleware.HealthCheckMiddleware',
         'corsheaders.middleware.CorsMiddleware',
@@ -480,8 +470,6 @@ class Development(Base, Configuration):
     """Development settings."""
 
     DEBUG = True
-    DOTENV = os.environ.get('ENV_FILE')
-    BASE_URL = 'http://ida.localhost:8000'
 
     _TENANTS = {
         'IDA': {
@@ -540,6 +528,14 @@ class Development(Base, Configuration):
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SECRET_KEY = 'django-development-environment-insecure-secret-key'
+
+    def INSTALLED_APPS(self):
+        installed_apps = ['django_tenants']
+        for schema in self.TENANT_TYPES:
+            installed_apps += [app for app in self.TENANT_TYPES[schema]['APPS'] if app not in installed_apps]
+        installed_apps += ['django_extensions']
+
+        return installed_apps
 
     @property
     def MEDIA_ROOT(self):
@@ -678,12 +674,15 @@ class CI(Development, Configuration):
 class Production(Base, Configuration):
     """Production settings."""
 
-    @classmethod
-    def setup(cls):
-        super().setup()
-        cls.LOGGING['root']['handlers'] = ['flat_line']
-
     DEBUG = False
+
+    def INSTALLED_APPS(self):
+        installed_apps = ['django_tenants']
+        for schema in self.TENANT_TYPES:
+            installed_apps += [app for app in self.TENANT_TYPES[schema]['APPS'] if app not in installed_apps]
+        installed_apps += ['storages']
+
+        return installed_apps
 
     # NOTE: By property-izing these env values we make their evaluation lazy
     # and we don't need to also set them in the development environment, which
