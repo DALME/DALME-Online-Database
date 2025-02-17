@@ -53,7 +53,7 @@ class BaseAccessPolicy(AccessPolicy):
 
     def get_policy_statements(self, request, view):  # noqa: ARG002
         """Load policy statements."""
-        with pathlib.Path(f'{settings.PROJECT_ROOT}/app/static/policies/{self.id}.json').open() as policy:
+        with pathlib.Path(f'{settings.PROJECT_ROOT}/app/authorization/policies/{self.id}.json').open() as policy:
             return json.load(policy)
 
     def get_parent(self, target):

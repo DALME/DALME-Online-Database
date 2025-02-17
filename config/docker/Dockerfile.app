@@ -114,6 +114,7 @@ ENV LANG=en_US.UTF-8
 ENV BUILD=$BUILD
 WORKDIR /opt/app
 COPY ./app/app ./app
+COPY ./app/authorization ./authorization
 COPY ./app/domain ./domain
 COPY ./app/oauth ./oauth
 COPY ./app/search ./search
