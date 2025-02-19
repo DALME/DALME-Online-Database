@@ -84,9 +84,28 @@ class Base(Configuration):
 
     @property
     def STATICFILES_DIRS(self):
+        extensions_dirs = [
+            'banners',
+            'bibliography',
+            'extras',
+            'footnotes',
+            'gradients',
+            'images',
+            'records',
+            'team',
+        ]
+        extensions_static_dirs = [
+            (
+                f'web/extensions/{subdir}',
+                (self.PROJECT_ROOT / 'web' / 'extensions' / subdir / 'static').as_posix(),
+            )
+            for subdir in extensions_dirs
+        ]
+
         return [
             ('app', (self.PROJECT_ROOT / 'app' / 'static').as_posix()),
             ('web', (self.PROJECT_ROOT / 'web' / 'static').as_posix()),
+            *extensions_static_dirs,
         ]
 
     @property
