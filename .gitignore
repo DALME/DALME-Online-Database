@@ -35,11 +35,6 @@ ssl-certs*
 !.elasticbeanstalk/*.global.yml
 .ebignore
 
-# local static and media files
-staticfiles
-media
-www
-
 # BEX related directories and files
 /src-bex/www
 /src-bex/js/core
@@ -61,3 +56,6 @@ __pycache__/
 apply-perms.temp
 *.diff
 .ruff_cache
+
+# Local collected static and media files.
+www
