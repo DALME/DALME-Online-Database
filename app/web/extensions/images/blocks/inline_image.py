@@ -89,9 +89,9 @@ class InlineImageBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'images'
-        template = 'inline_image_block.html'
+        template = 'images/inline_image_block.html'
         form_classname = 'struct-block inline-image-block'
-        form_template = 'inline_image_form.html'
+        form_template = 'images/inline_image_form.html'
         label_format = 'Inline image {image_id}'
 
 
