@@ -85,7 +85,7 @@ class Base(Configuration):
     @property
     def STATICFILES_DIRS(self):
         return [
-            (self.PROJECT_ROOT / 'web' / 'static').as_posix(),
+            ('web', (self.PROJECT_ROOT / 'web' / 'static').as_posix()),
         ]
 
     @property
