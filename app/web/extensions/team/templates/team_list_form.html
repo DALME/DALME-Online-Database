@@ -14,7 +14,7 @@
         <div class="w-field-row">
             {% for child in children.values %}
                 {% if child.block.name in "mode,order"|make_list_csv %}
-                    {% include 'field_include.html' with child=child col_class="col6" %}
+                    {% include 'extras/field_include.html' with child=child col_class="col6" %}
                 {% endif %}
             {% endfor %}
         </div>
@@ -24,7 +24,7 @@
         {% if child.block.name not in "mode,order"|make_list_csv %}
             <section class="field-row-panel manual-form collapse-help align-top u-none" id="{{ prefix }}-{{ child.block.name }}-form-section" data-panel>
                 <div class="w-field-row">
-                    {% include 'field_include.html' with child=child col_class="col12" %}
+                    {% include 'extras/field_include.html' with child=child col_class="col12" %}
                 </div>
             </section>
         {% endif %}
