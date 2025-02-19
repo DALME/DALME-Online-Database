@@ -32,6 +32,7 @@ class StaticStorage(S3ManifestStaticStorage):
 class MediaStorage(S3Boto3Storage):
     """Multitenant aware media files storage class for S3."""
 
+    file_overwrite = False
     key = 'media'
 
     @property
