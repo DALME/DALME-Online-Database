@@ -76,7 +76,7 @@ class AuthorSelect(UserSelect):
 
 
 class AvatarFileInput(ClearableFileInput):
-    template_name = 'avatar_file_input.html'
+    template_name = 'team/avatar_file_input.html'
     input_text = 'Upload avatar'
 
     @cached_property

@@ -79,9 +79,9 @@ class TeamListBlock(blocks.StructBlock):
         value_class = TeamListStructValue
         label = 'Team List'
         icon = 'address-card'
-        template = 'team_list_block.html'
+        template = 'team/team_list_block.html'
         form_classname = 'struct-block team-list-block'
-        form_template = 'team_list_form.html'
+        form_template = 'team/team_list_form.html'
 
     def clean(self, value):
         for name, val in value.items():
