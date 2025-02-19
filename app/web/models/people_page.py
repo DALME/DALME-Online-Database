@@ -34,7 +34,7 @@ BLOCK_SET = [
 
 
 class People(RoutablePageMixin, BasePage):
-    template = 'flat.html'
+    template = 'web/flat.html'
 
     body = StreamField(BLOCK_SET, null=True)
 

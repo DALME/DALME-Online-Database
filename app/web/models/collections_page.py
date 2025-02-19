@@ -13,7 +13,7 @@ from web.models.settings import Settings
 
 
 class Collections(SearchEnabled, CitableMixin, GradientMixin):
-    template = 'collections.html'
+    template = 'web/collections.html'
     parent_page_types = ['web.Home']
     subpage_types = [
         'web.Collection',
