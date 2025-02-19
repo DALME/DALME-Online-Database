@@ -76,29 +76,31 @@ class Base(Configuration):
         """Determine if we are running in a non-deploy environment."""
         return self.ENV in {'ci', 'development', 'test'}
 
+    STATICFILES_FINDERS = [
+        'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ]
+
     @property
     def STATICFILES_DIRS(self):
         return [
-            (self.PROJECT_ROOT / 'web' / 'static' / 'common').as_posix(),
+            (self.PROJECT_ROOT / 'static').as_posix(),
         ]
 
     @property
     def MULTITENANT_STATICFILES_DIRS(self):
         return [
-            (self.PROJECT_ROOT / 'web' / 'static' / 'tenants' / '%s').as_posix(),
+            # NOTE: This doesn't seem to work unless you hardcode the %s string.
+            (self.PROJECT_ROOT / 'tenants' / 'overrides/%s/static').as_posix(),
         ]
 
     STATIC_LOCATION = 'static'
     MEDIA_LOCATION = 'media'
     AVATARS_LOCATION = 'avatar_images'
 
-    STATICFILES_FINDERS = [
-        'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    ]
-    STATIC_URL = '/static/'
-    MEDIA_URL = '/media/'
+    MULTITENANT_RELATIVE_STATIC_ROOT = ''
+    MULTITENANT_RELATIVE_MEDIA_ROOT = ''
 
     SHARED_TENANT_APPS = [
         'django.contrib.sites',
@@ -174,7 +176,7 @@ class Base(Configuration):
             'URLCONF': 'app.urls.urls_tenant',
         },
     }
-    ROOT_URLCONF = ''  # Don't change this! Multi-type tenants relies on it.
+    ROOT_URLCONF = ''  # NOTE: Don't change this! Multi-type tenants relies on it.
 
     def INSTALLED_APPS(self):
         installed_apps = ['django_tenants']
@@ -212,8 +214,7 @@ class Base(Configuration):
             {
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
                 'DIRS': [
-                    (self.PROJECT_ROOT / 'app' / 'templates').as_posix(),
-                    (self.PROJECT_ROOT / 'web' / 'templates' / 'common').as_posix(),
+                    (self.PROJECT_ROOT / 'templates').as_posix(),
                 ],
                 'OPTIONS': {
                     'context_processors': [
@@ -238,7 +239,8 @@ class Base(Configuration):
     @property
     def MULTITENANT_TEMPLATE_DIRS(self):
         return [
-            (self.PROJECT_ROOT / 'web' / 'templates' / 'tenants' / '%s').as_posix(),
+            # NOTE: This doesn't seem to work unless you hardcode the %s string.
+            (self.PROJECT_ROOT / 'tenants' / 'overrides/%s/templates').as_posix(),
         ]
 
     DATABASE_ROUTERS = [
@@ -546,6 +548,14 @@ class Development(Base, Configuration):
     @property
     def STATIC_ROOT(self):
         return (self.PROJECT_ROOT / 'www' / 'static').as_posix()
+
+    @property
+    def MEDIA_URL(self):
+        return f'/{self.MEDIA_LOCATION}/'
+
+    @property
+    def STATIC_URL(self):
+        return f'/{self.STATIC_LOCATION}/'
 
     DATABASES = {
         'default': {
