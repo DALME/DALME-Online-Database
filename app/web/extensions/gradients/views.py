@@ -60,7 +60,7 @@ class GradientChosenView(ChosenViewMixin, GradientChosenResponseMixin, View):
 class AdminGradientChooser(BaseChooser):
     model = Gradient
     chooser_modal_url_name = 'gradient_chooser:choose'
-    template_name = 'gradient_chooser.html'
+    template_name = 'gradients/gradient_chooser.html'
     js_constructor = 'GradientChooser'
 
     def get_value_data_from_instance(self, instance):
