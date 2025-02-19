@@ -31,8 +31,8 @@ def register_saved_search_feature(features):
         feature_name,
         draftail_features.EntityFeature(
             control,
-            js=['js/saved-search-chooser-modal.js'],
-            css={'all': ['css/saved-search-chooser.css']},
+            js=['web/extensions/records/js/saved-search-chooser-modal.js'],
+            css={'all': ['web/extensions/records/css/saved-search-chooser.css']},
         ),
     )
 

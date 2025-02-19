@@ -27,11 +27,11 @@ def enable_footnotes(features):
         feature_name,
         draftail_features.EntityFeature(
             control,
-            js=['js/footnote-chooser-modal.js'],
+            js=['web/extensions/footnotes/js/footnote-chooser-modal.js'],
             css={
                 'all': [
-                    'css/footnote-decorator.css',
-                    'css/footnote-chooser.css',
+                    'web/extensions/footnotes/css/footnote-decorator.css',
+                    'web/extensions/footnotes/css/footnote-chooser.css',
                 ]
             },
         ),

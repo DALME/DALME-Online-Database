@@ -102,8 +102,11 @@ class InlineImageBlockAdapter(StructBlockAdapter):
     def media(self):
         structblock_media = super().media
         return forms.Media(
-            js=[*structblock_media._js, 'js/inline-image-form.js'],  # noqa: SLF001
-            css={'all': ['css/inline-image-form.css']},
+            js=[
+                *structblock_media._js,  # noqa: SLF001
+                'web/extensions/images/js/inline-image-form.js',
+            ],
+            css={'all': ['web/extensions/images/css/inline-image-form.css']},
         )
 
 

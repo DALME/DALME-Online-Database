@@ -23,7 +23,7 @@ class ColourPickerWidget(TextInput):
         return Media(
             js=[
                 'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js',
-                'js/colour-picker-controller.js',
+                'web/extensions/extras/js/colour-picker-controller.js',
             ],
             css={'all': ['https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css']},
         )
