@@ -20,4 +20,7 @@ def register_extra_icons(icons):
 
 @hooks.register('insert_global_admin_css')
 def extra_admin_css():
-    return format_html('<link rel="stylesheet" href="{}">', static('css/extras-admin.css'))
+    return format_html(
+        '<link rel="stylesheet" href="{}">',
+        static('web/extensions/extras/css/extras-admin.css'),
+    )
