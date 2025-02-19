@@ -11,8 +11,8 @@
   {% include "web/includes/collections_filter.html" %}
   {% if page.citable %}
     <div id="cite-container" class="mt-5" v-cloak>
-      {% include "cite_menu.html" %}
-      {% include "cite_popup.html" %}
+      {% include "bibliography/cite_menu.html" %}
+      {% include "bibliography/cite_popup.html" %}
     </div>
   {% endif %}
   {% include "web/includes/at_a_glance.html" with stats=page.stats %}
