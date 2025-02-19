@@ -102,9 +102,9 @@ class TeamListBlockAdapter(StructBlockAdapter):
         return forms.Media(
             js=[
                 *structblock_media._js,  # noqa: SLF001
-                'web/extensions/team/js/team-list-form.js',
+                'js/team-list-form.js',
             ],
-            css={'all': ['web/extensions/team/css/team-list-form.css']},
+            css={'all': ['css/team-list-form.css']},
         )
 
 

@@ -37,12 +37,12 @@ class UserSelect(MultiSelect):
         multi_media = super().media
         return Media(
             js=[
-                'web/extensions/team/js/user-select-widget.js',
+                'js/user-select-widget.js',
                 *multi_media._js,  # noqa: SLF001
             ],
             css={
                 'all': [
-                    'web/extensions/team/css/user-select-widget.css',
+                    'css/user-select-widget.css',
                     *multi_media._css['all'],  # noqa: SLF001
                 ]
             },
@@ -70,7 +70,7 @@ class TeamMemberSelect(UserSelect):
         return Media(
             js=[
                 *multi_media._js,  # noqa: SLF001
-                'web/extensions/team/js/team-select-widget.js',
+                'js/team-select-widget.js',
             ],
             css=multi_media._css,  # noqa: SLF001
         )
@@ -83,7 +83,7 @@ class AuthorSelect(UserSelect):
         return Media(
             js=[
                 *multi_media._js,  # noqa: SLF001
-                'web/extensions/team/js/author-select-widget.js',
+                'js/author-select-widget.js',
             ],
             css=multi_media._css,  # noqa: SLF001
         )
@@ -98,5 +98,5 @@ class AvatarFileInput(ClearableFileInput):
         multi_media = super().media
         return Media(
             js=[*multi_media._js],  # noqa: SLF001
-            css={'all': ['web/extensions/team/css/avatar-file-widget.css']},
+            css={'all': ['css/avatar-file-widget.css']},
         )

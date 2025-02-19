@@ -6,7 +6,7 @@
 {% block styles %}
   {{ block.super }}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
-  <link href="{% static 'web/js/leafletDraw/leaflet.draw.css' %}" rel="stylesheet">
+  <link href="{% static 'js/leafletDraw/leaflet.draw.css' %}" rel="stylesheet">
   <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
 {% endblock %}
 
@@ -36,8 +36,8 @@
   {{ block.super }}
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
-  <script type="text/javascript" src="{% static 'web/js/leafletDraw/leaflet.draw.js' %}"></script>
-  <script type="text/javascript" src="{% static 'web/js/leafletZoomBox/L.Control.ZoomBox.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/leafletDraw/leaflet.draw.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/leafletZoomBox/L.Control.ZoomBox.min.js' %}"></script>
   <script>
     $(document).ready(function() {
       const endpoint = "/api/datasets/explore_map/?format=json";
@@ -131,7 +131,7 @@
   </script>
   <style>
     .leaflet-zoom-box-icon {
-      background-image: url('{% static "web/images/zoom-box-icon.svg" %}');
+      background-image: url('{% static "images/zoom-box-icon.svg" %}');
     }
   </style>
 {% endblock%}

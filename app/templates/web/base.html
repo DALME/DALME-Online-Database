@@ -30,8 +30,8 @@
     {% block styles %}
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-      <link rel="stylesheet" type="text/css" href="{% static 'web/css/vendor/bootstrap-vue.min.css' %}" />
-      <link rel="stylesheet" type="text/css" href="{% static 'web/css/base.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/vendor/bootstrap-vue.min.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
     {% endblock %}
 
     {% block extension_styles %}
@@ -61,7 +61,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"
         integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw=="
         crossorigin="anonymous"></script>
-      <script type="text/javascript" src="{% static 'web/js/wagtailUtils.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/wagtailUtils.js' %}"></script>
 
       {% if page.citable and not records and not record and not search %}
         <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>

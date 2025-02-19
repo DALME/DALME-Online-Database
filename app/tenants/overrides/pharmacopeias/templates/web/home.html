@@ -2,7 +2,7 @@
 {% load wagtailcore_tags wagtailimages_tags sponsors static %}
 
 {% block extra_styles %}
-  <link rel="stylesheet" type="text/css" href="{% static 'web/extensions/banners/css/banners.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'css/banners.css' %}" />
 {% endblock %}
 
 {% block header_extra %}
@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block main_column %}
-    {% include "web/includes/featured.html" %}
-    {% include_block page.body %}
-    {% sponsors %}
+  {% include "web/includes/featured.html" %}
+  {% include_block page.body %}
+  {% sponsors %}
 {% endblock %}
