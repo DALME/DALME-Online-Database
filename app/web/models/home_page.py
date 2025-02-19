@@ -1,11 +1,8 @@
 """Model home page data."""
 
-from datetime import datetime
-
 from wagtail.admin.panels import FieldPanel
 
 from django.db import models
-from django.utils import timezone
 
 from web.extensions.banners.models import Banner
 from web.extensions.gradients.models import GradientMixin
@@ -48,10 +45,12 @@ class Home(BasePage, GradientMixin):
         context['featured_inventory'] = inventories.last()
         context['essay'] = essays.last()
 
-        today = datetime.now(tz=timezone.get_current_timezone()).date()
-        context['banners'] = Banner.objects.filter(
-            start_date__lte=today,
-            end_date__gte=today,
-        ).order_by('start_date')
+        # TODO: I hacked this out as it was returning nothing (@jhrr).
+        # today = datetime.now(tz=timezone.get_current_timezone()).date()
+        # context['banners'] = Banner.objects.filter(
+        #     start_date__lte=today,
+        #     end_date__gte=today,
+        # ).order_by('start_date')
+        context['banners'] = Banner.objects.all().order_by('start_date')
 
         return context
