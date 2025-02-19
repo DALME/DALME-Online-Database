@@ -14,7 +14,7 @@ hooks.register('register_admin_viewset', TeamViewSetGroup)
 def extra_admin_css():
     return format_html(
         '<link rel="stylesheet" href="{}">',
-        static('web/extensions/team/css/team-admin.css'),
+        static('css/team-admin.css'),
     )
 
 

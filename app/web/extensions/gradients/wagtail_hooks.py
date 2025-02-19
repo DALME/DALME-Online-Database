@@ -15,7 +15,7 @@ hooks.register('register_admin_viewset', GradientChooserViewSet)
 def extra_admin_css():
     return format_html(
         '<link rel="stylesheet" href="{}">',
-        static('web/extensions/gradients/css/gradient-chooser.css'),
+        static('css/gradient-chooser.css'),
     )
 
 

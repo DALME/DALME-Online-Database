@@ -22,5 +22,5 @@ def register_extra_icons(icons):
 def extra_admin_css():
     return format_html(
         '<link rel="stylesheet" href="{}">',
-        static('web/extensions/extras/css/extras-admin.css'),
+        static('css/extras-admin.css'),
     )
