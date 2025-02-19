@@ -1,4 +1,4 @@
-{% extends "common/layouts/left_side_column.html" %}
+{% extends "web/layouts/left_side_column.html" %}
 {% load static js_translate dd_record_name get_highlights wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}{{ block.super }} &ndash; Search{% endblock %}
@@ -16,12 +16,12 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "common/includes/simple_header.html" %}
+  {% include "web/includes/simple_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "common/includes/collections_filter.html" %}
-  {% include "common/includes/features_nav.html" %}
+  {% include "web/includes/collections_filter.html" %}
+  {% include "web/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}

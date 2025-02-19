@@ -55,7 +55,7 @@ return {
               that.config.templates.add(style.name, xml_data);
             }
           };
-          xhttp.open("GET", `/static/common/citation_styles/${style.file}`, true);
+          xhttp.open("GET", `/static/web/citation_styles/${style.file}`, true);
           xhttp.send();
         }
       }));

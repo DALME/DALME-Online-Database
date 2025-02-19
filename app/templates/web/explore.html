@@ -1,4 +1,4 @@
-{% extends "common/layouts/left_side_column.html" %}
+{% extends "web/layouts/left_side_column.html" %}
 {% load static wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}Explore &mdash; {{ block.super }}{% endblock %}
@@ -6,17 +6,17 @@
 {% block styles %}
   {{ block.super }}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
-  <link href="{% static 'common/js/leafletDraw/leaflet.draw.css' %}" rel="stylesheet">
+  <link href="{% static 'web/js/leafletDraw/leaflet.draw.css' %}" rel="stylesheet">
   <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
 {% endblock %}
 
 {% block header_extra %}
-  {% include "common/includes/simple_header.html" %}
+  {% include "web/includes/simple_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "common/includes/collections_filter.html" %}
-  {% include "common/includes/features_nav.html" %}
+  {% include "web/includes/collections_filter.html" %}
+  {% include "web/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
@@ -36,8 +36,8 @@
   {{ block.super }}
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
-  <script type="text/javascript" src="{% static 'common/js/leafletDraw/leaflet.draw.js' %}"></script>
-  <script type="text/javascript" src="{% static 'common/js/leafletZoomBox/L.Control.ZoomBox.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'web/js/leafletDraw/leaflet.draw.js' %}"></script>
+  <script type="text/javascript" src="{% static 'web/js/leafletZoomBox/L.Control.ZoomBox.min.js' %}"></script>
   <script>
     $(document).ready(function() {
       const endpoint = "/api/datasets/explore_map/?format=json";
@@ -131,7 +131,7 @@
   </script>
   <style>
     .leaflet-zoom-box-icon {
-      background-image: url('{% static "common/images/zoom-box-icon.svg" %}');
+      background-image: url('{% static "web/images/zoom-box-icon.svg" %}');
     }
   </style>
 {% endblock%}

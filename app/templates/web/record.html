@@ -1,4 +1,4 @@
-{% extends "common/layouts/single_column.html" %}
+{% extends "web/layouts/single_column.html" %}
 {% load get_citation_data settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; {{ title }}{% endblock %}
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "common/includes/breadcrumbs.html" %}
+  {% include "web/includes/breadcrumbs.html" %}
 {% endblock %}
 
 {% block main_column %}
@@ -241,7 +241,7 @@
   <div class="folios u-flex viewer" :class="viewerMode">
     <section class="folio">
       <div class="record-info" v-if="showInfoPanel" v-on-clickaway="toggleInfoPanel">
-        {% include "common/includes/record_info_panel.html" %}
+        {% include "web/includes/record_info_panel.html" %}
       </div>
       <div id="diva_viewer">
         <beat-loader v-show="loading && transcriptionId" color="#aaa"></beat-loader>
@@ -284,16 +284,16 @@
 </div>
 <style>
   .folios.vertical-split .resize-handle {
-    background: url('{% static "common/images/solid_grip_v.svg" %}') 0px center/15px 40px no-repeat;
+    background: url('{% static "web/images/solid_grip_v.svg" %}') 0px center/15px 40px no-repeat;
   }
   .folios.horizontal-split .resize-handle {
-    background: url('{% static "common/images/solid_grip_v.svg" %}') center 0px/40px 15px no-repeat;
+    background: url('{% static "web/images/solid_grip_v.svg" %}') center 0px/40px 15px no-repeat;
   }
   section.transcription.show-newlines tei-lb::before {
-    background-image: url('{% static "common/icons/newline-icon.svg" %}')
+    background-image: url('{% static "web/icons/newline-icon.svg" %}')
   };
   section.transcription.show-newlines tei-hi[rend=center]::after {
-    background-image: url('{% static "common/icons/newline-icon.svg" %}');
+    background-image: url('{% static "web/icons/newline-icon.svg" %}');
   };
 </style>
 {% endblock %}
@@ -301,7 +301,7 @@
 {% block js_foot %}
   {{ block.super }}
   <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
-  <script type="text/javascript" src="{% static 'common/js/ResizeSensor.js' %}"></script>
+  <script type="text/javascript" src="{% static 'web/js/ResizeSensor.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/cetei_functions.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js" integrity="sha256-ur/YlHMU96MxHEsy3fHGszZHas7NzH4RQlD4tDVvFhw=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
@@ -599,7 +599,7 @@
                     that.config.templates.add(style.name, xml_data);
                   }
                 };
-                xhttp.open("GET", `/static/common/citation_styles/${style.file}`, true);
+                xhttp.open("GET", `/static/web/citation_styles/${style.file}`, true);
                 xhttp.send();
               }
             }));

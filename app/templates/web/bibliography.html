@@ -1,4 +1,4 @@
-{% extends "common/layouts/left_side_column.html" %}
+{% extends "web/layouts/left_side_column.html" %}
 {% load wagtailcore_tags settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
@@ -16,12 +16,12 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "common/includes/flat_header.html" %}
+  {% include "web/includes/flat_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "common/includes/flat_nav.html" %}
-  {% include "common/includes/features_nav.html" %}
+  {% include "web/includes/flat_nav.html" %}
+  {% include "web/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
@@ -69,7 +69,7 @@
               that.config.templates.add('ida', xml_data);
             }
           };
-          xhttp.open("GET", "{% static 'common/citation_styles/ida_bibliography.csl' %}", true);
+          xhttp.open("GET", "{% static 'web/citation_styles/ida_bibliography.csl' %}", true);
           xhttp.send();
         },
         async fetchData() {

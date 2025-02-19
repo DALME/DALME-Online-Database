@@ -1,4 +1,4 @@
-{% extends "common/layouts/single_column.html" %}
+{% extends "web/layouts/single_column.html" %}
 {% load get_breadcrumbs_nav settings_val static %}
 
 {% block title %}{{ block.super }} &ndash; Record Browser{% endblock %}
@@ -35,7 +35,7 @@
         <li>
           <small>${statusInfo}</small>
         </li>
-        {% include "common/includes/pagination.html" %}
+        {% include "web/includes/pagination.html" %}
 
         <li class="search ml-auto position-relative" v-if="showModes">
           <input
@@ -317,14 +317,14 @@
     </section>
     <div v-if="!spinner" class="pager">
       <ul class="pagination">
-        {% include "common/includes/pagination.html" %}
+        {% include "web/includes/pagination.html" %}
       </ul>
     </div>
   </div>
 </div>
 <style>
   .detail-thumb, .list-thumb {
-    background-image: url('{% static "common/images/eye-slash-solid.svg" %}');
+    background-image: url('{% static "web/images/eye-slash-solid.svg" %}');
   }
 </style>
 {% endblock %}

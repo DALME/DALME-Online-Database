@@ -1,4 +1,4 @@
-{% extends "common/layouts/left_side_column.html" %}
+{% extends "web/layouts/left_side_column.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
@@ -16,14 +16,14 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "common/includes/flat_header.html" %}
+  {% include "web/includes/flat_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
   {% if page.get_parent.title == 'Collections' %}
-    {% include "common/includes/collections_filter.html" %}
+    {% include "web/includes/collections_filter.html" %}
   {% else %}
-    {% include "common/includes/flat_nav.html" %}
+    {% include "web/includes/flat_nav.html" %}
   {% endif %}
   {% if page.citable %}
     <div id="cite-container" class="mt-5" v-cloak>
@@ -31,14 +31,14 @@
       {% include "cite_popup.html" %}
     </div>
   {% endif %}
-  {% include "common/includes/features_nav.html" %}
+  {% include "web/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
   <div class="content">
     {% include_block page.body %}
     {% if page.show_contact_form %}
-      {% include "common/includes/contact_form.html" %}
+      {% include "web/includes/contact_form.html" %}
     {% endif %}
   </div>
 {% endblock %}
@@ -48,5 +48,5 @@
   {% if page.title == 'Open Access' %}
     {% include "repo_badges.html" %}
   {% endif %}
-  {% include "common/includes/highlighter.html" %}
+  {% include "web/includes/highlighter.html" %}
 {% endblock%}
