@@ -38,6 +38,8 @@ ifndef folder
 		Usage: make infra.media folder='media/media')
 else
 	rm -rf ./app/www/media
+	mkdir ./app/www
+	mkdir ./app/www/media
 	mkdir ./app/www/media/dalme
 	mkdir ./app/www/media/dalme/images
 	mkdir ./app/www/media/pharmacopeias
