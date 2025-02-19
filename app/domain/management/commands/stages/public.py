@@ -187,6 +187,9 @@ class Stage(BaseStage):
                         elif model_name == 'home' and field == 'sponsors':
                             sponsors_raw = value
                         else:
+                            if model_name == 'baseimage' and field == 'file':
+                                # we need to add the tenant prefix to the file path
+                                value = f'dalme/{value}'  # noqa: PLW2901
                             columns.append(f'{field}')
                             # the value of certain field types has to be converted to account
                             # for differences in the way Django sets up certain fields depending
