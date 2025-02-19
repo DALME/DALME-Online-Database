@@ -6,7 +6,7 @@
 {% block styles %}
   {{ block.super }}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.css">
-  <link rel="stylesheet" href="{% static 'css/TEI_base.css' %}" />
+  <link rel="stylesheet" href="{% static 'app/css/TEI_base.css' %}" />
 {% endblock %}
 
 {% block header_extra %}
@@ -300,9 +300,9 @@
 
 {% block js_foot %}
   {{ block.super }}
-  <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+  <script type="text/javascript" src="{% static 'app/js/CETEI.js' %}"></script>
   <script type="text/javascript" src="{% static 'web/js/ResizeSensor.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/cetei_functions.js' %}"></script>
+  <script type="text/javascript" src="{% static 'app/js/cetei_functions.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js" integrity="sha256-ur/YlHMU96MxHEsy3fHGszZHas7NzH4RQlD4tDVvFhw=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
