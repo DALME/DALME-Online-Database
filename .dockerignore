@@ -5,7 +5,6 @@
 .pyc
 .DS_Store
 .ebignore
-env
 db.cnf
 *.md
 README.md

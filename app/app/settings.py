@@ -464,6 +464,8 @@ class Development(Base, Configuration):
     """Development settings."""
 
     DEBUG = True
+    DOTENV = os.environ.get('ENV_FILE')
+    BASE_URL = 'http://ida.localhost:8000'
 
     _TENANTS = {
         'IDA': {
@@ -546,10 +548,6 @@ class Development(Base, Configuration):
     @property
     def STATIC_URL(self):
         return f'/{self.STATIC_LOCATION}/'
-
-    @property
-    def BASE_URL(self):
-        return 'http://ida.localhost:8000'
 
     DATABASES = {
         'default': {
