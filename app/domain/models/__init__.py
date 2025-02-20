@@ -15,7 +15,7 @@ from .language_reference import LanguageReference
 from .locale_reference import LocaleReference
 from .location import Location
 from .object import Object, ObjectAttribute
-from .option import OptionsList, OptionsValue
+from .option import OptionsList, OptionsSerializer, OptionsValue
 from .page import Page
 from .permission import Permission
 from .place import Place
@@ -73,6 +73,7 @@ __all__ = [
     'Object',
     'ObjectAttribute',
     'OptionsList',
+    'OptionsSerializer',
     'OptionsValue',
     'Organization',
     'Page',

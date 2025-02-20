@@ -137,11 +137,12 @@ class Attributes(BaseViewSet):
         """Return options for list of attributes."""
         if request.GET.get('names') is not None:
             names = request.GET['names'].split(',')
+            serialize = request.GET.get('serialize', False)
             options = {}
             for name in names:
                 try:
                     atype = AttributeType.objects.get(name=name)
-                    options[name] = atype.options.get_values(public=self.is_public, serialize=False)
+                    options[name] = atype.options.get_values(public=self.is_public, serialize=serialize)
                 except AttributeType.DoesNotExist:
                     options[name] = 'Attribute Type does not exist.'
                 except AttributeError:
