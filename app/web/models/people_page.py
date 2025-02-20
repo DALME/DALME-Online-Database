@@ -105,6 +105,6 @@ class People(RoutablePageMixin, BasePage):
 
         return TemplateResponse(
             request,
-            'person.html',
+            'web/person.html',
             context,
         )

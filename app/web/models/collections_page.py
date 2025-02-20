@@ -51,6 +51,6 @@ class Collections(SearchEnabled, CitableMixin, GradientMixin):
 
         return TemplateResponse(
             request,
-            'explore.html',
+            'web/explore.html',
             context,
         )

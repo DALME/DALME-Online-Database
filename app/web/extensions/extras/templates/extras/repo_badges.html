@@ -11,11 +11,11 @@
         .then(releases => {
           const container = $('<div class="badge-container"></div>');
           const badge = $('<div class="github-badge"></div>');
-          badge.append('<a target="_blank" href="https://github.com/DALME/DALME-Online-Database"><img src="/static/public/web/images/github_logo.png"></a>');
+          badge.append('<a target="_blank" href="https://github.com/DALME/DALME-Online-Database"><img src="/static/images/github_logo.png"></a>');
           badge.append(`<a target="_blank" href="${releases.html_url}">Release ${releases.tag_name} (${$.timeago(releases.published_at)})</a>`);
           badge.append(`<a target="_blank" href="${activity_url}">Updated ${last_activity}</a>`);
           container.append(badge);
-          container.append('<div class="dataverse-badge"><a target="_blank" href="https://dataverse.harvard.edu/dataverse/dalme"><img src="/static/public/web/images/dataverse_logo.png"></a></div>');
+          container.append('<div class="dataverse-badge"><a target="_blank" href="https://dataverse.harvard.edu/dataverse/dalme"><img src="/static/images/dataverse_logo.png"></a></div>');
           $('.block-text').prepend(container);
         });
       });
