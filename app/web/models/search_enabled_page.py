@@ -101,7 +101,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
 
         return render(
             request,
-            'search.html',
+            'web/search.html',
             context,
         )
 
@@ -123,7 +123,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
 
         return TemplateResponse(
             request,
-            'records.html',
+            'web/records.html',
             context,
         )
 
@@ -195,7 +195,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
 
         return TemplateResponse(
             request,
-            'record.html',
+            'web/record.html',
             context,
         )
 

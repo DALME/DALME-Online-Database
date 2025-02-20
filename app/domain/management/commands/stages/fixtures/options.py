@@ -134,7 +134,7 @@ OPTIONS = [
             'concordance': {
                 'label': 'name',
                 'value': 'id',
-                'group': 'country',
+                'group': 'country.name',
             },
         },
         'pharma_schema': True,

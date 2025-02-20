@@ -24,6 +24,6 @@ class HeadingBlock(blocks.StructBlock):
     class Meta:
         icon = 'heading'
         label = 'Heading'
-        template = 'heading_block.html'
+        template = 'extras/heading_block.html'
         form_classname = 'struct-block heading-block'
-        form_template = 'heading_form.html'
+        form_template = 'extras/heading_form.html'

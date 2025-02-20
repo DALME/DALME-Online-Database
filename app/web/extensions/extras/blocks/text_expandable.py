@@ -7,7 +7,7 @@ class TextExpandableBlock(blocks.StructBlock):
     body = blocks.RichTextBlock()
 
     class Meta:
-        icon = 'expandable-text'
+        icon = 'web/icons/expandable-text'
         label = 'Text (exp.)'
-        template = 'text_expandable_block.html'
+        template = 'extras/text_expandable_block.html'
         form_classname = 'struct-block text-expandable-block'

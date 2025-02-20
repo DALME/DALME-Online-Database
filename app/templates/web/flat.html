@@ -1,0 +1,52 @@
+{% extends "web/layouts/left_side_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
+
+{% block banner %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block header_extra %}
+  {% include "web/includes/flat_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% if page.get_parent.title == 'Collections' %}
+    {% include "web/includes/collections_filter.html" %}
+  {% else %}
+    {% include "web/includes/flat_nav.html" %}
+  {% endif %}
+  {% if page.citable %}
+    <div id="cite-container" class="mt-5" v-cloak>
+      {% include "bibliography/cite_menu.html" %}
+      {% include "bibliography/cite_popup.html" %}
+    </div>
+  {% endif %}
+  {% include "web/includes/features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    {% include_block page.body %}
+    {% if page.show_contact_form %}
+      {% include "web/includes/contact_form.html" %}
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  {% if page.title == 'Open Access' %}
+    {% include "extras/repo_badges.html" %}
+  {% endif %}
+  {% include "web/includes/highlighter.html" %}
+{% endblock%}

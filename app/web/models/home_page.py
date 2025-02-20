@@ -16,7 +16,7 @@ from web.models.featured_object_page import FeaturedObject
 
 
 class Home(BasePage, GradientMixin):
-    template = 'home.html'
+    template = 'web/home.html'
 
     learn_more_page = models.ForeignKey(
         'wagtailcore.Page',

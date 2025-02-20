@@ -10,7 +10,7 @@ from django.utils.html import format_html
 def register_extra_icons(icons):
     return [
         *icons,
-        'icons/expandable-text.svg',
+        'web/icons/expandable-text.svg',
         'wagtailfontawesomesvg/solid/chart-area.svg',
         'wagtailfontawesomesvg/solid/file-pdf.svg',
         'wagtailfontawesomesvg/solid/table-cells.svg',
@@ -20,4 +20,7 @@ def register_extra_icons(icons):
 
 @hooks.register('insert_global_admin_css')
 def extra_admin_css():
-    return format_html('<link rel="stylesheet" href="{}">', static('css/extras-admin.css'))
+    return format_html(
+        '<link rel="stylesheet" href="{}">',
+        static('css/extras-admin.css'),
+    )

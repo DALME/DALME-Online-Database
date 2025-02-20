@@ -1,0 +1,137 @@
+{% extends "web/layouts/left_side_column.html" %}
+{% load static wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+
+{% block title %}Explore &mdash; {{ block.super }}{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+  <link href="{% static 'js/leafletDraw/leaflet.draw.css' %}" rel="stylesheet">
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+{% endblock %}
+
+{% block header_extra %}
+  {% include "web/includes/simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "web/includes/collections_filter.html" %}
+  {% include "web/includes/features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    {% if settings.web.Settings.explore_text_before %}
+      {{ settings.web.Settings.explore_text_before }}
+    {% endif %}
+    <div id="map_container" style="height:50vh;" class="mt-2 mb-3 d-flex">
+      <i class="fas fa-cog fa-spin fa-5x m-auto loader"></i>
+    </div>
+    {% if settings.web.Settings.explore_text_after %}
+      {{ settings.web.Settings.explore_text_after }}
+    {% endif %}
+  </div>
+{% endblock %}
+{% block js_foot %}
+  {{ block.super }}
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+  <script type="text/javascript" src="{% static 'js/leafletDraw/leaflet.draw.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/leafletZoomBox/L.Control.ZoomBox.min.js' %}"></script>
+  <script>
+    $(document).ready(function() {
+      const endpoint = "/api/datasets/explore_map/?format=json";
+      $.get(endpoint, function(data) {
+
+          map = L.map('map_container', {
+            fullscreenControl: true,
+            zoomSnap: 0.2,
+            zoomDelta: 1.0,
+            maxBounds: [[67.04012791618122, 78.25876635871595],[12.142718147196966, -55.86232739128406]],
+            minZoom: 3,
+          });
+          map.fitBounds([[53.36972758064242, 17.77562407825832],[37.04731028371683, -4.754649359241663]])
+
+          var cartodb_voyager_nl = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+              subdomains: 'abcd',
+              maxZoom: 19
+          }).addTo(map);
+
+          var esri_worldphysical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+            	attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
+            	maxZoom: 7,
+              detectRetina: false,
+              opacity: 1.0,
+          }).addTo(map);
+
+          var cartodb_labels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+          	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          	subdomains: 'abcd',
+          	maxZoom: 19,
+            zIndex: 200
+          }).addTo(map);
+
+          var record_markers = L.layerGroup();
+          for (let i = 0, len = data.length; i < len; ++i) {
+              let props = data[i];
+              let marker = L.circleMarker([props.latitude, props.longitude], {
+                  radius: props.count,
+                  stroke: true,
+                  color: '#611818',
+                  weight: 2,
+                  opacity: 0.8,
+                  fill: true,
+                  fillColor: '#840f0f',
+                  fillOpacity: 0.6,
+              });
+
+              let pop_content = `<div class="map-popup"><div class="map-pop-title">${props.name}</div>
+                <div class="map-pop-subtitle">${props.administrative_region}, ${props.country}</div>
+                <div class="map-pop-detail"><span class="map-pop-key">Number of records: </span>${props.records}</div>
+                <div class="map-pop-detail"><span class="map-pop-key">Temporal coverage: </span>${props.coverage}</div>`;
+
+              if (props.collections.length > 0) {
+                pop_content += `<span class="map-pop-key">Collections:</span><br/><ul>`;
+                for (let j = 0, c_len = props.collections.length; j < c_len; ++j) {
+                  pop_content += `<li><a href="/collections/${props.collections[j].replace(/\s+/g, '-').toLowerCase()}/" class="map-pop-link">${props.collections[j]}</a></li>`
+                }
+              }
+
+              pop_content += `</ul><a href="/collections/records/?locale=${props.locale_id}" class="map-pop-button">Browse records</a></div>`;
+
+              marker.bindPopup(pop_content, {
+                className: 'leaflet-popup-wrapper',
+                maxWidth: 'auto'
+              });
+              record_markers.addLayer(marker);
+          }
+
+          var zoom_box_control = L.control.zoomBox({
+              modal: false,
+              position: 'topleft',
+              title: 'Zoom to area',
+              addToZoomControl: true,
+          }).addTo(map);
+
+          var layers_control = L.control.layers({
+              },
+              {
+                'Labels': cartodb_labels,
+                'Records': record_markers.addTo(map),
+              },
+              {
+                position: 'topright',
+                collapsed: true
+              }
+          ).addTo(map);
+
+      }, 'json');
+    })
+  </script>
+  <style>
+    .leaflet-zoom-box-icon {
+      background-image: url('{% static "images/zoom-box-icon.svg" %}');
+    }
+  </style>
+{% endblock%}

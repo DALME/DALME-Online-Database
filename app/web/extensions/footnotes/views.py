@@ -10,7 +10,7 @@ from .models import Footnote
 
 
 class FootnoteChooser(BaseFormView, ModelFormMixin):
-    template_name = 'footnote_modal.html'
+    template_name = 'footnotes/footnote_modal.html'
     model = Footnote
     form_class = FootnoteForm
     prefix = 'footnote'

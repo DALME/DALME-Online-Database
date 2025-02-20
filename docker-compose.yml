@@ -39,16 +39,8 @@ services:
     networks:
       - app-network
     volumes:
-      - ./app/app:/opt/app/app
-      - ./app/domain:/opt/app/domain
-      - ./app/oauth/:/opt/app/oauth
-      - ./app/search/:/opt/app/search
-      - ./app/tenants/:/opt/app/tenants
-      - ./app/tests:/opt/app/tests
-      - ./app/web:/opt/app/web
-      - ./app/manage.py:/opt/app/manage.py
-      - ./app/pyproject.toml:/opt/app/pyproject.toml
-      - ./app/app/media:/opt/app/www/media
+      - ./app:/opt/app
+      - ./config/oidc.key:/opt/app/oidc.key
       - ./notebooks:/opt/app/notebooks
       - ./notebooks/ipython:/root/.ipython/profile_default
     restart: unless-stopped

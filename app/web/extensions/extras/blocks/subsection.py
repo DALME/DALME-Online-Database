@@ -17,7 +17,7 @@ class NestedSubsectionBlock(blocks.StructBlock):
     class Meta:
         icon = 'diagram-successor'
         label = 'Subsection'
-        template = 'nested_subsection_block.html'
+        template = 'extras/subsection_block.html'
         form_classname = 'struct-block subsection-block'
 
 
@@ -33,5 +33,5 @@ class SubsectionBlock(NestedSubsectionBlock):
     class Meta:
         icon = 'diagram-next'
         label = 'Subsection'
-        template = 'subsection_block.html'
+        template = 'extras/subsection_block.html'
         form_classname = 'struct-block subsection-block'

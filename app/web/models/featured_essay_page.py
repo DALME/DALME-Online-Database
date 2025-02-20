@@ -11,7 +11,7 @@ class Essay(FeaturedPage, RecordClass):
     parent_page_types = ['web.Features']
     subpage_types = []
     page_description = 'A page suitable for short to medium essays. Can link to records or collections.'
-    template = 'feature.html'
+    template = 'web/feature.html'
 
     metadata_panels = [
         *FeaturedPage.metadata_panels,

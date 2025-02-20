@@ -35,6 +35,6 @@ class DocumentBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'file-pdf'
-        template = 'document_block.html'
+        template = 'extras/document_block.html'
         form_classname = 'struct-block document-block'
-        form_template = 'document_form.html'
+        form_template = 'extras/document_form.html'

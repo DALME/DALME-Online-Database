@@ -18,7 +18,7 @@ urlpatterns = [
     re_path(r'^api/oauth/', include((auth_urls, 'api'), namespace='oauth2_provider')),
     re_path(r'^api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^api/', include((router.urls, 'api'), namespace='api_endpoint')),
-    re_path(r'^$', TemplateView.as_view(template_name='home.html')),
+    re_path(r'^$', TemplateView.as_view(template_name='web/home.html')),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 

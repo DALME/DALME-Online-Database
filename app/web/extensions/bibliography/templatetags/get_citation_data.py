@@ -1,7 +1,7 @@
 """Templatetag to return citation data."""
 
 import json
-import os
+import pathlib
 import urllib
 from datetime import datetime
 
@@ -24,9 +24,13 @@ def get_citation_data(context):  # noqa: C901, PLR0912, PLR0915
     record = context.get('record', False)
     settings = Settings.objects.first()
 
-    with open(
-        os.path.join('web', 'static', 'common', 'citation_styles', 'citation_formats.json'), encoding='utf-8'
-    ) as fp:
+    citations_path = pathlib.Path(
+        'web',
+        'static',
+        'citation_styles',
+        'citation_formats.json',
+    )
+    with open(citations_path, encoding='utf-8') as fp:
         formats = json.load(fp)
 
     coins_list = [

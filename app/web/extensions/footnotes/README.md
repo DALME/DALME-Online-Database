@@ -55,12 +55,12 @@ class BasePage(Page, FootnoteMixin):
 
 ```
 
-- Include the `footnote_container.html` below the main content in your page tamplates:
+- Include the `footnotes/footnote_container.html` below the main content in your page tamplates:
 
 ```python
     # main page content
     {% if page.has_footnotes and not page.has_placemarker %}
-        {% include "footnote_container.html" with footnotes=page.footnotes %}
+        {% include "footnotes/footnote_container.html" with footnotes=page.footnotes %}
     {% endif %}
 ```
 

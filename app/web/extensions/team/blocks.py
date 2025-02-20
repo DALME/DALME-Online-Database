@@ -79,9 +79,9 @@ class TeamListBlock(blocks.StructBlock):
         value_class = TeamListStructValue
         label = 'Team List'
         icon = 'address-card'
-        template = 'team_list_block.html'
+        template = 'team/team_list_block.html'
         form_classname = 'struct-block team-list-block'
-        form_template = 'team_list_form.html'
+        form_template = 'team/team_list_form.html'
 
     def clean(self, value):
         for name, val in value.items():
@@ -100,7 +100,10 @@ class TeamListBlockAdapter(StructBlockAdapter):
     def media(self):
         structblock_media = super().media
         return forms.Media(
-            js=[*structblock_media._js, 'js/team-list-form.js'],  # noqa: SLF001
+            js=[
+                *structblock_media._js,  # noqa: SLF001
+                'js/team-list-form.js',
+            ],
             css={'all': ['css/team-list-form.css']},
         )
 

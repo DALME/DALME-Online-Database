@@ -58,7 +58,7 @@ class CollectionChooserViewSet(ChooserViewSet):
 
 
 class SavedSearchChooser(BaseFormView):
-    template_name = 'saved_search_chooser_modal.html'
+    template_name = 'records/saved_search_chooser_modal.html'
     form_class = SavedSearchChooserForm
     prefix = 'saved_search'
 

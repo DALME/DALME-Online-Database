@@ -35,7 +35,7 @@ class BiblioChooserViewSet(ChooserViewSet):
             (self.base_block_class._meta_class,),  # noqa: SLF001
             {
                 'icon': self.icon,
-                'template': 'bibliography_block.html',
+                'template': 'bibliography/bibliography_block.html',
             },
         )
         cls = type(
@@ -78,7 +78,7 @@ biblio_chooser_viewset = BiblioChooserViewSet('biblio_chooser')
 
 
 class ReferenceChooser(BaseFormView):
-    template_name = 'reference_chooser_modal.html'
+    template_name = 'bibliography/reference_chooser_modal.html'
     form_class = ReferenceChooserForm
     prefix = 'reference'
 
