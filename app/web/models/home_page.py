@@ -53,6 +53,5 @@ class Home(BasePage, GradientMixin):
             start_date__lte=today,
             end_date__gte=today,
         ).order_by('start_date')
-        context['banners'] = Banner.objects.all().order_by('start_date')
 
         return context
