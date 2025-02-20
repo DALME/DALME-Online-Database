@@ -547,6 +547,10 @@ class Development(Base, Configuration):
     def STATIC_URL(self):
         return f'/{self.STATIC_LOCATION}/'
 
+    @property
+    def BASE_URL(self):
+        return 'http://ida.localhost:8000'
+
     DATABASES = {
         'default': {
             'ENGINE': 'django_tenants.postgresql_backend',
