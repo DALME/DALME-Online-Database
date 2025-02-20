@@ -595,7 +595,7 @@ class Development(Base, Configuration):
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
-            'BACKEND': 'django_tenants.files.storage.TenantFileSystemStorage',
+            'BACKEND': 'tenants.storage_backends.LocalMediaStorage',
         },
         'staticfiles': {
             'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',
