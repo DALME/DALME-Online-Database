@@ -30,7 +30,7 @@ class StaticStorage(S3ManifestStaticStorage):
     key = 'static'
 
     def __init__(self, *args, **kwargs):
-        location = f'{settings.AWS_STORAGE_BUCKET_NAME}/{self.location}'
+        location = self.schema
         manifest_storage = StorageOverride(location=location)
         super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
