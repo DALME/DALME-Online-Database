@@ -18,7 +18,7 @@ class StaticStorage(S3ManifestStaticStorage):
     key = 'static'
 
     def __init__(self, *args, **kwargs):
-        manifest_storage = S3ManifestStaticStorage(location=self.location)
+        manifest_storage = S3ManifestStaticStorage(location=f'{settings.STATIC_URL}/{self.schema}')
         super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
     @property
