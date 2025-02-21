@@ -29,7 +29,6 @@ class Migration(migrations.Migration):
                     'file',
                     wagtail.images.models.WagtailImageField(
                         height_field='height',
-                        max_length=255,
                         upload_to=wagtail.images.models.get_upload_to,
                         verbose_name='file',
                         width_field='width',
@@ -88,7 +87,6 @@ class Migration(migrations.Migration):
                     'file',
                     wagtail.images.models.WagtailImageField(
                         height_field='height',
-                        max_length=255,
                         storage=wagtail.images.models.get_rendition_storage,
                         upload_to=wagtail.images.models.get_rendition_upload_to,
                         width_field='width',
