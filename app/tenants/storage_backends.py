@@ -9,19 +9,19 @@ from django.db import connection
 
 from app.context import get_current_tenant
 
-logger = structlog.get_logger(__name__)
+# logger = structlog.get_logger(__name__)
 
 
-class StorageOverride(S3ManifestStaticStorage):
-    """Debug me."""
-
-    def read_manifest(self):
-        try:
-            with self.manifest_storage.open(self.manifest_name) as manifest:
-                return manifest.read().decode()
-        except FileNotFoundError:
-            logger.exception(self.location)
-            raise
+# class StorageOverride(S3ManifestStaticStorage):
+#    """Debug me."""
+#
+#    def read_manifest(self):
+#        try:
+#            with self.manifest_storage.open(self.manifest_name) as manifest:
+#                return manifest.read().decode()
+#        except FileNotFoundError:
+#            logger.exception(self.location)
+#            raise
 
 
 class StaticStorage(S3ManifestStaticStorage):
@@ -29,10 +29,10 @@ class StaticStorage(S3ManifestStaticStorage):
 
     key = 'static'
 
-    def __init__(self, *args, **kwargs):
-        location = self.schema
-        manifest_storage = StorageOverride(location=location)
-        super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
+    # def __init__(self, *args, **kwargs):
+        # location = self.schema
+        # manifest_storage = StorageOverride(location=location)
+        # super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
     @property
     def schema(self):
