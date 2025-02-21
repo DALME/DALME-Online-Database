@@ -17,6 +17,14 @@ class StaticStorage(S3ManifestStaticStorage):
 
     key = 'static'
 
+    def read_manifest(self):
+        manifest_name = f'{self.schema}/{self.manifest_name}'
+        try:
+            with self.manifest_storage.open(manifest_name) as manifest:
+                return manifest.read().decode()
+        except FileNotFoundError:
+            return None
+
     @property
     def schema(self):
         """Get the tenant schema name."""
