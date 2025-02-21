@@ -46,9 +46,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONBREAKPOINT=ipdb.set_trace
 WORKDIR /opt/app
-COPY ./config/env.web.dev ./.env
-COPY ./config/oidc.key ./oidc.key
-RUN mkdir /opt/app/www
 CMD ["python", "manage.py", "runserver_plus", "--nostatic", "0.0.0.0:8001"]
 STOPSIGNAL SIGINT
 

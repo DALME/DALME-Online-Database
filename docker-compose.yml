@@ -21,7 +21,7 @@ services:
       dockerfile: ./config/docker/Dockerfile.app
       target: "development"
     environment:
-      ENV_FILE: /opt/app/.env
+      ENV_FILE: /opt/app/env.app
       LOG_LEVEL: ERROR
       OAUTH_CLIENT_ID: oauth.ida.development
       OAUTH_CLIENT_SECRET: django-insecure-development-environment-oauth-client-secret
@@ -40,6 +40,7 @@ services:
       - app-network
     volumes:
       - ./app:/opt/app
+      - ./config/env.web.dev:/opt/app/env.app
       - ./config/oidc.key:/opt/app/oidc.key
       - ./notebooks:/opt/app/notebooks
       - ./notebooks/ipython:/root/.ipython/profile_default
