@@ -70,6 +70,8 @@ data "aws_iam_policy_document" "ecs_task_policy" {
     actions = [
       "s3:DeleteObject",
       "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:GetObjectVersion",
       "s3:ListBucket",
       "s3:PutObject",
     ]

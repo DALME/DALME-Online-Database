@@ -17,13 +17,9 @@ class StaticStorage(S3ManifestStaticStorage):
 
     key = 'static'
 
-    def read_manifest(self):
-        manifest_name = f'{self.schema}/{self.manifest_name}'
-        try:
-            with self.manifest_storage.open(manifest_name) as manifest:
-                return manifest.read().decode()
-        except FileNotFoundError:
-            return None
+    def __init__(self, *args, **kwargs):
+        manifest_storage = S3ManifestStaticStorage(location=self.location)
+        super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
     @property
     def schema(self):
