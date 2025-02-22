@@ -292,12 +292,17 @@ class Base(Configuration):
             'gunicorn.error': {
                 'level': LOG_LEVEL,
             },
-            # Nulled to use structlog middleware.
-            'django.server': {
+            'django.request': {
                 'handlers': ['null'],
                 'propagate': False,
             },
-            'django.request': {
+            # Prevent extreme logging noise when the app is crawled in prod.
+            'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+            # Nulled to prefer structlog middleware.
+            'django.server': {
                 'handlers': ['null'],
                 'propagate': False,
             },
