@@ -23,17 +23,15 @@ class StaticStorage(S3ManifestStaticStorage):
         return settings
 
     @property
-    def schema(self):
-        """Get the tenant schema name."""
-        try:
-            return get_current_tenant().schema_name
-        except RuntimeError:
-            return connection.tenant.schema_name
-
-    @property
     def location(self):
-        """Get the schema qualified filepath."""
-        return f'{self.key}/{self.schema}'
+        """Get the schema qualified filepath prefix.
+
+        This corresponds the `AWS_LOCATION` setting.
+
+        https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
+
+        """
+        return f'{self.key}/%s'
 
 
 class MediaStorage(S3Boto3Storage):
@@ -44,21 +42,19 @@ class MediaStorage(S3Boto3Storage):
 
     def get_default_settings(self):
         settings = super().get_default_settings()
-        settings['location'] = self._get_location()
+        settings['location'] = self.location
         return settings
 
     @property
-    def schema(self):
-        """Get the tenant schema name."""
-        try:
-            return get_current_tenant().schema_name
-        except RuntimeError:
-            return connection.tenant.schema_name
-
-    @property
     def location(self):
-        """Get the schema qualified filepath."""
-        return f'{self.key}/{self.schema}'
+        """Get the schema qualified filepath prefix.
+
+        This corresponds the `AWS_LOCATION` setting.
+
+        https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
+
+        """
+        return f'{self.key}/%s'
 
 
 class LocalMediaStorage(FileSystemStorage):
