@@ -1,6 +1,5 @@
 """Customize staticfiles storage logic."""
 
-import structlog
 from storages.backends.s3boto3 import S3Boto3Storage, S3ManifestStaticStorage
 
 from django.conf import settings
@@ -8,8 +7,6 @@ from django.core.files.storage import FileSystemStorage
 from django.db import connection
 
 from app.context import get_current_tenant
-
-logger = structlog.get_logger(__name__)
 
 
 class TenantStorageMixin:
