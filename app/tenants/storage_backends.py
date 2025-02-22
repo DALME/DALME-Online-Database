@@ -17,16 +17,6 @@ class StaticStorage(S3ManifestStaticStorage):
 
     key = 'static'
 
-    def read_manifest(self):
-        try:
-            with self.manifest_storage.open(self.manifest_name) as manifest:
-                data = manifest.read().decode()
-                logger.info(data)
-                return data
-        except FileNotFoundError:
-            logger.exception(self.location)
-            raise
-
     def get_default_settings(self):
         settings = super().get_default_settings()
         settings['location'] = self._get_location()
