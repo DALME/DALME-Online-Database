@@ -38,7 +38,7 @@ class Settings(BaseGenericSetting):
     logo = models.CharField(
         max_length=255,
         blank=True,
-        help_text='Path to an image file containing a graphic logo to be used in this site, e.g. "images/dalme_logo.svg".',
+        help_text='Path to an image file containing a graphic logo to be used in this site, e.g. "images/logo.svg".',
     )
     copyright_line = models.CharField(
         max_length=255,

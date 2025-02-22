@@ -490,7 +490,7 @@ class Stage(BaseStage):
                     name='DALME',
                     short_form='DALME',
                     tagline='The Documentary Archaeology of Late Medieval Europe',
-                    logo='images/dalme_logo.svg',
+                    logo='images/logo.svg',
                     copyright_line='The Documentary Archaeology of Late Medieval Europe',
                     analytics_domain='dalme.org',
                     contact_email='projectdalme@gmail.com',
