@@ -12,16 +12,35 @@ from app.context import get_current_tenant
 logger = structlog.get_logger(__name__)
 
 
-class StorageOverride(S3ManifestStaticStorage):
-    """Debug me."""
+# class ManifestStaticStorage(S3ManifestStaticStorage):
+#     """Debug me."""
 
-    def read_manifest(self):
-        try:
-            with self.manifest_storage.open(self.manifest_name) as manifest:
-                return manifest.read().decode()
-        except FileNotFoundError:
-            logger.exception(self.location)
-            raise
+#     def read_manifest(self):
+#         try:
+#             with self.manifest_storage.open(self.manifest_name) as manifest:
+#                 data = manifest.read().decode()
+#                 logger.info('--------- MANIFEST DATA ---------')
+#                 logger.info(data)
+#                 return data
+#         except FileNotFoundError:
+#             logger.exception(self.location)
+#             raise
+
+#     def get_default_settings(self):
+#         settings = super().get_default_settings()
+#         settings['location'] = self._get_location()
+#         return settings
+
+#     def _get_tenant(self):
+#         """Get the tenant schema name."""
+#         try:
+#             return get_current_tenant().schema_name
+#         except RuntimeError:
+#             return connection.tenant.schema_name
+
+#     def _get_location(self):
+#         """Get the schema qualified filepath."""
+#         return f'{self.key}/{self._get_tenant()}'
 
 
 class StaticStorage(S3ManifestStaticStorage):
@@ -29,22 +48,36 @@ class StaticStorage(S3ManifestStaticStorage):
 
     key = 'static'
 
-    def __init__(self, *args, **kwargs):
-        manifest_storage = StorageOverride()
-        super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     manifest_storage = ManifestStaticStorage()
+    #     super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
-    @property
-    def schema(self):
+    def read_manifest(self):
+        try:
+            with self.manifest_storage.open(self.manifest_name) as manifest:
+                data = manifest.read().decode()
+                logger.info('--------- MANIFEST DATA ---------')
+                logger.info(data)
+                return data
+        except FileNotFoundError:
+            logger.exception(self.location)
+            raise
+
+    def get_default_settings(self):
+        settings = super().get_default_settings()
+        settings['location'] = self._get_location()
+        return settings
+
+    def _get_tenant(self):
         """Get the tenant schema name."""
         try:
             return get_current_tenant().schema_name
         except RuntimeError:
             return connection.tenant.schema_name
 
-    @property
-    def location(self):
+    def _get_location(self):
         """Get the schema qualified filepath."""
-        return f'{self.key}/{self.schema}'
+        return f'{self.key}/{self._get_tenant()}'
 
 
 class MediaStorage(S3Boto3Storage):
@@ -53,18 +86,21 @@ class MediaStorage(S3Boto3Storage):
     file_overwrite = False
     key = 'media'
 
-    @property
-    def schema(self):
+    def get_default_settings(self):
+        settings = super().get_default_settings()
+        settings['location'] = self._get_location()
+        return settings
+
+    def _get_tenant(self):
         """Get the tenant schema name."""
         try:
             return get_current_tenant().schema_name
         except RuntimeError:
             return connection.tenant.schema_name
 
-    @property
-    def location(self):
+    def _get_location(self):
         """Get the schema qualified filepath."""
-        return f'{self.key}/{self.schema}'
+        return f'{self.key}/{self._get_tenant()}'
 
 
 class LocalMediaStorage(FileSystemStorage):
