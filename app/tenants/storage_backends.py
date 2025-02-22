@@ -19,19 +19,21 @@ class StaticStorage(S3ManifestStaticStorage):
 
     def get_default_settings(self):
         settings = super().get_default_settings()
-        settings['location'] = self._get_location()
+        settings['location'] = self.location
         return settings
 
-    def _get_tenant(self):
+    @property
+    def schema(self):
         """Get the tenant schema name."""
         try:
             return get_current_tenant().schema_name
         except RuntimeError:
             return connection.tenant.schema_name
 
-    def _get_location(self):
+    @property
+    def location(self):
         """Get the schema qualified filepath."""
-        return f'{self.key}/{self._get_tenant()}'
+        return f'{self.key}/{self.schema}'
 
 
 class MediaStorage(S3Boto3Storage):
