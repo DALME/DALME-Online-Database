@@ -851,7 +851,7 @@ class Production(Base, Configuration):
 class Staging(Production, Configuration):
     """Staging settings."""
 
-    DEBUG = True
+    DEBUG = False
 
     _TENANTS = {
         'IDA': {
