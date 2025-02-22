@@ -85,7 +85,7 @@ class Base(Configuration):
     @property
     def MULTITENANT_STATICFILES_DIRS(self):
         return [
-            os.path.join(self.PROJECT_ROOT, 'tenants', 'overrides', '%s', 'static'),
+            os.path.join(self.PROJECT_ROOT, 'tenants/overrides/%s/static'),
         ]
 
     STATIC_LOCATION = 'static'
@@ -222,7 +222,7 @@ class Base(Configuration):
     @property
     def MULTITENANT_TEMPLATE_DIRS(self):
         return [
-            os.path.join(self.PROJECT_ROOT, 'tenants', 'overrides', '%s', 'templates'),
+            os.path.join(self.PROJECT_ROOT, 'tenants/overrides/%s/templates'),
         ]
 
     DATABASE_ROUTERS = [
