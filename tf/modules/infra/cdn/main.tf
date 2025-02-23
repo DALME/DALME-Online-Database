@@ -155,7 +155,7 @@ resource "aws_cloudfront_origin_access_control" "s3" {
 
 resource "aws_cloudfront_function" "viewer_request" {
   name    = module.cloudfront_function_label_vr.id
-  runtime = "cloudfront-js-1.0"
+  runtime = "cloudfront-js-2.0"
   publish = true
   code    = file("${path.module}/files/viewer-request.js")
 }
@@ -220,9 +220,9 @@ module "cloudfront" {
       allowed_methods          = local.allowed_methods
       cached_methods           = ["GET", "HEAD"]
       target_origin_id         = local.origin_id_assets
-      viewer_protocol_policy   = "redirect-to-https"
       cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
       origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
+      viewer_protocol_policy   = "redirect-to-https"
 
       function_association = [
         {
