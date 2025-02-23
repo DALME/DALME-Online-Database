@@ -13,17 +13,6 @@ from app.context import get_current_tenant
 logger = structlog.get_logger(__name__)
 
 
-class ManifestStaticStorage(S3ManifestStaticStorage):
-    """Debugging."""
-
-    def read_manifest(self):
-        with self.manifest_storage.open(self.manifest_name) as manifest:
-            data = manifest.read().decode()
-            logger.critical('-------- %s/%s --------', self.location, self.manifest_name)
-            logger.critical(data)
-            return data
-
-
 class TenantStorageMixin:
     """Reusable mutltitenant storage functionality."""
 
@@ -41,9 +30,27 @@ class StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
 
     key = 'static'
 
-    def __init__(self, *args, **kwargs):
-        manifest_storage = ManifestStaticStorage(location=self._get_location())
-        super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
+    # Overrides for strict tenanting over multiple manifests.
+    def read_manifest(self):
+        with self.manifest_storage.open(self.manifest_name) as manifest:
+            data = manifest.read().decode()
+            logger.critical('-------- %s/%s --------', self.location, self.manifest_name)
+            logger.critical(data)
+            return data
+
+    def save_manifest(self):
+        self._remap_manifest()
+        super().save_manifest()
+
+    def stored_name(self, name):
+        self._remap_manifest()
+        return super().stored_name(name)
+
+    def _remap_manifest(self):
+        if (location := self._get_location()) != self.location:
+            self.location = location
+            self.manifest_storage = S3ManifestStaticStorage(location=location)
+            self.hashed_files, self.manifest_hash = self.load_manifest()
 
 
 class MediaStorage(TenantStorageMixin, S3Boto3Storage):
