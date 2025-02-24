@@ -3,13 +3,13 @@
 import pathlib
 
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 
 def avatar_file_path(instance, filename):
     """Partition avatar file paths by model."""
     return pathlib.Path(
+        'public',
         settings.AVATARS_LOCATION,
         instance.__class__.__name__.lower(),
         filename,
@@ -23,9 +23,6 @@ class AvatarField(models.ImageField):
         """Construct the AvatarField."""
         super().__init__(*args, **kwargs)
         self.upload_to = avatar_file_path
-        # we specify Django's default storage model to prevent
-        # django-tenants from adding the tenant to the path
-        self.storage = FileSystemStorage()
 
 
 class Avatar(models.Model):

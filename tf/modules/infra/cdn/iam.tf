@@ -3,7 +3,9 @@ data "aws_iam_policy_document" "oac_assets" {
   statement {
     actions = [
       "s3:GetObject",
+      "s3:GetObjectAcl",
       "s3:GetObjectVersion",
+      "s3:ListBucket",
     ]
 
     condition {
@@ -18,6 +20,7 @@ data "aws_iam_policy_document" "oac_assets" {
     }
 
     resources = [
+      module.assets.bucket_arn,
       "${module.assets.bucket_arn}/*",
     ]
   }
@@ -30,6 +33,7 @@ data "aws_iam_policy_document" "oac_staticfiles" {
       "s3:GetObjectAcl",
       "s3:GetObjectVersion",
       "s3:ListBucket",
+      "s3:PutObject",
     ]
 
     condition {

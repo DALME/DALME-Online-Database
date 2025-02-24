@@ -1,26 +1,15 @@
-/* Cloudfront function viewer-request event handler. */
+/* Cloudfront function viewer-request event handler.
+
+  This is overly aggressive for debugging purposes.
+
+*/
 
 async function handler(event) {
   var request = event.request;
   var uri = request.uri;
 
-  // if (!uri.includes('.') && !uri.endsWith('/')) {
-  //   request.uri += '/';
-  // }
-
-  // request.uri = request.uri.replace(/^\/[^/]*\//, '/');
-
-  // if (!uri.includes('.')) {
-  //   request.uri = '/index.html';
-  // }
-
-  // Check whether the URI is missing a file name.
-  if (uri.endsWith('/')) {
-    request.uri += 'index.html';
-  }
-  // Check whether the URI is missing a file extension.
-  else if (!uri.includes('.')) {
-    request.uri += '/index.html';
+  if (!uri.includes('favicon')) {
+    request.uri = '/index.html'
   }
 
   return request;

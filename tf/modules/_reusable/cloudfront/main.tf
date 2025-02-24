@@ -76,6 +76,7 @@ resource "aws_cloudfront_distribution" "this" {
     content {
       domain_name              = origin.value.domain_name
       origin_id                = origin.value.origin_id
+      origin_path              = try(origin.value.origin_path, null)
       origin_access_control_id = try(origin.value.origin_access_control_id, null)
 
       dynamic "custom_origin_config" {

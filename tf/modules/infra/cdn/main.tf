@@ -20,6 +20,7 @@ locals {
   origin_id_alb         = "${var.namespace}-${var.environment}-s3-origin-alb"
   origin_id_assets      = "${var.namespace}-${var.environment}-s3-origin-assets"
   origin_id_staticfiles = "${var.namespace}-${var.environment}-s3-origin-staticfiles"
+  origin_id_mediafiles  = "${var.namespace}-${var.environment}-s3-origin-mediafiles"
 }
 
 # Buckets
@@ -73,7 +74,6 @@ module "access_logs" {
   }
 }
 
-# tfsec:ignore:aws-s3-block-public-policy tfsec:ignore:aws-s3-no-public-buckets
 module "assets" {
   source = "../..//_reusable/bucket/"
 
@@ -84,6 +84,16 @@ module "assets" {
   name                     = "assets"
   namespace                = var.namespace
   object_ownership         = "BucketOwnerEnforced"
+
+  cors_rules = [
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET"]
+      allowed_origins = local.allowed_origins
+      expose_headers  = ["ETag"]
+      max_age_seconds = 3000
+    },
+  ]
 
   logging = {
     target_bucket = module.access_logs.bucket_id
@@ -194,14 +204,23 @@ module "cloudfront" {
 
     assets = {
       domain_name              = module.assets.bucket_regional_domain_name
-      origin_id                = local.origin_id_assets
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
+      origin_id                = local.origin_id_assets
+      # origin_path              = "/db"
+    }
+
+    mediafiles = {
+      domain_name              = module.staticfiles.bucket_regional_domain_name
+      origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
+      origin_id                = local.origin_id_mediafiles
+      # origin_path              = "/media"
     }
 
     staticfiles = {
       domain_name              = module.staticfiles.bucket_regional_domain_name
-      origin_id                = local.origin_id_staticfiles
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
+      origin_id                = local.origin_id_staticfiles
+      # origin_path              = "/static"
     }
   }
 
@@ -209,42 +228,46 @@ module "cloudfront" {
     allowed_methods          = local.allowed_methods
     cached_methods           = ["GET", "HEAD"]
     target_origin_id         = local.origin_id_alb
-    viewer_protocol_policy   = "redirect-to-https"
     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
     origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
+    viewer_protocol_policy   = "redirect-to-https"
   }
 
   ordered_cache_behavior = [
     {
-      path_pattern             = "/db*"
-      allowed_methods          = local.allowed_methods
-      cached_methods           = ["GET", "HEAD"]
-      target_origin_id         = local.origin_id_assets
+      path_pattern     = "/db/*"
+      allowed_methods  = local.allowed_methods
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = local.origin_id_assets
+      # cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
       cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
       origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
       viewer_protocol_policy   = "redirect-to-https"
 
-      function_association = [
-        {
-          event_type   = "viewer-request"
-          function_arn = aws_cloudfront_function.viewer_request.arn
-        }
-      ]
+      # TODO: Disabled for debugging.
+      # function_association = [
+      #   {
+      #     event_type   = "viewer-request"
+      #     function_arn = aws_cloudfront_function.viewer_request.arn
+      #   }
+      # ]
     },
     {
-      path_pattern           = "/media*"
-      allowed_methods        = local.allowed_methods
-      cached_methods         = ["GET", "HEAD"]
-      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
-      target_origin_id       = local.origin_id_staticfiles
+      path_pattern     = "/media/*"
+      allowed_methods  = local.allowed_methods
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = local.origin_id_mediafiles
+      # cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+      cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
       viewer_protocol_policy = "redirect-to-https"
     },
     {
-      path_pattern           = "/static*"
-      allowed_methods        = local.allowed_methods
-      cached_methods         = ["GET", "HEAD"]
-      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
-      target_origin_id       = local.origin_id_staticfiles
+      path_pattern     = "/static/*"
+      allowed_methods  = local.allowed_methods
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = local.origin_id_staticfiles
+      # cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+      cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
       viewer_protocol_policy = "redirect-to-https"
     },
   ]

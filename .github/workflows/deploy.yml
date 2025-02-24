@@ -163,7 +163,7 @@ jobs:
           image: ${{ env.NAMESPACE }}.ui:build
           path: /opt/ui/dist/spa/.
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: build-artifact
           path: ${{ steps.extract.outputs.destination }}

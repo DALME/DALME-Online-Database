@@ -24,8 +24,3 @@ output "bucket_website_domain" {
   description = "The domain of the website endpoint (if configured)."
   value       = module.this.s3_bucket_website_domain
 }
-
-output "bucket_website_endpoint" {
-  description = "The website endpoint (if configured)."
-  value       = module.this.s3_bucket_website_endpoint
-}
