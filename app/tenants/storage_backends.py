@@ -37,13 +37,9 @@ class StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
 
     key = 'static'
 
-    def save_manifest(self):
+    def _normalize_name(self, name):
         self._remap_manifest()
-        super().save_manifest()
-
-    def stored_name(self, name):
-        self._remap_manifest()
-        return super().stored_name(name)
+        return super()._normalize_name(name)
 
     def _remap_manifest(self):
         if (location := self._get_location()) != self.location:
@@ -57,6 +53,14 @@ class MediaStorage(TenantStorageMixin, S3Boto3Storage):
 
     file_overwrite = False
     key = 'media'
+
+    def _normalize_name(self, name):
+        self._remap_location()
+        return super()._normalize_name(name)
+
+    def _remap_location(self):
+        if (location := self._get_location()) != self.location:
+            self.location = location
 
 
 class LocalMediaStorage(FileSystemStorage):
