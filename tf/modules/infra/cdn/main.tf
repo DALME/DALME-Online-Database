@@ -206,21 +206,18 @@ module "cloudfront" {
       domain_name              = module.assets.bucket_regional_domain_name
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
       origin_id                = local.origin_id_assets
-      # origin_path              = "/db"
     }
 
     mediafiles = {
       domain_name              = module.staticfiles.bucket_regional_domain_name
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
       origin_id                = local.origin_id_mediafiles
-      # origin_path              = "/media"
     }
 
     staticfiles = {
       domain_name              = module.staticfiles.bucket_regional_domain_name
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
       origin_id                = local.origin_id_staticfiles
-      # origin_path              = "/static"
     }
   }
 
@@ -253,21 +250,19 @@ module "cloudfront" {
       # ]
     },
     {
-      path_pattern     = "/media/*"
-      allowed_methods  = local.allowed_methods
-      cached_methods   = ["GET", "HEAD"]
-      target_origin_id = local.origin_id_mediafiles
-      # cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
-      cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+      path_pattern           = "/media/*"
+      allowed_methods        = local.allowed_methods
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = local.origin_id_mediafiles
+      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
       viewer_protocol_policy = "redirect-to-https"
     },
     {
-      path_pattern     = "/static/*"
-      allowed_methods  = local.allowed_methods
-      cached_methods   = ["GET", "HEAD"]
-      target_origin_id = local.origin_id_staticfiles
-      # cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
-      cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+      path_pattern           = "/static/*"
+      allowed_methods        = local.allowed_methods
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = local.origin_id_staticfiles
+      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
       viewer_protocol_policy = "redirect-to-https"
     },
   ]
