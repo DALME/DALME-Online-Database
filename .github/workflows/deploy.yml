@@ -142,10 +142,24 @@ jobs:
           role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
           role-session-name: ${{ env.ROLE_SESSION }}
 
-      - uses: docker/build-push-action@v3
+      - id: parse-oauth-client-id
+        uses: mathiasvr/command-output@v2.0.0
+        env:
+          OAUTH_CLIENT_ID: ${{ github.ref_name == 'main' && secrets.OAUTH_CLIENT_ID_PRODUCTION || secrets.OAUTH_CLIENT_ID_STAGING }}
+        with:
+          run: |
+            echo "${{ env.OAUTH_CLIENT_ID }}.${{ env.NAMESPACE }}.${{ env.ENVIRONMENT }}"
+
+      - uses: docker/build-push-action@v5
+        env:
+          OAUTH_CLIENT_ID: ${{ steps.parse-oauth-client-id.outputs.stdout }}
         with:
           context: .
           file: config/docker/Dockerfile.ui
+          build-args: |
+            ENV=${{ env.ENVIRONMENT }}
+            BUILD=${{ github.sha }}
+            OAUTH_CLIENT_ID=${{ env.OAUTH_CLIENT_ID }}
           load: true
           push: false
           cache-from: |
