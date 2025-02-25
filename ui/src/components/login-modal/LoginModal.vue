@@ -15,7 +15,7 @@
       <q-card-section class="login-card-body">
         <div class="login-card-text">
           <span v-if="auth.reauthenticate">Please re-authenticate</span>
-          <span v-else>Please log in</span>
+          <span v-else>{{ envDebug }}</span>
         </div>
         <q-form @submit="onSubmit" class="q-gutter-sm">
           <q-input
@@ -118,6 +118,12 @@ export default defineComponent({
     const usernameRules = [(val) => (val && !isEmpty(val)) || "Username is required"];
     const passwordRules = [(val) => (val && !isEmpty(val)) || "Password is required"];
 
+    const envDebug = {
+      VITE_ENV: process.env.VITE_ENV,
+      VITE_BUILD: process.env.VITE_BUILD,
+      VITE_OAUTH_CLIENT_ID: process.env.VITE_OAUTH_CLIENT_ID,
+    };
+
     const logout = () => {
       auth.send({ type: "LOGOUT" });
     };
@@ -146,6 +152,7 @@ export default defineComponent({
     return {
       auth,
       disabled,
+      envDebug,
       isPassword,
       logout,
       onSubmit,

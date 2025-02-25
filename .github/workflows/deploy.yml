@@ -375,7 +375,7 @@ jobs:
         env:
           DISTRIBUTION: ${{ steps.set-distribution.outputs.DISTRIBUTION }}
           AWS_REGION: us-east-1
-          PATHS: '/db/index.html'
+          PATHS: '/db/*'
 
   should-deploy-docs:
     name: 'Docs?'

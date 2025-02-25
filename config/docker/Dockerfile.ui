@@ -8,7 +8,7 @@ RUN yarn install --silent
 FROM node:20-bookworm-slim AS reqs
 WORKDIR /opt/ui
 COPY --from=base /opt/build/node_modules ./node_modules
-ENV PATH /opt/ui/node_modules/.bin:$PATH
+ENV PATH=/opt/ui/node_modules/.bin:$PATH
 COPY ./ui .
 
 FROM reqs AS development
@@ -21,8 +21,9 @@ FROM reqs AS production
 ARG ENV
 ARG BUILD
 ARG OAUTH_CLIENT_ID
-RUN touch .env
-RUN echo VITE_ENV=$ENV >> .env
-RUN echo VITE_BUILD=$BUILD >> .env
-RUN echo VITE_OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID >> .env
+RUN touch .env.prod
+RUN echo VITE_ENV=$ENV >> .env.prod
+RUN echo VITE_BUILD=$BUILD >> .env.prod
+RUN echo OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID >> .env.prod
+RUN cat .env.prod
 RUN yarn build

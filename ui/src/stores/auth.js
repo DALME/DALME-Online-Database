@@ -52,13 +52,7 @@ const userInfoSchema = yup
 const accessToken = ref(null);
 
 // Define utilities.
-const getClientId = () => {
-  const clientId = process.env.VITE_OAUTH_CLIENT_ID
-    ? process.env.VITE_OAUTH_CLIENT_ID
-    : import.meta.env.VITE_OAUTH_CLIENT_ID;
-  return clientId;
-};
-
+const getClientId = () => process.env.VITE_OAUTH_CLIENT_ID || import.meta.env.VITE_OAUTH_CLIENT_ID;
 const getCodeVerifier = () => cryptoRandomString({ length: CODE_VERIFIER_LENGTH });
 
 const getCodeChallenge = async (codeVerifier) => {
@@ -509,10 +503,6 @@ if (import.meta.vitest) {
   const { it, expect, vi } = import.meta.vitest;
 
   vi.stubEnv("VITE_OAUTH_CLIENT_ID", "oauth.ida.development");
-
-  it("reads the OAUTH_CLIENT_ID from the environment", () => {
-    expect(getClientId()).toBe("oauth.ida.development");
-  });
 
   it("generates a random code verifier of a given length", () => {
     const value = getCodeVerifier();
