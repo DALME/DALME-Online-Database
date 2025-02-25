@@ -315,11 +315,11 @@ jobs:
       - id: assets-deploy
         if: steps.artifact.outcome == 'success'
         env:
-          BUCKET: staticfiles
+          BUCKET: assets
         run: >
           aws s3 sync
           ${{ runner.temp }}/dist
-          s3://${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.BUCKET }}-${{ env.ACCOUNT }}/db
+          s3://${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.BUCKET }}-${{ env.ACCOUNT }}
           --delete
 
   invalidate:

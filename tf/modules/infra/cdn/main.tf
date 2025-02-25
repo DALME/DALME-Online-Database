@@ -203,8 +203,7 @@ module "cloudfront" {
     }
 
     assets = {
-      # domain_name              = module.assets.bucket_regional_domain_name
-      domain_name              = module.staticfiles.bucket_regional_domain_name
+      domain_name              = module.assets.bucket_regional_domain_name
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
       origin_id                = local.origin_id_assets
     }
@@ -227,28 +226,32 @@ module "cloudfront" {
     cached_methods           = ["GET", "HEAD"]
     target_origin_id         = local.origin_id_alb
     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
-    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
+    origin_request_policy_id = "33f36d7e-f396-46d9-90e0-52428a34d9dc" # AllViewerAndCloudFrontHeaders-2022-06
     viewer_protocol_policy   = "redirect-to-https"
   }
 
   ordered_cache_behavior = [
     {
-      path_pattern     = "/db/*"
-      allowed_methods  = local.allowed_methods
-      cached_methods   = ["GET", "HEAD"]
-      target_origin_id = local.origin_id_assets
-      # cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
-      cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
-      origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
-      viewer_protocol_policy   = "redirect-to-https"
+      path_pattern           = "/db/*"
+      allowed_methods        = local.allowed_methods
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = local.origin_id_assets
+      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+      viewer_protocol_policy = "redirect-to-https"
 
-      # TODO: Disabled for debugging.
-      # function_association = [
-      #   {
-      #     event_type   = "viewer-request"
-      #     function_arn = aws_cloudfront_function.viewer_request.arn
-      #   }
-      # ]
+      forwarded_values = {
+        query_string = true
+        cookies = {
+          forward = "all"
+        }
+      }
+
+      function_association = [
+        {
+          event_type   = "viewer-request"
+          function_arn = aws_cloudfront_function.viewer_request.arn
+        }
+      ]
     },
     {
       path_pattern           = "/media/*"
