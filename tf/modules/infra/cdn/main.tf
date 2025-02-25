@@ -203,7 +203,8 @@ module "cloudfront" {
     }
 
     assets = {
-      domain_name              = module.assets.bucket_regional_domain_name
+      # domain_name              = module.assets.bucket_regional_domain_name
+      domain_name              = module.staticfiles.bucket_regional_domain_name
       origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
       origin_id                = local.origin_id_assets
     }
