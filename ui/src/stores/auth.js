@@ -52,7 +52,12 @@ const userInfoSchema = yup
 const accessToken = ref(null);
 
 // Define utilities.
-const getClientId = () => import.meta.env.VITE_OAUTH_CLIENT_ID;
+const getClientId = () => {
+  const clientId = process.env.VITE_OAUTH_CLIENT_ID
+    ? process.env.VITE_OAUTH_CLIENT_ID
+    : import.meta.env.VITE_OAUTH_CLIENT_ID;
+  return clientId;
+};
 
 const getCodeVerifier = () => cryptoRandomString({ length: CODE_VERIFIER_LENGTH });
 

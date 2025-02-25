@@ -4,7 +4,7 @@ import { createActor } from "xstate";
 import { useStorage } from "@vueuse/core";
 
 const inspect =
-  process.env.NODE_ENV === "development" && import.meta.env.VITE_INSPECT_ACTORS === "true"
+  process.env.NODE_ENV === "development" && process.env.VITE_INSPECT_ACTORS === "true"
     ? (event) => console.log(event)
     : null;
 
