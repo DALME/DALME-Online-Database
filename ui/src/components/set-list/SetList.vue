@@ -166,8 +166,7 @@ export default defineComponent({
       if (success.value)
         await schema.validate(data.value.data, { stripUnknown: true }).then((value) => {
           columns.value = getColumns(columnMap.value);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           rows.value = value;
           //rows.value.splice(0, rows.value.length, ...value);
           loading.value = false;

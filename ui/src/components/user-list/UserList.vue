@@ -149,10 +149,9 @@ export default defineComponent({
       const request = requests.users.getUsers(query);
       await fetchAPI(request);
       if (success.value)
-        await userListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+        await userListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
           columns.value = getColumns(columnMap);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           rows.value = value;
           loading.value = false;
         });

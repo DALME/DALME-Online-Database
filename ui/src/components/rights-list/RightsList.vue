@@ -182,8 +182,7 @@ export default defineComponent({
       if (success.value)
         await rightsListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
           columns.value = getColumns(columnMap);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           rows.value = value;
           loading.value = false;
         });

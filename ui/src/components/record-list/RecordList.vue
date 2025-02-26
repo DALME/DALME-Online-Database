@@ -236,8 +236,7 @@ export default defineComponent({
       if (success.value)
         recordListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
           columns.value = getColumns(columnMap);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           value.forEach(
             (a) =>
               (a.attributes = camelcaseKeys(
