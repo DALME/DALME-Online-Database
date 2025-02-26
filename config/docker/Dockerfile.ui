@@ -25,5 +25,4 @@ RUN touch .env.prod
 RUN echo VITE_ENV=$ENV >> .env.prod
 RUN echo VITE_BUILD=$BUILD >> .env.prod
 RUN echo OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID >> .env.prod
-RUN cat .env.prod
 RUN yarn build
