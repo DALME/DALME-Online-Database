@@ -3,30 +3,17 @@ import * as yup from "yup";
 export const languageSchema = yup
   .object()
   .shape({
+    glottocode: yup.string().required(),
     id: yup.number().required(),
     name: yup.string().required(),
-    type: yup
-      .object()
-      .shape({
-        id: yup.number().required(),
-        name: yup.string().required(),
-      })
-      .required(),
-    parent: yup
-      .object()
-      .shape({
-        id: yup.number().required(),
-        name: yup.string().required(),
-      })
-      .default(null)
-      .nullable(),
+    isDialect: yup.boolean().required(),
     iso6393: yup
       .string()
       .length(3)
       .default(null)
       .nullable()
       .transform((val) => (!val ? null : val)), // Null out empty strings.
-    glottocode: yup.string().required(),
+    parent: yup.lazy(() => languageSchema.default(null).nullable()),
   })
   .camelCase();
 

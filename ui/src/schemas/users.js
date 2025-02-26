@@ -12,7 +12,7 @@ export const userSchema = yup.object().shape({
   isSuperuser: yup.boolean().required(),
   isActive: yup.boolean().required(),
   dateJoined: timeStampSchema.required(),
-  lastLogin: timeStampSchema.nullable(),
+  lastLogin: timeStampSchema.default(null).nullable(),
   groups: yup.array().of(groupSchema).default(null).nullable(),
   avatar: yup.string().default(null).nullable(),
 });
@@ -20,11 +20,11 @@ export const userSchema = yup.object().shape({
 export const userListSchema = yup.array().of(userSchema);
 
 export const userAttributeSchema = yup.object().shape({
+  avatar: yup.string().default(null).nullable(),
+  email: yup.string().email().required(),
+  fullName: yup.string().required(),
   id: yup.number().required(),
   username: yup.string().required(),
-  fullName: yup.string().required(),
-  email: yup.string().email().required(),
-  avatar: yup.string().default(null).nullable(),
 });
 
 export const usersAsOptionsSchema = yup.array().of(

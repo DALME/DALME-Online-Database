@@ -10,12 +10,6 @@ import {
 export const collectionAttributeSchema = yup.object().shape({
   id: yup.string().uuid().required(),
   name: yup.string().required(),
-  isPublished: yup.boolean().required(),
-  isPrivate: yup.boolean().required(),
-  useAsWorkset: yup.boolean().required(),
-  owner: userAttributeSchema.default(null).nullable(),
-  teamLink: groupAttributeSchema.default(null).nullable(),
-  memberCount: yup.number().default(null).nullable(),
 });
 
 export const collectionSchema = yup.object().shape({

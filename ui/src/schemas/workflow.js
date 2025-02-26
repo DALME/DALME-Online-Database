@@ -4,7 +4,7 @@ import { timeStampSchema, userAttributeSchema } from "@/schemas";
 export const logEventSchema = yup.object().shape({
   event: yup.string().required(),
   id: yup.number().required(),
-  timestamp: yup.string().required(),
+  timestamp: timeStampSchema.required(),
   user: userAttributeSchema.required(),
 });
 

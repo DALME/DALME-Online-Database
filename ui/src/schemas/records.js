@@ -6,14 +6,18 @@ import { agentsNormalizeInputSchema } from "@/components/forms/agents-field/norm
 import { foliosNormalizeInputSchema } from "@/components/forms/folios-field/normalize";
 import {
   attributeSchema,
+  agentListSchema,
   agentsFieldSchema,
   attributesFieldSchema,
+  collectionAttributeSchema,
   creditsFieldSchema,
   pageFieldSchema,
   pageSchema,
   timeStampSchema,
   userAttributeSchema,
   workflowSchema,
+  recordGroupAttributeSchema,
+  publicationAttributeSchema,
 } from "@/schemas";
 
 export const recordSchema = yup.object().shape({
@@ -34,22 +38,34 @@ export const recordSchema = yup.object().shape({
 
 export const recordListSchema = yup.array().of(recordSchema);
 
-export const recordDetailSchema = yup.object().shape({
+export const recordAttributeSchema = yup.object().shape({
   id: yup.string().uuid().required(),
   name: yup.string().required(),
   shortName: yup.string().required(),
-  owner: userAttributeSchema.required(),
+});
+
+export const recordDetailSchema = yup.object().shape({
+  agents: agentListSchema,
   attributes: yup.array().of(attributeSchema).required(),
-  noFolios: yup.number().required(),
-  noImages: yup.number().required(),
-  workflow: workflowSchema.nullable(),
-  pages: yup.array().of(pageSchema).nullable(),
-  isPrivate: yup.boolean().required(),
+  collections: yup.array().of(collectionAttributeSchema).required(),
   commentCount: yup.number().required(),
   creationTimestamp: timeStampSchema.required(),
   creationUser: userAttributeSchema.required(),
+  creditLine: yup.string().required(),
+  id: yup.string().uuid().required(),
+  isPrivate: yup.boolean().required(),
   modificationTimestamp: timeStampSchema.required(),
   modificationUser: userAttributeSchema.required(),
+  name: yup.string().required(),
+  noFolios: yup.number().required(),
+  noTranscriptions: yup.number().required(),
+  owner: userAttributeSchema.required(),
+  pages: yup.array().of(pageSchema).nullable(),
+  shortName: yup.string().required(),
+  parent: yup.lazy((value) =>
+    "parent" in value ? recordGroupAttributeSchema : publicationAttributeSchema,
+  ),
+  workflow: workflowSchema,
 });
 
 // Field-level validation rules/schemas.

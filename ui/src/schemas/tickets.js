@@ -1,51 +1,15 @@
 import * as yup from "yup";
 import { attachmentSchema, userAttributeSchema } from "@/schemas";
 
-export const ticketDetailSchema = yup
-  .object()
-  .shape({
-    id: yup.string().uuid().required(),
-    number: yup.number().required(),
-    status: yup.boolean().required(),
-    subject: yup.string().required(),
-    description: yup
-      .string()
-      .default(null)
-      .nullable()
-      .transform((_, value) => {
-        return value === null ? "" : String(value);
-      }),
-    tags: yup.array().of(
-      yup
-        .object()
-        .shape({
-          tag: yup
-            .string()
-            // necessary to deal with malformed tags
-            .nullable()
-            .transform((value) => (value === "0" ? null : value)),
-          tagTypeName: yup.string().required(),
-        })
-        .camelCase(),
-    ),
-    file: attachmentSchema.default(null).nullable(),
-    commentCount: yup.number().default(0).nullable(),
-    creationUser: userAttributeSchema.required(),
-    creationTimestamp: yup.string(),
-    modificationUser: userAttributeSchema.required(),
-    modificationTimestamp: yup.string(),
-    closingUser: userAttributeSchema.default(null).nullable(),
-    closingDate: yup.string().default(null).nullable(),
-  })
-  .camelCase();
-
 export const ticketSchema = yup
   .object()
   .shape({
-    id: yup.string().uuid().required(),
-    number: yup.number().required(),
-    status: yup.boolean().required(),
-    subject: yup.string().required(),
+    assignedTo: userAttributeSchema.default(null).nullable(),
+    closingDate: yup.string().default(null).nullable(),
+    closingUser: userAttributeSchema.default(null).nullable(),
+    commentCount: yup.number().default(0).nullable(),
+    creationTimestamp: yup.string(),
+    creationUser: userAttributeSchema.required(),
     description: yup
       .string()
       .default(null)
@@ -53,6 +17,12 @@ export const ticketSchema = yup
       .transform((_, value) => {
         return value === null ? "" : String(value);
       }),
+    id: yup.string().uuid().required(),
+    modificationTimestamp: yup.string(),
+    modificationUser: userAttributeSchema.required(),
+    number: yup.number().required(),
+    status: yup.boolean().required(),
+    subject: yup.string().required(),
     tags: yup.array().of(
       yup
         .object()
@@ -65,14 +35,7 @@ export const ticketSchema = yup
         })
         .camelCase(),
     ),
-    file: attachmentSchema.default(null).nullable(),
-    commentCount: yup.number().default(0).nullable(),
-    creationUser: userAttributeSchema.required(),
-    creationTimestamp: yup.string(),
-    modificationUser: userAttributeSchema.required(),
-    modificationTimestamp: yup.string(),
-    closingUser: userAttributeSchema.default(null).nullable(),
-    closingDate: yup.string().default(null).nullable(),
+    files: yup.array().of(attachmentSchema),
     url: yup.string().url().default(null).nullable(),
   })
   .camelCase();
