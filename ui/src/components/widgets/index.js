@@ -1,4 +1,6 @@
+export { default as ExternalLink } from "./ExternalLink.vue";
 export { default as ToolTip } from "./ToolTip.vue";
+export { default as UserPill } from "./UserPill.vue";
 export { default as AdaptiveSpinner } from "./AdaptiveSpinner.vue";
 export { default as TagPill } from "./TagPill.vue";
 export { default as BooleanValue } from "./BooleanValue.vue";
