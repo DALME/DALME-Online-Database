@@ -1,0 +1,22 @@
+[
+    {
+        "action": [
+            "retrieve",
+            "options",
+            "list"
+        ],
+        "principal": [
+            "*"
+        ],
+        "effect": "allow"
+    },
+    {
+        "action": [
+            "get"
+        ],
+        "principal": [
+            "authenticated"
+        ],
+        "effect": "allow"
+    }
+]
