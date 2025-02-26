@@ -355,7 +355,7 @@
       el: '#app',
       delimiters: ['${', '}'],
       created() {
-        fetch(`${this.api_url}/attributes/options/?names=record_type,collection,corpus,locale&serialize=true`)
+        fetch(`${this.api_url}/attribute-types/options/?names=record_type,collection,corpus,locale&serialize=true`)
           .then(response => response.json())
           .then(data => {
             for (const key in this.choiceLists) {
