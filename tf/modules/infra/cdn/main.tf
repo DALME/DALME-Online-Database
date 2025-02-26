@@ -236,7 +236,7 @@ module "cloudfront" {
       allowed_methods        = local.allowed_methods
       cached_methods         = ["GET", "HEAD"]
       target_origin_id       = local.origin_id_assets
-      cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+      cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
       viewer_protocol_policy = "redirect-to-https"
 
       forwarded_values = {
