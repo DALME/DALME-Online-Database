@@ -163,8 +163,8 @@ export default defineComponent({
         .then((response) => response.json())
         .then((options) => filterAgentOptions(options));
     const getLegalPersonaOptions = () =>
-      fetcher(requests.attributes.getAttributeOptions("legalPersona")).then((response) =>
-        response.json(),
+      fetcher(requests.attributesTypes.getAttributeTypeOptions("legalPersona", true)).then(
+        (response) => response.json(),
       );
 
     return {

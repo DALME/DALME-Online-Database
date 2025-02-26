@@ -165,18 +165,25 @@
                     <div class="meta-label">Assignees</div>
                     <div class="meta-content">
                       <q-avatar v-for="(user, i) in tm.viewing.assignees" :key="i" size="30px">
-                        <img v-if="!nully(user.avatar)" :src="user.avatar" />
-                        <q-icon v-else size="38px" name="mdi-account-circle" />
+                        <q-img
+                          v-if="!nully(user.avatar)"
+                          :src="user.avatar"
+                          fit="cover"
+                          ratio="1"
+                        />
+                        <q-icon v-else size="28px" name="mdi-account-circle" />
                       </q-avatar>
                     </div>
                   </div>
                   <div v-if="tm.viewing.files.length">
                     <div class="meta-label">Attachments</div>
                     <div class="meta-content">
-                      <AttachmentIconWidget
+                      <AttachmentWidget
                         v-for="(file, i) in tm.viewing.files"
                         :key="i"
-                        :attachment="file"
+                        :file="file"
+                        compact
+                        icon-only
                       />
                     </div>
                   </div>
@@ -245,7 +252,7 @@ import { useTasks } from "@/stores/tasks";
 import TasklistManager from "./TasklistManager.vue";
 import TaskList from "./TaskList.vue";
 import {
-  AttachmentIconWidget,
+  AttachmentWidget,
   CommentBox,
   DetailPopover,
   MarkdownEditor,
@@ -254,7 +261,7 @@ import {
 
 export default {
   components: {
-    AttachmentIconWidget,
+    AttachmentWidget,
     CommentBox,
     DetailPopover,
     MarkdownEditor,

@@ -81,7 +81,7 @@
       :toggle="false"
       type="tickets"
       icon="mdi-bug"
-      return-field="id"
+      return-field="number"
       tooltip="Reference a ticket"
       @item-chosen="onTicketSelected"
     />
@@ -211,6 +211,7 @@
             :dark="dark"
             type="tickets"
             icon="mdi-bug"
+            return-field="number"
             label="Reference a ticket"
             @item-chosen="onTicketSelected"
           />

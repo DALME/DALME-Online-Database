@@ -132,6 +132,7 @@ export const columnMap = {
     classes: null,
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
+    key: "fullName",
   },
   creationTimestamp: {
     label: "Created on",
@@ -142,6 +143,7 @@ export const columnMap = {
     classes: "text-no-wrap",
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
+    key: "timestamp",
   },
   modificationUser: {
     label: "Modified by",
@@ -152,6 +154,7 @@ export const columnMap = {
     classes: null,
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
+    key: "fullName",
   },
   modificationTimestamp: {
     label: "Modified on",
@@ -162,5 +165,6 @@ export const columnMap = {
     classes: "text-no-wrap",
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
+    key: "timestamp",
   },
 };

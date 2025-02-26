@@ -4,7 +4,7 @@
     persistent
     transition-show="scale"
     transition-hide="scale"
-    class="frosted-background"
+    class="frosted-background login-dialog"
     v-if="pageBackdropLoaded"
   >
     <q-card class="login-modal">
@@ -164,6 +164,8 @@ export default defineComponent({
 .login-modal {
   min-width: 400px;
   box-shadow: 0px 0px 20px 3px #212f3a8c;
+  margin-top: 10%;
+  margin-bottom: auto;
 }
 .dalme-logo-image {
   align-self: center;
@@ -238,5 +240,8 @@ export default defineComponent({
 .login-modal-button {
   font-weight: 400;
   padding: 4px 4rem !important;
+}
+.login-dialog .q-dialog__inner {
+  align-items: unset;
 }
 </style>

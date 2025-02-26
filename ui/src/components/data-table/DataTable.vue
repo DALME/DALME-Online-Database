@@ -9,6 +9,7 @@
       :rowsPerPage="pagination.rowsPerPage"
       :sortList="sortList"
       :editable="!isEmpty(editable)"
+      :resource="resource"
       @changeRowsPerPage="onChangeRowsPerPage"
       @changeEditMode="onChangeEditMode"
       @changeSearch="onChangeSearch"
@@ -118,7 +119,7 @@
             >
               <slot :name="`render-cell-${column.field}`" v-bind="props">
                 <template v-if="isObject(props.row[column.field])">
-                  {{ props.row[column.field].name }}
+                  {{ props.row[column.field][column.key] }}
                 </template>
                 <template v-else>
                   {{ props.row[column.field] }}
@@ -316,6 +317,10 @@ export default defineComponent({
     visibleColumns: {
       type: Array,
       required: false,
+    },
+    resource: {
+      type: String,
+      default: "",
     },
   },
   setup(props) {

@@ -10,6 +10,7 @@ export const getColumns = (columnMap) => {
     sortOrder: columnMap[key].sortOrder,
     classes: columnMap[key].classes,
     headerClasses: columnMap[key].headerClasses,
+    key: columnMap[key].key || "name",
   });
   return map(toColumn, keys(columnMap));
 };

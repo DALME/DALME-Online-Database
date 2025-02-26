@@ -128,10 +128,7 @@
     </template>
 
     <template v-slot:render-cell-locale="props">
-      {{ props.row.locale.name
-      }}<span v-if="props.row.locale.administrativeRegion"
-        >, {{ props.row.locale.administrativeRegion }}</span
-      ><span v-if="props.row.locale.country"> ({{ props.row.locale.country.name }})</span>
+      <span v-text="getList(props.row.locale, 'locale')" />
     </template>
 
     <template v-slot:render-cell-recordType="props">
@@ -143,7 +140,7 @@
     </template>
 
     <template v-slot:render-cell-language="props">
-      <span v-text="getLanguage(props.row.language)" />
+      <span v-text="getList(props.row.language, 'language')" />
     </template>
 
     <template v-slot:render-cell-status="props">
@@ -170,7 +167,7 @@
           {{ props.row.workflow.lastUser.fullName }}
         </router-link>
         <br />
-        {{ props.row.workflow.lastModified }}
+        {{ props.row.workflow.lastModified.timestamp }}
       </span>
     </template>
 

@@ -6,6 +6,7 @@
     :filterList="filterList"
     :loading="loading"
     :noData="noData"
+    resource="rights policies"
     :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
@@ -29,7 +30,7 @@
     <template v-slot:grid-main="props">
       <DetailPopover
         linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Rights', params: { id: props.row.id } }"
+        :linkTarget="{ name: 'Rights Policy', params: { id: props.row.id } }"
         :linkText="props.row.name"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
