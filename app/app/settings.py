@@ -830,6 +830,7 @@ class Production(Base, Configuration):
         'default': {
             'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
             'LOCATION': 'cache_table',
+            'KEY_FUNCTION': 'django_tenants.cache.make_key',
         },
     }
 
