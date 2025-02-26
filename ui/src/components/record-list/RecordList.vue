@@ -220,13 +220,17 @@ export default defineComponent({
     useMeta(() => ({ title: title.value }));
 
     const noData = "No records found.";
+    const templates = {
+      language: (data) => `${data.name}`,
+      locale: (data) => `${data.name} (${data.administrativeRegion}, ${data.country.name})`,
+    };
 
-    const getLanguage = (data) => {
+    const getList = (data, template) => {
       if (data.length > 1) {
-        const langs = data.map((a) => a.name);
-        return langs.join(", ");
+        const lst = data.map((a) => templates[template](a));
+        return lst.join(", ");
       } else {
-        return data[0].name;
+        return templates[template](data[0]);
       }
     };
 
@@ -281,7 +285,7 @@ export default defineComponent({
     return {
       columns,
       currentPageIcon,
-      getLanguage,
+      getList,
       filterList: filterList(auth.user.userId),
       loading,
       noData,
