@@ -38,7 +38,7 @@ class Stage(BaseStage):
         https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0007_data_m_collections.py#L37
 
         """
-        if Collection.objects.count() == 0:
+        if Collection.unattributed.count() == 0:
             user_obj = User.objects.get(pk=1)
             collection_ct = ContentType.objects.get(app_label='domain', model='collection')
             group_ct = ContentType.objects.get(app_label='auth', model='group')
@@ -73,7 +73,7 @@ class Stage(BaseStage):
                         },
                     )
 
-                    Collection.objects.create(**row)
+                    Collection.unattributed.create(**row)
 
                     if description:
                         Attribute.objects.create(
@@ -115,7 +115,7 @@ class Stage(BaseStage):
                         CollectionMembership.objects.create(
                             collection_id=row_id,
                             content_type=record_ct,
-                            object_id=Record.objects.get(pk=member['object_id']).id,
+                            object_id=Record.unattributed.get(pk=member['object_id']).id,
                             tenant_id=tenant_id,
                             creation_user=User.objects.get(pk=member['creation_user_id']),
                             modification_user=User.objects.get(pk=member['modification_user_id']),
@@ -152,6 +152,6 @@ class Stage(BaseStage):
                     # Omitted the comments handling, see the finalize stage.
                     # https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0007_data_m_collections.py#L159
 
-            self.logger.info('Created %s Collection instances', Collection.objects.count())
+            self.logger.info('Created %s Collection instances', Collection.unattributed.count())
         else:
             self.logger.warning('Collection data already exists')

@@ -72,7 +72,7 @@ class Stage(BaseStage):
         https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0010_data_m_basic_types.py#L163
 
         """
-        if Record.objects.count() == 0:
+        if Record.unattributed.count() == 0:
             user_obj = User.objects.get(pk=1)
             rg_ct = ContentType.objects.get(app_label='domain', model='recordgroup')
             org_ct = ContentType.objects.get(app_label='domain', model='organization')
@@ -108,7 +108,7 @@ class Stage(BaseStage):
                     # https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0010_data_m_basic_types.py#L72
                     if type_id not in NON_RECORD_IDS:
                         # self.logger.info('Creating record %s of type %s as Record', record_id, type_id)
-                        Record.objects.create(**row)
+                        Record.unattributed.create(**row)
 
                         if is_private:
                             Permission.objects.create(

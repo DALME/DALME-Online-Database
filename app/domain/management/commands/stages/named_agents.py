@@ -50,7 +50,7 @@ class Stage(BaseStage):
             tr_ids = []
             for rec_id in record_ids:
                 try:
-                    record = Record.objects.get(pk=rec_id)
+                    record = Record.unattributed.get(pk=rec_id)
                     if record.has_transcriptions:
                         page_nodes = record.pagenodes.all().select_related('transcription')
                         for node in page_nodes:
