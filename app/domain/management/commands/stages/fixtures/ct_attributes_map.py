@@ -153,6 +153,7 @@ CT_DATA = {
         'atypes': [
             'id',
             'name',
+            'collection_metadata',
             'description',
             'is_public',
             'is_corpus',
@@ -164,6 +165,7 @@ CT_DATA = {
             'creation_timestamp',
             'modification_username',
             'modification_timestamp',
+            'workset_progress',
         ],
     },
     'rightspolicy': {
@@ -207,12 +209,13 @@ CT_DATA = {
             'creation_timestamp',
             'modification_username',
             'modification_timestamp',
-            'mk2_identifier',
             'mk1_identifier',
-            'alt_identifier',
             'authority',
             'format',
             'support',
+            'locale',
+            'archival_series',
+            'archival_number',
         ],
     },
     'publication': {
@@ -233,9 +236,7 @@ CT_DATA = {
             'creation_timestamp',
             'modification_username',
             'modification_timestamp',
-            'mk2_identifier',
-            'mk1_identifier',
-            'alt_identifier',
+            'default_rights',
         ],
     },
     'record': {
