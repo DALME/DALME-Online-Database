@@ -139,7 +139,7 @@ export default defineComponent({
   setup() {
     const { notifier } = useEventHandling();
     const $route = useRoute();
-    const { isAdmin, ui } = useStores();
+    const { auth, ui } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
@@ -197,7 +197,7 @@ export default defineComponent({
       buttonColours,
       capitalize,
       formatDate,
-      isAdmin,
+      isAdmin: auth.user.isAdmin,
       isEmpty,
       loading,
       onAction,

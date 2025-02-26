@@ -337,7 +337,7 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
 
-    const { isAdmin } = useStores();
+    const { auth } = useStores();
 
     const { diffCount, isDirty, cellIsDirty, objDiffs, onDiff, resetTransport, transportWatcher } =
       useTransport();
@@ -484,7 +484,7 @@ export default defineComponent({
       getValidation,
       handleSubmit,
       inline,
-      isAdmin,
+      isAdmin: auth.user.isAdmin,
       isDirty,
       isEmpty,
       isFocussed,
