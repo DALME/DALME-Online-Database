@@ -87,28 +87,53 @@ class AttributeTypes(BaseViewSet):
         return super().get_object()
 
     @action(detail=True, methods=['get'])
-    def options(self, request, *args, **kwargs):  # noqa: ARG002
-        """Return options for attribute type."""
-        atype = self.get_object()
+    def opts(self, request, *args, **kwargs):  # noqa: ARG002
+        """Return options for single attribute type."""
         serialize = request.GET.get('serialize', False)
+        model = request.GET.get('model', None)
+        filters = request.GET.get('filters', None)
+        content = request.GET.get('content', None)
+        atype = self.get_object()
 
         try:
-            options = atype.options.get_values(public=self.is_public, serialize=serialize)
+            options_obj = atype.get_options_for_content(content)
+            options = options_obj.get_values(
+                public=self.is_public,
+                model=model,
+                filters=filters,
+                serialize=serialize,
+            )
+
         except AttributeError:
             options = None
 
-        if options is not None:
+        if options:
             return Response(options, 200)
 
         return Response({'error': 'No options could be retrieved.'}, 400)
 
+    @action(detail=False, methods=['get'])
+    def options(self, request, *args, **kwargs):  # noqa: ARG002
+        """Return options for a list of attribute types."""
+        if request.GET.get('names') is None:
+            return Response({'error': 'No list of attributes was provided.'}, 400)
 
-class WebAttributeTypes(AttributeTypes):
-    """Website API endpoint for managing attribute types."""
+        serialize = request.GET.get('serialize', False)
+        names = request.GET['names'].split(',')
+        options = {}
+        for name in names:
+            try:
+                atype = AttributeType.objects.get(name=name)
+                options[name] = atype.options.get_values(public=self.is_public, serialize=serialize)
+            except AttributeType.DoesNotExist:
+                options[name] = 'Attribute Type does not exist.'
+            except AttributeError:
+                options[name] = 'No options could be retrieved.'
 
-    permission_classes = [WebAccessPolicy]
-    oauth_permission_classes = [WebAccessPolicy]
-    is_public = True
+        if options:
+            return Response(options, 200)
+
+        return Response({'error': 'No options could be retrieved.'}, 400)
 
 
 class Attributes(BaseViewSet):
@@ -132,24 +157,37 @@ class Attributes(BaseViewSet):
             return obj
         return super().get_object()
 
-    @action(detail=False, methods=['get'])
+    @action(detail=True, methods=['get', 'post'])
     def options(self, request, *args, **kwargs):  # noqa: ARG002
-        """Return options for list of attributes."""
-        if request.GET.get('names') is not None:
-            names = request.GET['names'].split(',')
-            serialize = request.GET.get('serialize', False)
-            options = {}
-            for name in names:
-                try:
-                    atype = AttributeType.objects.get(name=name)
-                    options[name] = atype.options.get_values(public=self.is_public, serialize=serialize)
-                except AttributeType.DoesNotExist:
-                    options[name] = 'Attribute Type does not exist.'
-                except AttributeError:
-                    options[name] = 'No options could be retrieved.'
-            if options:
-                return Response(options, 200)
+        """Return options for attribute."""
+        serialize = request.GET.get('serialize', False)
+        model = request.GET.get('model', None)
+        filters = request.GET.get('filters', None)
+        attr = self.get_object()
+
+        try:
+            options_obj = attr.get_options()
+            options = options_obj.get_values(
+                public=self.is_public,
+                model=model,
+                filters=filters,
+                serialize=serialize,
+            )
+        except AttributeError:
+            options = None
+
+        if options:
+            return Response(options, 200)
+
         return Response({'error': 'No options could be retrieved.'}, 400)
+
+
+class WebAttributeTypes(AttributeTypes):
+    """Website API endpoint for managing attribute types."""
+
+    permission_classes = [WebAccessPolicy]
+    oauth_permission_classes = [WebAccessPolicy]
+    is_public = True
 
 
 class WebAttributes(Attributes):

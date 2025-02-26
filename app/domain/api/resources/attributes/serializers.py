@@ -124,6 +124,7 @@ class AttributeSerializer(DynamicSerializer, WritableNestedModelSerializer):
             'value',
             'attribute_type',
             'data_type',
+            'is_unique',
         ]
 
     def __init__(self, instance=None, data=empty, **kwargs):
