@@ -14,7 +14,7 @@
       :searchable="searchable"
       :showSelected="showSelected"
       :fetcher="fetcher"
-      @item-chosen="$emit('itemChosen')"
+      @item-chosen="(v) => $emit('itemChosen', v)"
       @clear-filters="$emit('clearFilters')"
     />
   </q-item>
@@ -40,7 +40,7 @@
       :searchable="searchable"
       :showSelected="showSelected"
       :fetcher="fetcher"
-      @item-chosen="$emit('itemChosen')"
+      @item-chosen="(v) => $emit('itemChosen', v)"
       @clear-filters="$emit('clearFilters')"
     />
   </q-btn>

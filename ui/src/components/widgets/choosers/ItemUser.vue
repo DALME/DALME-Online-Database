@@ -2,7 +2,7 @@
   <q-item clickable v-close-popup dense :class="cls" @click="$emit('itemChosen', item)">
     <q-item-section v-if="showAvatar" side>
       <q-avatar v-if="!nully(item.avatar)" size="34px">
-        <img :src="item.avatar" class="chooser-avatar-image" />
+        <q-img :src="item.avatar" class="chooser-avatar-image" fit="cover" ratio="1" />
       </q-avatar>
       <q-icon v-else size="34px" name="mdi-account-circle" :color="dark ? 'grey-9' : 'grey-4'" />
     </q-item-section>
