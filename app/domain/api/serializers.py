@@ -2,6 +2,8 @@
 
 from rest_framework import serializers
 
+from django.contrib.contenttypes.models import ContentType
+
 
 class DynamicSerializer(serializers.ModelSerializer):
     """A serializer that takes an additional `fields` or 'field_set' keyword argument to indicate which fields should be included."""
@@ -39,3 +41,18 @@ class DynamicSerializer(serializers.ModelSerializer):
         elif hasattr(self.Meta, 'default_exclude'):
             for field in self.Meta.default_exclude:
                 self.fields.pop(field)
+
+        # always include the model field
+        self.fields['model'] = serializers.ReadOnlyField(source='_meta.model.__name__')
+
+
+class BaseContentTypeSerializer(DynamicSerializer):
+    """Serializer for base Django content types."""
+
+    class Meta:
+        model = ContentType
+        fields = [
+            'id',
+            'app_label',
+            'model',
+        ]

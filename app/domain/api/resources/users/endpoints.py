@@ -41,7 +41,7 @@ class Users(BaseViewSet):
         'is_superuser',
         'first_name',
     ]
-    ordering = ['-is_active', 'username']
+    ordering = ['-is_active', 'full_name']
 
     def get_object(self):
         """Return the object the view is displaying by id or username."""

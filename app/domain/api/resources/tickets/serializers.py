@@ -19,7 +19,7 @@ class TicketSerializer(DynamicSerializer):
     """Serializer for tickets."""
 
     tags = TagSerializer(many=True, required=False)
-    file = AttachmentSerializer(required=False)
+    files = AttachmentSerializer(required=False, many=True)
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
     closing_user = UserSerializer(field_set='attribute', required=False)
@@ -36,7 +36,7 @@ class TicketSerializer(DynamicSerializer):
             'status',
             'tags',
             'url',
-            'file',
+            'files',
             'closing_user',
             'closing_date',
             'comment_count',
