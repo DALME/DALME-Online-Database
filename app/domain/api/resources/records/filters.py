@@ -2,7 +2,7 @@
 
 import django_filters as filters
 
-from django.db.models import Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef
 
 from domain.models import AttributeType, Collection, Permission, Record
 
@@ -39,7 +39,18 @@ class RecordOrderingFilter(filters.OrderingFilter):
             ('-date', 'Date (descending)'),
             ('short_name', 'Short name'),
             ('-short_name', 'Short name (descending)'),
+            ('comment_count', 'Comment count'),
+            ('-comment_count', 'Comment count (descending)'),
         ]
+
+    def filter_queryset(self, request, queryset, view):
+        queryset = queryset.annotate(comment_count=Count('comments'))
+        ordering = self.get_ordering(request, queryset, view)
+
+        if ordering:
+            return queryset.order_by(*ordering)
+
+        return queryset
 
     @staticmethod
     def get_value(field, value):
@@ -52,6 +63,9 @@ class RecordOrderingFilter(filters.OrderingFilter):
             for field in value:
                 field = f'{field}__year' if field.endswith('date') else field  # noqa: PLW2901
                 field = f'{field}__name' if field.endswith('record_type') else field  # noqa: PLW2901
+                if field.endswith('comment_count'):
+                    field = field.replace('comment_count', 'comment_ct')  # noqa: PLW2901
+                    qs = qs.annotate(comment_ct=Count('comments'))
                 return qs.order_by(field)
         return qs.order_by('name')
 
@@ -81,7 +95,7 @@ class RecordFilter(filters.FilterSet):
 
     is_private = filters.BooleanFilter(method='filter_private')
 
-    order_by = RecordOrderingFilter()
+    ordering = RecordOrderingFilter()
 
     class Meta:
         model = Record
@@ -95,7 +109,7 @@ class RecordFilter(filters.FilterSet):
             'has_transcription',
             'has_image',
             'locale',
-            'order_by',
+            'ordering',
             'owner',
             'is_private',
         ]
