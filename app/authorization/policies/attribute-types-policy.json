@@ -1,17 +1,36 @@
 [
   {
-    "action": ["options", "list", "retrieve", "has_permission"],
-    "principal": ["authenticated"],
+    "action": [
+      "options",
+      "opts",
+      "list",
+      "retrieve",
+      "has_permission"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create"],
-    "principal": ["group:Editors"],
+    "action": [
+      "create"
+    ],
+    "principal": [
+      "group:Editors"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy"],
-    "principal": ["group:Administrators"],
+    "action": [
+      "create",
+      "partial_update",
+      "update",
+      "destroy"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
     "effect": "allow"
   }
 ]
