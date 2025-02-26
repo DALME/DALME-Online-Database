@@ -70,6 +70,7 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
                 'id',
                 'username',
                 'full_name',
+                'avatar',
             ],
         }
         extra_kwargs = {

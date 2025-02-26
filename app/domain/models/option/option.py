@@ -42,7 +42,7 @@ class OptionsList(TrackingMixin):
     payload_type = models.CharField(max_length=15, choices=PAYLOAD_TYPES)
     description = models.TextField()
 
-    def get_values(self, serialize=True, raw_data=False, public=False, tenanted=True):
+    def get_values(self, serialize=True, raw_data=False, public=False, tenanted=True, model=None, filters=None):  # noqa: PLR0913
         values = self.values.all() if tenanted else self.values.unscoped()
         if not values.exists():
             return None
@@ -53,15 +53,31 @@ class OptionsList(TrackingMixin):
             payload = values.first().payload
 
         concordance = None
+        model_name = None
+
         if self.payload_type == 'db_records':
-            model = apps.get_model(payload.get('app'), payload.get('model'))
-            filters = payload.get('filters')
-            data = model.objects.filter(**filters) if filters else model.objects.all()
+            model_name = model if model and payload.get('model') == 'TBD' else payload.get('model')
+            target_model = apps.get_model(payload.get('app'), model_name)
+            target_filters = {**payload.get('filters'), **filters} if filters else payload.get('filters')
             concordance = payload.get('concordance')
+            order = payload.get('order')
+
+            if hasattr(target_model, 'attribute_list'):
+                data = (
+                    target_model.unattributed.filter(**target_filters)
+                    if target_filters
+                    else target_model.unattributed.all()
+                )
+            else:
+                data = target_model.objects.filter(**target_filters) if target_filters else target_model.objects.all()
+
+            if order:
+                data = data.order_by(*order)
 
         elif self.payload_type == 'field_choices':
-            model = apps.get_model(payload.get('app'), payload.get('model'))
-            choices = getattr(model, payload.get('choices'))
+            model_name = model if model else payload.get('model')
+            target_model = apps.get_model(payload.get('app'), model_name)
+            choices = getattr(target_model, payload.get('choices'))
             data = [{'label': i[1], 'value': i[0]} for i in choices]
 
         elif self.payload_type == 'static_list':
@@ -71,7 +87,7 @@ class OptionsList(TrackingMixin):
             return data
 
         if serialize:
-            serializer = OptionsSerializer(data, many=True, concordance=concordance)
+            serializer = OptionsSerializer(data, many=True, concordance=concordance, model_name=model_name)
             return serializer.data
 
         value_name = concordance.get('value', 'value') if concordance else 'value'
