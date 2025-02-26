@@ -157,16 +157,32 @@ const routes = [
         name: "Project",
         path: "project",
         menu: "app",
+        meta: {
+          navPath: ["Project", null],
+        },
         children: [
           {
-            component: () => import("src/components/rights-list/RightsList.vue"),
-            name: "Rights",
-            label: "Manage content rights",
+            component: () => import("pages/Rights.vue"),
             path: "rights",
             meta: {
-              navPath: ["Project", "Rights"],
+              navPath: ["Project", "Rights Policies"],
               icon: "mdi-copyright",
             },
+            children: [
+              {
+                component: () => import("src/components/rights-list/RightsList.vue"),
+                name: "Rights Policies",
+                path: "",
+              },
+              {
+                component: () => import("src/components/rights-detail/RightsDetail.vue"),
+                name: "Rights Policy",
+                path: ":id",
+                meta: {
+                  viewDefaults: { tab: "info" },
+                },
+              },
+            ],
           },
           {
             component: () => import("src/components/rights-list/RightsList.vue"),
