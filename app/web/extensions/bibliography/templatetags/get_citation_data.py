@@ -6,6 +6,7 @@ import urllib
 from datetime import datetime
 
 from django import template
+from django.templatetags.static import static
 from django.utils import timezone
 
 from web.models.settings import Settings
@@ -32,6 +33,10 @@ def get_citation_data(context):  # noqa: C901, PLR0912, PLR0915
     )
     with open(citations_path, encoding='utf-8') as fp:
         formats = json.load(fp)
+
+    for entry in formats:
+        if entry.get('file'):
+            entry['file'] = static(f'citation_styles/{entry["file"]}')
 
     coins_list = [
         ('url_ver', 'Z39.88-2004'),
