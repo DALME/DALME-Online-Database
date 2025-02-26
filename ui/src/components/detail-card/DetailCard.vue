@@ -13,7 +13,7 @@
       <template v-if="showFilter">
         <q-input
           dense
-          borderless
+          standout="bg-indigo-6"
           hide-bottom-space
           v-model="cardFilter"
           debounce="300"
@@ -23,7 +23,7 @@
           spellcheck="false"
           placeholder="Filter"
           class="card-title-search"
-          color="blue-9"
+          color="indigo-9"
         >
           <template v-slot:append>
             <q-icon v-if="cardFilter === ''" name="search" color="blue-grey-5" size="14px" />
@@ -38,10 +38,42 @@
           </template>
         </q-input>
       </template>
+      <EditButtons
+        v-if="editable"
+        :linkable="data.link"
+        cancellable
+        :main-icon="editIcon"
+        :main-color="editColour"
+        :show-main="!saving"
+        :show-cancel="markdown && editOn && editor.hasChanged"
+        :show-spinner="saving"
+        @navigate="router.push(linkTarget)"
+        @action="editOn = !editOn"
+        @cancel="editor?.onCancel"
+      />
     </q-item>
     <q-separator class="bg-grey-4" />
     <q-card-section :class="padContainer ? 'q-pa-md' : 'q-pa-none'">
-      <slot>
+      <template v-if="fields && data">
+        <template v-for="field in fields" :key="field">
+          <ValueDisplay
+            :ref="(el) => register(field, el)"
+            :data="data[field]"
+            :field="field"
+            @value-changed="valueChanged"
+          />
+        </template>
+      </template>
+      <template v-else-if="markdown">
+        <MarkdownEditor
+          ref="md-editor"
+          :text="data.value"
+          in-card
+          @onSaveText="valueChanged"
+          :placeholder="data.placeholder"
+        />
+      </template>
+      <slot v-else>
         {{ noData }}
       </slot>
     </q-card-section>
@@ -49,43 +81,99 @@
 </template>
 
 <script>
-import { defineComponent, provide, ref } from "vue";
+import { computed, defineComponent, provide, ref, useTemplateRef } from "vue";
+import ValueDisplay from "./ValueDisplay.vue";
+import { MarkdownEditor } from "@/components";
+import { isObject } from "@/utils";
+import EditButtons from "./EditButtons.vue";
 
 export default defineComponent({
   name: "DetailCard",
+  components: {
+    EditButtons,
+    MarkdownEditor,
+    ValueDisplay,
+  },
+  emits: ["valueChanged"],
   props: {
-    icon: {
-      type: String,
-      required: false,
-    },
+    icon: String,
     title: {
       type: String,
       required: true,
     },
     noData: {
       type: String,
-      required: false,
       default: "There is no data to show.",
     },
-    badgeValue: {
-      type: Number,
-      required: false,
-    },
+    badgeValue: Number,
     showFilter: {
       type: Boolean,
-      required: false,
       default: false,
     },
     padContainer: {
       type: Boolean,
-      required: false,
+      default: false,
+    },
+    editable: {
+      type: Boolean,
+      default: false,
+    },
+    fields: Array,
+    data: Object,
+    register: Function,
+    fieldName: String,
+    markdown: {
+      type: Boolean,
       default: false,
     },
   },
-  setup() {
+
+  setup(props, context) {
     const cardFilter = ref("");
+    const editor = useTemplateRef("md-editor");
+    const editOn = ref(false);
+    const saving = ref(false);
+    const isNew = ref(props.data?.value === null && props.data?.show === true);
+
+    const editIcon = computed(() =>
+      editOn.value
+        ? editor.value.hasChanged
+          ? "mdi-content-save-outline"
+          : "mdi-close-circle-outline"
+        : "mdi-cog-outline",
+    );
+
+    const editColour = computed(() =>
+      editOn.value ? (editor.value.hasChanged ? "green-6" : "orange-6") : "grey-5",
+    );
+
+    const valueChanged = (value) => {
+      const baseAttr = {
+        name: props.fieldName,
+        update: !isNew.value,
+        source: props.data.source,
+        id: props.data.id,
+      };
+      if (isObject(value) && "name" in value) {
+        context.emit("valueChanged", value);
+      } else {
+        const valObj = isObject(value) ? value : { value: value, oldValue: props.data.value };
+        context.emit("valueChanged", Object.assign(valObj, baseAttr));
+      }
+    };
+
     provide("cardFilter", cardFilter);
-    return { cardFilter };
+    provide("editOn", editOn);
+
+    return {
+      cardFilter,
+      editOn,
+      editIcon,
+      editColour,
+      editor,
+      saving,
+      valueChanged,
+    };
   },
 });
 </script>
@@ -112,5 +200,13 @@ export default defineComponent({
 }
 .card-title-search .q-field__inner {
   align-self: center;
+}
+@media only screen and (min-width: 1100px) {
+  .detail-card .q-card__section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
 }
 </style>
