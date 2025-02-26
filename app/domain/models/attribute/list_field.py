@@ -24,15 +24,10 @@ class ListField(ArrayField):
             return [self.base_field.get_db_prep_value(value, connection, prepared=False)]
         return value
 
-    def to_python(self, value):
-        value = super().to_python(value)
-        return value[0] if len(value) == 1 else value
-
     def _from_db_value(self, value, expression, connection):
         if value is None:
             return value
-        value = [self.base_field.from_db_value(item, expression, connection) for item in value]
-        return value[0] if len(value) == 1 and self.is_unique else value
+        return [self.base_field.from_db_value(item, expression, connection) for item in value]
 
     @property
     def model(self):
