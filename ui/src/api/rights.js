@@ -10,6 +10,12 @@ const rights = {
       method: "GET",
     };
   },
+  getPolicy(id) {
+    return {
+      url: `${endpoint}/${id}/`,
+      method: "GET",
+    };
+  },
 };
 
 export default rights;

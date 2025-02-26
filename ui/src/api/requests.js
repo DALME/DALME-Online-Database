@@ -23,6 +23,8 @@ import tickets from "./tickets";
 import users from "./users";
 import preferences from "./preferences";
 import teiElements from "./tei-elements";
+import datasets from "./datasets";
+import workflow from "./workflow";
 
 const requests = {
   agents,
@@ -33,6 +35,7 @@ const requests = {
   comments,
   countries,
   collections,
+  datasets,
   teiElements,
   groups,
   images,
@@ -50,6 +53,7 @@ const requests = {
   tasks,
   tickets,
   users,
+  workflow,
 };
 
 export default requests;
