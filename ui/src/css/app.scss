@@ -26,6 +26,8 @@
   --light-green-button-text: #337a2a;
   --light-indigo-button-bg: #bcaae1;
   --light-indigo-button-text: #612a7a;
+  --light-red-button-bg: #ddcfcf;
+  --light-red-button-text: #713d3d;
   --light-link-colour: #01579b;
 
   --dark-bg-base-colour: #0a141c;
@@ -51,6 +53,8 @@
   --dark-green-button-text: #4bc33c;
   --dark-indigo-button-bg: #0f0d21;
   --dark-indigo-button-text: #9964cc;
+  --dark-red-button-bg: #ddcfcf;
+  --dark-red-button-text: #713d3d;
   --dark-link-colour: #5d87a7;
   --dark-highlight-tile: #26354580;
   --dark-infomenu-selected: #689f38;
@@ -85,12 +89,13 @@ a.title-link, a.title-link:visited {
   color: inherit;
 }
 
-a.text-link, a.text-link:visited {
+a.text-link, a.text-link:visited, a.external-link-inline, a.external-link-inline:visited {
   color: #5c6bc0;
 }
 
 a.text-link:hover,
-a.title-link:hover {
+a.title-link:hover,
+a.external-link-inline:hover {
   text-decoration: underline dotted;
 }
 
@@ -195,7 +200,7 @@ pre {
 }
 
 .sticky-header {
-  max-height: 800px;
+  max-height: 292px;
   thead tr th {
     position: sticky;
     z-index: 1;
@@ -256,7 +261,7 @@ pre {
   top: calc(50% - 12px);
   left: -25px;
 }
-.box-arrow::after {
+.box-arrow:not(.top)::after {
   content: "";
   position: absolute;
   border-width: 12px;
@@ -270,6 +275,12 @@ pre {
 }
 .box-arrow.dark::after {
   border-right-color: var(--dark-bg-base-colour);
+}
+.box-arrow.top::before {
+  top: 8px;
+}
+.box-arrow.top::after {
+  top: 8px;
 }
 .box-arrow.right::before {
   border-right-color: transparent;
@@ -725,9 +736,12 @@ pre {
 }
 .drawer-menu-list .q-item[class*="tile"]:not(:first-of-type) {
   border-top: 1px solid var(--dark-border-base-colour);
+
 }
+.drawer-menu-list .q-item--active,
 .drawer-menu-list .q-item.selected {
   background: var(--dark-highlight-tile);
+  color: var(--dark-textbox-colour);
 }
 .drawer-menu-list .q-item .q-item__label--caption {
   color: #ffffff8a;
@@ -758,4 +772,7 @@ pre {
   background-color: var(--dark-secondary-text-colour);
   width: 7px;
   opacity: 0.5;
+}
+.no-padding {
+  padding: 0 !important;
 }
