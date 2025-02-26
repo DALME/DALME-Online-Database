@@ -45,15 +45,29 @@ const routes = [
       },
       {
         // Collections
-        component: () => import("pages/Collections.vue"),
-        name: "Record Groups",
-        path: "collections",
+        component: () => import("pages/RecordGroups.vue"),
+        path: "record-groups",
+        menu: "menu",
         meta: {
-          navPath: ["Collections", null],
+          navPath: ["Record Groups", null],
           icon: "mdi-archive-outline",
           pageIcon: "mdi-archive",
         },
-        menu: "menu",
+        children: [
+          {
+            component: () => import("components/record-group-list/RecordGroupList.vue"),
+            name: "Record Groups",
+            path: "",
+          },
+          {
+            component: () => import("components/record-group-detail/RecordGroupDetail.vue"),
+            name: "Record Group",
+            path: ":id",
+            meta: {
+              viewDefaults: { tab: "info" },
+            },
+          },
+        ],
       },
       {
         // Images

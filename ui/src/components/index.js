@@ -31,6 +31,8 @@ export { default as WorkflowManager } from "./workflow-manager";
 export { default as RecordEditor } from "./record-editor";
 export { default as RecordList } from "./record-list";
 export { default as RecordDetail } from "./record-detail";
+export { default as RecordGroupList } from "./record-group-list";
+export { default as RecordGroupDetail } from "./record-group-detail";
 export { default as TasklistList } from "./tasklist-list";
 export { default as TaskList } from "./task-list";
 export { default as TaskDetail } from "./task-detail";
