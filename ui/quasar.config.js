@@ -15,7 +15,9 @@ const getDevCSP = () => {
   const styleSrc =
     "style-src 'self' https://fonts.googleapis.com https://stackpath.bootstrapcdn.com/ 'unsafe-inline'";
   const fontSrc = "font-src 'self' https://ka-f.fontawesome.com/ https://fonts.gstatic.com/";
-  return `${defaultSrc}; ${imgSrc}; ${scriptSrc}; ${styleSrc}; ${fontSrc}`;
+  const frameSrc =
+    "frame-src 'self' data: https://dam.dalme.org https://dalme-app-media.s3.amazonaws.com/ https://view.officeapps.live.com";
+  return `${defaultSrc}; ${imgSrc}; ${scriptSrc}; ${styleSrc}; ${fontSrc}; ${frameSrc}`;
 };
 
 export default configure((ctx) => {
@@ -132,7 +134,26 @@ export default configure((ctx) => {
 
     // animations: "all", // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: ["fadeIn", "fadeOut"],
+    animations: [
+      "fadeIn",
+      "fadeOut",
+      "slideInDown",
+      "slideInLeft",
+      "slideInRight",
+      "slideInUp",
+      "fadeInDown",
+      "fadeInLeft",
+      "fadeInRight",
+      "fadeInUp",
+      "fadeOutDown",
+      "fadeOutLeft",
+      "fadeOutRight",
+      "fadeOutUp",
+      "slideOutDown",
+      "slideOutLeft",
+      "slideOutRight",
+      "slideOutUp",
+    ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#sourcefiles
     // sourceFiles: {
