@@ -10,5 +10,4 @@ export { default as OpaqueSpinner } from "./OpaqueSpinner.vue";
 export { default as SuspenseWithError } from "./SuspenseWithError.vue";
 export { default as CommentBox } from "./CommentBox.vue";
 export { default as AttachmentWidget } from "./AttachmentWidget.vue";
-export { default as AttachmentIconWidget } from "./AttachmentIconWidget.vue";
 export { default as CustomIcon } from "./CustomIcon.vue";
