@@ -1,10 +1,10 @@
 <template>
-  <template v-if="editable">
-    <q-card flat bordered :class="containerClasses">
-      <div>
+  <q-card flat :bordered="!inCard" :class="containerClasses">
+    <Transition enter-active-class="animated slideInDown">
+      <div v-if="isEditable" class="md-editor-header">
         <q-tabs v-model="mdTab" dense indicator-color="transparent" no-caps>
           <q-tab name="write" label="Write" />
-          <q-tab name="preview" label="Preview" :disable="disabled" />
+          <q-tab name="preview" label="Preview" :disable="!hasChanged" />
         </q-tabs>
 
         <MDEToolbar
@@ -13,40 +13,49 @@
           @insert-prefix="insertPrefix"
         />
       </div>
+    </Transition>
 
-      <q-separator />
-      <q-tab-panels
-        v-model="mdTab"
-        keep-alive
-        animated
-        transition-prev="jump-up"
-        transition-next="jump-up"
-      >
-        <q-tab-panel name="write" class="q-pa-sm">
-          <q-input
-            type="textarea"
-            ref="input"
-            v-model="mdText"
-            outlined
-            dense
-            :placeholder="pHolder"
-            autocapitalize="off"
-            autocomplete="off"
-            autocorrect="off"
-          />
-        </q-tab-panel>
-        <q-tab-panel name="preview" class="q-py-sm q-px-md">
-          <q-markdown
-            :class="dark ? 'dark' : ''"
-            :src="mdText"
-            :extend="extendMarkdown"
-            style="min-height: 132px"
-            task-lists-enable
-          />
-        </q-tab-panel>
-      </q-tab-panels>
+    <q-tab-panels
+      v-if="isEditable"
+      v-model="mdTab"
+      keep-alive
+      animated
+      transition-prev="jump-up"
+      transition-next="jump-up"
+    >
+      <q-tab-panel name="write" class="q-pa-md">
+        <q-input
+          type="textarea"
+          ref="input"
+          v-model="mdText"
+          outlined
+          dense
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+        />
+      </q-tab-panel>
+      <q-tab-panel name="preview" class="q-pa-md">
+        <q-markdown
+          :class="dark ? 'dark' : ''"
+          :src="mdText"
+          :extend="extendMarkdown"
+          style="min-height: 124px"
+          task-lists-enable
+        />
+      </q-tab-panel>
+    </q-tab-panels>
 
-      <div class="md-editor-footer">
+    <q-markdown
+      v-else
+      class="md-editor-readonly"
+      :src="mdText ? mdText : pHolder"
+      :extend="extendMarkdown"
+      task-lists-enable
+    />
+
+    <Transition enter-active-class="animated slideInUp">
+      <div v-if="isEditable" class="md-editor-footer">
         <q-icon
           size="sm"
           name="mdi-language-markdown"
@@ -56,27 +65,29 @@
         <div v-if="help" class="text-caption">{{ help }}</div>
         <q-space />
         <q-btn
-          class="submit-button text-roboto"
-          :disable="disabled"
+          v-if="!inCard"
+          dense
+          class="md-button cancel text-roboto q-mr-sm"
+          :disable="!hasChanged"
+          label="cancel"
+          @click="onCancel"
+        />
+        <q-btn
+          v-if="!inCard"
+          dense
+          class="md-button submit text-roboto"
+          :disable="!hasChanged"
           :label="buttonLabel"
           @click="onSubmit"
         />
       </div>
-    </q-card>
-  </template>
-  <q-markdown
-    v-else
-    :class="dark ? 'dark' : ''"
-    :src="mdText"
-    :extend="extendMarkdown"
-    task-lists-enable
-  />
+    </Transition>
+  </q-card>
 </template>
 
 <script>
 import { openURL } from "quasar";
-import { nully } from "@/utils";
-import { computed, defineComponent, onMounted, provide, ref } from "vue";
+import { computed, defineComponent, inject, provide, ref, watch } from "vue";
 import MDEToolbar from "./MDEToolbar.vue";
 
 export default defineComponent({
@@ -84,34 +95,26 @@ export default defineComponent({
   props: {
     dark: {
       type: Boolean,
-      required: false,
       default: false,
     },
     right: {
       type: Boolean,
-      required: false,
       default: false,
     },
     editable: {
       type: Boolean,
-      required: false,
       default: false,
     },
     text: {
       type: String,
-      required: false,
+      default: "",
     },
-    placeholder: {
-      type: String,
-      required: false,
-    },
-    help: {
-      type: String,
-      required: false,
-    },
-    submitLabel: {
-      type: String,
-      required: false,
+    placeholder: String,
+    help: String,
+    submitLabel: String,
+    inCard: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -119,22 +122,29 @@ export default defineComponent({
   },
   emits: ["onSaveText"],
   setup(props, context) {
-    const textareaEl = ref(null);
     const input = ref(null);
+    const textareaEl = computed(() => input.value.getNativeElement());
     const buttonLabel = props.submitLabel || "Save";
-    const mdText = ref(!nully(props.text) ? props.text : "");
+    const mdText = ref(props.text);
     const pHolder = props.placeholder || "Enter text here...";
     const mdTab = ref("write");
-    const disabled = computed(() => nully(mdText.value));
+    const hasChanged = computed(() => mdText.value !== props.text);
+    const isEditable = props.inCard ? inject("editOn", false) : props.editable;
 
     const containerClasses = computed(() => {
-      let clss = props.dark
-        ? "md-editor-container box-arrow dark"
-        : "md-editor-container box-arrow";
-      return props.right ? (clss += " right") : clss;
+      let clss = props.dark ? "md-editor-container dark" : "md-editor-container";
+      if (props.inCard) {
+        clss += " in-card";
+      } else {
+        clss += " box-arrow";
+      }
+      if (props.right) clss += " right";
+      return clss;
     });
 
-    const onUserSelected = (value) => insertText("@" + value);
+    const onUserSelected = (value) => {
+      insertText("@" + value);
+    };
     const onTicketSelected = (value) => insertText("#" + value);
 
     const openMarkdown = () => {
@@ -212,22 +222,34 @@ export default defineComponent({
       context.emit("onSaveText", mdText.value);
     };
 
+    const onCancel = () => {
+      mdText.value = props.text;
+    };
+
     const resetEditor = () => {
       mdText.value = "";
     };
 
-    if (props.editable) {
-      onMounted(() => {
-        textareaEl.value = input.value.getNativeElement();
-      });
-    }
-
     provide("onUserSelected", onUserSelected);
     provide("onTicketSelected", onTicketSelected);
 
+    if (props.inCard) {
+      watch(
+        () => isEditable.value,
+        (val) => {
+          if (val === false && hasChanged.value) {
+            context.emit("onSaveText", {
+              value: mdText.value,
+              oldValue: props.text,
+            });
+          }
+        },
+      );
+    }
+
     return {
       buttonLabel,
-      disabled,
+      hasChanged,
       extendMarkdown,
       insertEnclosure,
       insertPrefix,
@@ -243,6 +265,8 @@ export default defineComponent({
       resetEditor,
       textareaEl,
       containerClasses,
+      isEditable,
+      onCancel,
     };
   },
 });
@@ -260,6 +284,8 @@ export default defineComponent({
   --textbox-text: var(--light-textbox-colour);
   --green-button: var(--light-green-button-bg);
   --green-button-text: var(--light-green-button-text);
+  --red-button: var(--light-red-button-bg);
+  --red-button-text: var(--light-red-button-text);
 }
 .md-editor-container.dark {
   --base-colour: var(--dark-bg-base-colour);
@@ -272,16 +298,19 @@ export default defineComponent({
   --textbox-text: var(--dark-textbox-colour);
   --green-button: var(--dark-green-button-bg);
   --green-button-text: var(--dark-green-button-text);
+  --red-button: var(--dark-red-button-bg);
+  --red-button-text: var(--dark-red-button-text);
 }
 .md-editor-container {
   min-width: 350px;
   width: 100%;
 }
-.md-editor-container > div:first-child {
+.md-editor-container > .md-editor-header {
   display: flex;
   flex-wrap: nowrap;
   padding: 4px 8px;
   background: var(--bg-colour);
+  border-bottom: 1px solid var(--border-colour);
 }
 .md-editor-container .q-tabs {
   position: relative;
@@ -313,16 +342,20 @@ export default defineComponent({
   background: var(--base-colour);
 }
 .md-editor-container .q-tab-panels .q-field--outlined .q-field__control:before {
-  border-color: var(--border-colour);
+  border: none;
+}
+.md-editor-container .q-tab-panels .q-field--outlined .q-field__control:after {
+  border: none;
 }
 .md-editor-container .q-field.q-textarea .q-field__control {
-  border-radius: 6px;
+  border-radius: 0;
   padding: 0;
   background: var(--textbox-bg);
 }
 .md-editor-container .q-field.q-textarea .q-field__native {
   color: var(--textbox-text);
-  padding: 10px;
+  padding: 0;
+  min-height: 120px;
 }
 .md-editor-container .md-editor-footer {
   display: flex;
@@ -338,26 +371,31 @@ export default defineComponent({
   overflow: hidden;
   line-height: 31px;
 }
-.md-editor-container .submit-button {
+.md-editor-container .md-button {
+  font-weight: 600;
+  font-size: 11px;
+  padding: 0 22px;
+}
+.md-editor-container .md-button.submit {
   background: var(--green-button);
   color: var(--green-button-text);
-  font-weight: 500;
-  font-size: 12px;
-  padding: 0 22px;
-  border-radius: 0;
-  min-height: 30px;
-  border-right: 1px solid var(--border-colour);
-  border-left: 1px solid var(--border-colour);
 }
-.md-editor-container .submit-button.disabled {
+.md-editor-container .md-button.cancel {
+  background: var(--red-button);
+  color: var(--red-button-text);
+}
+.md-editor-container .md-button.disabled {
   opacity: 0.2 !important;
   background: none;
   color: grey;
 }
-.md-editor-container .submit-button::before {
+.md-editor-container .md-button::before {
   box-shadow: none;
 }
 .q-markdown.dark a {
   color: var(--dark-link-colour);
+}
+.md-editor-readonly {
+  padding: 16px;
 }
 </style>
