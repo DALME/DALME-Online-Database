@@ -2,6 +2,7 @@ export { getColumns, getDefaults } from "./process-columns.js";
 export { formatDate } from "./format-date.js";
 export {
   nully,
+  copyToClipboard,
   formatUuid,
   isObject,
   isNumber,
