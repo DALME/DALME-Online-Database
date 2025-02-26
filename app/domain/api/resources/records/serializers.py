@@ -86,6 +86,20 @@ class RecordAttributeCollectionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
+class RecordParentSerializer(serializers.BaseSerializer):
+    """Serializer for record parent instances (either RecordGroup or Publication)."""
+
+    def to_representation(self, data):
+        """Override method to use serializer class instead of instance."""
+        model_name = data._meta.model.__name__  # noqa: SLF001
+        serializer_class_name = f'{model_name}Serializer'
+        srs = __import__('domain.api.resources', fromlist=[serializer_class_name])  # noqa: F841
+        self.serializer_class = eval(f'srs.{serializer_class_name}')
+        ret = self.serializer_class(data, field_set='parent').data
+        ret['type'] = model_name
+        return ret
+
+
 class RecordSerializer(DynamicSerializer):
     """Serializer for records."""
 
@@ -98,6 +112,7 @@ class RecordSerializer(DynamicSerializer):
     modification_user = UserSerializer(field_set='attribute', required=False)
     image_urls = serializers.SerializerMethodField()
     collections = RecordAttributeCollectionSerializer(many=True, required=False)
+    parent = RecordParentSerializer(required=False)
     # annotated fields
     description = serializers.ReadOnlyField()
     record_type = RecordTypeSerializer()
