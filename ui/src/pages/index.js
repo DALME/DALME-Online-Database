@@ -9,6 +9,7 @@ export { default as Project } from "./Project.vue";
 export { default as Rights } from "./Rights.vue";
 export { default as Sets } from "./Sets.vue";
 export { default as Records } from "./Records.vue";
+export { default as RecordGroups } from "./RecordGroups.vue";
 export { default as System } from "./System.vue";
 export { default as Tasks } from "./Tasks.vue";
 export { default as Tickets } from "./Tickets.vue";
