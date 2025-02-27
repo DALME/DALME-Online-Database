@@ -28,7 +28,8 @@ class ReferenceSource extends window.React.Component {
       };
 
       const setInitialValue = (entityId) => {
-        fetch(`${window.APIURL}/library/${entityId}/?content=csljson&format=json`)
+        const baseURL = window.CustomUtils.constants.APIURL;
+        fetch(`${baseURL}/library/${entityId}/?content=csljson&format=json`)
         .then(response => response.json())
         .then(data => {
           const citation = new window.cite(data[0]);
@@ -61,7 +62,7 @@ class ReferenceSource extends window.React.Component {
               width: "100%",
               dropdownParent: $(".modal"),
               ajax: {
-                url: `${window.APIURL}/library/`,
+                url: `${window.CustomUtils.constants.APIURL}/library/`,
                 dataType: "json",
                 delay: 500,
                 processResults: processAPIResults,

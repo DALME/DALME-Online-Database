@@ -1,5 +1,5 @@
 {% extends "web/layouts/left_side_column.html" %}
-{% load wagtailcore_tags wagtailimages_tags get_previous_item static %}
+{% load wagtailcore_tags wagtailimages_tags get_previous_item media_prefix static %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }} &ndash; {{ title }} {% endblock %}
 
@@ -29,7 +29,7 @@
         <section id="person-profile">
             <div class="avatar-frame">
                 {% if person.avatar %}
-                    <div class="headshot-bg" style="background: center / cover url({% get_media_prefix %}{{ person.avatar }});"></div>
+                    <div class="headshot-bg" style="background: center / cover url({% media_prefix %}{{ person.avatar }});"></div>
                 {% else %}
                     <div class="headshot-bg no-photo"></div>
                 {% endif %}

@@ -1,11 +1,11 @@
-{% load wagtailcore_tags wagtailimages_tags static %}
+{% load wagtailcore_tags wagtailimages_tags media_prefix static %}
 
 <div class="column-container">
     {% for member in self.member_list %}
         <div class="u-flex">
             <a href="#{{ member.name|slugify }}" class="anchor" aria-label="{{ member.name }} image">
                 {% if member.avatar %}
-                    <div class="headshot-bg" style="background: center / cover url({% get_media_prefix %}{{ member.avatar }});"></div>
+                    <div class="headshot-bg" style="background: center / cover url({% media_prefix %}{{ member.avatar }});"></div>
                 {% else %}
                     <div class="headshot-bg no-photo"></div>
                 {% endif %}
