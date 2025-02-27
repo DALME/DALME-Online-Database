@@ -2,6 +2,8 @@
 
 from django import template
 
+from .sanitize_alt_text import sanitize_alt_text
+
 register = template.Library()
 
 
@@ -21,7 +23,7 @@ def render_image(record):
     else:
         img = image.get_rendition('original')
 
-    img_tag = f'<img alt="{img.alt}" height="{img.height}" width="{img.width}" src="{img.url}" '
+    img_tag = f'<img alt="{sanitize_alt_text(img.alt)}" height="{img.height}" width="{img.width}" src="{img.url}" '
     img_tag = img_tag + f'id="{image_id}" ' if image_id and resize_rule != 'background' else img_tag
     img_tag = img_tag + 'class="u-none" ' if resize_rule == 'background' else img_tag
     img_tag += '/>'
