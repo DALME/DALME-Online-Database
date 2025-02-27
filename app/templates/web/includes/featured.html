@@ -1,4 +1,4 @@
-{% load get_snippet wagtailcore_tags wagtailimages_tags %}
+{% load get_snippet wagtailcore_tags wagtailimages_tags sanitize_alt_text %}
 
 {% if featured_object or featured_inventory or featured_essay %}
   <section class="featured u-flex">
@@ -10,12 +10,12 @@
           <a href="{% pageurl featured_object %}">
             <div class="monthly source object u-flex">
               {% if featured_object.front_image %}
-                {% image featured_object.front_image fill-230x230-c50 %}
+                {% image featured_object.front_image fill-230x230-c50 alt="Decorative image." %}
               {% endif %}
               <div class="u-flex">
                 <h2>{{ featured_object.title }}</h2>
                 <h3>Object of the Month</h3>
-                <p class="line-clamp seven-lines">{% get_snippet featured_object 500 %}</p>
+                <p class="line-clamp {% if featured_object.title|length > 40 %} six-lines {% else %} seven-lines {% endif %}">{% get_snippet featured_object 500 %}</p>
               </div>
             </div>
           </a>
@@ -25,12 +25,12 @@
           <a href="{% pageurl featured_inventory %}">
             <div class="monthly source u-flex">
               {% if featured_inventory.front_image %}
-                {% image featured_inventory.front_image fill-230x230-c50 %}
+                {% image featured_inventory.front_image fill-230x230-c50 alt="Decorative image." %}
               {% endif %}
               <div class="u-flex">
                 <h2>{{ featured_inventory.title }}</h2>
                 <h3>Inventory of the Month</h3>
-                <p class="line-clamp seven-lines">{% get_snippet featured_inventory 500 %}</p>
+                <p class="line-clamp {% if featured_inventory.title|length > 40 %} six-lines {% else %} seven-lines {% endif %}">{% get_snippet featured_inventory 500 %}</p>
               </div>
             </div>
           </a>
@@ -41,11 +41,11 @@
     {% if essay %}
       <div class="monthly essay u-flex">
         {% if essay.front_image %}
-          {% image essay.front_image fill-311x200-c50 %}
+          {% image essay.front_image fill-311x200-c50 alt="Decorative image." %}
         {% endif %}
         <div class="u-flex essay-content">
           <h3>{{ essay.title }}</h3>
-          <p class="line-clamp eight-lines">{% get_snippet essay 500 %}</p>
+          <p class="line-clamp {% if essay.title|length > 30 %} seven-lines {% else %} eight-lines {% endif %}">{% get_snippet essay 500 %}</p>
           <a class="u-button" href="{% pageurl essay %}">READ MORE</a>
         </div>
       </div>

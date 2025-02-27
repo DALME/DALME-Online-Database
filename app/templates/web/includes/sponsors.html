@@ -1,4 +1,4 @@
-{% load wagtailimages_tags %}
+{% load wagtailimages_tags sanitize_alt_text %}
 {% if sponsors %}
     <section class="support u-flex">
         <h2 class="u-lozenge">SUPPORT</h2>
@@ -7,7 +7,8 @@
             {% for sponsor in sponsors %}
                 <div class="u-flex">
                     <a href="{{ sponsor.url }}">
-                        {% image sponsor.logo original %}
+                        {% image sponsor.logo original as logo %}
+                        <img src="{{ logo.url }}" width="{{ logo.width }}" height="{{ logo.height }}" alt="{{ logo.alt|sanitize_alt_text }}">
                     </a>
                 </div>
             {% endfor %}
