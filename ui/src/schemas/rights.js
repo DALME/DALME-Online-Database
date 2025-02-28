@@ -1,31 +1,31 @@
 import * as yup from "yup";
-import { attachmentSchema, userAttributeSchema } from "@/schemas";
+import { attachmentSchema, userAttributeSchema, timeStampSchema } from "@/schemas";
 
-export const rightsListSchema = yup.array().of(
-  yup
-    .object()
-    .shape({
-      id: yup.string().uuid().required(),
-      name: yup.string().required(),
-      rights: yup.string().required(),
-      rightsHolder: yup.string().required(),
-      rightsNotice: yup.string().default(null).nullable(),
-      rightsStatus: yup
-        .object()
-        .shape({
-          id: yup.number().required(),
-          name: yup.string().required(),
-        })
-        .required(),
-      publicDisplay: yup.boolean().required(),
-      noticeDisplay: yup.boolean().required(),
-      commentCount: yup.number().default(null).nullable(),
-      licence: yup.string().default(null).nullable(),
-      creationTimestamp: yup.string().required(),
-      creationUser: userAttributeSchema.required(),
-      modificationTimestamp: yup.string().required(),
-      modificationUser: userAttributeSchema.required(),
-      attachments: attachmentSchema.default(null).nullable(),
-    })
-    .camelCase(),
-);
+export const rightsSchema = yup
+  .object()
+  .shape({
+    attachments: attachmentSchema.default(null).nullable(),
+    commentCount: yup.number().default(null).nullable(),
+    creationTimestamp: timeStampSchema.required(),
+    creationUser: userAttributeSchema.required(),
+    id: yup.string().uuid().required(),
+    licence: yup.string().default(null).nullable(),
+    modificationTimestamp: timeStampSchema.required(),
+    modificationUser: userAttributeSchema.required(),
+    name: yup.string().required(),
+    noticeDisplay: yup.boolean().required(),
+    publicDisplay: yup.boolean().required(),
+    rights: yup.string().required(),
+    rightsHolder: yup.string().required(),
+    rightsNotice: yup.string().default(null).nullable(),
+    rightsStatus: yup
+      .object()
+      .shape({
+        id: yup.number().required(),
+        name: yup.string().required(),
+      })
+      .required(),
+  })
+  .camelCase();
+
+export const rightsListSchema = yup.array().of(rightsSchema);

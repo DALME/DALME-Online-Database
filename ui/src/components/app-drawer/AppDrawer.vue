@@ -34,7 +34,7 @@
           inDrawer
           :scrollHeight="minScrollHeight"
           width="319"
-          :defaultOpened="false"
+          :defaultOpened="true"
           label="Your collections"
         />
         <template v-for="(route, idx) in appRoutes" :key="idx">
@@ -43,6 +43,7 @@
             header-class="drawer_expansion_header"
             expand-icon="mdi-plus-box-outline"
             expanded-icon="mdi-minus-box-outline"
+            group="app-drawer"
           >
             <q-item
               v-for="(child, i) in route.children"
@@ -50,14 +51,20 @@
               clickable
               v-close-popup
               :key="i"
-              :to="{ name: child.name }"
-              :active="ui.currentSection === child.name"
+              :to="{ name: child.children ? child.children[0].name : child.name }"
+              :active="
+                child.children
+                  ? ui.currentSubsection === child.children[0].name
+                  : ui.currentSubsection === child.name
+              "
               class="q-my-xs"
             >
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon :name="child.meta.icon" size="xs" />
               </q-item-section>
-              <q-item-section>{{ child.name }}</q-item-section>
+              <q-item-section>
+                {{ child.children ? child.children[0].name : child.name }}
+              </q-item-section>
             </q-item>
           </q-expansion-item>
         </template>

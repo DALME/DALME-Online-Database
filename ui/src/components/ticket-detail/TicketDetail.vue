@@ -34,7 +34,7 @@
     </div>
     <q-separator class="q-mb-lg" />
     <div class="row">
-      <div class="col-9 q-pr-md">
+      <div class="col-9 q-pr-lg">
         <q-card flat class="q-mb-md">
           <q-card-section
             :class="
@@ -43,29 +43,32 @@
                 : 'q-pt-none q-pr-none comments-container'
             "
           >
-            <div class="comment_thread q-mt-none q-pb-lg">
-              <q-item class="q-pb-sm q-pt-none q-px-none">
+            <div class="comment-thread q-mt-none q-pb-lg">
+              <q-item class="q-pb-sm q-pt-none q-px-none comment-box op-post">
                 <q-item-section top avatar>
-                  <q-avatar v-if="ticket.creationUser.avatar" size="40px">
-                    <img :src="ticket.creationUser.avatar" />
+                  <q-avatar size="40px">
+                    <q-img
+                      v-if="!nully(ticket.creationUser.avatar)"
+                      :src="ticket.creationUser.avatar"
+                      fit="cover"
+                      ratio="1"
+                    />
+                    <q-icon v-else size="36px" name="mdi-account-circle" />
                   </q-avatar>
-                  <q-avatar
-                    v-else
-                    size="40px"
-                    icon="account_circle"
-                    color="grey-4"
-                    text-color="grey-6"
-                  />
                 </q-item-section>
                 <q-item-section>
-                  <q-card flat bordered class="box-left-arrow">
+                  <q-card flat bordered class="box-arrow top">
                     <q-card-section class="bg-grey-2 comment-head">
                       <DetailPopover :userData="ticket.creationUser" :showAvatar="false" />
                       commented {{ formatDate(ticket.creationTimestamp) }}
                     </q-card-section>
                     <q-separator />
-                    <q-card-section class="text-body2">
-                      <MarkdownEditor v-if="ticket.description" :text="ticket.description" />
+                    <q-card-section class="text-body2 q-pa-none">
+                      <MarkdownEditor
+                        v-if="ticket.description"
+                        :text="ticket.description"
+                        in-card
+                      />
                       <span v-else>No description provided.</span>
                     </q-card-section>
                   </q-card>
@@ -74,7 +77,7 @@
             </div>
             <CommentBox>
               <template v-if="ticket.status" v-slot:comment-stream-end>
-                <div class="comment_thread row items-center q-mt-none q-pb-lg">
+                <div class="comment-thread row items-center q-mt-none q-pb-lg">
                   <div class="closing-dot bg-deep-purple-6">
                     <q-icon name="o_check_circle" color="white" size="20px" />
                   </div>
@@ -89,40 +92,57 @@
         </q-card>
       </div>
       <div class="col-3 q-pl-md">
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Assignees</div>
-        <div class="q-mb-sm text-13">
-          <span>No one assigned</span>
-        </div>
-        <q-separator class="q-my-md" />
-
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Tags</div>
-        <div class="q-mb-sm text-13">
-          <template v-if="!isEmpty(cleanTags(ticket.tags))">
-            <TagPill
-              v-for="(tag, idx) in cleanTags(ticket.tags)"
-              :key="idx"
-              :name="tag.tag"
-              :type="tag.tag"
-              size="xs"
-              module="ticket"
-              class="q-ml-sm"
-            />
+        <DetailSidebar>
+          <template v-slot:extraElements>
+            <DetailElement label="Assignee">
+              <template v-slot:content>
+                <template v-if="ticket.assignedTo">
+                  <router-link
+                    :to="{
+                      name: 'User',
+                      params: { username: ticket.assignedTo.username },
+                    }"
+                  >
+                    {{ ticket.assignedTo.fullName }}
+                  </router-link>
+                </template>
+                <div class="text-13" v-else>No one assigned</div>
+              </template>
+            </DetailElement>
+            <DetailElement label="Tags">
+              <template v-slot:content>
+                <template v-if="!isEmpty(cleanTags(ticket.tags))">
+                  <TagPill
+                    v-for="(tag, idx) in cleanTags(ticket.tags)"
+                    :key="idx"
+                    :name="tag.tag"
+                    :type="tag.tag"
+                    size="xs"
+                    module="ticket"
+                    class="q-ml-sm"
+                  />
+                </template>
+                <div class="text-13" v-else>None yet</div>
+              </template>
+            </DetailElement>
+            <DetailElement label="Attachments">
+              <template v-slot:content>
+                <template v-if="!isEmpty(ticket.files)">
+                  <AttachmentWidget v-for="file in ticket.files" :key="file.id" :file="file" />
+                </template>
+                <div class="text-13" v-else>None yet</div>
+              </template>
+            </DetailElement>
+            <DetailElement label="Link">
+              <template v-slot:content>
+                <template v-if="ticket.url">
+                  <ExternalLink :url="ticket.url" />
+                </template>
+                <div class="text-13" v-else>None yet</div>
+              </template>
+            </DetailElement>
           </template>
-          <span v-else>None yet</span>
-        </div>
-        <q-separator class="q-my-md" />
-
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Attachments</div>
-        <div class="q-mb-sm text-13">
-          <AttachmentWidget v-if="attachment" />
-          <span v-else>None yet</span>
-        </div>
-        <q-separator class="q-my-md" />
-
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Links</div>
-        <div class="q-mb-sm text-13">
-          <span>None yet</span>
-        </div>
+        </DetailSidebar>
       </div>
     </div>
   </div>
@@ -138,13 +158,16 @@ import { requests } from "@/api";
 import {
   AttachmentWidget,
   CommentBox,
+  DetailSidebar,
+  DetailElement,
   DetailPopover,
+  ExternalLink,
   MarkdownEditor,
   OpaqueSpinner,
   TagPill,
 } from "@/components";
-import { formatDate } from "@/utils";
-import { ticketDetailSchema } from "@/schemas";
+import { formatDate, nully } from "@/utils";
+import { ticketSchema } from "@/schemas";
 import { useAPI, useEventHandling, useStores } from "@/use";
 
 export default defineComponent({
@@ -152,7 +175,10 @@ export default defineComponent({
   components: {
     AttachmentWidget,
     CommentBox,
+    DetailSidebar,
+    DetailElement,
     DetailPopover,
+    ExternalLink,
     MarkdownEditor,
     OpaqueSpinner,
     TagPill,
@@ -160,7 +186,7 @@ export default defineComponent({
   setup() {
     const { notifier } = useEventHandling();
     const $route = useRoute();
-    const { isAdmin, ui } = useStores();
+    const { auth, ui } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
@@ -202,7 +228,7 @@ export default defineComponent({
     const fetchData = async () => {
       await fetchAPI(requests.tickets.getTicket(number.value));
       if (success.value)
-        await ticketDetailSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+        await ticketSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           action.value = value.status ? "reopen ticket" : "close ticket";
           ticket.value = value;
           attachment.value = value.file;
@@ -225,12 +251,13 @@ export default defineComponent({
       cleanTags,
       formatDate,
       number,
-      isAdmin,
+      isAdmin: auth.user.isAdmin,
       isEmpty,
       isNil,
       loading,
       onAction,
       ticket,
+      nully,
     };
   },
 });

@@ -93,6 +93,13 @@ class Records(BaseViewSet):
         except Exception as e:  # noqa: BLE001
             return Response(str(e), 400)
 
+    def get_serializer_kwargs(self, **kwargs):
+        """Overide serializer kwargs."""
+        kwargs = super().get_serializer_kwargs(**kwargs)
+        if self.action in ['create', 'update', 'partial_update', 'update_related']:
+            kwargs['field_set'] = 'retrieve'
+        return kwargs
+
 
 class WebRecords(Records):
     """API endpoint for managing records for frontend apps."""

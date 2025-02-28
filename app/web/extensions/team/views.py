@@ -2,6 +2,7 @@
 
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
 from wagtail.admin.ui.tables import Column, UpdatedAtColumn
+from wagtail.admin.views.account import BaseSettingsPanel
 from wagtail.admin.views.generic.models import IndexView
 from wagtail.admin.viewsets.base import ViewSetGroup
 from wagtail.admin.viewsets.model import ModelViewSet
@@ -11,6 +12,7 @@ from django.utils.functional import cached_property
 
 from web.extensions.extras.widgets import MultiSelect
 
+from .forms import TeamAvatarPreferencesForm
 from .models import TeamMember, TeamRole
 from .widgets import AvatarFileInput, UserSelect
 
@@ -114,3 +116,12 @@ class TeamViewSetGroup(ViewSetGroup):
     menu_label = 'Team'
     menu_icon = 'people-group'
     items = (TeamMemberViewSet, TeamRoleViewSet)
+
+
+class AvatarSettingsPanel(BaseSettingsPanel):
+    name = 'avatar'
+    title = 'Profile picture'
+    order = 300
+    template_name = 'team/avatar_admin_panel.html'
+    form_class = TeamAvatarPreferencesForm
+    form_object = 'user'

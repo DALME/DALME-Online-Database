@@ -13,8 +13,8 @@ class RightsPolicySerializer(DynamicSerializer):
 
     attachments = AttachmentSerializer(required=False)
     comment_count = serializers.SerializerMethodField(required=False)
-    creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
-    modification_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
+    creation_user = UserSerializer(field_set='attribute', required=False)
+    modification_user = UserSerializer(field_set='attribute', required=False)
 
     class Meta:
         model = RightsPolicy

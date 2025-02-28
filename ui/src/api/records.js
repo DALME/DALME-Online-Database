@@ -16,12 +16,6 @@ const records = {
       method: "GET",
     };
   },
-  // getSourceOptionsByType(sourceType) {
-  //   return {
-  //     url: `${endpoint}/?class=${sourceTypeMap[sourceType]}&as=options`,
-  //     method: "GET",
-  //   };
-  // },
   createRecord(data) {
     return {
       url: `${endpoint}/`,
@@ -29,19 +23,27 @@ const records = {
       data: data,
     };
   },
-  editRecord(id, data) {
+  editRecord(id, payload, patch = false) {
     return {
       url: `${endpoint}/${id}/`,
-      method: "PUT",
-      data: data,
+      method: patch ? "PATCH" : "PUT",
+      data: payload,
     };
   },
-  // getSourceManifest(id) {
-  //   return {
-  //     url: `${endpoint}/${id}/get_manifest/`,
-  //     method: "GET",
-  //   };
-  // },
+  addAttribute(id, type, value) {
+    return {
+      url: `${endpoint}/${id}/add_attribute/`,
+      method: "PATCH",
+      data: { type, value },
+    };
+  },
+  updateRelated(id, field, value) {
+    return {
+      url: `${endpoint}/${id}/update_related/`,
+      method: "PATCH",
+      data: { field, value },
+    };
+  },
 };
 
 export default records;

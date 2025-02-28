@@ -9,6 +9,7 @@
       :rowsPerPage="pagination.rowsPerPage"
       :sortList="sortList"
       :editable="!isEmpty(editable)"
+      :resource="resource"
       @changeRowsPerPage="onChangeRowsPerPage"
       @changeEditMode="onChangeEditMode"
       @changeSearch="onChangeSearch"
@@ -118,7 +119,7 @@
             >
               <slot :name="`render-cell-${column.field}`" v-bind="props">
                 <template v-if="isObject(props.row[column.field])">
-                  {{ props.row[column.field].name }}
+                  {{ props.row[column.field][column.key] }}
                 </template>
                 <template v-else>
                   {{ props.row[column.field] }}
@@ -317,6 +318,10 @@ export default defineComponent({
       type: Array,
       required: false,
     },
+    resource: {
+      type: String,
+      default: "",
+    },
   },
   setup(props) {
     const { apiInterface } = useAPI();
@@ -332,7 +337,7 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
 
-    const { isAdmin } = useStores();
+    const { auth } = useStores();
 
     const { diffCount, isDirty, cellIsDirty, objDiffs, onDiff, resetTransport, transportWatcher } =
       useTransport();
@@ -479,7 +484,7 @@ export default defineComponent({
       getValidation,
       handleSubmit,
       inline,
-      isAdmin,
+      isAdmin: auth.user.isAdmin,
       isDirty,
       isEmpty,
       isFocussed,

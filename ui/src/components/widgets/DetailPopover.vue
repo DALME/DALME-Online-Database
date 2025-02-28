@@ -15,13 +15,18 @@
       :class="dark ? 'dark' : ''"
       max-width="50%"
     >
-      <q-card flat bordered class="box-small-arrow" :class="dark ? 'dark' : ''">
+      <q-card bordered class="box-small-arrow q-pa-sm" :class="dark ? 'dark' : ''">
         <slot>
           <q-item v-if="userData">
             <q-item-section v-if="showAvatar" avatar>
               <q-avatar size="32px">
-                <img v-if="!nully(userData.avatar)" :src="userData.avatar" />
-                <q-icon v-else size="32px" name="mdi-account-circle" />
+                <q-img
+                  v-if="!nully(userData.avatar)"
+                  :src="userData.avatar"
+                  fit="cover"
+                  ratio="1"
+                />
+                <q-icon v-else size="30px" name="mdi-account-circle" />
               </q-avatar>
             </q-item-section>
             <q-item-section>
@@ -108,13 +113,14 @@ export default defineComponent({
   --secondary-colour: var(--dark-secondary-text-colour);
 }
 .popover-container {
-  padding-bottom: 8px;
+  padding: 8px;
   box-shadow: none !important;
   background: none !important;
 }
 .popover-container .q-card {
   background: var(--bg-colour);
   border-color: var(--border-colour);
+  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.2);
 }
 .popover-container .q-item {
   color: var(--main-colour);

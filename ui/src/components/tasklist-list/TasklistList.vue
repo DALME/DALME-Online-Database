@@ -144,7 +144,7 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
     const { notifier } = useEventHandling();
-    const { isAdmin } = useStores();
+    const { auth } = useStores();
     const $router = useRouter();
 
     const title = "Task Lists";
@@ -248,7 +248,7 @@ export default defineComponent({
       handleCreate,
       handleEdit,
       handleDelete,
-      isAdmin,
+      isAdmin: auth.user.isAdmin,
       taskLists,
       title,
     };

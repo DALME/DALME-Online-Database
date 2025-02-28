@@ -27,6 +27,7 @@ router.register(r'ping', resources.Ping, basename='ping')
 router.register(r'places', resources.Places, basename='places')
 router.register(r'preferences', resources.Preferences, basename='preferences')
 router.register(r'records', resources.Records, basename='records')
+router.register(r'record-groups', resources.RecordGroups, basename='record_groups')
 router.register(r'rights', resources.Rights, basename='rights')
 router.register(r'session', resources.Session, basename='session')
 router.register(r'tasklists', resources.TaskLists, basename='tasklists')
@@ -38,7 +39,7 @@ router.register(r'workflow', resources.Workflows, basename='workflow')
 
 # public web endpoints
 router.register(r'web/records', resources.WebRecords, basename='web_records')
-router.register(r'web/attribute_types', resources.WebAttributeTypes, basename='web_attribute_types')
+router.register(r'web/attribute-types', resources.WebAttributeTypes, basename='web_attribute_types')
 router.register(r'web/attributes', resources.WebAttributes, basename='web_attributes')
 
 # purl endpoint

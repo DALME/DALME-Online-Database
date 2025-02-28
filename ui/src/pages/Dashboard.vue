@@ -1,14 +1,14 @@
 <template>
   <PageContainer class="main-max-width">
     <div class="row horizontal-stretch q-gutter-sm dash-container">
-      <DashChart chart-type="polar" />
-      <DashChart chart-type="line" class="col-grow" />
-      <DashChart chart-type="radar" />
-      <DashChart chart-type="doughnut" />
-      <DashChart chart-type="pie" />
-      <DashChart chart-type="bubble" class="col-grow" />
-      <DashChart chart-type="scatter" class="col-grow" />
-      <DashChart chart-type="bar" class="col-grow" />
+      <DashChartWidget name="polar" />
+      <DashChartWidget name="RecordTypes" />
+      <DashChartWidget name="radar" />
+      <DashChartWidget name="doughnut" />
+      <DashChartWidget name="pie" />
+      <DashChartWidget name="line" />
+      <DashChartWidget name="bubble" />
+      <DashChartWidget name="scatter" />
     </div>
   </PageContainer>
 </template>
@@ -16,16 +16,22 @@
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-import { DashChart, PageContainer } from "@/components";
+import { DashChartWidget, PageContainer } from "@/components";
 
 export default defineComponent({
   name: "DashBoard",
   components: {
-    DashChart,
+    DashChartWidget,
     PageContainer,
   },
   setup() {
     useMeta({ title: "Dashboard" });
+    const query = {
+      target: "Record",
+      cat1: "record_type",
+    };
+
+    return { query };
   },
 });
 </script>

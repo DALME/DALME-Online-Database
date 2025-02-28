@@ -16,7 +16,10 @@ export const attributeDateSchema = yup.object().shape({
 
 export const attributeSchema = yup.object().shape({
   id: yup.string().uuid().required(),
-  name: yup.string().required(),
+  name: yup
+    .string()
+    .required()
+    .transform((value) => camelCase(value)),
   label: yup.string().required(),
   description: yup.string().nullable(),
   value: yup
@@ -42,7 +45,10 @@ export const attributeSchema = yup.object().shape({
     .required(),
   attributeType: yup.number().required(),
   dataType: yup.string().required(),
+  isUnique: yup.boolean().nullable().default(true),
 });
+
+export const attributeListSchema = yup.array().of(attributeSchema);
 
 export const attributesFieldSchema = yup.object().shape({
   attribute: yup

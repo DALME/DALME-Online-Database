@@ -3,17 +3,27 @@
 import numpy as np
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from app.access_policies import WebAccessPolicy
+from django.apps import apps
+from django.db.models import Count
+
+from app.access_policies import BaseAccessPolicy
 from domain.models import Record
+
+
+class DatasetAccessPolicy(BaseAccessPolicy):
+    """Access policies for the Datasets endpoint."""
+
+    id = 'datasets-policy'
 
 
 class Datasets(viewsets.GenericViewSet):
     """API endpoint for generating and retrieving datasets."""
 
-    permission_classes = [WebAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope & WebAccessPolicy]
+    permission_classes = [DatasetAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope & DatasetAccessPolicy]
 
     def retrieve(self, request, pk=None, fmt=None):  # noqa: ARG002
         """Return requested dataset."""
@@ -25,6 +35,23 @@ class Datasets(viewsets.GenericViewSet):
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
+
+    @action(detail=False, methods=['post', 'get'])
+    def get(self, request):
+        """Get a calculated dataset."""
+        if not request.data:
+            return Response({'error': 'Data missing from request.'}, 400)
+
+        target = request.data.get('target')
+        cat_1 = request.data.get('cat1')
+        _cat_2 = request.data.get('cat2')
+        _limit = request.data.get('limit')
+        _start = request.data.get('start')
+
+        model = apps.get_app_config('domain').get_model(target)
+        data = model.objects.all().values(cat_1).annotate(n=Count('pk'))
+        dataset = {str(i[cat_1]): i['n'] for i in data}
+        return Response(dataset, 200)
 
     def explore_map(self):
         """Return data for 'Explore' map in public site."""

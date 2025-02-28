@@ -56,6 +56,16 @@ class Command(BaseCommand):
 
     def migrate(self):
         """Run the migration pipeline."""
+        try:
+            assert settings.ZOTERO_API_KEY
+            assert settings.ZOTERO_API_KEY_GP
+            assert settings.ZOTERO_LIBRARY_ID
+            assert settings.ZOTERO_LIBRARY_ID_GP
+
+        except AssertionError:
+            logger.exception('Zotero environment variables are not set')
+            raise
+
         for cls in STAGES:
             stage = cls()
             label = f'Applying migration stage: {stage.name}'

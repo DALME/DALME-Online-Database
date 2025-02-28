@@ -86,37 +86,59 @@ class BaseViewSet(viewsets.ModelViewSet):
         for pk in pks:
             obj = self.queryset.filter(pk=pk)
             obj_data = request.data[pk]
-
-            # Update fields.
-            # Temporary until sorting out api parser/renderer.
-            # from stringcase import snakecase
-            # fields = {
-            #     snakecase(field): value for field, value in obj_data.items()
-            #     if not isinstance(value, dict)
-            # }
-            # fields = {
-            #     field: value for field, value in obj_data.items()
-            #     if not isinstance(value, dict)
-            # }
             obj.update(**obj_data)
-
-            # Update foreign keys.
-            # related = {
-            #     fk_field: value
-            #     for fk_field, value in obj_data.items()
-            #     if fk_field not in fields
-            # }
-
-            # for fk_field, value in related.items():
-            #     RelatedModel = Place._meta.get_field(fk_field).rel.to
-            #     instance = RelatedModel.objects.get(pk=value.id)
-            #     obj.update(fk_field=instance)
 
         return Response({'message': f'Updated {len(pks)} rows.'}, 201)
 
-    def get_serializer(self, *args, **kwargs):
-        """Return serializer."""
-        serializer_class = self.get_serializer_class()
+    @action(detail=True, methods=['patch'])
+    def add_attribute(self, request, *args, **kwargs):  # noqa: ARG002
+        """Add a new attribute to an object."""
+        if not hasattr(self.get_queryset().model, 'attribute_list'):
+            return Response({'error': 'This endpoint is not associated with a model with attributes.'}, 400)
+
+        try:
+            from domain.api.resources.attributes.serializers import AttributeSerializer
+            from domain.models import Attribute, AttributeType
+
+            obj = self.get_object()
+            atype_ref = request.data.get('type')
+            value = request.data.get('value')
+            atype = (
+                AttributeType.objects.get(pk=int(atype_ref))
+                if atype_ref.isdigit()
+                else AttributeType.objects.get(name=atype_ref)
+            )
+            att = Attribute(content_object=obj, attribute_type=atype, value=value)
+            att.save()
+            serializer = AttributeSerializer(
+                Attribute.objects.get(pk=att.id)
+            )  # we need to look it up to get the annotations
+            return Response(serializer.data, 200)
+
+        except Exception as e:  # noqa: BLE001
+            return Response({'error': str(e)}, 400)
+
+    @action(detail=True, methods=['patch'])
+    def update_related(self, request, *args, **kwargs):  # noqa: ARG002
+        """Update an object's related field."""
+        field = request.data.get('field')
+        related_id = request.data.get('value')
+
+        if not field or not related_id:
+            return Response({'error': 'A field name and a related id must be provided.'}, 400)
+
+        try:
+            obj = self.get_object()
+            setattr(obj, f'{field}_id', related_id)
+            obj.save()
+            serializer = self.get_serializer(obj)
+            return Response(serializer.data, 200)
+
+        except Exception as e:  # noqa: BLE001
+            return Response({'error': str(e)}, 400)
+
+    def get_serializer_kwargs(self, **kwargs):
+        """Return serializer kwargs."""
         kwargs['context'] = self.get_serializer_context()
         kwargs['action'] = self.action
 
@@ -125,5 +147,12 @@ class BaseViewSet(viewsets.ModelViewSet):
 
         if self.url_view:
             kwargs['field_set'] = 'url'
+
+        return kwargs
+
+    def get_serializer(self, *args, **kwargs):
+        """Return serializer."""
+        serializer_class = self.get_serializer_class()
+        kwargs = self.get_serializer_kwargs(**kwargs)
 
         return serializer_class(*args, **kwargs)

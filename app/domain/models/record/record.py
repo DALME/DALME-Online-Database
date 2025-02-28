@@ -39,7 +39,12 @@ class RecordGroup(
     parent = GenericForeignKey('parent_type', 'parent_id')
     parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     parent_id = models.CharField(max_length=36, db_index=True, null=True)
-    children = GenericRelation('domain.Record', related_query_name='record_group')
+    children = GenericRelation(
+        'domain.Record',
+        related_query_name='record_group',
+        content_type_field='parent_type',
+        object_id_field='parent_id',
+    )
 
     @cached_property
     def is_private(self):

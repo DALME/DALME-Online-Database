@@ -97,7 +97,7 @@ class Stage(BaseStage):
     @transaction.atomic
     def migrate_agent(self):
         """Copy agent data."""
-        if Agent.objects.count() == 0:
+        if Agent.unattributed.count() == 0:
             with connection.cursor() as cursor:
                 # migrate people
                 self.logger.info('Migrating agents: person')

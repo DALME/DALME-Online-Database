@@ -64,6 +64,8 @@ def translate_workflow_string(data):
 
 
 class RecordTypeSerializer(DynamicSerializer):
+    """Serializer for record types."""
+
     class Meta:
         model = RecordType
         fields = ['id', 'label']
@@ -86,6 +88,20 @@ class RecordAttributeCollectionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
+class RecordParentSerializer(serializers.BaseSerializer):
+    """Serializer for record parent instances (either RecordGroup or Publication)."""
+
+    def to_representation(self, data):
+        """Override method to use serializer class instead of instance."""
+        model_name = data._meta.model.__name__  # noqa: SLF001
+        serializer_class_name = f'{model_name}Serializer'
+        srs = __import__('domain.api.resources', fromlist=[serializer_class_name])  # noqa: F841
+        self.serializer_class = eval(f'srs.{serializer_class_name}')
+        ret = self.serializer_class(data, field_set='parent').data
+        ret['type'] = model_name
+        return ret
+
+
 class RecordSerializer(DynamicSerializer):
     """Serializer for records."""
 
@@ -96,19 +112,20 @@ class RecordSerializer(DynamicSerializer):
     owner = UserSerializer(field_set='attribute', required=False)
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
-    image_urls = serializers.SerializerMethodField()
+    image_urls = serializers.SerializerMethodField(required=False)
     collections = RecordAttributeCollectionSerializer(many=True, required=False)
+    parent = RecordParentSerializer(required=False)
     # annotated fields
-    description = serializers.ReadOnlyField()
-    record_type = RecordTypeSerializer()
-    locale = LocaleReferenceSerializer(many=True)
-    language = LanguageReferenceSerializer(many=True)
+    description = serializers.ReadOnlyField(required=False)
+    record_type = RecordTypeSerializer(field_set='attribute')
+    locale = LocaleReferenceSerializer(many=True, required=False)
+    language = LanguageReferenceSerializer(many=True, required=False)
     # method fields
     agents = AgentSerializer(many=True, required=False)
-    credit_line = serializers.SerializerMethodField()
-    credits = serializers.SerializerMethodField()
-    source = serializers.SerializerMethodField()
-    date = serializers.SerializerMethodField()
+    credit_line = serializers.SerializerMethodField(required=False)
+    credits = serializers.SerializerMethodField(required=False)
+    source = serializers.SerializerMethodField(required=False)
+    date = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = Record
@@ -143,6 +160,7 @@ class RecordSerializer(DynamicSerializer):
             'credits',
             'source',
             'agents',
+            'parent',
         ]
         default_exclude = [
             'has_images',
@@ -193,6 +211,27 @@ class RecordSerializer(DynamicSerializer):
                 'language',
                 'source',
                 'workflow',
+            ],
+            'retrieve': [
+                'id',
+                'name',
+                'short_name',
+                'owner',
+                'attributes',
+                'no_folios',
+                'workflow',
+                'pages',
+                'is_private',
+                'comment_count',
+                'creation_timestamp',
+                'creation_user',
+                'modification_timestamp',
+                'modification_user',
+                'no_transcriptions',
+                'collections',
+                'credit_line',
+                'parent',
+                'agents',
             ],
             'web': [
                 'id',

@@ -3,12 +3,13 @@
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from django.utils import timezone
 
 from app.access_policies import BaseAccessPolicy, RecordAccessPolicy
-from domain.models import Workflow, WorkLog
+from domain.models import Record, Workflow, WorkLog
 
 from .serializers import WorkflowSerializer
 
@@ -35,7 +36,7 @@ class Workflows(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'])
     def change_state(self, request, *args, **kwargs):  # noqa: ARG002
         """Change workflow status."""
-        obj = self.get_obj()
+        obj = self.get_object()
         try:
             action = self.request.data['action']
             stage_dict = dict(Workflow.PROCESSING_STAGES)
@@ -87,7 +88,8 @@ class Workflows(viewsets.ModelViewSet):
                 obj.save()
                 self.update_log(obj, f'status changed from {status_dict[prev_status]} to {status_dict[status]}')
 
-            return Response(200)
+            serializer = WorkflowSerializer(obj)
+            return Response(serializer.data, 200)
 
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
@@ -95,3 +97,13 @@ class Workflows(viewsets.ModelViewSet):
     def update_log(self, record, message):
         """Update associated work log."""
         WorkLog.objects.create(record=record, event=message)
+
+    def get_object(self):
+        """Return the object the view is displaying when provided a record id."""
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs[lookup_url_kwarg]
+        queryset = Record.unattributed.all()
+        filter_kwargs = {'pk': lookup_value}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+        return obj.workflow

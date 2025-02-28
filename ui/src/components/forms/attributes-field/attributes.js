@@ -55,7 +55,7 @@ export const attributeFields = reduce(
       options: optionFields.includes(attribute)
         ? /* eslint-disable */
           {
-            request: () => requests.attributes.getAttributeOptions(attribute),
+            request: () => requests.attributeTypes.getAttributeTypeOptions(attribute, true),
             schema: alternateSchema[attribute] || optionsSchema,
             multiple: multiple.includes(attribute),
           }

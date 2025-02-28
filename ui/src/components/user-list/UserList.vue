@@ -19,10 +19,10 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:grid-avatar="props">
-      <q-avatar v-if="!nully(props.row.avatar)" size="24px">
-        <img :src="props.row.avatar" />
+      <q-avatar size="38px" class="q-pt-xs">
+        <q-img v-if="!nully(props.row.avatar)" :src="props.row.avatar" fit="cover" ratio="1" />
+        <q-icon v-else color="blue-grey-3" name="mdi-account-circle" size="40px" />
       </q-avatar>
-      <q-icon v-else name="account_circle" size="sm" />
     </template>
 
     <template v-slot:grid-main="props">
@@ -149,10 +149,9 @@ export default defineComponent({
       const request = requests.users.getUsers(query);
       await fetchAPI(request);
       if (success.value)
-        await userListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+        await userListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
           columns.value = getColumns(columnMap);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           rows.value = value;
           loading.value = false;
         });

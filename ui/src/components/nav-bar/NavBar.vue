@@ -13,6 +13,7 @@
       <q-icon :name="pageIcon" color="grey-4" size="26px" />
 
       <q-breadcrumbs
+        v-if="ui.windowWidth > 790"
         separator-color="bc-colour"
         gutter="xs"
         class="menu-breadcrumb q-ml-md q-mr-auto"
@@ -276,6 +277,8 @@ export default defineComponent({
   background-image: linear-gradient(180deg, #072034 10%, #1b1b1b);
   background-size: cover;
   height: 60px;
+  flex-wrap: nowrap;
+  min-width: 620px;
 }
 .main-toolbar .tb-button {
   border: 1px solid rgb(51, 67, 84);
@@ -359,9 +362,11 @@ export default defineComponent({
 }
 .tb-search-button span.block {
   font-size: 14px;
+  margin-right: 10px;
 }
 .tb-search-button .q-btn__content {
   width: 100%;
+  flex-wrap: nowrap;
 }
 .tb-search-button .q-btn__content .q-icon.on-right {
   margin-left: auto;
@@ -392,6 +397,14 @@ export default defineComponent({
 .menu-breadcrumb {
   font-size: 16px;
   margin-left: 10px;
+  overflow: auto;
+  margin-right: 20px;
+}
+.menu-breadcrumb > div:first-of-type {
+  flex-wrap: nowrap;
+}
+.menu-breadcrumb .q-breadcrumbs__el {
+  text-wrap: nowrap;
 }
 .menu-bar {
   padding: 0;

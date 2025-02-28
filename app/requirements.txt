@@ -41,5 +41,5 @@ requests==2.32.3
 stringcase==1.2.0
 urllib3==1.26.18 # has to remain at this version because of elasticsearch
 wagtail-font-awesome-svg==1.0.1
-wagtail==6.3.3
+wagtail==6.4.1
 wagtailcodeblock==1.29.0.2

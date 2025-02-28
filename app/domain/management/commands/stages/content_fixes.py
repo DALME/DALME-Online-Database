@@ -216,7 +216,7 @@ class Stage(BaseStage):
             corpora = Corpus.objects.all()
 
             for corpus in corpora:
-                new_col = Collection.objects.create(
+                new_col = Collection.unattributed.create(
                     name=corpus.title,
                     is_corpus=True,
                     is_published=True,

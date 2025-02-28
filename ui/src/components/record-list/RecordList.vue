@@ -128,10 +128,7 @@
     </template>
 
     <template v-slot:render-cell-locale="props">
-      {{ props.row.locale.name
-      }}<span v-if="props.row.locale.administrativeRegion"
-        >, {{ props.row.locale.administrativeRegion }}</span
-      ><span v-if="props.row.locale.country"> ({{ props.row.locale.country.name }})</span>
+      <span v-text="getList(props.row.locale, 'locale')" />
     </template>
 
     <template v-slot:render-cell-recordType="props">
@@ -143,7 +140,7 @@
     </template>
 
     <template v-slot:render-cell-language="props">
-      <span v-text="getLanguage(props.row.language)" />
+      <span v-text="getList(props.row.language, 'language')" />
     </template>
 
     <template v-slot:render-cell-status="props">
@@ -170,7 +167,7 @@
           {{ props.row.workflow.lastUser.fullName }}
         </router-link>
         <br />
-        {{ props.row.workflow.lastModified }}
+        {{ props.row.workflow.lastModified.timestamp }}
       </span>
     </template>
 
@@ -223,13 +220,17 @@ export default defineComponent({
     useMeta(() => ({ title: title.value }));
 
     const noData = "No records found.";
+    const templates = {
+      language: (data) => `${data.name}`,
+      locale: (data) => `${data.name} (${data.administrativeRegion}, ${data.country.name})`,
+    };
 
-    const getLanguage = (data) => {
+    const getList = (data, template) => {
       if (data.length > 1) {
-        const langs = data.map((a) => a.name);
-        return langs.join(", ");
+        const lst = data.map((a) => templates[template](a));
+        return lst.join(", ");
       } else {
-        return data[0].name;
+        return templates[template](data[0]);
       }
     };
 
@@ -239,8 +240,7 @@ export default defineComponent({
       if (success.value)
         recordListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
           columns.value = getColumns(columnMap);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           value.forEach(
             (a) =>
               (a.attributes = camelcaseKeys(
@@ -285,7 +285,7 @@ export default defineComponent({
     return {
       columns,
       currentPageIcon,
-      getLanguage,
+      getList,
       filterList: filterList(auth.user.userId),
       loading,
       noData,

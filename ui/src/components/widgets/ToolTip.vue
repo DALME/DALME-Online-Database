@@ -30,7 +30,7 @@ export default defineComponent({
   },
   setup() {
     const settings = useSettingsStore();
-    return { showTips: settings.preferences.tooltipsOn };
+    return { showTips: settings.preferences.tooltipsOn.value };
   },
 });
 </script>

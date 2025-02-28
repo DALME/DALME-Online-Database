@@ -3,7 +3,10 @@ import { OptionListSchema } from "@/schemas";
 import { filterItemClass, filterItemClassSelected, optionFetcher, userFetcher } from "@/components";
 
 const recordTypes = () =>
-  optionFetcher(requests.attributeTypes.getAttributeOptions("record_type", true), OptionListSchema);
+  optionFetcher(
+    requests.attributeTypes.getAttributeTypeOptions("record_type", true),
+    OptionListSchema,
+  );
 
 const wfStatusList = [
   {
@@ -217,14 +220,14 @@ export const sortList = () => [
     },
   },
   {
-    label: "Number of folios (asc)",
+    label: "Least folios",
     value: {
       column: "no_folios",
       desc: false,
     },
   },
   {
-    label: "Number of folios (dsc)",
+    label: "Most folios",
     value: {
       column: "no_folios",
       desc: true,

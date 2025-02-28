@@ -1,5 +1,6 @@
 """Publication model."""
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
@@ -17,6 +18,12 @@ class Publication(UuidMixin, TrackingMixin, AttributeMixin, CommentMixin, Permis
 
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
+    children = GenericRelation(
+        'domain.Record',
+        related_query_name='publication',
+        content_type_field='parent_type',
+        object_id_field='parent_id',
+    )
 
     class Meta:
         attribute_matching_fields = ['name', 'short_name']

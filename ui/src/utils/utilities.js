@@ -1,4 +1,5 @@
 import { isEmpty, isNil } from "ramda";
+import notifier from "@/notifier";
 
 export const nully = (value) => isNil(value) || isEmpty(value);
 
@@ -27,4 +28,15 @@ export const removeFromList = (list, value) => {
   let tokens = list.split(",");
   tokens = tokens.filter((x) => x !== value);
   return tokens.join(",");
+};
+
+export const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text).then(
+    () => {
+      notifier.clipboard.success();
+    },
+    () => {
+      notifier.clipboard.failure();
+    },
+  );
 };

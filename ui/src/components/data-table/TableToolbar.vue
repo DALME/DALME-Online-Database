@@ -286,6 +286,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    resource: {
+      type: String,
+      default: "",
+    },
   },
   components: {
     FilterChooser,
@@ -301,7 +305,7 @@ export default defineComponent({
   ],
   setup(props, context) {
     const $route = useRoute();
-    const resource = $route.name.toLowerCase();
+    const resource = computed(() => props.resource || $route.name.toLowerCase());
     const { pagination } = inject("pagination");
     const showGrid = inject("showGrid");
     const activeFilters = props.filterList ? inject("activeFilters") : ref({});
@@ -351,7 +355,9 @@ export default defineComponent({
 
       return `Showing ${rangeStart.toLocaleString("en-US")}-${rangeEnd.toLocaleString(
         "en-US",
-      )} out of a total of ${pagination.value.rowsTotal.toLocaleString("en-US")} ${resource}.`;
+      )} out of a total of ${pagination.value.rowsNumber.toLocaleString(
+        "en-US",
+      )} ${resource.value}.`;
     });
 
     watch(isEditModeOn, (newValue) => {

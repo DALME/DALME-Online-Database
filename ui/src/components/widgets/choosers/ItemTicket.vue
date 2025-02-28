@@ -9,9 +9,7 @@
     </q-item-section>
     <q-item-section class="text-roboto">
       <q-item-label>
-        <span class="text-detail q-mr-sm">
-          {{ `#${item.id}` }}
-        </span>
+        <span class="text-detail q-mr-sm">{{ `#${item.number}` }}</span>
         {{ item.subject }}
       </q-item-label>
     </q-item-section>
@@ -34,11 +32,7 @@ export default defineComponent({
     },
     itemClass: {
       type: String,
-      required: true,
-    },
-    showAvatar: {
-      type: Boolean,
-      required: true,
+      default: "",
     },
   },
   emits: ["itemChosen"],

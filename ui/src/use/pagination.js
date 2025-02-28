@@ -25,7 +25,6 @@ export const usePagination = (fetchData, listName, defaults, embedded = false) =
     descending: lists[listName]["sortDesc"],
     page: 1,
     rowsNumber: 0,
-    rowsTotal: 0,
     rowsPerPage: embedded ? 5 : lists[listName]["rowsPerPage"],
     sortBy: lists[listName]["sortBy"],
   };

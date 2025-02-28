@@ -8,6 +8,7 @@ class OptionsSerializer(serializers.Serializer):
     value = serializers.ReadOnlyField()
     group = serializers.ReadOnlyField(required=False)
     detail = serializers.ReadOnlyField(required=False)
+    icon = serializers.ReadOnlyField(required=False)
 
     class Meta:
         fields = [
@@ -15,10 +16,12 @@ class OptionsSerializer(serializers.Serializer):
             'value',
             'group',
             'detail',
+            'icon',
         ]
 
     def __init__(self, *args, **kwargs):
         self.concordance = kwargs.pop('concordance', None)
+        self.model_name = kwargs.pop('model_name', None)
         super().__init__(*args, **kwargs)
 
     def get_fields(self):
@@ -26,5 +29,8 @@ class OptionsSerializer(serializers.Serializer):
         fields = super().get_fields()
         if self.concordance:
             for key, value in self.concordance.items():
-                fields[key] = serializers.ReadOnlyField(source=value)
+                fields[key] = serializers.ReadOnlyField(source=value, required=False)
+        if self.model_name:
+            fields['model'] = serializers.ReadOnlyField(default=self.model_name, required=False)
+
         return fields

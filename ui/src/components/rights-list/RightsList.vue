@@ -6,6 +6,7 @@
     :filterList="filterList"
     :loading="loading"
     :noData="noData"
+    resource="rights policies"
     :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
@@ -29,7 +30,7 @@
     <template v-slot:grid-main="props">
       <DetailPopover
         linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Rights', params: { id: props.row.id } }"
+        :linkTarget="{ name: 'Rights Policy', params: { id: props.row.id } }"
         :linkText="props.row.name"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
@@ -181,8 +182,7 @@ export default defineComponent({
       if (success.value)
         await rightsListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
           columns.value = getColumns(columnMap);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           rows.value = value;
           loading.value = false;
         });

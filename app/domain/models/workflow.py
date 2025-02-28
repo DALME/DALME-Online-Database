@@ -5,6 +5,7 @@ from django_currentuser.middleware import get_current_user
 from django.conf import settings
 from django.db import models
 from django.db.models import options
+from django.utils import timezone
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
@@ -75,7 +76,7 @@ class WorkLog(models.Model):
     id = models.AutoField(primary_key=True, unique=True, db_index=True)
     record = models.ForeignKey('domain.Workflow', db_index=True, on_delete=models.CASCADE, related_name='work_log')
     event = models.CharField(max_length=255)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE, default=get_current_user)
 
     def __str__(self):

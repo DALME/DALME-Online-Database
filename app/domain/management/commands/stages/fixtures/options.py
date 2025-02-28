@@ -2,6 +2,22 @@
 
 OPTIONS = [
     {
+        'atype_name': 'parent',
+        'name': 'record parents list',
+        'payload_type': 'db_records',
+        'description': 'List of record parents - model, either Publication or RecordGroup, must be included in request.',
+        'payload': {
+            'app': 'domain',
+            'model': 'TBD',
+            'order': ['name'],
+            'concordance': {
+                'label': 'name',
+                'value': 'id',
+            },
+        },
+        'pharma_schema': True,
+    },
+    {
         'atype_name': 'authority',
         'name': 'record authority',
         'payload_type': 'static_list',
@@ -34,6 +50,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'RecordType',
+            'order': ['name'],
             'concordance': {'value': 'id'},
         },
         'pharma_schema': True,
@@ -70,13 +87,15 @@ OPTIONS = [
         'payload_type': 'db_records',
         'description': 'Full list of active system users.',
         'payload': {
-            'app': 'auth',
+            'app': 'oauth',
             'model': 'User',
+            'order': ['full_name'],
             'filters': {'is_active': True},
             'concordance': {
                 'label': 'full_name',
                 'value': 'id',
                 'detail': 'username',
+                'icon': 'avatar_url',
             },
         },
         'pharma_schema': True,
@@ -101,6 +120,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'LanguageReference',
+            'order': ['name'],
             'concordance': {
                 'label': 'name',
                 'value': 'id',
@@ -116,6 +136,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'CountryReference',
+            'order': ['name'],
             'concordance': {
                 'label': 'name',
                 'value': 'id',
@@ -131,6 +152,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'LocaleReference',
+            'order': ['name'],
             'concordance': {
                 'label': 'name',
                 'value': 'id',
@@ -147,6 +169,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'Collection',
+            'order': ['name'],
             'filters': {'is_corpus': False},
             'concordance': {
                 'label': 'name',
@@ -164,6 +187,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'Collection',
+            'order': ['name'],
             'filters': {
                 'is_corpus': False,
                 'is_published': True,
@@ -184,6 +208,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'Collection',
+            'order': ['name'],
             'filters': {'is_corpus': True},
             'concordance': {
                 'label': 'name',
@@ -200,6 +225,7 @@ OPTIONS = [
         'payload': {
             'app': 'domain',
             'model': 'Collection',
+            'order': ['name'],
             'filters': {
                 'is_corpus': True,
                 'is_published': True,

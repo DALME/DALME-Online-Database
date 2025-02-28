@@ -5,9 +5,10 @@ from wagtail import hooks
 from django.templatetags.static import static
 from django.utils.html import format_html
 
-from .views import TeamViewSetGroup
+from .views import AvatarSettingsPanel, TeamViewSetGroup
 
 hooks.register('register_admin_viewset', TeamViewSetGroup)
+hooks.register('register_account_settings_panel', AvatarSettingsPanel)
 
 
 @hooks.register('insert_global_admin_css')

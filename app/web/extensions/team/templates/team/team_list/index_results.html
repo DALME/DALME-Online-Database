@@ -1,4 +1,4 @@
-{% load wagtailadmin_tags wagtailimages_tags i18n static %}
+{% load wagtailadmin_tags wagtailimages_tags media_prefix i18n static %}
 
 {% block before_results %}{% endblock %}
 {% if object_list %}
@@ -28,7 +28,7 @@
                             {% if cell.column.name == 'avatar' %}
                                 <td class="{% if column.classname %}{{ column.classname }}{% endif %} avatar-cell">
                                     {% if cell.instance.avatar %}
-                                        <div class="avatar-bg" style="background: center / cover url({% get_media_prefix %}{{ cell.instance.avatar }});"></div>
+                                        <div class="avatar-bg" style="background: center / cover url({% media_prefix %}{{ cell.instance.avatar }});"></div>
                                     {% else %}
                                         {% icon name="user" classname="user-placeholder" title="no_photo" %}
                                     {% endif %}

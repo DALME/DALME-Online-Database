@@ -39,6 +39,7 @@ body.home section.featured img {
   margin-top: 1rem;
   font-family: "Lora", "Times New Roman", serif;
   font-style: italic;
+  line-height: 1.3;
 }
 .monthly h3 {
   font-size: 1rem;
@@ -79,6 +80,7 @@ body.home section.featured img {
   color: black;
   font-style: italic;
   font-weight: 500;
+  line-height: 1.3;
 }
 .featured > div,
 .featured > div .monthly.object {
@@ -93,6 +95,10 @@ body.home section.featured img {
 .line-clamp {
   display: -webkit-box;
   -webkit-box-orient: vertical;
+}
+.six-lines {
+  line-clamp: 6;
+  -webkit-line-clamp: 6;
 }
 .seven-lines {
   line-clamp: 7;

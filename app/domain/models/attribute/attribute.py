@@ -48,6 +48,10 @@ class Attribute(UuidMixin, TrackingMixin):
     def __str__(self):
         return f'{self.attribute_type.name}: {self.value}'
 
+    @property
+    def is_unique(self):
+        return self.attribute_type.contenttypes.get(content_type=self.content_type).is_unique
+
     def get_options(self):
         """Return options for attribute."""
         qs = self.attribute_type.contenttypes.filter(content_type=self.content_type.id)

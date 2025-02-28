@@ -42,11 +42,11 @@
                 : 'q-pt-none q-pr-none comments-container'
             "
           >
-            <div class="comment_thread q-mt-none q-pb-lg">
+            <div class="comment-thread q-mt-none q-pb-lg">
               <q-item class="q-pb-sm q-pt-none q-px-none">
                 <q-item-section top avatar>
                   <q-avatar v-if="task.creationUser.avatar" size="40px">
-                    <img :src="task.creationUser.avatar" />
+                    <q-img :src="task.creationUser.avatar" fit="cover" ratio="1" />
                   </q-avatar>
                   <q-avatar
                     v-else
@@ -73,7 +73,7 @@
             </div>
             <CommentBox>
               <template v-if="task.completed" v-slot:comment-stream-end>
-                <div class="comment_thread row items-center q-mt-none q-pb-lg">
+                <div class="comment-thread row items-center q-mt-none q-pb-lg">
                   <div class="closing-dot bg-deep-purple-6">
                     <q-icon name="o_check_circle" color="white" size="20px" />
                   </div>
@@ -139,7 +139,7 @@ export default defineComponent({
   setup() {
     const { notifier } = useEventHandling();
     const $route = useRoute();
-    const { isAdmin, ui } = useStores();
+    const { auth, ui } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
@@ -197,7 +197,7 @@ export default defineComponent({
       buttonColours,
       capitalize,
       formatDate,
-      isAdmin,
+      isAdmin: auth.user.isAdmin,
       isEmpty,
       loading,
       onAction,

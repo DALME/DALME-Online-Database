@@ -248,8 +248,7 @@ export default defineComponent({
       if (success.value)
         await tasksSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
           columns.value = getColumns(columnMap);
-          pagination.value.rowsNumber = data.value.filtered;
-          pagination.value.rowsTotal = data.value.count;
+          pagination.value.rowsNumber = data.value.count;
           rows.value = value;
           const query = $router.currentRoute.value.query;
           taskLists.value !== undefined && !isEmpty(taskLists.value) && !isEmpty(query)

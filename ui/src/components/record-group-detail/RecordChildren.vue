@@ -19,7 +19,7 @@
         <router-link
           class="text-link"
           :to="{
-            name: 'Source',
+            name: 'Record',
             params: { id: props.row.id },
           }"
         >

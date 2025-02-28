@@ -57,7 +57,7 @@ class Collections(BaseViewSet):
         self.ordering_fields = [*self.search_fields]
         obj = self.get_object()
 
-        qs = Record.objects.filter(
+        qs = Record.unattributed.filter(
             pk__in=[x.content_object.pk for x in obj.members.all().prefetch_related('content_object')],
         )
         qs = self.filter_queryset(qs)
@@ -82,7 +82,7 @@ class Collections(BaseViewSet):
 
             new_members = []
             for member in members:
-                record = Record.objects.get(pk=member)
+                record = Record.unattributed.get(pk=member)
                 if not CollectionMembership.objects.filter(collection_id=obj.id, object_id=record.id).exists():
                     new_entry = CollectionMembership()
                     new_entry.collection_id = obj
