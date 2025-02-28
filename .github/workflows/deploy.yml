@@ -187,6 +187,7 @@ jobs:
   should-provision-tf:
     name: 'Provision?'
     runs-on: ubuntu-latest
+    if: false
     needs:
       - build_app
       - build_proxy
@@ -210,6 +211,7 @@ jobs:
     needs:
       - should-provision-tf
     if: >
+      false &&
       always() &&
       !failure() &&
       !cancelled() &&
