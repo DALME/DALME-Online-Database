@@ -2,17 +2,19 @@
 
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
 from wagtail.admin.ui.tables import Column, UpdatedAtColumn
-from wagtail.admin.views.account import BaseSettingsPanel
+from wagtail.admin.views.account import AccountView, AvatarSettingsPanel
 from wagtail.admin.views.generic.models import IndexView
 from wagtail.admin.viewsets.base import ViewSetGroup
 from wagtail.admin.viewsets.model import ModelViewSet
 
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
+from django.views.decorators.debug import sensitive_post_parameters
 
 from web.extensions.extras.widgets import MultiSelect
 
-from .forms import TeamAvatarPreferencesForm
+from .forms import TeamAvatarPreferencesForm, UserAvatarPreferencesForm
 from .models import TeamMember, TeamRole
 from .widgets import AvatarFileInput, UserSelect
 
@@ -118,10 +120,29 @@ class TeamViewSetGroup(ViewSetGroup):
     items = (TeamMemberViewSet, TeamRoleViewSet)
 
 
-class AvatarSettingsPanel(BaseSettingsPanel):
-    name = 'avatar'
-    title = 'Profile picture'
-    order = 300
+class UserAvatarSettingsPanel(AvatarSettingsPanel):
+    title = 'User picture'
+    form_class = UserAvatarPreferencesForm
+    form_object = 'user'
+
+
+class TeamAvatarSettingsPanel(AvatarSettingsPanel):
+    name = 'teamavatar'
+    title = 'Team member picture'
+    order = 301
     template_name = 'team/avatar_admin_panel.html'
     form_class = TeamAvatarPreferencesForm
-    form_object = 'user'
+    form_object = 'profile'  # will use third argument to form class
+
+
+@method_decorator(sensitive_post_parameters(), name='post')
+class TeamAccountView(AccountView):
+    """Override the account view to prevent the default avatar panel from saving alongside our panel override."""
+
+    def get_panels(self):
+        panels = [panel for panel in super().get_panels() if panel.name != 'avatar']
+        panels.append(UserAvatarSettingsPanel(self.request, self.request.user, {}))
+        tm = TeamMember.objects.filter(user=self.request.user)
+        if tm.exists():
+            panels.append(TeamAvatarSettingsPanel(self.request, self.request.user, tm.first()))
+        return panels

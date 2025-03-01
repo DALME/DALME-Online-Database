@@ -16,6 +16,7 @@ from web.extensions.footnotes.urls import urlpatterns as footnote_urls
 from web.extensions.images.api import WebImageAPIViewSet
 from web.extensions.records.urls import urlpatterns as record_urls
 from web.extensions.team.api import TeamAPIViewSet, UserAPIViewSet
+from web.extensions.team.views import TeamAccountView
 
 admin.site.unregister(Group)
 
@@ -50,6 +51,7 @@ urlpatterns = [
     # TODO: re-enable before final prod deployment
     # path('cms/login/', to_ida_login, name='wagtailadmin_login'),
     # path('cms/logout/', to_ida_logout, name='wagtailadmin_logout'),
+    path('cms/account/', TeamAccountView.as_view(), name='wagtailadmin_account'),
     path('cms/', include(cmsurls)),
     path('documents/', include(wagtaildocs_urls)),
 ]
