@@ -1,6 +1,16 @@
 <template>
-  <div ref="el" :class="`spinner-container ${position}`" :style="style" v-if="showing">
-    <q-spinner-facebook v-if="type === 'facebook'" :thickness="thickness" :color="color" />
+  <div
+    ref="container"
+    :class="`spinner-container ${position} ${adaptive ? 'adaptive' : ''}`"
+    :style="style"
+    v-if="showing"
+  >
+    <q-spinner-facebook
+      v-if="type === 'facebook'"
+      :size="cSize"
+      :thickness="thickness"
+      :color="color"
+    />
     <q-spinner-audio
       v-else-if="type === 'audio'"
       :size="cSize"
@@ -62,7 +72,8 @@
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed } from "vue";
+import { defineComponent, onMounted, ref, useTemplateRef } from "vue";
 
 export default defineComponent({
   name: "AdaptiveSpinner",
@@ -73,7 +84,7 @@ export default defineComponent({
     },
     adaptive: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     type: {
       type: String,
@@ -111,24 +122,31 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
+    containerHeight: Number,
+    containerWidth: Number,
   },
   setup(props) {
-    const el = ref(null);
-    /* eslint-disable */
-    const style = computed(
-      () => `top: ${props.top}px; right: ${props.right}px; bottom: ${props.bottom}px; left: ${props.left}px`
-    );
-    /* eslint-enable */
+    const container = useTemplateRef("container");
     const cSize = ref(props.size);
+    const style = computed(() => {
+      let result = "";
+      if (props.top) result += `top: ${props.top}px;`;
+      if (props.right) result += `right: ${props.right}px;`;
+      if (props.bottom) result += `bottom: ${props.bottom}px;`;
+      if (props.left) result += `left: ${props.left}px;`;
+      if (props.containerHeight) result += `height: ${props.containerHeight}px;`;
+      if (props.containerWidth) result += `width: ${props.containerWidth}px;`;
+      return result;
+    });
 
     onMounted(() => {
       if (props.adaptive) {
-        cSize.value = `${el.value.clientWidth / 10}px`;
+        cSize.value = `${container.value.clientWidth / 10}px`;
       }
+      console.log(style.value);
     });
 
     return {
-      el,
       cSize,
       style,
     };
@@ -144,6 +162,10 @@ export default defineComponent({
   justify-content: center;
   justify-items: center;
   color: #5c5c5c2e;
+  margin: auto;
+}
+.spinner-container .adaptive {
+  display: flex;
 }
 .spinner-container.relative {
   position: relative;

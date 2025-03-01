@@ -85,7 +85,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { computed, defineComponent, ref, onMounted } from "vue";
+import { computed, defineComponent, ref, onBeforeMount } from "vue";
 import { isEmpty, isNil } from "ramda";
 import { useStores } from "@/use";
 import { useTasks } from "@/stores/tasks";
@@ -121,10 +121,8 @@ export default defineComponent({
       });
     };
 
-    onMounted(() => {
-      if (!tm.tasksReady || !tm.listsReady) {
-        tm.init();
-      }
+    onBeforeMount(() => {
+      if (!tm.tasksReady || !tm.listsReady) tm.init();
     });
 
     return {

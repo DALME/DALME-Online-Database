@@ -13,78 +13,88 @@
       </q-card-section>
       <q-separator />
       <q-card-section class="login-card-body">
-        <div class="login-card-text">
-          <span v-if="auth.reauthenticate">Please re-authenticate</span>
-          <span v-else>Please log in</span>
-        </div>
-        <q-form @submit="onSubmit" class="q-gutter-sm">
-          <q-input
-            placeholder="Username"
-            v-model="username"
-            dense
-            outlined
-            color="indigo-6"
-            bg-color="white"
-            hide-bottom-space
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            lazy-rules
-            :rules="usernameRules"
-          />
-
-          <q-input
-            v-model="password"
-            placeholder="Password"
-            dense
-            outlined
-            color="indigo-6"
-            bg-color="white"
-            lazy-rules
-            hide-bottom-space
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            :type="isPassword ? 'password' : 'text'"
-            :rules="passwordRules"
-          >
-            <template v-slot:append>
-              <q-icon
-                class="cursor-pointer"
-                :name="isPassword ? 'visibility_off' : 'visibility'"
-                @click.stop="isPassword = !isPassword"
-              />
-            </template>
-          </q-input>
-
-          <div class="row justify-center q-mt-sm q-pt-md">
-            <q-btn
-              unelevated
-              no-caps
-              label="Log in"
-              type="submit"
-              class="login-modal-button"
+        <template v-if="auth.reauthenticate || auth.authenticate">
+          <div class="login-card-text">
+            <span v-if="auth.reauthenticate">Please re-authenticate</span>
+            <span v-else>Please log in</span>
+          </div>
+          <q-form @submit="onSubmit" class="q-gutter-sm">
+            <q-input
+              placeholder="Username"
+              v-model="username"
+              dense
+              outlined
               color="indigo-6"
-              padding="sm 5rem"
-              preventClose="true"
-              :disable="disabled"
-              :loading="submitting"
+              bg-color="white"
+              hide-bottom-space
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              lazy-rules
+              :rules="usernameRules"
+            />
+
+            <q-input
+              v-model="password"
+              placeholder="Password"
+              dense
+              outlined
+              color="indigo-6"
+              bg-color="white"
+              lazy-rules
+              hide-bottom-space
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              :type="isPassword ? 'password' : 'text'"
+              :rules="passwordRules"
             >
-              <template v-slot:loading>
-                <q-spinner-facebook />
+              <template v-slot:append>
+                <q-icon
+                  class="cursor-pointer"
+                  :name="isPassword ? 'visibility_off' : 'visibility'"
+                  @click.stop="isPassword = !isPassword"
+                />
               </template>
-            </q-btn>
-          </div>
-          <div class="row justify-center text-indigo-6 login-modal-link">
-            <a href="" class="text-link">Recover password</a>
-            <span v-if="auth.reauthenticate" class="text-grey-7 q-mx-sm">|</span>
-            <a v-if="auth.reauthenticate" @click="logout" class="text-link cursor-pointer">
-              Log out
-            </a>
-          </div>
-        </q-form>
+            </q-input>
+
+            <div class="row justify-center q-mt-sm q-pt-md">
+              <q-btn
+                unelevated
+                no-caps
+                label="Log in"
+                type="submit"
+                class="login-modal-button"
+                color="indigo-6"
+                padding="sm 5rem"
+                preventClose="true"
+                :disable="disabled"
+                :loading="submitting"
+              >
+                <template v-slot:loading>
+                  <q-spinner-facebook />
+                </template>
+              </q-btn>
+            </div>
+            <div class="row justify-center text-indigo-6 login-modal-link">
+              <a href="" class="text-link">Recover password</a>
+              <span v-if="auth.reauthenticate" class="text-grey-7 q-mx-sm">|</span>
+              <a v-if="auth.reauthenticate" @click="logout" class="text-link cursor-pointer">
+                Log out
+              </a>
+            </div>
+          </q-form>
+        </template>
+        <AdaptiveSpinner
+          v-else
+          type="facebook"
+          color="indigo-3"
+          size="100px"
+          :container-height="240"
+          :container-width="250"
+        />
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -96,11 +106,13 @@ import { computed, defineComponent, inject, ref } from "vue";
 import { requests } from "@/api";
 import { useAPI, useEventHandling, useStores } from "@/use";
 import { useRoute } from "vue-router";
+import { AdaptiveSpinner } from "@/components";
 
 export default defineComponent({
   name: "LoginModal",
+  components: { AdaptiveSpinner },
   setup() {
-    const { auth, settings } = useStores();
+    const { auth } = useStores();
     const { notifier } = useEventHandling();
     const $route = useRoute();
     const { apiInterface } = useAPI();
@@ -113,6 +125,7 @@ export default defineComponent({
     const isPassword = ref(true);
     const submitting = ref(false);
 
+    const show = computed(() => auth.reauthenticate || auth.authenticate);
     const disabled = computed(() => any(isEmpty)([username.value, password.value]));
 
     const usernameRules = [(val) => (val && !isEmpty(val)) || "Username is required"];
@@ -132,8 +145,9 @@ export default defineComponent({
       );
       if (status.value == 202) {
         auth.send({ type: "LOGIN" });
-        await settings.fetchPreferences();
         if ($route.query.next) {
+          username.value = "";
+          password.value = "";
           window.location.href = $route.query.next;
         }
       } else {
@@ -155,6 +169,7 @@ export default defineComponent({
       submitting,
       username,
       usernameRules,
+      show,
     };
   },
 });
@@ -217,6 +232,7 @@ export default defineComponent({
 .login-card-body {
   background-color: #fcfcfc;
   padding: 0px 60px 20px;
+  min-height: 266px;
 }
 .login-card-body .text-negative {
   color: #c3747c !important;

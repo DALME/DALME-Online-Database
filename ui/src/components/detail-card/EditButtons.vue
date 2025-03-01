@@ -31,7 +31,7 @@
     :ripple="false"
     @click="$emit('action')"
   />
-  <AdaptiveSpinner v-if="showSpinner" type="pie" color="green-6" size="140px" class="q-mr-xs" />
+  <AdaptiveSpinner v-if="showSpinner" type="pie" color="green-6" size="14px" class="q-mr-xs" />
 </template>
 
 <script>

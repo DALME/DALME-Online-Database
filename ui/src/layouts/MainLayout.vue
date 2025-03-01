@@ -33,6 +33,7 @@ import {
   provideTransport,
   provideStores,
 } from "@/use";
+import { watch } from "vue";
 
 export default defineComponent({
   name: "MainLayout",
@@ -44,11 +45,11 @@ export default defineComponent({
   },
   setup() {
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
-    const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
+    const { auth, ui, settings, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
     const pageBackdrop = useTemplateRef("page-backdrop");
 
-    const render = computed(() => auth.authorized && !auth.reauthenticate);
+    const render = computed(() => (auth.authorized || auth.reauthenticate) && settings.loaded);
     const originPage = window.localStorage.getItem("origin_background");
     const showMap = computed(() => auth.authenticate && !originPage);
     const pageBackdropLoaded = ref(originPage ? false : true);
@@ -81,6 +82,16 @@ export default defineComponent({
         };
       }
     });
+
+    watch(
+      () => auth.authorized,
+      () => {
+        if (auth.authorized && !settings.loaded) {
+          settings.fetchPreferences();
+        }
+      },
+      { immediate: true },
+    );
 
     return {
       auth,

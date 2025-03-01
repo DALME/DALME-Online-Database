@@ -16,6 +16,7 @@ export const useSettingsStore = defineStore(
     const teiElementData = ref([]);
     const teiTagData = ref([]);
     const currentSetId = ref("");
+    const loaded = computed(() => preferenceData.value.length > 0);
     const teiReady = computed(() => teiElementData.value.length > 0);
     const options = {
       themeOptions: [
@@ -74,7 +75,7 @@ export const useSettingsStore = defineStore(
     // #region getters - elements
     const elements = computed(() => ({
       all: teiElementData.value.map((x) => Object.assign(x, getElement(x.element))),
-      current: sets.value.current.members.map((x) => Object.assign(x, getElement(x.element))),
+      current: sets.value.current.members?.map((x) => Object.assign(x, getElement(x.element))),
       menu: rFilter((x) => x.inContextMenu == true, sets.value.current.members),
       toolbar: rFilter((x) => x.inToolbar == true, sets.value.current.members),
       filter: filterElements,
@@ -278,6 +279,7 @@ export const useSettingsStore = defineStore(
       teiElementData,
       teiTagData,
       getElementAttributes,
+      loaded,
     };
   },
   {
