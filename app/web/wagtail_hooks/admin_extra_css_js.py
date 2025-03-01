@@ -4,10 +4,6 @@ from django.conf import settings
 from django.templatetags.static import static
 from django.utils.html import format_html
 
-from app.context import get_current_tenant
-
-tenant = get_current_tenant()
-
 
 def extra_admin_css():
     return format_html(
@@ -25,10 +21,8 @@ def extra_admin_js():
         <script type="text/javascript">window.cite = require("citation-js")</script>\
         <script type="text/javascript" src="{}"></script>\
         <script type="text/javascript" src="{}"></script>\
-        <script type="text/javascript">window.CustomUtils.constants.APIURL = "{}"</script>\
-        <script type="text/javascript">window.CustomUtils.constants.tenant = "{}"</script>',
+        <script type="text/javascript">window.CustomUtils.constants.APIURL = "{}"</script>',
         static('js/wagtailUtils.js'),
         static('js/wagtailAdminStartup.js'),
         settings.API_URL,
-        tenant,
     )
