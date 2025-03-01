@@ -12,8 +12,7 @@ window.CustomUtils.userSelectState = {
     nameField: null,
     iconPlaceholder: "<svg class=\"icon icon-user user-placeholder\" aria-hidden=\"true\"><use href=\"#icon-user\"></use></svg>",
     getAvatarHTML: (url) => {
-      const tenant = window.CustomUtils.constants.tenant;
-      url = url.startsWith("/media") || url.startsWith("blob") ? url : `/media/${tenant}/${url}`;
+      url = url.startsWith("/media") || url.startsWith("blob") ? url : `/media/${url}`;
       return `<div class="avatar-bg" style="background: center/cover url(${url});"></div>`;
     },
     templateSelection: (item) => {
