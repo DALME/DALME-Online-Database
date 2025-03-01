@@ -3,6 +3,7 @@
 import pathlib
 
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 
@@ -23,6 +24,9 @@ class AvatarField(models.ImageField):
         """Construct the AvatarField."""
         super().__init__(*args, **kwargs)
         self.upload_to = avatar_file_path
+        # we specify Django's default storage model to prevent
+        # django-tenants from adding the tenant to the path
+        self.storage = FileSystemStorage()
 
 
 class Avatar(models.Model):
@@ -36,4 +40,10 @@ class Avatar(models.Model):
     @property
     def avatar_url(self):
         """Return url to avatar image."""
-        return self.avatar.url if self.avatar else None
+        if self.avatar:
+            return self.avatar.url
+
+        if hasattr(self, 'user') and self.user.avatar:
+            return self.user.avatar.url
+
+        return None
