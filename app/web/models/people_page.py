@@ -52,9 +52,9 @@ class People(RoutablePageMixin, BasePage):
 
     @path('<slug:name_slug>/', name='people')
     def person(self, request, name_slug):
-        qs = TeamMember.objects.annotate(name_slug=Replace(Lower('name'), Value(' '), Value('-'))).filter(
-            name_slug=name_slug
-        )
+        qs = TeamMember.objects.annotate(
+            name_slug=Replace(Replace(Lower('name'), Value(' '), Value('-')), Value('.'))
+        ).filter(name_slug=name_slug)
         if not qs.exists():
             raise Http404
 
@@ -83,15 +83,24 @@ class People(RoutablePageMixin, BasePage):
         )
 
         q = Q(authors=person.user) | (Q(byline_text__isnull=True) & Q(owner=person.user))
-        features = [
-            {'title': i.title, 'url': i.url, 'month': i.go_live_at.strftime('%b'), 'year': i.go_live_at.year}
-            for i in FeaturedInventory.objects.filter(q)
+        feature_qs = (
+            FeaturedInventory.objects.live()
+            .filter(q)
             .union(
-                FeaturedObject.objects.filter(q),
-                Essay.objects.filter(q),
+                FeaturedObject.objects.live().filter(q),
+                Essay.objects.live().filter(q),
             )
             .order_by('-go_live_at')
-        ]
+        )
+
+        features = (
+            [
+                {'title': i.title, 'url': i.url, 'month': i.go_live_at.strftime('%b'), 'year': i.go_live_at.year}
+                for i in feature_qs
+            ]
+            if feature_qs.exists()
+            else []
+        )
 
         context = self.get_context(request)
         context.update(
