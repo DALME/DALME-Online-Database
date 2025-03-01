@@ -32,3 +32,28 @@
 .w-field[data-contentpath="roles"] .w-field__input {
   align-items: flex-start;
 }
+.team-avatar-admin-help {
+  margin-top: -20px;
+  margin-bottom: 20px;
+}
+img.avatar {
+  object-fit: cover;
+}
+.w-mr-10 {
+  margin-inline-end: 3rem;
+}
+.avatar-no-photo {
+  background-color: #efefef;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  border: none;
+}
+.avatar-no-photo:after {
+  content: "\f007";
+  font-family: "Font Awesome 5 Free";
+  font-size: 3rem;
+  font-weight: 800;
+  margin: auto;
+  color: #dedede;
+}
