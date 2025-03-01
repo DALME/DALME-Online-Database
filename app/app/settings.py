@@ -605,6 +605,9 @@ class Development(Base, Configuration):
         'staticfiles': {
             'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',
         },
+        'avatars': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
     }
 
     RECAPTCHA_PUBLIC_KEY = 'django-insecure-development-environment-recaptcha-public-key'
@@ -823,6 +826,9 @@ class Production(Base, Configuration):
         },
         'staticfiles': {
             'BACKEND': 'tenants.storage_backends.StaticStorage',
+        },
+        'avatars': {
+            'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
         },
     }
 

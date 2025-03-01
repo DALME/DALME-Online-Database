@@ -3,7 +3,7 @@
 import pathlib
 
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import storages
 from django.db import models
 
 
@@ -26,7 +26,7 @@ class AvatarField(models.ImageField):
         self.upload_to = avatar_file_path
         # we specify Django's default storage model to prevent
         # django-tenants from adding the tenant to the path
-        self.storage = FileSystemStorage()
+        self.storage = storages['avatars']
 
 
 class Avatar(models.Model):
