@@ -1,3 +1,116 @@
+/* Admin Dalme logo */
+.sidebar-custom-branding {
+  margin: 0.5em auto;
+}
+.dalme-logo {
+  background-color: var(--w-color-white-15);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  transition: border-radius 1s ease-in-out, background-color 2s ease-in-out, transform 1s ease-in-out, box-shadow 3s ease-in-out;
+  border-top: 2px solid var(--w-color-surface-button-default);
+  border-bottom: 2px solid var(--w-color-surface-button-default);
+  border-right: 2px solid var(--w-color-white-15);
+  border-left: 2px solid var(--w-color-white-15);
+  transform: rotate(45deg);
+  overflow: hidden;
+  box-shadow: none;
+}
+.dalme-logo .dalme-logo-svg {
+  transition: transform 1s ease-in-out;
+  transform: rotate(-45deg);
+}
+.dalme-logo .logo-fill-letter {
+  fill: var(--w-color-surface-menus);
+  transition: fill 0.5s ease-in-out;
+}
+.dalme-logo .logo-fill-detail {
+  fill: var(--w-color-surface-menus);
+  transition: fill 1s ease-in-out;
+}
+.dalme-logo .logo-fill-frame {
+  fill: transparent;
+  transition: fill 1.5s ease-in-out;
+}
+.dalme-logo:hover {
+  border-radius: 0;
+  background-color: white;
+  transform: rotate(0deg);
+  border-color: transparent;
+  box-shadow: 0px 0px 20px 2px #ffffffc9;
+}
+.dalme-logo:hover .dalme-logo-svg {
+  transform: rotate(0deg);
+}
+.dalme-logo:hover .logo-fill-letter,
+.dalme-logo:hover .logo-fill-detail {
+  fill: white;
+}
+.dalme-logo:hover .logo-fill-frame {
+  fill: #7f1416;
+}
+
+/* userbar dalme logo*/
+.w-userbar-trigger {
+  border: none;
+  background-color: rgb(255 255 255 / 70%);
+  backdrop-filter: blur(5px);
+}
+.dalme-logo-userbar {
+  background-color: var(--w-color-white-15);
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  transition: all 1.5s ease-in-out, background-color 2s ease-in-out, transform 0.5s ease-in-out;
+  border-top: 2px solid rgb(0 125 126 / 55%);
+  border-bottom: 2px solid rgb(0 125 126 / 55%);
+  border-right: 2px solid rgb(46 31 94 / 51%);
+  border-left: 2px solid rgb(46 31 94 / 51%);
+  transform: rotate(45deg);
+  overflow: hidden;
+  box-shadow: inset 0px 0px 15px 3px #007d7e40;
+}
+.dalme-logo-userbar::after {
+  content: "";
+  border: 1px solid white;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  border-radius: 50%;
+}
+.dalme-logo-userbar .dalme-logo-svg {
+  transform: rotate(-45deg);
+}
+.dalme-logo-userbar .logo-fill-letter {
+  fill: #948dac;
+  transition: all 0.5s ease-in-out;
+  stroke: #007d7ea3;
+}
+.dalme-logo-userbar .logo-fill-detail {
+  fill: transparent;
+  transition: opacity 1s ease-in-out;
+}
+.dalme-logo-userbar:hover {
+  transform: rotate(315deg);
+  background-color: #7f1416ba;
+  box-shadow: inset 0px 0px 3px 1px #007d7ead;
+  border-top: 2px solid var(--w-color-surface-button-default);
+  border-bottom: 2px solid var(--w-color-surface-button-default);
+  border-right: 2px solid var(--w-color-surface-menus);
+  border-left: 2px solid var(--w-color-surface-menus);
+}
+.dalme-logo-userbar:hover .dalme-logo-svg {
+  transform: rotate(-315deg);
+}
+.dalme-logo-userbar:hover .logo-fill-letter {
+  fill: white;
+  stroke: #480c0c8a;
+}
+.dalme-logo-userbar:hover .logo-fill-detail {
+  fill: #ffffff7d;
+}
 /* set editor font */
 .Draftail-Editor .DraftEditor-root {
   font-family: "PT Serif", "Times New Roman", serif !important;
