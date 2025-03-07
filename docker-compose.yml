@@ -166,7 +166,8 @@ services:
       - "5050:80"
 
   rs.db:
-    image: mysql:8.2.0
+    image: mysql:5.7.27
+    platform: "linux/amd64"
     container_name: rs.db
     environment:
       MYSQL_DATABASE: resourcespace
