@@ -66,15 +66,14 @@ jobs:
           MYSQL_DATABASE: test_db
           MYSQL_USER: dam
           MYSQL_PASSWORD: dam
-          MYSQL_HOST: 127.0.0.1
           MYSQL_ROOT_PASSWORD: root
         options: >-
-          --health-cmd "mysqladmin ping -h 127.0.0.1"
+          --health-cmd "mysqladmin ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 3306:3306
+          - 3306
 
     steps:
       - uses: actions/checkout@v4
