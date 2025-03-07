@@ -18,8 +18,8 @@ env:
     ${{ github.repository_owner == 'DALME' && github.ref_name == 'master' && 'production' || github.repository_owner == 'ocp' && github.ref_name == 'ocp/development.v2' && 'staging' || 'staging' }}
   CI_TAG: dev
   MYSQL_DATABASE: test_db
-  MYSQL_USER: root
-  MYSQL_PASSWORD: root
+  MYSQL_USER: dam
+  MYSQL_PASSWORD: dam
   MYSQL_HOST: 127.0.0.1
   PYTHON: 3.11
   SKIP_APP: |
@@ -61,11 +61,11 @@ jobs:
           - 5432:5432
 
       mysql:
-        image: mysql:5.7.27
+        image: mysql:5.7
         env:
           MYSQL_DATABASE: test_db
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
+          MYSQL_USER: dam
+          MYSQL_PASSWORD: dam
           MYSQL_HOST: 127.0.0.1
           MYSQL_ROOT_PASSWORD: root
         options: >-
