@@ -14,7 +14,7 @@ logger = structlog.get_logger(__name__)
 
 
 class TenantStorageMixin:
-    """Reusable mutltitenant storage functionality."""
+    """Reusable multitenant storage functionality."""
 
     def get_default_settings(self):
         settings = super().get_default_settings()
