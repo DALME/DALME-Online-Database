@@ -38,7 +38,6 @@ ifndef folder
 		Usage: make infra.media folder='media/media')
 else
 	rm -rf ./app/www/media
-	mkdir ./app/www
 	mkdir ./app/www/media
 	mkdir ./app/www/media/dalme
 	mkdir ./app/www/media/dalme/images
@@ -50,7 +49,6 @@ else
 	cp -Rp $(folder)/documents ./app/www/media/dalme/documents
 	cp -Rp $(folder)/attachments ./app/www/media/dalme/attachments
 	cp -Rp $(folder)/original_images ./app/www/media/dalme/original_images
-	cp -Rp $(folder)/avatar_images ./app/www/media/avatar_images
 endif
 .PHONY: infra.media
 
