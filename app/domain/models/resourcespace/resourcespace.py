@@ -10,6 +10,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import options
 
+from .legacy_manager import LegacyManager
+
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
@@ -99,10 +101,13 @@ class rs_resource(models.Model):  # noqa: N801
     modified = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     collections = models.ManyToManyField('domain.rs_collection', through='domain.rs_collection_resource')
 
+    objects = LegacyManager()
+
     class Meta:
         managed = False
         db_table = 'resource'
         in_db = 'dam'
+        base_manager_name = 'objects'
 
     def __str__(self):
         return self.ref
@@ -140,10 +145,13 @@ class rs_resource_data(models.Model):  # noqa: N801
     )
     value = models.TextField()
 
+    objects = LegacyManager()
+
     class Meta:
         managed = False
         db_table = 'resource_data'
         in_db = 'dam'
+        base_manager_name = 'objects'
 
     def __str__(self):
         return self.django_id
@@ -184,10 +192,13 @@ class rs_collection(models.Model):  # noqa: N801
     theme19 = models.CharField(max_length=100, blank=True)
     theme20 = models.CharField(max_length=100, blank=True)
 
+    objects = LegacyManager()
+
     class Meta:
         managed = False
         db_table = 'collection'
         in_db = 'dam'
+        base_manager_name = 'objects'
 
     def __str__(self):
         return self.ref
@@ -219,10 +230,13 @@ class rs_collection_resource(models.Model):  # noqa: N801
     purchase_price = models.FloatField(max_length=10, default='0.00')
     sortorder = models.IntegerField(null=True)
 
+    objects = LegacyManager()
+
     class Meta:
         managed = False
         db_table = 'collection_resource'
         in_db = 'dam'
+        base_manager_name = 'objects'
 
     def __str__(self):
         return f'{self.resource.ref - {self.collection.ref}}'
@@ -266,10 +280,13 @@ class rs_user(models.Model):  # noqa: N801
     wp_authrequest = models.CharField(max_length=50, blank=True)
     csrf_token = models.CharField(max_length=255, blank=True)
 
+    objects = LegacyManager()
+
     class Meta:
         managed = False
         db_table = 'user'
         in_db = 'dam'
+        base_manager_name = 'objects'
 
     def __str__(self):
         return self.ref
@@ -315,10 +332,13 @@ class rs_resource_type_field(models.Model):  # noqa: N801
     fits_field = models.CharField(max_length=255, blank=True)
     personal_data = models.IntegerField(default='0')
 
+    objects = LegacyManager()
+
     class Meta:
         managed = False
         db_table = 'resource_type_field'
         in_db = 'dam'
+        base_manager_name = 'objects'
 
     def __str__(self):
         return self.ref
