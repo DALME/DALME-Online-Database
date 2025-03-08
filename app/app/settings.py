@@ -828,7 +828,10 @@ class Production(Base, Configuration):
             'BACKEND': 'tenants.storage_backends.StaticStorage',
         },
         'avatars': {
-            'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'location': 'media',
+            },
         },
     }
 
