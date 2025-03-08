@@ -501,7 +501,6 @@ class Development(Base, Configuration):
         'ida.localhost',
         'dalme.localhost',
         'pharmacopeias.localhost',
-        'dalme.org',  # for previews in the CMS
     ]
 
     CORS_ALLOW_ALL_ORIGINS = False
