@@ -6,6 +6,7 @@ from wagtail.telepath import register
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import OuterRef, Subquery
 from django.utils.functional import cached_property
 
 from web.extensions.extras.widgets import CustomSelect
@@ -22,8 +23,8 @@ ORDER_CHOICES = [
     ('name', 'Name'),
     ('role', 'Role'),
     ('affiliation', 'Affiliation'),
-    ('join-date-asc', 'Join date (oldest first)'),
-    ('join-date-dsc', 'Join date (latest first)'),
+    ('user__date_joined', 'Join date (oldest first)'),
+    ('-user__date_joined', 'Join date (latest first)'),
 ]
 
 
@@ -38,8 +39,13 @@ def get_member_choices():
 class TeamListStructValue(blocks.StructValue):
     def member_list(self):
         if self.get('members'):
-            return TeamMember.objects.filter(id__in=self.get('members'))
-        return TeamMember.objects.filter(roles=self.get('role'))
+            qs = TeamMember.objects.filter(id__in=self.get('members'))
+            order = self.get('order')
+            if order != 'role':
+                return qs.order_by(order, 'name')
+            roles = TeamRole.objects.filter(teammember=OuterRef('pk'))
+            return qs.annotate(role=Subquery(roles.values('role')[:1])).order_by('-role', 'name')
+        return TeamMember.objects.filter(roles=self.get('role')).order_by(self.get('order'), 'name')
 
 
 class TeamListBlock(blocks.StructBlock):

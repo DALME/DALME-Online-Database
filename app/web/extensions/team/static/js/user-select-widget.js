@@ -12,7 +12,7 @@ window.CustomUtils.userSelectState = {
     nameField: null,
     iconPlaceholder: "<svg class=\"icon icon-user user-placeholder\" aria-hidden=\"true\"><use href=\"#icon-user\"></use></svg>",
     getAvatarHTML: (url) => {
-      url = url.startsWith("/media") || url.startsWith("blob") ? url : `/media/${url}`;
+      url = url.startsWith("/media") || url.startsWith("blob") || url.startsWith("http") ? url : `/media/${url}`;
       return `<div class="avatar-bg" style="background: center/cover url(${url});"></div>`;
     },
     templateSelection: (item) => {

@@ -24,6 +24,9 @@ class TeamRole(models.Model):
         help_text='Parent role, if any.',
     )
 
+    class Meta:
+        ordering = ['-parent__role', '-role']
+
     def __str__(self):
         return f'{self.role} ({self.parent.role})' if self.parent else f'{self.role}'
 
