@@ -15,15 +15,15 @@ from django.db import models
 from django.db.models.fields.related import ForeignKey, OneToOneField, RelatedField
 from django.db.models.query import EmptyQuerySet, ModelIterable, QuerySet, ValuesIterable, ValuesListIterable
 
-connections = {
-    'dam': MySQLdb.connect(
-        host=settings.DATABASES['dam']['HOST'],
-        port=int(settings.DATABASES['dam'].get('PORT', 3306)),
-        database=settings.DATABASES['dam']['NAME'],
-        user=settings.DATABASES['dam']['USER'],
-        password=settings.DATABASES['dam']['PASSWORD'],
-    )
-}
+# connections = {
+#     'dam': MySQLdb.connect(
+#         host=settings.DATABASES['dam']['HOST'],
+#         port=int(settings.DATABASES['dam'].get('PORT', 3306)),
+#         database=settings.DATABASES['dam']['NAME'],
+#         user=settings.DATABASES['dam']['USER'],
+#         password=settings.DATABASES['dam']['PASSWORD'],
+#     )
+# }
 
 
 class LegacyQuerySet:
@@ -67,7 +67,13 @@ class LegacyQuerySet:
         with contextlib.suppress(EmptyResultSet):
             self.sql, self.params = compiler.as_sql()
 
-        self.db = connections[self.queryset.db]
+        self.db = MySQLdb.connect(
+            host=settings.DATABASES['dam']['HOST'],
+            port=int(settings.DATABASES['dam'].get('PORT', 3306)),
+            database=settings.DATABASES['dam']['NAME'],
+            user=settings.DATABASES['dam']['USER'],
+            password=settings.DATABASES['dam']['PASSWORD'],
+        )
         self.cursor = self.db.cursor()
 
     def __iter__(self):

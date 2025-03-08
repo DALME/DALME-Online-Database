@@ -20,7 +20,7 @@ env:
   MYSQL_DATABASE: test_db
   MYSQL_USER: dam
   MYSQL_PASSWORD: dam
-  MYSQL_HOST: 0.0.0.0
+  MYSQL_HOST: 127.0.0.1
   PYTHON: 3.11
   SKIP_APP: |
     eslint,prettier,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
