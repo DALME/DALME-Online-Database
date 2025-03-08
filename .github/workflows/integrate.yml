@@ -17,9 +17,9 @@ env:
   ENVIRONMENT: >
     ${{ github.repository_owner == 'DALME' && github.ref_name == 'master' && 'production' || github.repository_owner == 'ocp' && github.ref_name == 'ocp/development.v2' && 'staging' || 'staging' }}
   CI_TAG: dev
-  MYSQL_DATABASE: test_db
-  MYSQL_USER: dam
-  MYSQL_PASSWORD: dam
+  MYSQL_DB: test_db
+  MYSQL_USER: root
+  MYSQL_PASSWORD: root
   MYSQL_HOST: 127.0.0.1
   PYTHON: 3.11
   SKIP_APP: |
@@ -60,27 +60,22 @@ jobs:
         ports:
           - 5432:5432
 
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: dam
-          MYSQL_PASSWORD: dam
-          MYSQL_ROOT_PASSWORD: root
-        options: >-
-          --health-cmd "mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 3306
-
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON }}
+
+      - name: MySQL Start
+        run: sudo /etc/init.d/mysql start
+
+      - name: MySQL Service
+        run: >
+          mysql -e 'CREATE DATABASE ${{ env.MYSQL_DB }};'
+          -u${{ env.MYSQL_USER }}
+          -p${{ env.MYSQL_PASSWORD }}
+          -h${{ env.MYSQL_HOST }}
 
       - uses: docker/setup-buildx-action@v3
 
@@ -128,7 +123,7 @@ jobs:
           context: .
           file: config/docker/Dockerfile.app
           build-args: |
-            DAM_DB_NAME=${{ env.MYSQL_DATABASE }}
+            DAM_DB_NAME=${{ env.MYSQL_DB }}
             DAM_DB_USER=${{ env.MYSQL_USER }}
             DAM_DB_PASSWORD=${{ env.MYSQL_PASSWORD }}
             DAM_DB_HOST=${{ env.MYSQL_HOST }}
