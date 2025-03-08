@@ -840,6 +840,15 @@ class Production(Base, Configuration):
         },
     }
 
+    # DAM API
+    @property
+    def DAM_API_USER(self):
+        return os.environ['DAM_API_USER']
+
+    @property
+    def DAM_API_KEY(self):
+        return os.environ['DAM_API_KEY']
+
     # Zotero
     @property
     def ZOTERO_API_KEY(self):
