@@ -1,0 +1,37 @@
+<li
+  class="page-item"
+  v-bind:class="{ disabled: !previous }">
+  <button @click="handlePreviousPage" aria-label="Previous page">
+    <i class="fa fa-caret-left fa-lg"></i>
+  </button>
+</li>
+<template v-if="showFirst">
+  <li class="page-item">
+    <button @click="handlePage(1)">1</button>
+  </li>
+  <li class="page-item disabled">
+    <button>...</button>
+  </li>
+</template>
+<template v-for="page in pageNumbers" :key="page">
+  <li
+    class="page-item"
+    v-bind:class="{ active: page == currentPage }">
+    <button @click="handlePage(page)">${page}</button>
+  </li>
+</template>
+<template v-if="showLast">
+  <li class="page-item disabled">
+    <button>...</button>
+  </li>
+  <li class="page-item">
+    <button @click="handlePage(totalPages)">${totalPages}</button>
+  </li>
+</template>
+<li
+  class="page-item right"
+  v-bind:class="{ disabled: !next }">
+  <button @click="handleNextPage" aria-label="Next page">
+    <i class="fa fa-caret-right fa-lg"></i>
+  </button>
+</li>

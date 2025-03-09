@@ -1,0 +1,15 @@
+{% load wagtailcore_tags wagtailimages_tags classname %}
+
+{% include "web/includes/breadcrumbs.html" %}
+<div class="title u-flex u-type-serif">
+  <h1>{{ page.title }}</h1>
+  <h2>
+    {% with page.get_parent as parent %}
+      {% if parent|classname == 'Collection' %}
+        <a href="{% pageurl parent %}">{{ parent.title }}</a>
+      {% else %}
+          <a href="/">{{ settings.web.Settings.tagline }}</a>
+      {% endif %}
+    {% endwith %}
+  </h2>
+</div>

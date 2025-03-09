@@ -1,0 +1,308 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+IAMLIVE := true
+REGION := us-east-1
+TF_LOG := WARN
+TF_MODULES := modules
+
+CLUSTER := $(NAMESPACE)-$(ENVIRONMENT)-ecs-cluster
+SERVICE := $(NAMESPACE)-$(ENVIRONMENT)-ecs-service
+JUMP_HOST := $(NAMESPACE)-$(ENVIRONMENT)-network-jump-host-asg
+
+# DAG order of infra module application.
+APPLY := authorization \
+	security \
+	network \
+	firewall \
+	load-balancer \
+	cdn \
+	datastores \
+	orchestration \
+	ida
+
+deploy.help:
+	@echo "  deploy.apply             provision a single module"
+	@echo "  deploy.destroy           delete a single module"
+	@echo "  deploy.init              initialize a single resource module"
+	@echo "  deploy.init.upgrade      re-init/upgrade terraform providers for a module"
+	@echo "  deploy.lint              invoke all terraform linters"
+	@echo "  deploy.plan              generate a provisioning scheme for a single terraform module"
+	@echo "  deploy.state.ls          detail the resources in the state for a module"
+	@echo "  deploy.state.rm          do some surgery on the state for a module"
+	@echo "  deploy.shell             shell into the deploy container"
+	@echo "  deploy.ssh               open a secure shell to a deploy environment"
+	@echo "  deploy.tunnel            forward ports via a secure tunnel into a deploy environment"
+	@echo "  deploy.unlock            force the release of a terraform module lock"
+	@echo "  deploy.update            update all terraform provider and third-party module versions"
+	@echo "  deploy.validate          validate all terraform modules and configuration."
+	@echo "  deploy.validate.module   validate a single terraform modules."
+	@echo ""
+.PHONY: deploy.help
+
+deploy.apply:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.apply module=ecs)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		-e IAMLIVE=$(IAMLIVE) \
+		$(NAMESPACE).deploy \
+		terragrunt apply \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.apply
+
+deploy.destroy: _deploy.confirm.destroy
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.destroy module=ecs)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		terragrunt destroy \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-ignore-external-dependencies \
+		--terragrunt-log-level $(TF_LOG) \
+		--terragrunt-non-interactive
+endif
+.PHONY: deploy.destroy
+
+deploy.unlock: _confirm
+ifndef uuid
+	$(error Supply lock uuid. \
+		Usage: make deploy.unlock uuid=00000000-0000-0000-0000-000000000000)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		-e IAMLIVE=$(IAMLIVE) \
+		$(NAMESPACE).deploy \
+		terragrunt force-unlock \
+		$(uuid) \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.unlock
+
+deploy.graph:
+	docker compose run -T --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		terragrunt graph-dependencies \
+		--terragrunt-working-dir environments/$(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.graph
+
+deploy.init: _deploy.ensure.cache
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.init module=vpc)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		terragrunt init \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.init
+
+deploy.init.upgrade: _deploy.ensure.cache
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.init.upgrade module=vpc)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		terragrunt init -upgrade \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.init.upgrade
+
+deploy.lint: _deploy.format _deploy.validate \
+	_deploy.docs _deploy.tfsec
+.PHONY: deploy.lint
+
+deploy.plan:  _deploy.ensure.cache
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.plan module=ecs)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		-e IAMLIVE=$(IAMLIVE) \
+		$(NAMESPACE).deploy \
+		terragrunt plan \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.plan
+
+deploy.shell:
+	docker compose run --rm \
+		$(NAMESPACE).deploy \
+		bash
+.PHONY: deploy.shell
+
+deploy.state.ls:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.state.ls module=ecs)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		terragrunt state list \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.state.ls
+
+deploy.state.rm:
+ifndef resource
+	$(error Supply exact state resources to delete. \
+		Usage: make deploy.state.rm \
+		resource='aws_ecs_task_definition.example' \
+		module=ecs)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		terragrunt state rm \
+		$(resource) \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.state.rm
+
+deploy.ssh:
+	$(CONFIG)/scripts/aws.ec2.ssh.sh \
+		--jump_host "$(JUMP_HOST)" \
+		--profile "$(AWS_PROFILE)" \
+		--region "$(REGION)"
+.PHONY: deploy.ssh
+
+deploy.tunnel:
+	$(CONFIG)/scripts/aws.ec2.tunnel.sh \
+		--jump_host "$(JUMP_HOST)" \
+		--profile "$(AWS_PROFILE)" \
+		--region "$(REGION)" \
+		--host "$(host)" \
+		--host_bind "$(host_bind)" \
+		--local_bind "$(local_bind)"
+.PHONY: deploy.tunnel
+
+deploy.update: _deploy.update.provider _deploy.update.module
+.PHONY: deploy.update
+
+# Ensure validate doesn't try to call out to any kind of backend when it runs
+# during pre-commit. This seems to be a bug in terragrunt/terraform which only
+# happens with certain modules. Here we just ensure no auto init happens,
+# which is easier than muddying everything else up with dynamic machinery.
+deploy.validate:
+ifdef IN_CI
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		$(NAMESPACE).deploy \
+		terragrunt run-all validate \
+		--terragrunt-working-dir environments/$(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+else
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		$(NAMESPACE).deploy \
+		terragrunt run-all validate \
+		--terragrunt-working-dir environments/$(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG) \
+		--terragrunt-no-auto-init
+endif
+.PHONY: deploy.validate
+
+deploy.validate.module:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.validate module=vpc)
+else
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		$(NAMESPACE).deploy \
+		terragrunt validate \
+		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--terragrunt-log-level $(TF_LOG) \
+		$(args)
+endif
+.PHONY: deploy.validate.module
+
+### Private (non-interface) targets.
+_deploy.confirm.destroy:
+	@echo "CAUTION - Are you certain? Confirm with 'destroy' [destroy/N] " && \
+		read ans && [ $${ans:-N} = destroy ]
+.PHONY: _deploy.confirm.destroy
+
+_deploy.docs:
+	for dir in infra services _reusable; do \
+		docker compose run -T --rm \
+			$(NAMESPACE).deploy \
+			terraform-docs \
+			markdown table \
+			--recursive \
+			--recursive-path $$dir \
+			--output-file README.md \
+			/opt/tf/$(TF_MODULES); \
+	done
+.PHONY: _deploy.docs
+
+_deploy.ensure.cache:
+	@mkdir -p $(HOME)/.terraform.d/plugin-cache
+.PHONY: _deploy.ensure.cache
+
+_deploy.fmt:
+	docker compose run -T --rm \
+		$(NAMESPACE).deploy \
+		terraform fmt -diff -write
+.PHONY: _deploy.fmt
+
+_deploy.hclfmt:
+	docker compose run -T --rm \
+		$(NAMESPACE).deploy \
+		terragrunt hclfmt -diff -write
+.PHONY: _deploy.hclfmt
+
+_deploy.format: _deploy.fmt _deploy.hclfmt
+.PHONY: _deploy.format
+
+_deploy.tfsec:
+	docker compose run -T --rm \
+		$(NAMESPACE).deploy \
+		tfsec .
+.PHONY: _deploy.tfsec
+
+_deploy.update.message:
+	@echo "You must call 'make deploy.init.update' \
+		to install the new dependencies."
+.PHONY: _deploy.update.message
+
+_deploy.update.module:
+ifndef args
+	$(error Supply a module version and module name pair. \
+		Usage: make _deploy.update.module \
+		args='3.15.1 terraform-aws-modules/s3-bucket/aws')
+else
+	docker compose run -T --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		tfupdate module -r --version $(args) modules
+endif
+	@$(MAKE) _deploy.update.message
+.PHONY: _deploy.update.module
+
+_deploy.update.provider:
+	docker compose run -T --rm \
+		$(NAMESPACE).deploy \
+		tfupdate provider aws modules -r
+	@$(MAKE) _deploy.update.message
+.PHONY: _deploy.update.provider

@@ -1,0 +1,11 @@
+<script>
+  $(document).ready(function() {
+    if (window.location.hash) {
+      const anchor = $(`a[href='${window.location.hash}']`)
+      $('html').animate({
+        scrollTop: anchor.offset().top - 20
+      }, 800);
+      anchor.next().addClass('highlight');
+    }
+  });
+</script>

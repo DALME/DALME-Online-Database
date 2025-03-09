@@ -1,0 +1,170 @@
+@import "featured.css";
+
+main.home {
+  background: #e8e8e8;
+  box-shadow:
+    0 0px 0px 0px #e8e8e8,
+    0 -9px 12px rgba(255, 255, 255, 0.2),
+    1px 0 20px -4px rgba(0, 0, 0, 0.6),
+    -1px 0 20px -4px rgba(0, 0, 0, 0.6);
+  padding-bottom: 0;
+}
+body.home main p {
+  line-height: 1.5;
+  color: #636363;
+  overflow: hidden;
+  margin: 1rem;
+}
+body.home main .main-column {
+  border-left: 0;
+}
+
+/* HEADER */
+header.home .title > h1 {
+  font-size: 3rem;
+  font-weight: 600;
+  text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.8);
+}
+header.home .title > h1.last {
+  display: inline-flex;
+  flex-direction: row;
+}
+header.home h1.small,
+header.home span.small {
+  font-size: 1.8rem;
+  font-style: italic;
+  font-family: "PT Serif", "Times New Roman", serif;
+  font-weight: 500;
+}
+header.home span.small {
+  align-self: center;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+}
+header.home .title {
+  display: none;
+  padding: 4.8rem 0 0 0;
+}
+header.home > div > a {
+  margin: 3rem 0 8rem 0;
+}
+
+/* MISSION STATEMENT */
+body.home main .statement p {
+  margin: 0 0 1rem 0;
+  line-height: 2;
+  color: #464646;
+}
+.mission {
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.mission h2 {
+  color: #fff;
+  font-size: 1rem;
+  transform: translate(0, -1.1rem);
+}
+.mission h2 {
+  background: #535353;
+}
+.mission {
+  background: #fff;
+  margin-top: 2rem;
+  box-shadow:
+    0 0px 20px -2px rgba(0, 0, 0, 0.6),
+    9px 0 20px -4px #fff,
+    -9px 0 20px -4px #fff;
+}
+.mission > div {
+  /* width: 950px;
+  margin: 2rem 0 4rem 0;
+  padding: 0 1rem; */
+  margin-top: -42px;
+}
+.mission h2 {
+  font-size: 1.4rem;
+}
+.statement {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.statement a {
+  color: #354d87;
+}
+.statement a:hover {
+  border-bottom: 1px dotted #354d87;
+}
+.statement .block-text {
+  font-family: "PT Serif", "Times New Roman", serif;
+  padding: 3rem 3rem 2rem 4.5rem;
+}
+.statement .block-text p:first-of-type {
+  text-indent: 35px;
+}
+.statement .block-text p:first-of-type b:first-of-type {
+  font-size: 110%;
+}
+.statement .block-text .rich-text p {
+  font-size: 1.2rem;
+  overflow: initial;
+}
+.home-parchment {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: right 0px top 0px;
+  width: 75%;
+}
+.home-parchment img {
+  width: 35px;
+  height: auto;
+  float: left;
+  position: relative;
+  top: 39px;
+  left: 4.4rem;
+}
+.home-register {
+  background-size: cover;
+  width: 25%;
+}
+
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  header.home .title {
+    display: flex;
+  }
+  .statement {
+    display: block;
+  }
+}
+
+@media only screen and (min-width: 950px) {
+  .statement {
+    display: block;
+  }
+  .register {
+    display: block;
+  }
+  .support-logos {
+    flex-direction: row;
+    margin-bottom: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    margin-right: 4rem;
+    margin-left: 4rem;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .home-parchment {
+    width: 65%;
+  }
+  .home-register {
+    width: 35%;
+  }
+  body.home {
+    margin: 0 auto;
+  }
+}

@@ -1,0 +1,29 @@
+button[name="FOOTNOTE"] > svg > path:nth-child(1) {
+  fill: none;
+}
+.footnoteEntity {
+  cursor: pointer;
+  position: relative;
+  top: -5px;
+  font-size: 90%;
+}
+.footnoteTooltipText {
+  margin-right: 10px;
+  width: max-content;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 24px;
+  display: inline-block;
+  height: 100%;
+}
+.Tooltip {
+  display: flex;
+}
+.tooltip-entity-footnote-icon {
+  height: .8em !important;
+  width: .8em !important;
+  margin-inline-end: unset !important;
+  vertical-align: super !important;
+}

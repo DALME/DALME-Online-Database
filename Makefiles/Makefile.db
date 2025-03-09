@@ -1,0 +1,124 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+DB_VOLUME := pgdata
+DUMPS := /opt/db/dumps
+RESTORE_SCHEMA := restore
+
+db.help:
+	@echo "  db.drop                  drop the db volume"
+	@echo "  db.dump                  dump the dev database to sql (data only, no schema)"
+	@echo "  db.load                  restore a local sql dump"
+	@echo "  db.migrations.empty      generate an empty database revision"
+	@echo "  db.migrations.make       generate a database revision"
+	@echo "  db.migrations.merge      merge database revisions"
+	@echo "  db.migrations.show       show database revision state"
+	@echo "  db.migrate               apply all upgrades to the database schema"
+	@echo "  db.migrate.fake          run faked migrations"
+	@echo "  db.migrate.revert        revert migrations for an app"
+	@echo "  db.psql                  shell into psql on the service"
+	@echo "  db.shell                 shell into the db container"
+	@echo ""
+.PHONY: db.help
+
+# TODO: The db volume prefix comes automatically from the **project directory**
+# so eventually this will probably need to become ida_$(DB_VOLUME).
+db.drop: _confirm
+	@$(MAKE) infra.stop
+	docker rm -f $$(docker ps -a -q)
+	docker volume rm dalme_$(DB_VOLUME)
+	@$(MAKE) infra.start
+.PHONY: db.drop
+
+db.dump:
+	docker compose exec \
+		$(NAMESPACE).db \
+		pg_dump \
+		-Fc $(args) \
+		--dbname $(NAMESPACE) \
+		--username $(NAMESPACE) \
+		-f $(DUMPS)/$(NAMESPACE)-$$(date -u +"%Y%m%d-T%s").dump
+.PHONY: db.dump
+
+db.load: _db.create_restore_schema
+ifndef dump
+	$(error No local dump specified to restore. \
+		Usage: make db.load dump='dalme-20231025-T1698276955.dump')
+else
+	docker exec -i \
+		$(NAMESPACE).db \
+		pg_restore \
+		--clean \
+		--if-exists \
+		--schema=$(RESTORE_SCHEMA) \
+		--dbname=$(NAMESPACE) \
+		--username=$(NAMESPACE) \
+		$(DUMPS)/$(dump)
+endif
+.PHONY: db.load
+
+db.migrate:
+	docker compose run --rm \
+		$(NAMESPACE).app \
+		python manage.py migrate_schemas $(args)
+.PHONY: db.migrate
+
+db.migrate.fake:
+	docker compose run --rm \
+		$(NAMESPACE).app \
+		python manage.py migrate_schemas --fake $(args)
+.PHONY: db.migrate.fake
+
+db.migrations.make:
+	docker compose run --rm \
+		$(NAMESPACE).app \
+		python manage.py makemigrations
+.PHONY: db.migrations.make
+
+db.migrations.empty:
+ifndef app
+	$(error Target app not specified. \
+		Usage: make db.migrations.empty app='core')
+else
+	docker compose run --rm \
+		$(NAMESPACE).app \
+		python manage.py makemigrations --empty $(app)
+endif
+.PHONY: db.migrations.empty
+
+db.migrations.merge:
+	docker compose run --rm \
+		$(NAMESPACE).app \
+		python manage.py migrations.make --merge
+.PHONY: db.migrations.merge
+
+db.migrations.show:
+	docker compose run --rm \
+		$(NAMESPACE).app \
+		python manage.py showmigrations
+.PHONY: db.migrations.show
+
+db.psql:
+	PGPASSWORD=$(NAMESPACE) \
+		docker compose exec \
+		$(NAMESPACE).db \
+		psql -wx \
+		--username $(NAMESPACE) \
+		--dbname $(NAMESPACE)
+.PHONY: db.psql
+
+db.shell:
+	PGPASSWORD=$(NAMESPACE) \
+		docker compose exec \
+		$(NAMESPACE).db \
+		bash
+.PHONY: db.shell
+
+### Private (non-interface) targets.
+_db.create_restore_schema:
+	docker compose exec \
+		$(NAMESPACE).db \
+		psql -wx \
+		--dbname $(NAMESPACE) \
+		--username $(NAMESPACE) \
+		-c 'CREATE SCHEMA IF NOT EXISTS $(RESTORE_SCHEMA)'
+.PHONY: _db.create_restore_schema

@@ -1,0 +1,28 @@
+.record-detail h3 {
+  border-bottom: 1px dotted #9c9c9c;
+  padding: 0 0 0.5rem 0;
+  margin-bottom: 0.5rem;
+}
+.record-detail {
+  flex-direction: column;
+  width: 100%;
+  text-align: right;
+}
+.record-detail a span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #989898;
+}
+aside.side-column .record-detail a:hover {
+  border-bottom: none;
+  text-decoration: none;
+  color: #084094;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  .record-detail {
+    flex-direction: column;
+    margin-top: 5rem;
+  }
+}

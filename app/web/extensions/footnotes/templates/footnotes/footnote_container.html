@@ -1,0 +1,19 @@
+{% load wagtailcore_tags %}
+<div id="footnote-container">
+    <div class="footnote_list">
+        <hr>
+        <ol>
+            {% for footnote in page.footnote_list %}
+            <li id="fn_{{ footnote.id }}">
+                <div class="footnote-entry">
+                    {{ footnote.text|richtext }}
+                    <a href="#{{ footnote.id }}" class="footnote_back_link" title="Jump back to footnote {{ forloop.counter }} in the text.">↩︎</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+<script>
+    document.querySelectorAll(".footnote_callout").forEach((fn) => fn.innerText = fn.dataset.index);
+</script>

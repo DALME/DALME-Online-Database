@@ -1,0 +1,312 @@
+.folios {
+  margin: 0;
+  overflow: hidden;
+}
+.folio-rights {
+  color: #90909082;
+  padding: .25rem .75rem;
+  background-color: transparent;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  max-height: 30px;
+}
+.folio-rights:hover {
+  color: #fff;
+  background-color: rgb(62 62 62 / 39%);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  max-height: fit-content;
+}
+.folios .folio-rights div {
+  font-size: 0.9rem;
+  margin: auto;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.folios .folio-rights:hover div {
+  white-space: normal;
+  overflow: auto;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* viewer */
+.diva-no-image,
+.diva-no-right {
+  background-color: #2d2d2d;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  padding: 2rem;
+  flex-direction: column;
+}
+.diva-no-right > div {
+  color: #636363;
+  margin: 0 auto auto auto;
+  text-align: center;
+  min-width: 134px;
+  max-width: 270px;
+}
+.diva-no-image::after {
+  content: "\f070";
+  font-family: "Font Awesome 5 Free";
+  font-size: 6rem;
+  font-weight: 900;
+  margin: auto;
+  color: #404040;
+}
+.diva-no-right::before {
+  content: "\f1f9";
+  font-family: "Font Awesome 5 Free";
+  font-size: 6rem;
+  font-weight: 900;
+  margin: auto auto 0 auto;
+  color: #404040;
+}
+
+/* VIEWER SIZING */
+div.viewer {
+  background: #2d2d2d;
+}
+#diva_viewer {
+  display: flex;
+  flex: 1 1 auto;
+  height: 100%;
+}
+#diva_viewer .v-spinner {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: #2d2d2d;
+  margin: 0;
+  flex-direction: row;
+  align-items: center;
+}
+#diva_viewer .v-spinner .v-beat:first-child {
+  margin-left: auto !important;
+}
+#diva_viewer .v-spinner .v-beat:last-child {
+  margin-right: auto !important;
+}
+#tei-container {
+  position: relative;
+  width: 100%;
+  padding: 30px;
+  display: flex;
+}
+main.viewer {
+  flex: 0;
+  height: calc(100vh - 147px);
+  overflow: hidden;
+}
+.folios.vertical-split {
+  flex-direction: row;
+}
+.folios.vertical-split div.diva-wrapper {
+  min-height: 100% !important;
+}
+.folios.vertical-split section.transcription {
+  min-height: 100px;
+  border-left: 3px solid #354d87;
+}
+.folios.vertical-split .diva-viewer-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.folios.vertical-split section.folio {
+  width: 50%;
+  max-width: 99.5%;
+  display: flex;
+  flex-direction: column;
+  margin-right: -7px;
+  position: relative;
+}
+.folios.horizontal-split {
+  flex-direction: column;
+}
+.folios.horizontal-split div.diva-wrapper {
+  min-height: 100% !important;
+}
+.folios.horizontal-split section.folio {
+  border-bottom: none;
+  width: 100%;
+  position: relative;
+  height: calc((100vh - 204px) / 2);
+  margin-bottom: -6px;
+}
+.folios.horizontal-split section.folio .folio-rights {
+  bottom: -1px;
+}
+.folios.horizontal-split section.transcription {
+  border-top: 3px solid #354d87;
+  flex: 1 1 auto;
+}
+.folios section.folio {
+  flex: 0 0 auto;
+}
+.folios .resize-handle {
+  flex: 0 0 auto;
+}
+.folios.vertical-split .resize-handle {
+  cursor: col-resize;
+  width: 15px;
+  margin-right: -8px;
+  z-index: 6;
+}
+.folios.horizontal-split .resize-handle {
+  cursor: row-resize;
+  height: 15px;
+  margin-bottom: -8px;
+  z-index: 3;
+}
+div.diva-outer {
+  background: none;
+  border: 0;
+}
+input.vs__search {
+  display: none;
+}
+div.vs__dropdown-toggle {
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid #ccc;
+  min-height: 3rem;
+}
+div.vs__selected-options,
+span.vs__selected {
+  margin: 0;
+  padding: 0;
+}
+section.transcription {
+  background-color: #fff;
+  flex: 1 1 auto;
+  z-index: 1;
+}
+.record-info {
+  position: absolute;
+  z-index: 5;
+  background-color: rgb(109 109 109 / 68%);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border-bottom: 1px solid #6b6b6b87;
+  padding: 2rem 2rem;
+  width: 100%;
+}
+.record-info ul {
+  color: white;
+  flex-direction: column;
+  margin: 1rem 0 0 0;
+  padding: 0;
+  font-size: 12px;
+}
+.record-info ul li span {
+  color: #8dbfff;
+  font-weight: 600;
+}
+.record-info .description {
+  color: white;
+  font-family: "PT Serif", "Times New Roman", serif;
+  font-size: 16px;
+  overflow: auto;
+  max-height: calc(100vh - 500px);
+}
+.record-info .credits {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.record-info hr {
+  border-top: 1px solid #969696;
+}
+.record-info a {
+  color: #fff;
+}
+.record-info a:hover {
+  border-bottom: 1px dotted #fff;
+}
+
+
+/* RECORD INFO PANEL Data attributes */
+div.description[data-collapsed='true'] {
+  display: none;
+}
+div.description[data-collapsed='true'] {
+  border-top: 0;
+}
+
+
+.popover-body .dropdown-menu {
+  padding: .75rem 0;
+}
+.popover-body .dropdown-menu li.active a {
+  font-weight: 700;
+}
+
+.empty-folio-warning {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b6b6b;
+  border-top: 1px dotted #d4d4d4;
+  border-bottom: 1px dotted #d4d4d4;
+  padding: 1rem;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.gloss-container {
+  font-family: Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Segoe UI Symbol";
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.inline-gloss {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.gloss-lang {
+  display: inline-flex;
+  margin-right: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 0 4px;
+  color: #1e5782;
+  background: #c0d7eb;
+  border: 1px solid #2770a4;
+  border-radius: 6px;
+}
+.gloss-text {
+  color: black;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  .folios {
+    margin: 0;
+  }
+}
+
+@media only screen and (min-width: 950px) {
+  .folios {
+    margin: 0;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .folios {
+    margin: 0;
+  }
+}

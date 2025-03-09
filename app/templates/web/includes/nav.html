@@ -1,0 +1,27 @@
+{% load get_nav nav_active wagtailcore_tags wagtailimages_tags %}
+
+{% get_nav as nav %}
+<nav class="primary u-flex">
+  <div class="u-flex">
+    <div class="home">
+      <a href="{% pageurl nav.0 %}">{{ settings.web.Settings.short_form }}</a>
+    </div>
+    <i id="hamburger" class="fa fa-bars hamburger" onclick="window.CustomUtils.toggleHamburger(this)"></i>
+  </div>
+  <ul class="u-flex">
+    {% for tab in nav %}
+      {% nav_active tab as active %}
+      <li>
+        {% if forloop.counter == 1 %}
+         <a {% if active %}class="active" {% endif %}href="{% pageurl tab %}">
+           HOME
+         </a>
+        {% else %}
+          <a {% if active %}class="active" {% endif %}href="{% pageurl tab %}">
+            {{ tab.title_switch|upper }}
+          </a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

@@ -1,0 +1,18 @@
+{% load wagtailadmin_tags %}
+
+<div class="{{ classname }}">
+    {% if help_text %}
+        <span>
+            <div class="help">
+                {% icon name="help" classname="default" %}
+                {{ help_text }}
+            </div>
+        </span>
+    {% endif %}
+    <section class="field-row-panel manual-form" id="{{ prefix }}-heading-form-section" data-panel>
+        <div class="w-field-row">
+            {% include 'extras/field_include.html' with child=children.heading hide_name=True col_class="col9" %}
+            {% include 'extras/field_include.html' with child=children.level hide_name=True col_class="col3" %}
+        </div>
+    </section>
+</div>

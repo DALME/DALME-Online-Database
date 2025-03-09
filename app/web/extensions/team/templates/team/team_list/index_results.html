@@ -1,0 +1,62 @@
+{% load wagtailadmin_tags wagtailimages_tags i18n static %}
+
+{% block before_results %}{% endblock %}
+{% if object_list %}
+    {% block results %}
+        <table class="team listing">
+            {% with caption=table.get_caption %}
+                {% if caption %}
+                    <caption class="w-sr-only">{{ caption }}</caption>
+                {% endif %}
+            {% endwith %}
+            {% if table.has_column_widths %}
+                {% for column in table.columns.values %}
+                    <col {% if column.width %}width="{{ column.width }}"{% endif %} />
+                {% endfor %}
+            {% endif %}
+            <thead>
+                <tr {% if table.header_row_classname %}class="{{ table.header_row_classname }}"{% endif %}>
+                    {% for column in table.columns.values %}
+                        {% component column.header %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in table.rows %}
+                    <tr{% include "wagtailadmin/shared/attrs.html" with attrs=row.attrs %}>
+                        {% for cell in row.values %}
+                            {% if cell.column.name == 'avatar' %}
+                                <td class="{% if column.classname %}{{ column.classname }}{% endif %} avatar-cell">
+                                    {% if cell.instance.avatar_url %}
+                                        <div class="avatar-bg" style="background: center / cover url({{ cell.instance.avatar_url }});"></div>
+                                    {% else %}
+                                        {% icon name="user" classname="user-placeholder" title="no_photo" %}
+                                    {% endif %}
+                                </td>
+                            {% elif cell.column.name == 'user' %}
+                                <td class="username">
+                                    {% if cell.instance.user %}
+                                        <div class="w-status w-status--primary w-username">{{ cell.instance.user }}</div>
+                                    {% endif %}
+                                </td>
+                            {% else %}
+                                {% component cell %}
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+    {% block pagination %}
+        {% if is_paginated %}
+            <div class="nice-padding">
+                {% include "wagtailadmin/shared/pagination_nav.html" with items=page_obj linkurl=index_url %}
+            </div>
+        {% endif %}
+    {% endblock %}
+{% else %}
+    <div class="nice-padding w-mt-8">
+        {% block no_results_message %}<p>{% trans "There are no results." %}</p>{% endblock %}
+    </div>
+{% endif %}

@@ -1,0 +1,22 @@
+-r requirements.txt
+django-extensions==3.2.3
+factory-boy==3.3.1
+hypothesis==6.123.0
+ipdb==0.13.13
+ipython==8.31.0
+jupyter==1.0.0
+markdown==3.7
+notebook==6.5.6
+pre-commit==4.0.1
+pydot==3.0.3
+pyparsing==3.2.0
+pytest-cov==6.0.0
+pytest-django==4.9.0
+pytest-lazy-fixture==0.6.3
+pytest-mock==3.14.0
+pytest-watcher==0.4.2
+pytest==8.3.4
+rich==13.9.4
+ruff==0.9.6
+tqdm==4.67.1
+watchdog==6.0.0

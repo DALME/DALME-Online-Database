@@ -1,0 +1,35 @@
+[
+  {
+    "action": [
+      "list",
+      "retrieve",
+      "has_permission",
+      "completions"
+    ],
+    "principal": [
+      "authenticated"
+    ],
+    "effect": "allow"
+  },
+  {
+    "action": [
+      "create"
+    ],
+    "principal": [
+      "group:Editors"
+    ],
+    "effect": "allow"
+  },
+  {
+    "action": [
+      "create",
+      "partial_update",
+      "update",
+      "destroy"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
+    "effect": "allow"
+  }
+]

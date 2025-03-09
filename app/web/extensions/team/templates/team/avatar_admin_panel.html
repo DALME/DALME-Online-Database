@@ -1,0 +1,24 @@
+{% load i18n wagtailadmin_tags %}
+{% block content %}
+    <div class="help team-avatar-admin-help">Leave blank to use the user picture.</div>
+    <div class="w-avatar-panel w-flex w-flex-wrap w-items-center">
+        <div class="w-avatar-panel__image w-mr-9 w-mb-5">
+            {% if form.avatar.value %}
+                <input class="avatar-clear" type="checkbox" name="teamavatar-avatar-clear" id="teamavatar-avatar-clear_id">
+                <label for="teamavatar-avatar-clear_id">{% trans "Reset to default" %}</label>
+                <img class="avatar large gravatar w-block w-mt-3" src="{% avatar_url request.user 70  gravatar_only=True %}" alt="{% trans 'Default avatar' %}"/>
+            {% endif %}
+            <span class="avatar large avatar-span w-block w-mt-3 w-mr-10">
+                {% if form.avatar.value %}
+                    <img src="/media/{{ form.avatar.value }}" alt="" decoding="async" loading="lazy" />
+                {% else %}
+                    <div class="avatar-no-photo"></div>
+                {% endif %}
+            <span>
+        </div>
+        <div class="w-avatar-panel__form">
+            <label for="id_teamavatar-avatar">{% trans "Upload a profile picture:" %}</label>
+            <input type="file" name="teamavatar-avatar" accept="image/*" id="id_teamavatar-avatar">
+        </div>
+    </div>
+{% endblock %}

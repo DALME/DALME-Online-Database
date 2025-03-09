@@ -1,0 +1,38 @@
+[
+  {
+    "action": [
+      "list",
+      "retrieve",
+      "has_permission"
+    ],
+    "principal": [
+      "authenticated"
+    ],
+    "effect": "allow"
+  },
+  {
+    "action": [
+      "partial_update",
+      "update"
+    ],
+    "principal": [
+      "authenticated"
+    ],
+    "effect": "allow",
+    "condition": [
+      "user_must_be:self"
+    ]
+  },
+  {
+    "action": [
+      "create",
+      "partial_update",
+      "update",
+      "destroy"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
+    "effect": "allow"
+  }
+]

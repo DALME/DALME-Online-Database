@@ -1,75 +1,41 @@
-# OS and other general stuff
-.DS_Store
-.thumbs.db
-_extra
-
-# local environment
-env
-devEnv
-venv
-*.env
-env.*
-
-# local dev database dumps
-sql/
-*.sql
-
-# local test and temporary files
-extracted_datasets
-data
-TODO*
-
-# certificates for development server
-*.cert
-*.key
-ssl-certs*
-
-# Elastic Beanstalk Setup
-.elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-.ebignore
-
-# local static and media files
-staticfiles
-media
-www
-dalme/media
-
-# node and other js dev files
-node_modules
-yarn-error.log
-store-flag.d.ts
-.quasar
-/dist
-
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Cordova related directories and files
-/src-cordova/node_modules
-/src-cordova/platforms
-/src-cordova/plugins
-/src-cordova/www
-
-# Capacitor related directories and files
-/src-capacitor/www
-/src-capacitor/node_modules
-
-# BEX related directories and files
-/src-bex/www
-/src-bex/js/core
-
-# compiled and other python dev files
-*.pyc
-__pycache__/
-
-# Editor directories and files
-.vscode/
-.idea
-*.suo
-*.ntvs*
+!env.hcl
+*.cert
+*.diff
+*.env
+*.ipynb
+*.ipynb_checkpoints
+*.key
 *.njsproj
+*.ntvs*
+*.pyc
 *.sln
+*.suo
+*venv
+.DS_Store
+.coverage
+.ebignore
+.elasticbeanstalk/*
+.idea
+.infracost/
+.ruff_cache
+.thumbs.db
+.vscode/
+/src-bex/js/core
+/src-bex/www
+TODO*
+__pycache__/
+_extra
+apply-perms.temp
+data
+devEnv
+env
+env.*
+extracted_datasets
+notebooks
+sql/**/*.dump
+sql/**/*.sql
+sql/dumps/pg_restore.log
+ssl-certs*
+www

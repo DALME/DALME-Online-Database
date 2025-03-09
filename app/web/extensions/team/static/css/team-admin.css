@@ -1,0 +1,59 @@
+.avatar-cell {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+.user-placeholder,
+.avatar-bg {
+  width: 50px;
+  height: 50px;
+  border: 1px solid var(--w-color-border-field-default);
+  border-radius: 5px;
+}
+.user-placeholder {
+  background: var(--w-color-surface-header);
+  color: var(--w-color-border-field-default);
+  padding: 10px;
+}
+.listing.team td {
+  min-height: 77px;
+}
+.listing.team .title-wrapper {
+  font-size: 0.9rem;
+}
+.w-username {
+  text-transform: lowercase;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 2px 8px;
+  color: var(--w-color-surface-button-default) !important;
+  border-color: var(--w-color-surface-button-default) !important;
+  background: var(--w-color-admin-panel-header) !important;
+}
+.w-field[data-contentpath="roles"] .w-field__input {
+  align-items: flex-start;
+}
+.team-avatar-admin-help {
+  margin-top: -20px;
+  margin-bottom: 20px;
+}
+img.avatar {
+  object-fit: cover;
+}
+.w-mr-10 {
+  margin-inline-end: 3rem;
+}
+.avatar-no-photo {
+  background-color: #efefef;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  border: none;
+}
+.avatar-no-photo:after {
+  content: "\f007";
+  font-family: "Font Awesome 5 Free";
+  font-size: 3rem;
+  font-weight: 800;
+  margin: auto;
+  color: #dedede;
+}

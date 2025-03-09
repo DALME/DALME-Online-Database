@@ -1,0 +1,431 @@
+{% extends "web/layouts/left_side_column.html" %}
+{% load static js_translate dd_record_name get_highlights wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+
+{% block title %}{{ block.super }} &ndash; Search{% endblock %}
+
+{% block banner %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block header_extra %}
+  {% include "web/includes/simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "web/includes/collections_filter.html" %}
+  {% include "web/includes/features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div id="search_app" class="content" v-cloak>
+    <b-form method="post" action="{% routablepageurl page.specific 'search' %}" ref="search_form">
+      {% csrf_token %}
+      <input type="hidden" name="form-PAGE" v-model="page" id="id_form-PAGE">
+      <input type="hidden" name="form-TOTAL_FORMS" v-model="management_total" id="id_form-TOTAL_FORMS">
+      <input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS">
+      <input type="hidden" name="form-MIN_NUM_FORMS" value="0" id="id_form-MIN_NUM_FORMS">
+      <input type="hidden" name="form-MAX_NUM_FORMS" value="1000" id="id_form-MAX_NUM_FORMS">
+      <div class="search-head-container d-flex">
+        <div
+          class="btn search-button mr-1 ml-auto"
+          v-bind:class="{ active: advancedMode }"
+          @click="advancedMode = !advancedMode"
+          v-b-tooltip.hover.left="{title: 'Open advanced search', disabled: true }">
+          Advanced
+        </div>
+        <div
+          class="btn search-button"
+          v-bind:class="{ active: showHelp }"
+          @click="showHelp = !showHelp"
+          v-b-tooltip.hover.top="{title: 'Show search tips and examples', disabled: true }">
+          Help
+        </div>
+      </div>
+      <div id="search_box" v-if="!advancedMode" class="position-relative">
+        <i class="fas fa-search fa-fw search-icon"></i>
+        <b-form-input
+          id="{{ form.0.query.id_for_label }}"
+          name="{{ form.0.query.html_name }}"
+          v-model="searchQuery"
+          placeholder="Search"
+          size="lg"
+          type="text"
+          :formatter="toLowercase"
+          class="search-results-input"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          v-b-tooltip.hover.top="{title: 'Type a query here to start a search', disabled: true }">
+        </b-form-input>
+        <div class="search-input-buttons">
+          <button
+            class="btn search-button"
+            v-if="searchQuery"
+            @click="performSearch"
+            v-b-tooltip.hover.top="{title: 'Submit search', disabled: true }">
+            Search
+          </button>
+          <div
+            class="btn search-button clear-search"
+            v-if="searchQuery"
+            @click="clearSearch"
+            v-b-tooltip.hover.left="{title: 'Clear search', disabled: true }">
+            X
+          </div>
+        </div>
+      </div>
+      <div id="advanced-search" v-if="advancedMode">
+        <div class="help-heading">
+          <small>Use multiple statements to build a complex search query.</small>
+        </div>
+        <div id="advanced-search-sets">
+          <template v-for="(clause, index) in clauses">
+            <div class="advanced-search-row">
+              <input type="hidden" :name="`form-${index}-field_type`" :id="`id_form-${index}-field_type`" v-model="clause.field_type">
+              <b-form-select
+                v-show="index > 0"
+                class="form-group query_op"
+                v-model="clause.join_type"
+                :name="`form-${index}-join_type`"
+                :id="`id_form-${index}-join_type`"
+                :options="searchContext.options.join_types"
+                size="sm"
+                v-b-tooltip.html.hover.top="{title: '{{ form.0.join_type.help_text|safe }}', disabled: true }"
+                >
+              </b-form-select>
+              <div v-show="index == 0" class="form-group query_op_first">Search:</div>
+              <b-form-select
+                class="form-group query_field"
+                v-model="clause.field"
+                :name="`form-${index}-field`"
+                :id="`id_form-${index}-field`"
+                :options="fields_list"
+                size="sm"
+                v-b-tooltip.html.hover.top="{title: '{{ form.0.field.help_text|safe }}', disabled: true }">
+              </b-form-select>
+              <div class="form-group query_is" v-if="['keyword', 'date'].includes(get_field_type(clause.field))">is</div>
+              <div class="form-group query_is" v-else>contains</div>
+              <b-form-select
+                v-if="!['keyword', 'date'].includes(get_field_type(clause.field))"
+                class="form-group query_type"
+                v-model="clause.query_type"
+                :name="`form-${index}-query_type`"
+                :id="`id_form-${index}-query_type`"
+                :options="searchContext.options.query_types"
+                size="sm"
+                v-b-tooltip.html.hover.top="{title: '{{ form.0.query_type.help_text|safe }}', disabled: true }">
+              </b-form-select>
+              <b-form-select
+                v-if="get_field_type(clause.field) == 'date'"
+                class="form-group range_type"
+                v-model="clause.range_type"
+                :name="`form-${index}-range_type`"
+                :id="`id_form-${index}-range_type`"
+                :options="searchContext.options.range_types"
+                size="sm"
+                v-b-tooltip.html.hover.top="{title: '{{ form.0.range_type.help_text|safe }}', disabled: true }">
+              </b-form-select>
+              <b-form-input
+                class="form-group query_input grow"
+                v-if="get_field_type(clause.field) != 'keyword'"
+                v-model="clause.field_value"
+                :name="`form-${index}-field_value`"
+                :id="`id_form-${index}-field_value`"
+                :placeholder="searchContext.fields[clause.field].placeholder"
+                size="sm"
+                type="search"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                v-b-tooltip.html.hover.top="{title: '{{ form.0.field_value.help_text|safe }}', disabled: true }">
+              </b-form-input>
+              <b-form-select
+                v-else
+                class="form-group query_input"
+                v-model="clause.field_value"
+                :name="`form-${index}-field_value`"
+                :id="`id_form-${index}-field_value`"
+                :options="searchContext.fields[clause.field].options"
+                size="sm"
+                v-b-tooltip.html.hover.top="{title: '{{ form.0.field_value.help_text|safe }}', disabled: true }">
+              </b-form-select>
+              <div
+                class="button remove"
+                :class="{ disabled: index == 0 }"
+                @click="removeRow(index)"
+                v-b-tooltip.hover.top="{title: 'Remove query clause', disabled: true }">
+                <i class="fas fa-minus"></i>
+              </div>
+              <div
+                class="button add"
+                @click="addRow(index)"
+                v-b-tooltip.hover.top="{title: 'Add query clause', disabled: true }">
+                <i class="fas fa-plus"></i>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div class="advanced-search-footer">
+          <button
+            class="btn search-button ml-auto mr-1"
+            @click="performSearch"
+            v-b-tooltip.hover.top="{title: 'Submit search', disabled: true }">
+            Search
+          </button>
+          <div
+            class="btn search-button clear-search"
+            @click="clearSearch"
+            v-b-tooltip.hover.left="{title: 'Clear search', disabled: true }">
+            X
+          </div>
+        </div>
+      </div>
+      <div
+        class="search-status d-flex"
+        :class="{ 'search-error': formErrors}"
+        v-b-tooltip.hover.bottom="{title: 'Information about the result of your search is displayed here', disabled: true }">
+        <ul v-if="formErrors">
+          <li v-for="error in formErrors">
+            <small>${error}</small>
+          </li>
+        </ul>
+        <small v-else>${status_message}</small>
+      </div>
+      <div id="search-help-content" v-if="showHelp">
+        <b-form-checkbox
+          class="custom-switch"
+          v-model="showTooltips"
+          name="tooltip-toggle"
+          switch>
+          <small>Show/hide tooltips</small>
+        </b-form-checkbox>
+        {{ settings.web.Settings.search_help_content }}
+      </div>
+    </b-form>
+    <div class="search-results" v-if="hasResults">
+      <div id="results-container">
+          {% if results %}
+            <div class="ml-1 mr-1 mb-5">
+            {% for result in results %}
+                <div class="search-result-entry">
+                    <a class="search-result-link" href="{% routablepageurl page.specific 'record' result.meta.id %}">{{ result.name|dd_record_name }}</a>
+                    <div class="search-result-detail">{{ result.name|dd_record_name:'loc'}}</div>
+                    <div class="search-text-container" ref="container_{{ forloop.counter0 }}">
+                    {% with result.meta|get_highlights:search_context.fields as highlights %}
+                      {% if highlights %}
+                        <div class="show-more"
+                          v-if="resultsShowMore[{{ forloop.counter0 }}]"
+                          @click="toggle_show_more('{{ forloop.counter0 }}')"
+                          ref="toggle_{{ forloop.counter0 }}">
+                          Show more
+                        </div>
+                        {% for highlight in highlights %}
+                          {% if highlight.link %}
+                            <div class="search-result-text"><b><a href="{% routablepageurl page.specific 'record_folio' result.meta.id highlight.link %}">{{ highlight.field }}:</a> </b>{{ highlight.fragment|safe }}</div>
+                          {% else %}
+                            <div class="search-result-text"><b>{{ highlight.field }}: </b>{{ highlight.fragment|safe }}</div>
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+            <div class="pager" v-if="isPaginated">
+              <ul class="pagination">
+                <li class="page-item" :class="{ disabled: !paginator.has_previous }">
+                  <button @click="page = paginator.previous_page">
+                    <i class="fa fa-caret-left fa-lg"></i>
+                  </button>
+                </li>
+                <template v-if="paginator.show_first">
+                  <li  class="page-item">
+                    <button @click="page = 1">1</button>
+                  </li>
+                  <li class="page-item disabled"><button>...</button></li>
+                </template>
+                <template v-for="p in paginator.page_numbers">
+                  <li class="page-item" :class="{ active: p == page }">
+                    <button @click="page = p">${p}</button>
+                  </li>
+                </template>
+                <template v-if="paginator.show_last">
+                  <li class="page-item disabled"><button>...</button></li>
+                  <li class="page-item">
+                    <button @click="page = paginator.num_pages">${paginator.num_pages}</button>
+                  </li>
+                </template>
+                <li class="page-item" :class="{ disabled: !paginator.has_next }">
+                  <button @click="page = paginator.next_page">
+                    <i class="fa fa-caret-right fa-lg"></i>
+                  </button>
+                </li>
+              </ul>
+            </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block js_foot %}
+  {{ block.super }}
+  {{ search_context|json_script:"search_context" }}
+  <script id="clauses" type="application/json">
+    [{% for set in form %}
+      {
+        "field_type": "{{ set.field_type.value|default_if_none:'' }}",
+        "join_type": "{{ set.join_type.value|default_if_none:'must' }}",
+        "field": "{{ set.field.value|default_if_none:'transcription' }}",
+        "query_type": "{{ set.query_type.value|default_if_none:'match_phrase' }}",
+        "range_type": "{{ set.range_type.value|default_if_none:'value' }}",
+        "field_value": "{{ set.field_value.value|default_if_none:'' }}"
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}]
+  </script>
+  <script>
+  $(document).ready(function () {
+    const search_app = new Vue({
+      el: '#search_app',
+      delimiters: ['${', '}'],
+      created() {
+        this.searchContext = JSON.parse($('#search_context').detach().text());
+        this.clauses = JSON.parse($('#clauses').detach().text());
+        this.showHelp = !this.hasResults;
+      },
+      mounted() {
+        if (this.hasResults) {
+          for (let i = 0, len = this.resultCount; i < len; ++i) {
+            const container = this.$refs[`container_${i}`];
+            this.resultsShowMore[i] = container.scrollHeight > container.offsetHeight
+          }
+        }
+      },
+      data: {
+        hasQuery: {{ query|js_translate|safe }},
+        hasResults: {{ results|js_translate:'bool'|safe }},
+        resultCount: {{ results|length|js_translate|safe }},
+        formErrors: {% if not errors %}null{% else %}[{% for error in errors %} '{{ error }}' {% endfor %}]{% endif %},
+        advancedMode: {{ advanced|js_translate|safe }},
+        showHelp: false,
+        showTooltips: false,
+        searchContext: null,
+        searchQuery: {{ form.0.query.value|js_translate|safe }},
+        clauses: clauses,
+        page: {{ form.management_form.PAGE.value }},
+        isPaginated: {{ paginated|js_translate|safe }},
+        paginator: {
+          {% if paginator %}
+            {% for key, value in paginator.items %}
+              {{ key }}: {{ value|js_translate|safe }},
+            {% endfor %}
+          {% endif %}
+        },
+        emptyRow: {
+          field_type: 'text',
+          join_type: 'must',
+          field: 'transcription',
+          query_type: 'match_phrase',
+          range_type: 'value',
+          field_value: null
+        },
+        resultsShowMore: {},
+      },
+      watch: {
+        showTooltips: "toggleTooltips",
+        page: function() { setTimeout(() => this.performSearch(), 0) },
+      },
+      computed: {
+        status_message() {
+          if (this.hasQuery) {
+            if (this.hasResults) {
+              if (this.isPaginated) {
+                return `Showing records ${this.paginator.result_start} to ${this.paginator.result_end} out of ${this.paginator.total_count} found.`
+              } else {
+                let noun = this.resultCount > 1 ? 'records' : 'record';
+                return `${this.resultCount} ${noun} found.`
+              }
+            } else {
+              return 'Your query returned no results.'
+            }
+          } else {
+            return 'Enter a query to search.'
+          }
+        },
+        fields_list() {
+          let field_list = [];
+          let field_names = Object.keys(this.searchContext.fields);
+          for (let i = 0, len = field_names.length ; i < len; ++i) {
+            field_list.push({
+              value: field_names[i],
+              text: this.searchContext.fields[field_names[i]].label
+            })
+          }
+          return field_list
+        },
+        management_total() {
+          return this.clauses.length;
+        },
+      },
+      methods: {
+        get_field_type(field) {
+          return this.searchContext.fields[field].type
+        },
+        toLowercase(value) {
+          return value.toLowerCase()
+        },
+        addRow(index) {
+          let row = { ...this.emptyRow };
+          this.clauses.splice(index + 1, 0, row);
+          setTimeout(() => this.toggleTooltips(), 10);
+        },
+        removeRow(index) {
+          if (index > 0) {
+            this.clauses.splice(index, 1);
+          }
+        },
+        clearSearch() {
+          let row = { ...this.emptyRow };
+          this.hasQuery = false;
+          this.hasResults = false;
+          this.formErrors = null;
+          this.searchQuery = null;
+          this.clauses = [row]
+          this.page = 1;
+          this.isPaginated = false;
+          let payload = {};
+          payload[this.searchContext['session_var']] = false;
+          window.CustomUtils.updateSession(payload);
+        },
+        performSearch() {
+          this.$refs.search_form.submit();
+        },
+        toggleTooltips() {
+          if (this.showTooltips) {
+            this.$root.$emit('bv::enable::tooltip');
+          } else {
+            this.$root.$emit('bv::disable::tooltip');
+          }
+        },
+        toggle_show_more(ref) {
+          const container = this.$refs[`container_${ref}`];
+          const button = this.$refs[`toggle_${ref}`];
+          const more = button.innerText == 'SHOW MORE';
+          button.innerText = more ? 'SHOW LESS' : 'SHOW MORE';
+          container.style.maxHeight = more ? '1000px' : '63px';
+        }
+      }
+    });
+  });
+  </script>
+{% endblock%}

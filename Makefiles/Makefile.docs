@@ -1,0 +1,43 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+
+docs.help:
+	@echo "  docs.render              output the documentation as html"
+	@echo "  docs.shell               shell into the docs container"
+	@echo "  docs.sync                compile the docs requirements file and rebuild the service"
+	@echo "  docs.write               run the documentation live-reload server"
+	@echo ""
+.PHONY: docs.help
+
+docs.render: _docs.clean
+	docker compose run --rm -T \
+		$(NAMESPACE).docs \
+		sphinx-build -b html -nW /opt/docs /opt/docs/_build/html
+.PHONY: docs.render
+
+docs.shell:
+	docker compose run --rm \
+		$(NAMESPACE).docs \
+		bash
+.PHONY: docs.shell
+
+docs.sync: _docs.build
+.PHONY: docs.sync
+
+docs.write:
+	open http://localhost:8002
+.PHONY: docs.write
+
+### Private (non-interface) targets.
+_docs.build:
+	docker compose up -d --no-deps --build $(NAMESPACE).docs
+.PHONY: _docs.build
+
+_docs.clean:
+	docker compose run --rm -T \
+		$(NAMESPACE).docs \
+		rm -rf /opt/docs/_build
+.PHONY: _docs.clean
+
+_docs.init: _docs.build
+.PHONY: _docs.init

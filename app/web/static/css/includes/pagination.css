@@ -1,0 +1,76 @@
+/* pagination */
+.pager {
+  font-size: 13px;
+  align-self: flex-end;
+  border-top: 1px solid #aaa;
+}
+.pagination {
+  margin: 0;
+  white-space: nowrap;
+  justify-content: center;
+}
+li.page-item {
+  padding: 0 !important;
+}
+.app nav li.page-item {
+  border-right: 1px solid #b3b3b370;
+}
+li.page-item button {
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  line-height: 1;
+  color: #6d6d6d;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  display: block;
+  height: 100%;
+}
+ul.pagination li.page-item button {
+  border: 1px solid #aaa;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-left: -1px;
+}
+li.page-item.disabled button:hover,
+li.page-item.disabled button {
+  background: none;
+  color: #ababab;
+  cursor: default;
+}
+ul.pagination li.page-item.disabled button:hover,
+ul.pagination li.page-item.disabled button {
+  background: none;
+  border-bottom-color: #aaa;
+}
+li.page-item button:hover {
+  background-color: #497bbb24;
+  color: #354d87;
+}
+li.page-item.active button,
+li.page-item.active button:hover {
+  background-color: #497bbb24;
+  color: #354d87;
+  cursor: default;
+  border-bottom-color: #aaa;
+}
+ul.pagination li.page-item button:hover {
+  background-color: #e6ecf6;
+  border-bottom-color: #354d87;
+}
+li.page-item button:focus,
+li.page-item button:active,
+li.page-item:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+ul.pagination > li.page-item:first-child button {
+  border-bottom-left-radius: 3px;
+}
+ul.pagination > li.page-item:last-child button {
+  border-bottom-right-radius: 3px;
+}

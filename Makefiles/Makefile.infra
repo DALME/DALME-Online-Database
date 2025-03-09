@@ -1,0 +1,112 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+
+infra.help:
+	@echo "  infra.bootstrap          ready the development environment"
+	@echo "  infra.log                tail the container logs"
+	@echo "  infra.media              take a downloaded S3 bucket and create a local media folder in the new format"
+	@echo "  infra.rebuild            rebuild the containers"
+	@echo "  infra.start              spin up the container network"
+	@echo "  infra.stop               stop the container network"
+	@echo ""
+.PHONY: infra.help
+
+infra.bootstrap:
+ifndef dump
+	$(error No local dump specified to restore. \
+		Usage: make bootstrap dump='dalme-20231025-T1698276955.dump')
+else
+	@$(MAKE) db.migrate
+	@$(MAKE) db.load dump='$(dump)'
+	@$(MAKE) app.migrate_data
+	@$(MAKE) app.manage args='tenant_command update_index --schema=dalme'
+endif
+.PHONY: infra.bootstrap
+
+infra.hooks.update:
+	$(VENV_BIN)/pre-commit autoupdate
+.PHONY: infra.hooks.update
+
+infra.log:
+	docker compose logs --follow
+.PHONY: infra.log
+
+# Copy s3 assets from a local dump to the media (uploads) folder.
+infra.media:
+ifndef folder
+	$(error No local folder specified to process. \
+		Usage: make infra.media folder='media/media')
+else
+	rm -rf ./app/www/media
+	mkdir ./app/www/media
+	mkdir ./app/www/media/dalme
+	mkdir ./app/www/media/dalme/images
+	mkdir ./app/www/media/pharmacopeias
+	mkdir ./app/www/media/pharmacopeias/images
+	mkdir ./app/www/media/pharmacopeias/documents
+	mkdir ./app/www/media/pharmacopeias/attachments
+	mkdir ./app/www/media/pharmacopeias/original_images
+	cp -Rp $(folder)/documents ./app/www/media/dalme/documents
+	cp -Rp $(folder)/attachments ./app/www/media/dalme/attachments
+	cp -Rp $(folder)/original_images ./app/www/media/dalme/original_images
+endif
+.PHONY: infra.media
+
+infra.rebuild:
+	docker compose up -d --build --force-recreate
+.PHONY: infra.rebuild
+
+infra.start:
+	docker compose up -d
+.PHONY: infra.start
+
+infra.stop:
+	docker compose stop
+.PHONY: infra.stop
+
+### Private (non-interface) targets.
+_infra.build:
+	docker compose up -d --build
+.PHONY: _infra.build
+
+_infra.env:
+	@$(MAKE) _infra.pg.check || $(MAKE) _infra.pg.warn
+	@$(MAKE) _infra.pyenv.check || $(MAKE) _infra.pyenv.warn
+	@$(MAKE) _infra.pyenv.local || $(MAKE) _infra.pyenv.install
+	pyenv exec python -m venv $(VENV)
+	$(VENV_BIN)/pip install --upgrade pip
+.PHONY: _infra.env
+
+_infra.hooks.install:
+	$(VENV_BIN)/pre-commit install
+.PHONY: _infra.hooks.install
+
+_infra.oidc.key:
+	if [ ! -f $(CONFIG)/oidc.key ]; \
+		then openssl genrsa -out $(CONFIG)/oidc.key 4096; fi;
+.PHONY: _infra.oidc.key
+
+_infra.pg.check:
+	@command -v 'postgres' >/dev/null 2>&1
+.PHONY: _infra.pg.check
+
+_infra.pg.warn:
+	$(error 'ERROR: Install postgres so psycopg can be compiled locally)
+.PHONY: _infra.pg.warn
+
+_infra.pyenv.check:
+	@command -v 'pyenv' >/dev/null 2>&1
+.PHONY: _infra.pyenv.check
+
+_infra.pyenv.local:
+	pyenv local $(PY)
+.PHONY: _infra.pyenv.local
+
+_infra.pyenv.install:
+	pyenv install $(PY)
+	@$(MAKE) _infra.pyenv.local
+.PHONY: _infra.pyenv.install
+
+_infra.pyenv.warn:
+	$(error 'ERROR: Install pyenv')
+.PHONY: _infra.pyenv.warn

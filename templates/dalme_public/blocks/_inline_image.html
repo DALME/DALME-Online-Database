@@ -1,8 +1,0 @@
-{% load wagtailimages_tags %}
-
-<div class="inline-image u-flex {{ value.alignment }}">
-  {% image value.image original %}
-  {% if value.show_caption and value.caption %}
-    <div class="caption">{{ value.caption }}</div>
-  {% endif %}
-</div>

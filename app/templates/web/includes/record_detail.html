@@ -1,0 +1,32 @@
+{% load get_record_details get_string_list wagtailroutablepage_tags %}
+
+{% get_record_details as record_data %}
+{% if record_data.record or record_data.record_collection %}
+  <div class="record-detail u-flex">
+    {% if record_data.record %}
+      <h3 class="u-small-caps-heading">RECORD</h3>
+      <div>
+        <a href="{{ record_data.url }}">
+          {{ record_data.name }}
+          {% if record_data.date %}
+            <span>| {{ record_data.date }}</span>
+          {% endif %}
+          {% if record_data.language %}
+            <span>| {{ data.language|get_string_list:'name' }}</span>
+          {% endif %}
+          {% if record_data.locale %}
+            <span>| {{ record_data.locale|get_string_list:'name,administrative_region,country.name|{} ({}, {})' }}</span>
+          {% endif %}
+        </a>
+      </div>
+    {% endif %}
+    {% if record_data.record_collection %}
+    <h3 class="u-small-caps-heading mt-4">COLLECTION</h3>
+    <div>
+      <a href="{{ record_data.collection_url }}">
+        {{ record_data.record_collection.name }}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+{% endif %}

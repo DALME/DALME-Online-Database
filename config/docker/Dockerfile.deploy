@@ -1,0 +1,71 @@
+# ; -*- mode: dockerfile;-*-
+# vim: set ft=dockerfile:
+FROM debian:bookworm-slim AS base
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl && \
+    apt-get clean
+
+FROM base AS iamlive
+ARG TARGETARCH
+ARG VERSION=v1.1.8
+RUN curl -Lo \
+  ./iamlive.tar.gz \
+  https://github.com/iann0036/iamlive/releases/download/$VERSION/iamlive-$VERSION-$(uname)-$TARGETARCH.tar.gz
+RUN tar -xzf iamlive.tar.gz
+RUN chmod +x iamlive.tar.gz
+RUN mv iamlive /usr/local/iamlive
+
+FROM base AS terragrunt
+ARG TARGETARCH
+ARG VERSION=v0.67.16
+RUN curl -Lo \
+  ./terragrunt \
+  https://github.com/gruntwork-io/terragrunt/releases/download/$VERSION/terragrunt_$(uname)_$TARGETARCH
+RUN chmod +x terragrunt
+RUN mv terragrunt /usr/local/terragrunt
+
+FROM base AS tfdocs
+ARG TARGETARCH
+ARG VERSION=v0.17.0
+RUN curl -Lo \
+  ./terraform-docs.tar.gz \
+  https://github.com/terraform-docs/terraform-docs/releases/download/$VERSION/terraform-docs-$VERSION-$(uname)-$TARGETARCH.tar.gz
+RUN tar -xzf terraform-docs.tar.gz
+RUN chmod +x terraform-docs
+RUN mv terraform-docs /usr/local/terraform-docs
+
+FROM base AS tfupdate
+ARG TARGETARCH
+# Omit the 'v' here as their release naming convention is asymmetrical.
+ARG VERSION=0.8.2
+RUN curl -Lo \
+  tfupdate.tar.gz \
+  https://github.com/minamijoyo/tfupdate/releases/download/v$VERSION/tfupdate_${VERSION}_$(uname)_$TARGETARCH.tar.gz
+RUN tar -xzf tfupdate.tar.gz
+RUN chmod +x tfupdate
+RUN mv tfupdate /usr/local/tfupdate
+
+FROM python:3.11-slim-bookworm AS tf
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    awscli \
+    bash \
+    git \
+    jq \
+    procps && \
+    apt-get clean
+COPY --from=hashicorp/terraform:1.8.3 /bin/terraform /usr/local/bin/terraform
+COPY --from=iamlive /usr/local/iamlive /usr/local/bin/iamlive
+COPY --from=terragrunt /usr/local/terragrunt /usr/local/bin/terragrunt
+COPY --from=tfdocs /usr/local/terraform-docs /usr/local/bin/terraform-docs
+COPY --from=tfupdate /usr/local/tfupdate /usr/local/bin/tfupdate
+COPY --from=aquasec/tfsec-ci:latest /usr/bin/tfsec /usr/local/bin/tfsec
+RUN pip install --user --no-cache-dir --upgrade pip
+RUN pip install --no-cache ecs-deploy
+WORKDIR /opt/tf
+ENV TF_CLI_CONFIG_FILE /opt/tf/.terraformrc
+COPY ./config/scripts/entrypoint.deploy.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

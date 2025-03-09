@@ -1,0 +1,122 @@
+.at-a-glance {
+  margin-bottom: 1rem;
+}
+.at-a-glance > ul {
+  display: flex;
+  flex-direction: column;
+}
+.at-a-glance p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+.at-a-glance h5 {
+  color: #8c8c8c;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.at-a-glance .languages {
+  flex-direction: column;
+  align-items: center;
+}
+.at-a-glance .languages ul {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: row-reverse;
+}
+.at-a-glance ul > li {
+  border-bottom: 1px dotted #9c9c9c;
+  padding: 0.75rem .5rem;
+}
+.at-a-glance .lang-lozenge {
+  align-self: flex-end;
+  background: #edf5fd;
+  color: #5f719c;
+  border: 1px solid #5f719c;
+  border-radius: 1.5rem;
+  font-size: 0.9rem;
+  padding: 0.1rem 0.5rem;
+  width: fit-content;
+  margin-left: 0.3rem;
+  white-space: nowrap;
+}
+.at-a-glance .lang-lozenge:not(:first-child) {
+  margin-top: 0.3rem;
+}
+.at-a-glance span.records {
+  line-height: 1;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #5f719c;
+}
+.histogram path.domain {
+  display: none;
+}
+.histogram .tick,
+.histogram .tick line {
+  display: none;
+}
+.histogram .popup-histogram .tick,
+.histogram .popup-histogram .tick line {
+  display: inline;
+}
+.at-a-glance .histogram {
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 0;
+}
+.popup-histogram {
+  align-self: center;
+  background: #5e5e5e;
+  box-shadow: 0 0 5px #7b7b7b;
+  margin-top: 12rem;
+  overflow: auto;
+  padding: 1rem;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+.popup-histogram path.domain {
+  display: none;
+}
+.popup-histogram .tick line {
+  display: none;
+}
+.popup-histogram .tick text {
+  cursor: default;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  .at-a-glance .languages {
+    align-items: flex-end;
+  }
+  .popup-histogram {
+    align-self: auto;
+    border-radius: 1rem;
+    margin-top: 0;
+    overflow: initial;
+    transform: initial;
+    width: auto;
+  }
+  .popup-histogram:before,
+  .popup-histogram:after {
+    bottom: 100%;
+    right: 70%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  .popup-histogram:before {
+    border-bottom-color: #5e5e5e;
+    border-width: 31px;
+  }
+  .popup-histogram:after {
+    border-bottom-color: #5e5e5e;
+    border-width: 30px;
+  }
+}

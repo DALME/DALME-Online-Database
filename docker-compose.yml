@@ -1,0 +1,197 @@
+services:
+  ida.dns:
+    image: dockurr/dnsmasq
+    container_name: ida.dns
+    networks:
+      - app-network
+    volumes:
+      - ./config/dnsmasq.conf:/etc/dnsmasq.conf
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "5335:5335/tcp"
+      - "5335:5335/udp"
+
+  ida.app:
+    image: ida.app:dev
+    container_name: ida.app
+    build:
+      context: ./
+      dockerfile: ./config/docker/Dockerfile.app
+      target: "development"
+    environment:
+      ENV_FILE: /opt/app/env.app
+      LOG_LEVEL: ERROR
+      OAUTH_CLIENT_ID: oauth.ida.development
+      OAUTH_CLIENT_SECRET: django-insecure-development-environment-oauth-client-secret
+      OIDC_RSA_PRIVATE_KEY: /opt/app/oidc.key
+      POSTGRES_DB: ida
+      POSTGRES_HOST: ida.db
+      POSTGRES_PASSWORD: ida
+      POSTGRES_USER: ida
+      DAM_DB_NAME: resourcespace
+      DAM_DB_HOST: rs.db
+      DAM_DB_PASSWORD: dalme
+      DAM_DB_USER: dalme
+    depends_on:
+      - ida.db
+    networks:
+      - app-network
+    volumes:
+      - ./app:/opt/app
+      - ./config/env.web.dev:/opt/app/env.app
+      - ./config/oidc.key:/opt/app/oidc.key
+      - ./notebooks:/opt/app/notebooks
+      - ./notebooks/ipython:/root/.ipython/profile_default
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    expose:
+      - "8001"
+      - "8888"
+
+  ida.ui:
+    image: ida.ui:dev
+    container_name: ida.ui
+    build:
+      context: ./
+      dockerfile: ./config/docker/Dockerfile.ui
+      target: "development"
+    environment:
+      NODE_ENV: development
+      VITE_INSPECT_ACTORS: "true"
+      VITE_OAUTH_CLIENT_ID: oauth.ida.development
+    volumes:
+      - ./ui/src:/opt/ui/src
+    networks:
+      - app-network
+    ports:
+      - "3000"
+
+  ida.db:
+    image: postgres:16-bookworm # This should always match the RDS version.
+    container_name: ida.db
+    environment:
+      POSTGRES_DB: ida
+      POSTGRES_USER: ida
+      POSTGRES_PASSWORD: ida
+      POSTGRES_HOST: ida.db
+    volumes:
+      - ./sql/dumps:/opt/db/dumps
+      - ./sql/postgresql:/docker-entrypoint-initdb.d
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    cap_add:
+      - SYS_NICE
+    expose:
+      - "5432"
+
+  ida.proxy:
+    image: nginx:mainline
+    container_name: ida.proxy
+    command: [ nginx-debug, "-g", "daemon off;" ]
+    depends_on:
+      - ida.app
+    volumes:
+      - "./config/nginx/development/nginx.conf:/etc/nginx/nginx.conf:ro"
+    networks:
+      - app-network
+    ports:
+      - "8000:80"
+      - "8888:8888"
+
+  ida.es:
+    image: elasticsearch:7.8.0
+    container_name: ida.es
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - app-network
+    ports:
+      - "9200:9200"
+
+  ida.deploy:
+    image: ida.deploy:dev
+    container_name: ida.deploy
+    build:
+      context: ./
+      dockerfile: ./config/docker/Dockerfile.deploy
+    volumes:
+      - ./tf:/opt/tf
+      - ~/.aws:/root/.aws:rw
+      - ~/.iamlive:/root/.iamlive:rw
+      - ~/.terraform.d:/root/.terraform.d:rw
+
+  ida.docs:
+    image: "ida.docs:dev"
+    container_name: ida.docs
+    build:
+      context: ./
+      dockerfile: "./config/docker/Dockerfile.docs"
+      target: "serve"
+    depends_on:
+      - ida.app
+    volumes:
+      - ./docs:/opt/docs
+    networks:
+      - app-network
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+
+  ida.pgadmin:
+    container_name: ida.pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - app-network
+    ports:
+      - "5050:80"
+
+  rs.db:
+    image: mysql:5.7.27
+    platform: "linux/amd64"
+    container_name: rs.db
+    environment:
+      MYSQL_DATABASE: resourcespace
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: dalme
+      MYSQL_PASSWORD: dalme
+      MYSQL_HOST: rs.db
+    volumes:
+      - ./config/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - ./sql/rs:/docker-entrypoint-initdb.d
+      - rsdata:/var/lib/mysql
+    networks:
+      - app-network
+    ports:
+      - "3306"
+    cap_add:
+      - SYS_NICE
+
+volumes:
+  esdata:
+  pgdata:
+  rsdata:
+  pgadmin-data:
+
+networks:
+  app-network:
+    driver: bridge

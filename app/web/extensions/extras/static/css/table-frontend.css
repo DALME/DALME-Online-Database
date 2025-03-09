@@ -1,0 +1,60 @@
+.block-table,
+.block-table_typed {
+  margin-bottom: 40px;
+}
+.block-table table,
+.block-table_typed table {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #aaaaaa;
+}
+.block-table thead,
+.block-table_typed thead {
+  background-color: #fafafa;
+}
+.block-table thead,
+.block-table tbody tr:not(:last-of-type),
+.block-table_typed thead,
+.block-table_typed tbody tr:not(:last-of-type) {
+  border-bottom: 1px solid #cfcdcd;
+}
+.block-table th,
+.block-table td,
+.block-table_typed th,
+.block-table_typed td {
+  font-size: 13px;
+  padding: 6px 25px;
+}
+.block-table th:not(:last-child),
+.block-table td:not(:last-child),
+.block-table_typed th:not(:last-child),
+.block-table_typed td:not(:last-child) {
+  border-right: 1px solid #cfcdcd;
+}
+.htRight {
+  text-align: right;
+}
+.htCenter {
+  text-align: center;
+}
+.htLeft {
+  text-align: left;
+}
+.htJustify {
+  text-align: justify;
+}
+.htMiddle {
+  vertical-align: middle;
+}
+.htBottom {
+  vertical-align: bottom;
+}
+.htTop {
+  vertical-align: top;
+}
+.block-table caption,
+.block-table_typed caption {
+  font-size: 14px;
+  text-align: center;
+}

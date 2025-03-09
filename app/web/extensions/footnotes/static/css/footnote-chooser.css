@@ -1,0 +1,23 @@
+/* footnote chooser */
+#footnote-dialogue {
+  bottom: 0;
+  inset-inline-end: 0;
+  inset-inline-start: 0;
+  overflow: auto;
+  overflow-y: scroll;
+  position: fixed;
+  top: 0;
+  z-index: 500;
+}
+.footnote-modal-body {
+  overflow: hidden;
+}
+.footnote-modal .base-modal-box {
+  min-width: 600px;
+}
+.footnote-modal .Draftail-Editor {
+  min-height: 150px;
+}
+#footnote-dialogue .modal-content {
+  box-shadow: none;
+}

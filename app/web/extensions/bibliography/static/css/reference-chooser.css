@@ -1,0 +1,15 @@
+/*import admin.css to get relevant rules e.g. select2 */
+@import "../css/admin.css";
+/* bibliography chooser */
+.w-field--zotero_collection_chooser_widget .w-field__input {
+  width: fit-content;
+}
+.reference-modal .base-modal-box {
+  min-width: 500px;
+}
+.reference-modal .csl-bib-body {
+  margin-bottom: .5rem;
+}
+.tooltip-entity-reference-icon {
+  height: .8em !important;
+}

@@ -1,0 +1,6 @@
+*.tfstate
+*.tfstate.backup
+.terraform
+.terragrunt-cache
+iamlive.out
+policy.json

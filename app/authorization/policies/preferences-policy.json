@@ -1,0 +1,21 @@
+[
+    {
+        "action": [
+            "list"
+        ],
+        "principal": [
+            "authenticated"
+        ],
+        "effect": "allow"
+    },
+    {
+        "action": [
+            "update",
+            "partial_update"
+        ],
+        "principal": [
+            "authenticated"
+        ],
+        "effect": "allow"
+    }
+]

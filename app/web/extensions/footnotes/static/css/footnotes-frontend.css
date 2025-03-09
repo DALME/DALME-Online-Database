@@ -1,0 +1,88 @@
+/* footnotes front end css */
+#footnote-container {
+  text-align: left;
+  padding: 0 1rem 4rem 1rem;
+}
+.footnote_list {
+  font-size: .85em;
+}
+.footnote_list hr {
+  margin-left: 0;
+  margin-bottom: 2em;
+  margin-top: 0;
+  width: 15em;
+  border-style: solid;
+  border-width: 1px 0 0 0;
+}
+.footnote-entry {
+  margin-bottom: 0.5rem;
+}
+.footnote-entry a {
+  color: #084094;
+  text-decoration: none;
+}
+.footnote-entry a:hover {
+  color: #084094;
+  border-bottom: 1px dotted #084094;
+}
+.footnote_list ol {
+  display: block;
+  padding-left: 1.25em;
+  margin: 0 0 2em 1em;
+  list-style-type: decimal;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+.footnote_list li {
+  display: list-item;
+  text-align: -webkit-match-parent;
+  list-style-type: decimal;
+  padding-left: 5px;
+}
+.footnote_list p {
+  margin: 0 0 0.5rem 0;
+  padding: 0 !important;
+  font-size: inherit;
+  line-height: 1.5;
+}
+.footnote-entry :nth-last-child(2) {
+  display: inline;
+}
+a.footnote_callout {
+  font-weight: 700;
+  color: #676666;
+  font-size: 12px;
+  vertical-align: super;
+}
+a.footnote_back_link {
+  border: 0;
+  padding: 3px 4px 2px 4px;
+  vertical-align: -.2em;
+  font-size: 1.2em;
+  line-height: 0px;
+  color: #989898;
+  display: inline;
+}
+a.footnote_back_link:hover,
+a.footnote_callout:hover {
+  color: #084094;
+  text-decoration: none;
+  border-bottom: none;
+}
+.footnote_list blockquote {
+  font-family: "PT Serif", "Times New Roman", serif;
+  line-height: 1.8;
+}
+/* .footnote_list blockquote:before {
+    content: "\301D";
+    font-size: 20px;
+    font-family: 'Asul';
+    position: relative;
+    top: 29px;
+    left: -45px;
+}
+.footnote_list blockquote:after {
+    content: "\301E";
+} */

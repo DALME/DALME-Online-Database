@@ -1,0 +1,130 @@
+#person-profile .avatar-frame {
+  border: 1px solid #9c9c9c;
+  padding: 5px;
+  border-radius: 6px;
+  background-color: #fdfdfd;
+  float: right;
+  margin-left: 25px;
+  margin-bottom: 20px;
+}
+#person-profile .headshot-bg {
+  width: 150px;
+  height: 200px;
+  margin-right: 0;
+  border: 1px solid #d0d0d0;
+}
+#person-profile .person-headshot.no-photo {
+  background-color: #efefef;
+  display: flex;
+  flex: 0 0 auto;
+}
+#person-profile .person-headshot.no-photo:after {
+  content: "\f007";
+  font-family: "Font Awesome 5 Free";
+  font-size: 4rem;
+  font-weight: 800;
+  margin: auto;
+  color: #e6e6e6;
+}
+#person-profile .person-name {
+  display: flex;
+}
+#person-profile .person-name > div {
+  font-family: "Lora", "Times New Roman", serif;
+  font-style: italic;
+  font-size: 2rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #06305d;
+  margin-left: -2px;
+  display: inline-flex;
+}
+#person-profile .person-title,
+#person-profile .person-affiliation {
+  color: #636363;
+  font-size: 17px;
+  line-height: 1.5;
+}
+#person-profile .person-roles {
+  margin: 15px 0;
+  border-top: 1px dotted #6098b7;
+  border-bottom: 1px dotted #6098b7;
+  max-width: calc(100% - 200px);
+  padding: 5px 10px;
+  color: #005880;
+  background-color: #ddf2ff;
+}
+#person-profile .person-url {
+  font-size: 18px;
+  align-self: center;
+  margin-left: 10px;
+  color: #6198b7;
+}
+#person-profile .person-url:hover {
+  color: #11587c;
+}
+#person-profile .person-biography {
+  margin-bottom: 20px;
+}
+#person-essays .item-container,
+#person-contributions .item-container {
+  display: flex;
+  flex-direction: row;
+  line-height: 1.3;
+  align-items: baseline;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  border-bottom: 1px dotted #e7e7e7;
+}
+#person-essays .item-container:last-of-type,
+#person-contributions .item-container:last-of-type {
+  margin-bottom: 20px;
+}
+#person-essays .item-container a,
+#person-contributions .item-container a {
+  font-family: "PT Serif", "Times New Roman", serif;
+  font-size: 18px;
+  font-style: oblique;
+  margin-right: auto;
+  max-width: 85%;
+  border-bottom: 1px dotted transparent;
+}
+#person-essays .item-container a:hover,
+#person-contributions .item-container a:hover {
+  color: #11587c;
+  border-bottom-color: #11587c;
+}
+#person-contributions .item-container a {
+  font-size: 16px;
+}
+#person-essays .item-container .item-year,
+#person-contributions .item-container .item-year,
+#person-essays .item-container .item-month,
+#person-contributions .item-container .item-month {
+  font-family: "Azeret Mono";
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05rem;
+}
+#person-essays .item-container .item-year,
+#person-contributions .item-container .item-year {
+  color: #e7f0f6;
+  width: 40px;
+}
+#person-essays .item-container .item-year.first,
+#person-contributions .item-container .item-year.first {
+  color: #57789c;
+}
+#person-essays .item-container .item-month,
+#person-contributions .item-container .item-month {
+  margin-right: 6px;
+  color: #92b9cf;
+}
+#person-contributions .item-container a span {
+  font-style: normal;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-family: 'Azeret Mono';
+  color: #9daa93;
+  font-weight: 600;
+}

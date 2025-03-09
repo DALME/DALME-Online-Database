@@ -1,0 +1,44 @@
+/* Subsection form */
+.subsection-container {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+.subsection-block {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.subsection-block div[data-contentpath="subsection"] {
+  flex-grow: 1;
+  margin-right: 40px;
+}
+.subsection-block div[data-contentpath="collapsed"],
+.subsection-block div[data-contentpath="minor_heading"] {
+  display: flex;
+  flex-direction: column;
+}
+.subsection-block div[data-contentpath="collapsed"] {
+  margin-right: 20px;
+}
+.subsection-block div[data-contentpath="collapsed"] > *,
+.subsection-block div[data-contentpath="minor_heading"] > * {
+  margin: 0;
+  padding: 0;
+}
+.subsection-block div[data-contentpath="collapsed"] .w-field__input,
+.subsection-block div[data-contentpath="minor_heading"] .w-field__input {
+  margin-top: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.subsection-block div[data-contentpath="collapsed"] .w-field__comment-button,
+.subsection-block div[data-contentpath="minor_heading"] .w-field__comment-button {
+  position: relative;
+  top: unset;
+  transform: none;
+  padding: .8rem .5rem;
+}
+.subsection-block div[data-contentpath="body"] {
+  flex-basis: 100%;
+}

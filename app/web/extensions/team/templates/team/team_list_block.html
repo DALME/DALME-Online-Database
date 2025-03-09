@@ -1,0 +1,28 @@
+{% load wagtailcore_tags wagtailimages_tags static %}
+
+<div class="column-container">
+    {% for member in self.member_list %}
+        <div class="u-flex">
+            <a href="#{{ member.name|slugify }}" class="anchor" aria-label="{{ member.name }} image">
+                {% if member.avatar_url %}
+                    <div class="headshot-bg" style="background: center / cover url({{ member.avatar_url }});"></div>
+                {% else %}
+                    <div class="headshot-bg no-photo"></div>
+                {% endif %}
+            </a>
+            <div class="person">
+                <h2>
+                    <a href="{{ settings.web.Settings.team_profiles_url }}{{ member.name|slugify }}/">{{ member.name }}</a>
+                </h2>
+                <p class="u-type-sans">
+                    {% if member.url %}
+                        <a href="{{ member.url }}">{{ member.title }}</a>
+                    {% else %}
+                        {{ member.title }}
+                    {% endif %}
+                </p>
+                <p class="u-type-sans">{{ member.affiliation }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>

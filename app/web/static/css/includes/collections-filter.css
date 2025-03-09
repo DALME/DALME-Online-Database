@@ -1,0 +1,33 @@
+nav.collections-filter ul {
+  flex-direction: column;
+}
+nav.collections-filter ul li {
+  text-align: center;
+  width: 100%;
+}
+nav.collections-filter ul li.searchbox {
+  margin-bottom: .4rem;
+}
+nav.collections-filter input {
+  border: 0;
+  border-bottom: 1px solid #9c9c9c;
+  font-size: 1rem;
+  padding: 0.3rem;
+  outline: none;
+  width: 50%;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  nav.collections-filter input {
+    margin-right: 0;
+    padding-right: 0;
+    width: 100%;
+    text-align: right;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  nav.collections-filter ul li {
+    text-align: right;
+  }
+}

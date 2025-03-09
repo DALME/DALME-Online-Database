@@ -1,0 +1,17 @@
+{% load render_image wagtailimages_tags %}
+
+{% if value.alignment == 'main' %}
+  <div class="main-image u-flex">
+{% else %}
+  <div class="inline-image u-flex {{ value.alignment }}" onclick="window.CustomUtils.toggleLightbox(this)">
+{% endif %}
+  {% render_image value as img %}
+  {{ img | safe }}
+  {% if value.show_caption %}
+    {% if value.use_file_caption and value.image.caption %}
+      <div class="caption">{{ value.image.caption }}</div>
+    {% elif value.caption %}
+      <div class="caption">{{ value.caption }}{{value.is_main}}</div>
+    {% endif %}
+  {% endif %}
+</div>

@@ -1,0 +1,45 @@
+<b-popover
+  :show.sync="showCitePanel"
+  target="cite-button"
+  :placement="popoverPlacement"
+  custom-class="form-popover"
+  v-cloak>
+  <div v-on-clickaway="closeCitePanel">
+  <div class="mb-2">
+      <div class="form-control h-auto" v-if="citation" v-html="formatted_citation" id="citation"></div>
+  </div>
+  <div class="form-button d-flex">
+      <b-dropdown
+        size="sm"
+        text="Change format"
+        class="flex-fill"
+        toggle-class="base-button">
+        <template v-for="style in styles">
+          <b-dropdown-divider v-if="style.divider"></b-dropdown-divider>
+          <b-dropdown-item
+            v-else
+            v-bind:class="{ active: template == style.name }"
+            @click="template = style.name">
+            ${style.label}
+          </b-dropdown-item>
+        </template>
+      </b-dropdown>
+      <b-button
+        id="clip_copy"
+        size="sm"
+        class="flex-fill base-button ml-1 mr-1"
+        data-clipboard-target="#citation"
+        @click="showCopiedTooltip">
+        Copy
+      </b-button>
+      <b-dropdown
+        size="sm"
+        text="Download"
+        class="flex-fill"
+        toggle-class="base-button">
+        <b-dropdown-item @click="downloadCitation('bibtex')">BibTeX</b-dropdown-item>
+        <b-dropdown-item @click="downloadCitation('ris')">RIS/Endnote</b-dropdown-item>
+      </b-dropdown>
+  </div>
+  </div>
+</b-popover>

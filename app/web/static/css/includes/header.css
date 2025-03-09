@@ -1,0 +1,91 @@
+header {
+  background: linear-gradient(59deg, #11587c 54.62%, #1b1b1b);
+  color: #fff;
+  /* box-shadow: 0 5px 20px -4px rgba(0, 0, 0, 0.8); */
+  box-shadow: 0 0 20px #000000c2;
+  background-position-y: top;
+}
+header a {
+  color: #fff;
+  text-decoration: none;
+  text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.85);
+}
+header a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+header hgroup {
+  text-shadow: 0 0 12pt rgba(0, 0, 0, 0.6);
+}
+header .title {
+  padding: 1rem;
+}
+header .title h2 {
+  display: none;
+}
+header > div {
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+header .title > h1 {
+  font-size: 2rem;
+  text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+header .title > h2 {
+  font-family: "PT Serif", "Times New Roman", serif;
+  margin-top: 0.5rem;
+  font-size: 1.3rem;
+  font-style: italic;
+  font-weight: 100;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  header:not(.home) .title {
+    background-color: #ffffff14;
+    backdrop-filter: blur(3px);
+    padding: 2rem;
+    -webkit-backdrop-filter: blur(3px);
+  }
+  header .title h2 {
+    display: block;
+  }
+  header .description p {
+    margin-right: 5rem;
+  }
+  header .title.collapsible {
+    padding: 1.5rem 2rem;
+  }
+  header .description {
+    padding: 1rem 2rem;
+  }
+  header .description > div {
+    flex-direction: row;
+  }
+  header .description ul {
+    margin: 0 0 0 2rem;
+  }
+}
+
+@media only screen and (min-width: 950px) {
+  header .title.collapsible {
+    padding: 1.5rem 4rem;
+  }
+  header .description {
+    padding: 1rem 4em;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  header .title > .title-wrapper,
+  header .description > div,
+  header .description .credit {
+    width: 100%;
+  }
+  header .description > div > p {
+    margin-right: auto;
+    width: 40%;
+  }
+}

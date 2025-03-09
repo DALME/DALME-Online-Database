@@ -1,0 +1,54 @@
+nav.breadcrumbs {
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 0.5rem 1rem;
+}
+nav.breadcrumbs ul {
+  list-style-type: none;
+  margin: 0;
+  overflow: auto;
+  padding: 0;
+  white-space: nowrap;
+}
+nav.breadcrumbs ul li {
+  display: inline-block;
+  margin: 0 0 0 0.5rem;
+}
+nav.breadcrumbs ul li:not(:last-child)::after {
+  content: "\f0da";
+  font-family: "Font Awesome 5 Free";
+  font-size: 0.8rem;
+  font-weight: 900;
+  padding-left: 0.3rem;
+  margin-left: 0.5rem;
+}
+nav.breadcrumbs ul li {
+  color: #ddd;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.85);
+}
+nav.breadcrumbs ul li.home {
+  margin: 0;
+}
+nav.breadcrumbs ul li a {
+  color: #ddd;
+  cursor: pointer;
+}
+nav.breadcrumbs ul li a:hover {
+  color: #fff;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  nav.breadcrumbs {
+    padding: 0.5rem 2rem;
+  }
+}
+
+@media only screen and (min-width: 950px) {
+  nav.breadcrumbs {
+    padding: 0.5rem 4rem;
+  }
+}

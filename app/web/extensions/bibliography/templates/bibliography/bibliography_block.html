@@ -1,0 +1,12 @@
+<beat-loader
+  v-if="!collections.{{ value.id }}"
+  :loading="!collections.{{ value.id }}"
+  color="#aaa">
+</beat-loader>
+<div
+  class="bibliography-container"
+  data-collection="{{ value.id }}"
+  v-show="collections.{{ value.id }}"
+  v-html="collections.{{ value.id }}"
+  v-cloak>
+</div>

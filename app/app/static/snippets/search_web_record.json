@@ -1,0 +1,81 @@
+{
+  "transcription": {
+    "label": "Transcription",
+    "type": "text",
+    "placeholder": "Type one or more words",
+    "child_relationship": "WebFolio",
+    "highlight": {
+      "number_of_fragments": 10
+    }
+  },
+  "collections.name.keyword": {
+    "label": "Collection",
+    "type": "keyword",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
+  "credits.agent": {
+    "label": "Credits",
+    "type": "text",
+    "placeholder": "Type one or more names",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
+  "attributes.date": {
+    "label": "Date",
+    "type": "date",
+    "placeholder": "Type a date in a standard format, e.g. YYYY-MM-DD or MM/DD/YYYY",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
+  "attributes.description": {
+    "label": "Description",
+    "type": "text",
+    "placeholder": "Type one or more words",
+    "highlight": {
+      "number_of_fragments": 2,
+      "type": "plain"
+    }
+  },
+  "attributes.language.keyword": {
+    "label": "Language",
+    "type": "keyword",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
+  "attributes.locale": {
+    "label": "Location",
+    "type": "text",
+    "placeholder": "Type one or more placenames",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
+  "parent": {
+    "label": "Parent",
+    "type": "text",
+    "placeholder": "Type one or more words",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
+  "name": {
+    "label": "Record name",
+    "type": "text",
+    "placeholder": "Type one or more words",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
+  "attributes.record_type.keyword": {
+    "label": "Record type",
+    "type": "keyword",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  }
+}

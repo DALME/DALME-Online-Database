@@ -1,0 +1,17 @@
+*store-flag.d.ts
+.DS_Store
+.quasar
+.thumbs.db
+/dist
+/quasar.config.*.temporary.compiled*
+/src-capacitor/node_modules
+/src-capacitor/www
+/src-cordova/node_modules
+/src-cordova/platforms
+/src-cordova/plugins
+/src-cordova/www
+coverage/
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
