@@ -213,7 +213,7 @@ jobs:
       always() &&
       !failure() &&
       !cancelled() &&
-      github.event.pull_request.merged &&
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true) &&
       needs.should-provision-tf.outputs.apply == 'true'
     steps:
       - uses: actions/checkout@v4
