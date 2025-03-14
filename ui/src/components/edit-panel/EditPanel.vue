@@ -1,6 +1,7 @@
 <template>
   <q-expansion-item
     label="Editing tools"
+    class="edit-panel-item"
     header-class="drawer_expansion_header"
     expand-icon="mdi-plus-box-outline"
     expanded-icon="mdi-minus-box-outline"
@@ -121,6 +122,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.edit-panel-item {
+  margin-top: 8px;
+  border-top: 1px solid var(--dark-border-base-colour);
+}
+/* OLD CSS */
 .edit-panel-strip {
   display: flex;
   flex-direction: row;
