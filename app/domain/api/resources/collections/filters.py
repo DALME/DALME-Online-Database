@@ -10,4 +10,4 @@ class CollectionFilter(filters.FilterSet):
 
     class Meta:
         model = Collection
-        fields = ['name', 'is_published', 'is_corpus']
+        fields = ['name', 'is_published', 'is_corpus', 'owner']

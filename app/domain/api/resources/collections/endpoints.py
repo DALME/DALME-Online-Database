@@ -30,15 +30,6 @@ class Collections(BaseViewSet):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
     filterset_class = CollectionFilter
-    filterset_fields = [
-        'id',
-        'name',
-        'use_as_workset',
-        'is_corpus',
-        'is_published',
-        'owner',
-        'owner__full_name',
-    ]
     search_fields = ['name', 'owner__full_name']
     ordering_fields = ['name', 'is_published', 'owner', 'owner__first_name', 'member_count']
     ordering_aggregates = {
