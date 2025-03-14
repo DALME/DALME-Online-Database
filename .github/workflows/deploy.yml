@@ -1,8 +1,6 @@
 name: Deploy
 on:
   workflow_dispatch:
-    branches:
-      - ocp/development.v2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,11 +9,11 @@ concurrency:
 env:
   NAMESPACE: ida
   ROLE: gha-oidc-role
-  ACCOUNT: ${{ github.repository_owner == 'DALME' && 701541878387 || 905418315284 }}
-  ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+  ACCOUNT: ${{ github.repository_owner == 'DALME' && 905418315284 || 905418315284 }}
+  ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
   REGION: us-east-1
   ROLE_SESSION: GithubActionsOIDCDeploy
-  TAG: ${{ github.ref_name == 'main' && 'latest' || 'staging' }}
+  TAG: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
   TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache/.tflint.d/plugins
   TF_ROOT: ./tf
   TF_VERSION: 1.6
@@ -145,7 +143,7 @@ jobs:
       - id: parse-oauth-client-id
         uses: mathiasvr/command-output@v2.0.0
         env:
-          OAUTH_CLIENT_ID: ${{ github.ref_name == 'main' && secrets.OAUTH_CLIENT_ID_PRODUCTION || secrets.OAUTH_CLIENT_ID_STAGING }}
+          OAUTH_CLIENT_ID: ${{ github.ref_name == 'master' && secrets.OAUTH_CLIENT_ID_PRODUCTION || secrets.OAUTH_CLIENT_ID_STAGING }}
         with:
           run: |
             echo "${{ env.OAUTH_CLIENT_ID }}.${{ env.NAMESPACE }}.${{ env.ENVIRONMENT }}"

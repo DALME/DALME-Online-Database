@@ -15,7 +15,7 @@ concurrency:
 env:
   NAMESPACE: ida
   ENVIRONMENT: >
-    ${{ github.repository_owner == 'DALME' && github.ref_name == 'master' && 'production' || github.repository_owner == 'ocp' && github.ref_name == 'ocp/development.v2' && 'staging' || 'staging' }}
+    ${{ github.ref_name == 'master' && 'production' || github.ref_name == 'development.v2' && 'staging' || 'staging' }}
   CI_TAG: dev
   MYSQL_DB: test_db
   MYSQL_USER: root
