@@ -1,7 +1,11 @@
 name: Integrate
 on:
   push:
+    branches:
+      - development.v2
   pull_request:
+    branches:
+      - development.v2
     types:
       - opened
       - reopened
