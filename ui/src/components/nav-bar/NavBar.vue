@@ -30,8 +30,8 @@
 
       <q-space />
 
-      <div class="q-mr-xs dalme-logotype">
-        <strong>DALME</strong><span class="dalme-logotype-db">DB</span>
+      <div class="q-mr-xs ida-logotype">
+        <strong>IDA</strong><span class="ida-logotype-db">DB</span>
       </div>
 
       <q-btn
@@ -41,7 +41,7 @@
         no-caps
         class="tb-button q-mx-md tb-search-button"
       >
-        <ToolTip>Search DALME.</ToolTip>
+        <ToolTip>Search IDA.</ToolTip>
       </q-btn>
 
       <q-separator vertical dark class="q-mr-md" />
@@ -378,11 +378,11 @@ export default defineComponent({
   align-self: center;
   background: rgb(51, 67, 84);
 }
-.dalme-logotype {
+.ida-logotype {
   color: rgb(119, 142, 172);
   font-size: 16px;
 }
-.dalme-logotype-db {
+.ida-logotype-db {
   color: rgb(97, 115, 139);
   margin-left: 5px;
 }
