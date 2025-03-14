@@ -130,7 +130,26 @@ class SearchEnabled(RoutablePageMixin, BasePage):
     @path('records/<uuid:pk>/', name='record')
     @path('records/<uuid:pk>/<str:folio>/', name='record_folio')
     def record(self, request, pk, folio=None, scoped=True):  # noqa: ARG002
-        qs = Record.objects.include_attrs('record_type', 'description', 'locale', 'language').filter(pk=pk)
+        qs = (
+            Record.objects.include_attrs(
+                'record_type',
+                'description',
+                'locale',
+                'language',
+                'date',
+            )
+            .select_related(
+                'parent_type',
+                'owner',
+                'workflow',
+            )
+            .prefetch_related(
+                'parent',
+                'pages',
+            )
+            .filter(pk=pk)
+        )
+
         if not qs.exists():
             raise Http404
 

@@ -16,8 +16,24 @@ def get_record_details(context):
     result = {}
 
     if record:
-        record = Record.objects.include_attrs('record_type', 'description', 'locale', 'language', 'date').get(
-            pk=record.id
+        record = (
+            Record.objects.include_attrs(
+                'record_type',
+                'description',
+                'locale',
+                'language',
+                'date',
+            )
+            .select_related(
+                'parent_type',
+                'owner',
+                'workflow',
+            )
+            .prefetch_related(
+                'parent',
+                'pages',
+            )
+            .get(pk=record.id)
         )
         data = RecordSerializer(record, field_set=['web', 'web_detail']).data
         result.update(

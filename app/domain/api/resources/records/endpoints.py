@@ -61,10 +61,54 @@ class Records(BaseViewSet):
     permission_classes = [RecordAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope & RecordAccessPolicy]
 
-    queryset = Record.objects.all()
     serializer_class = RecordSerializer
     filterset_class = RecordFilter
     search_fields = ['name', 'short_name']
+
+    def get_queryset(self):
+        if self.action == 'list':
+            qs = (
+                Record.objects.include_attrs(
+                    'date',
+                    'locale',
+                    'language',
+                )
+                .select_related(
+                    'parent_type',
+                    'owner',
+                    'workflow',
+                )
+                .prefetch_related(
+                    'parent',
+                    'pages',
+                    'collections',
+                    'attributes',
+                    'comments',
+                )
+                .all()
+            )
+
+        elif self.action == 'retrieve':
+            qs = (
+                Record.unattributed.select_related(
+                    'parent_type',
+                    'owner',
+                    'workflow',
+                )
+                .prefetch_related(
+                    'parent',
+                    'pages',
+                    'collections',
+                    'attributes',
+                    'comments',
+                )
+                .all()
+            )
+        elif self.options_view:
+            qs = Record.unattributed.all()
+        else:
+            qs = Record.objects.all()
+        return qs
 
     @action(detail=True, methods=['post', 'get'])
     def get_manifest(self, request, *args, **kwargs):  # noqa: ARG002
@@ -104,7 +148,22 @@ class Records(BaseViewSet):
 class WebRecords(Records):
     """API endpoint for managing records for frontend apps."""
 
-    queryset = Record.objects.filter(workflow__is_public=True)
+    queryset = (
+        Record.objects.include_attrs(
+            'record_type',
+            'description',
+            'date',
+        )
+        .select_related(
+            'owner',
+            'workflow',
+        )
+        .prefetch_related(
+            'pages',
+            'collections',
+        )
+        .filter(workflow__is_public=True)
+    )
     permission_classes = [WebAccessPolicy]
     pagination_class = CustomPageNumberPagination
     renderer_classes = [CamelCaseJSONRenderer]
