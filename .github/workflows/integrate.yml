@@ -1,0 +1,471 @@
+name: Integrate
+on:
+  push:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NAMESPACE: ida
+  ENVIRONMENT: >
+    ${{ github.ref_name == 'master' && 'production' || github.ref_name == 'development.v2' && 'staging' || 'staging' }}
+  CI_TAG: dev
+  MYSQL_DB: test_db
+  MYSQL_USER: root
+  MYSQL_PASSWORD: root
+  MYSQL_HOST: 127.0.0.1
+  PYTHON: 3.11
+  SKIP_APP: |
+    eslint,prettier,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
+  SKIP_TF: |
+    ruff,ruff-format,eslint,prettier,docs
+  SKIP_UI: |
+    ruff,ruff-format,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
+  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache/.tflint.d/plugins
+  TF_ROOT: ./tf
+  TF_VERSION: 1.6
+  TG_VERSION: 0.67.16
+
+permissions:
+  contents: read
+  id-token: write  # OIDC permission.
+  pull-requests: write
+
+jobs:
+  integrate_app:
+    name: 'Integrate App'
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ida
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_INITDB_ARGS: --no-sync
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON }}
+
+      - name: MySQL Start
+        run: sudo /etc/init.d/mysql start
+
+      - name: MySQL Service
+        run: >
+          mysql -e 'CREATE DATABASE ${{ env.MYSQL_DB }};'
+          -u${{ env.MYSQL_USER }}
+          -p${{ env.MYSQL_PASSWORD }}
+          -h${{ env.MYSQL_HOST }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.app
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=app.base
+          cache-to: |
+            type=gha,scope=app.base,mode=max
+          target: base
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.app
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=app.dev-reqs
+            type=gha,scope=app.base
+          cache-to: |
+            type=gha,scope=app.dev-reqs,mode=max
+          target: dev-reqs
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.app
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=app.install-dev
+            type=gha,scope=app.dev-reqs
+            type=gha,scope=app.base
+          cache-to: |
+            type=gha,scope=app.install-dev,mode=max
+          target: install-dev
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.app
+          build-args: |
+            DAM_DB_NAME=${{ env.MYSQL_DB }}
+            DAM_DB_USER=${{ env.MYSQL_USER }}
+            DAM_DB_PASSWORD=${{ env.MYSQL_PASSWORD }}
+            DAM_DB_HOST=${{ env.MYSQL_HOST }}
+            'DAM_DB_PORT=${{ job.services.mysql.ports[3306] }}'
+            POSTGRES_DB=${{ env.NAMESPACE }}
+            POSTGRES_USER=postgres
+            POSTGRES_PASSWORD=postgres
+            POSTGRES_HOST=172.17.0.1
+            'POSTGRES_PORT=${{ job.services.postgres.ports[5432] }}'
+          load: true
+          push: false
+          cache-from: |
+            type=gha,scope=app.ci
+            type=gha,scope=app.install-dev
+            type=gha,scope=app.dev-reqs
+            type=gha,scope=app.base
+          cache-to: |
+            type=gha,scope=app.ci,mode=max
+          target: ci
+          tags: ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
+
+      - uses: pre-commit/action@v3.0.0
+        env:
+          SKIP: ${{ env.SKIP_APP }}
+
+      - name: Test
+        run: >
+          docker run --rm
+          -e DJANGO_CONFIGURATION='CI'
+          ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
+          pytest --cov=. --cov-report=term-missing --hypothesis-show-statistics
+
+  integrate_ui:
+    name: 'Integrate UI'
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.ui
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=ui.base
+          cache-to: |
+            type=gha,scope=ui.base,mode=max
+          target: base
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.ui
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=ui.reqs
+            type=gha,scope=ui.base
+          cache-to: |
+            type=gha,scope=ui.reqs,mode=max
+          target: reqs
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.ui
+          load: true
+          push: false
+          cache-from: |
+            type=gha,scope=ui.ci
+            type=gha,scope=ui.reqs
+            type=gha,scope=ui.base
+          cache-to: |
+            type=gha,scope=ui.ci,mode=max
+          target: ci
+          tags: ${{ env.NAMESPACE }}.ui:${{ env.CI_TAG }}
+
+      - uses: pre-commit/action@v3.0.0
+        env:
+          SKIP: ${{ env.SKIP_UI }}
+
+      - name: Test
+        run: >
+          docker run --rm ${{ env.NAMESPACE }}.ui:${{ env.CI_TAG }}
+          yarn test:unit:ci
+
+  integrate_docs:
+    name: 'Integrate Docs'
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=docs.base
+          cache-to: |
+            type=gha,scope=docs.base,mode=max
+          target: base
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=docs.reqs
+            type=gha,scope=docs.base
+          cache-to: |
+            type=gha,scope=docs.reqs,mode=max
+          target: reqs
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=docs.install
+            type=gha,scope=docs.reqs
+            type=gha,scope=docs.base
+          cache-to: |
+            type=gha,scope=docs.install,mode=max
+          target: install
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=docs.render
+            type=gha,scope=docs.install
+            type=gha,scope=docs.reqs
+            type=gha,scope=docs.base
+          target: render
+
+  integrate_terraform:
+    name: 'Integrate Terraform'
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: create-caches
+        run: |
+          mkdir -p ~/${{ env.TFLINT_PLUGIN_CACHE }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/${{ env.TFLINT_PLUGIN_CACHE }}
+          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('tf/.tflint.hcl') }}
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.deploy
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=terraform.base
+          cache-to: |
+            type=gha,scope=terraform.base,mode=max
+          target: base
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.deploy
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=terraform.iamlive
+            type=gha,scope=terraform.base
+          cache-to: |
+            type=gha,scope=terraform.iamlive,mode=max
+          target: iamlive
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.deploy
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=terraform.terragrunt
+            type=gha,scope=terraform.iamlive
+            type=gha,scope=terraform.base
+          cache-to: |
+            type=gha,scope=terraform.terragrunt,mode=max
+          target: terragrunt
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.deploy
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=terraform.tfdocs
+            type=gha,scope=terraform.terragrunt
+            type=gha,scope=terraform.iamlive
+            type=gha,scope=terraform.base
+          cache-to: |
+            type=gha,scope=terraform.tfdocs,mode=max
+          target: tfdocs
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.deploy
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=terraform.tfupdate
+            type=gha,scope=terraform.tfdocs
+            type=gha,scope=terraform.terragrunt
+            type=gha,scope=terraform.iamlive
+            type=gha,scope=terraform.base
+          cache-to: |
+            type=gha,scope=terraform.tfupdate,mode=max
+          target: tfupdate
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.deploy
+          load: true
+          push: false
+          cache-from: |
+            type=gha,scope=terraform.tf
+            type=gha,scope=terraform.tfupdate
+            type=gha,scope=terraform.tfdocs
+            type=gha,scope=terraform.terragrunt
+            type=gha,scope=terraform.iamlive
+            type=gha,scope=terraform.base
+          cache-to: |
+            type=gha,scope=terraform.tf,mode=max
+          target: tf
+          tags: ${{ env.NAMESPACE }}.deploy
+
+      - uses: pre-commit/action@v3.0.0
+        env:
+          SKIP: ${{ env.SKIP_TF }}
+          IN_CI: 1
+
+      # Necessary for the runner to have permissions to remove certain cached
+      # files created by the container in the course of the run.
+      - id: chown-globbed
+        run: >
+          sudo chown -R $USER:$USER
+          ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}
+
+  # If you've setup the github app integration for infracost on your
+  # organization then there's no need to run this job as well, so adjust
+  # the repository owner check below to suit your needs (we can't use an
+  # env value in an if statement unfortunately to make this clearer). See:
+  # https://www.infracost.io/docs/integrations/github_app/
+  # infracost:
+  #   name: 'Infracost'
+  #   if: >
+  #     github.repository_owner != 'ocp' &&
+  #     github.event_name == 'pull_request' &&
+  #     github.event.pull_request.draft == false
+  #   runs-on: ubuntu-latest
+  #   needs: integrate_terraform
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: '${{ github.event.pull_request.base.ref }}'
+
+  #     # If you use private modules, add an environment variable or secret
+  #     # called GIT_SSH_KEY with your private key, so Infracost can access
+  #     # private repositories.
+  #     # - name: add GIT_SSH_KEY
+  #     #   run: |
+  #     #     ssh-agent -a /tmp/ssh_agent.sock
+  #     #     mkdir -p ~/.ssh
+  #     #     echo '${{ secrets.GIT_SSH_KEY }}' | tr -d '\r' | ssh-add -
+  #     #     ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+  #     - uses: infracost/actions/setup@v2
+  #       with:
+  #         api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+  #     - run: >
+  #         infracost breakdown
+  #         --path=${{ env.TF_ROOT }}
+  #         --format=json
+  #         --out-file=/tmp/infracost-base.json
+
+  #     - uses: actions/checkout@v4
+
+  #     - run: >
+  #         infracost diff
+  #         --path=${{ env.TF_ROOT }}
+  #         --format=json
+  #         --compare-to=/tmp/infracost-base.json
+  #         --out-file=/tmp/infracost.json
+
+  #     # Posts a comment to the PR using the 'update' behavior.
+  #     # This creates a single comment and updates it. The 'quietest' option.
+  #     # The other valid behaviors are:
+  #     #   delete-and-new - Delete previous comments and create a new one.
+  #     #   hide-and-new - Minimize previous comments and create a new one.
+  #     #   new - Create a new cost estimate comment on every push.
+  #     # See https://www.infracost.io/docs/features/cli_commands/#comment-on-pull-requests for other options.
+  #     - run: >
+  #         infracost comment github
+  #         --path=/tmp/infracost.json
+  #         --repo=$GITHUB_REPOSITORY
+  #         --github-token=${{ github.token }}
+  #         --pull-request=${{ github.event.pull_request.number }}
+  #         --behavior=hide-and-new
