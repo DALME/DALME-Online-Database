@@ -9,7 +9,7 @@ locals {
   gha_oidc_role_name = local.env.locals.gha_oidc_role_name
   lock_table         = local.env.locals.lock_table
   oidc_allowed = [
-    { org = "ocp", repo = "DALME-Online-Database", branch = "ocp/development.v2" },
+    { org = "DALME", repo = "DALME-Online-Database", branch = "development.v2" },
   ]
 }
 
