@@ -8,9 +8,7 @@
       <q-list padding class="drawer-menu-list full-height col q-pb-none">
         <q-item dense class="no-shrink">
           <q-item-section avatar>
-            <q-avatar square color="white" size="34px">
-              <img src="~assets/dalme_logo.svg" alt="IDA" />
-            </q-avatar>
+            <IDALogo size="60px" fill="#83adcb" stroke-color="#fff" stroke-width="0px" />
           </q-item-section>
           <q-item-section>
             <q-item-label class="text-weight-bold">IDA DB</q-item-label>
@@ -77,13 +75,14 @@
 import { computed, defineComponent } from "vue";
 import { useStores } from "@/use";
 import { navRoutes } from "@/router";
-import { CollectionsManager, EditPanel, ToolTip } from "@/components";
+import { CollectionsManager, EditPanel, IDALogo, ToolTip } from "@/components";
 
 export default defineComponent({
   name: "AppDrawer",
   components: {
     CollectionsManager,
     EditPanel,
+    IDALogo,
     ToolTip,
   },
   setup() {
@@ -110,21 +109,20 @@ export default defineComponent({
   margin: 0;
   border: none;
 }
-.custom-drawer.app-drawer .q-list .q-expansion-item:nth-child(2) {
-  margin-top: 8px;
-}
 .custom-drawer.app-drawer .q-expansion-item:last-of-type .q-item:last-of-type {
   margin-bottom: 12px;
 }
 .text-off-blue {
   color: #6a90b2;
 }
-.custom-drawer.app-drawer .collection-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 220px;
+.app-drawer-nav {
+  border-top: 1px solid var(--dark-border-base-colour);
 }
-.q-item.collection-tile .q-item__label {
-  display: flex;
+.ida-logo-path {
+  fill: white !important;
+}
+.ida-logo-poly {
+  fill: white !important;
+  stroke: transparent !important;
 }
 </style>

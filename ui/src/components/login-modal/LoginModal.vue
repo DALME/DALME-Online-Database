@@ -182,15 +182,6 @@ export default defineComponent({
   margin-top: 10%;
   margin-bottom: auto;
 }
-.dalme-logo-image {
-  align-self: center;
-  width: 16rem;
-  filter: grayscale(1) invert(1);
-  transform: rotate(-35deg);
-  opacity: 0.4;
-  position: relative;
-  top: -10%;
-}
 .ida-logo-image {
   align-self: center;
   width: 100%;
