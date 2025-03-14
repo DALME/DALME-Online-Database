@@ -1,0 +1,86 @@
+.box-arrow::before {
+    content: "";
+    position: absolute;
+    border-width: 12px;
+    border-style: solid;
+    border-top-color: transparent;
+    border-right-color: inherit;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    top: calc(50% - 12px);
+    left: -25px;
+}
+
+.box-arrow:not(.top)::after {
+    content: "";
+    position: absolute;
+    border-width: 12px;
+    border-style: solid;
+    border-top-color: transparent;
+    border-right-color: var(--light-bg-base-colour);
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    top: calc(50% - 12px);
+    left: -24px;
+}
+
+.box-arrow.dark::after {
+    border-right-color: var(--dark-bg-base-colour);
+}
+
+.box-arrow.top::before {
+    top: 8px;
+}
+
+.box-arrow.top::after {
+    top: 8px;
+}
+
+.box-arrow.right::before {
+    border-right-color: transparent;
+    border-left-color: inherit;
+    left: unset;
+    right: -25px;
+}
+
+.box-arrow.right::after {
+    border-right-color: transparent;
+    border-left-color: var(--light-bg-base-colour);
+    left: unset;
+    right: -24px;
+}
+
+.box-arrow.right.dark::after {
+    border-left-color: var(--dark-bg-base-colour);
+}
+
+
+.box-small-arrow::before {
+    content: "";
+    position: absolute;
+    border-width: 8px;
+    border-style: solid;
+    border-top-color: inherit;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    left: 15px;
+    bottom: -17px;
+}
+
+.box-small-arrow::after {
+    content: "";
+    position: absolute;
+    border-width: 8px;
+    border-style: solid;
+    border-top-color: var(--light-bg-base-colour);
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    left: 15px;
+    bottom: -16px;
+}
+
+.box-small-arrow.dark::after {
+    border-top-color: var(--dark-bg-base-colour)
+}
