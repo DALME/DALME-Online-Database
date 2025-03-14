@@ -1,5 +1,5 @@
 <template>
-  <div class="full-width full-height q-px-content-visual">
+  <div class="full-width full-height">
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">

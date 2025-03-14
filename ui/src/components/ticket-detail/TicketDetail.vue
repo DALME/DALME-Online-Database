@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!loading && !isEmpty(ticket)" class="full-width full-height q-px-content-visual">
+  <div v-if="!loading && !isEmpty(ticket)" class="full-width full-height">
     <div class="info-area row">
       <div class="col-grow">
         <div class="row items-center text-h5">
