@@ -101,7 +101,7 @@ export default defineComponent({
     const minZoomLevel = ref(0.5);
     const maxZoomLevel = ref(8);
     const defaultZoomLevel = computed(() =>
-      currentPageData.value.viewerZoom ? currentPageData.value.viewerZoom : 0,
+      currentPageData.value.viewerZoom ? currentPageData.value.viewerZoom : 1,
     );
 
     const zoom = (type) => {
@@ -288,6 +288,7 @@ export default defineComponent({
   border-right: 1px solid #919191;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
+  transition: height 0.2s ease-in-out;
 }
 .q-splitter--vertical #viewer-container {
   border-right: none;
