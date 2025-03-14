@@ -20,15 +20,15 @@ export const useSettingsStore = defineStore(
     const teiReady = computed(() => teiElementData.value.length > 0);
     const options = {
       themeOptions: [
-        { value: "atomone", label: "AtomOne (dark)" },
-        { value: "bbedit", label: "BBEdit (light)" },
-        { value: "duotoneDark", label: "Duotone (dark)" },
-        { value: "duotoneLight", label: "Duotone (light)" },
-        { value: "githubDark", label: "GitHub (dark)" },
-        { value: "githubLight", label: "GitHub (light)" },
-        { value: "oneDark", label: "OneDark (dark)" },
-        { value: "vscodeDark", label: "VSCode (dark)" },
-        { value: "vscodeLight", label: "VSCode (light)" },
+        { value: "atomone", label: "AtomOne (dark)", bg: "#272C35" },
+        { value: "bbedit", label: "BBEdit (light)", bg: "#ffffff" },
+        { value: "duotoneDark", label: "Duotone (dark)", bg: "#2a2734" },
+        { value: "duotoneLight", label: "Duotone (light)", bg: "#faf8f5" },
+        { value: "githubDark", label: "GitHub (dark)", bg: "#0d1117" },
+        { value: "githubLight", label: "GitHub (light)", bg: "#ffffff" },
+        { value: "oneDark", label: "OneDark (dark)", bg: "#282c34" },
+        { value: "vscodeDark", label: "VSCode (dark)", bg: "#1e1e1e" },
+        { value: "vscodeLight", label: "VSCode (light)", bg: "#ffffff" },
       ],
       fontSizeOptions: { min: 10, max: 18 },
     };
