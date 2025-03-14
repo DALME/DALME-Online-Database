@@ -201,12 +201,14 @@ export default defineComponent({
 .card-title-search .q-field__inner {
   align-self: center;
 }
-@media only screen and (min-width: 1100px) {
-  .detail-card .q-card__section {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
+.q-field--standard.q-field--readonly .q-field__control:before,
+.q-field--readonly .q-field__control:before {
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.24);
+}
+.value-display .q-field__append {
+  height: auto;
+}
+.value-display .q-field--labeled .q-field__native {
+  padding-bottom: 0;
 }
 </style>

@@ -3,6 +3,7 @@
     v-if="linkable && showLink"
     icon="mdi-eye-outline"
     size="sm"
+    color="grey-5"
     dense
     no-caps
     flat

@@ -2,7 +2,7 @@
   <div v-if="!loading" class="value-display">
     <q-input
       v-if="data.dataType === 'STR'"
-      :borderless="!editOn"
+      autogrow
       :readonly="!editOn"
       v-model="value"
       :label="data.label"
@@ -28,7 +28,6 @@
       v-if="data.dataType === 'FKEY'"
       :multiple="multiple"
       :use-chips="multiple"
-      :borderless="!editOn"
       :readonly="!editOn"
       v-model="value"
       :options="options"
@@ -257,17 +256,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 .value-display {
   display: flex;
+  width: 100%;
   justify-content: space-between;
   align-items: baseline;
 }
 .value-display label {
   flex-grow: 1;
-}
-@media only screen and (min-width: 1100px) {
-  .value-display {
-    width: 49%;
-    border-bottom: 1px dotted #d8d8d8;
-    border-right: 1px dotted #d8d8d8;
-  }
 }
 </style>

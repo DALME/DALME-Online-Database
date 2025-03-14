@@ -120,6 +120,16 @@
               :data="workflowData"
               @state-changed="updateWorkflow"
             />
+            <q-btn
+              v-if="view.tab === 'pages'"
+              dense
+              outline
+              size="sm"
+              :icon="showInfoArea ? 'mdi-arrow-collapse-vertical' : 'mdi-arrow-expand-vertical'"
+              text-color="grey-7"
+              class="bg-grey-2 q-ml-xs"
+              @click="showInfoArea = !showInfoArea"
+            />
           </div>
         </div>
       </template>
@@ -136,53 +146,105 @@
           >
             <q-tab-panel name="info" class="q-pt-none q-px-none">
               <div class="col-9 q-pr-lg q-pt-md">
-                <DetailCard
-                  icon="bookmark"
-                  title="Record"
-                  pad-container
-                  :fields="fieldPlacements.infocard"
-                  :data="recordData"
-                  :register="registerComponent"
-                  @value-changed="onValueChange"
-                />
+                <template v-if="ui.windowWidth > 1100">
+                  <div class="row no-wrap">
+                    <div class="col-6 q-mr-md">
+                      <DetailCard
+                        icon="bookmark"
+                        title="Record"
+                        pad-container
+                        :fields="fieldPlacements.infocard"
+                        :data="recordData"
+                        :register="registerComponent"
+                        @value-changed="onValueChange"
+                      />
+                    </div>
+                    <div class="col-6">
+                      <DetailCard
+                        :ref="(el) => registerComponent(recordData.description.name, el)"
+                        :field-name="recordData.description.name"
+                        icon="subject"
+                        title="Description"
+                        noData="No description assigned."
+                        :data="recordData.description"
+                        markdown
+                        editable
+                        @value-changed="onValueChange"
+                      />
 
-                <DetailCard
-                  :ref="(el) => registerComponent(recordData.description.name, el)"
-                  :field-name="recordData.description.name"
-                  icon="subject"
-                  title="Description"
-                  noData="No description assigned."
-                  class="q-mt-md"
-                  :data="recordData.description"
-                  markdown
-                  editable
-                  @value-changed="onValueChange"
-                />
+                      <DetailCard
+                        v-if="pageData.length"
+                        icon="auto_stories"
+                        title="Folios"
+                        showFilter
+                        class="q-mt-md"
+                        @value-changed="onValueChange"
+                      >
+                        <RecordPages overview :pages="pageData" />
+                      </DetailCard>
 
-                <DetailCard
-                  v-if="pageData.length"
-                  icon="auto_stories"
-                  title="Folios"
-                  showFilter
-                  class="q-mt-md"
-                  @value-changed="onValueChange"
-                >
-                  <RecordPages overview :pages="pageData" />
-                </DetailCard>
+                      <DetailCard
+                        v-if="agentData.length"
+                        icon="people"
+                        title="Agents"
+                        showFilter
+                        class="q-mt-md"
+                        @value-changed="onValueChange"
+                      >
+                        <RecordAgents overview :agents="agentData" />
+                      </DetailCard>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <DetailCard
+                    icon="bookmark"
+                    title="Record"
+                    pad-container
+                    :fields="fieldPlacements.infocard"
+                    :data="recordData"
+                    :register="registerComponent"
+                    @value-changed="onValueChange"
+                  />
 
-                <DetailCard
-                  v-if="agentData.length"
-                  icon="people"
-                  title="Agents"
-                  showFilter
-                  class="q-mt-md"
-                  @value-changed="onValueChange"
-                >
-                  <RecordAgents overview :agents="agentData" />
-                </DetailCard>
+                  <DetailCard
+                    :ref="(el) => registerComponent(recordData.description.name, el)"
+                    :field-name="recordData.description.name"
+                    icon="subject"
+                    title="Description"
+                    noData="No description assigned."
+                    class="q-mt-md"
+                    :data="recordData.description"
+                    markdown
+                    editable
+                    @value-changed="onValueChange"
+                  />
+
+                  <DetailCard
+                    v-if="pageData.length"
+                    icon="auto_stories"
+                    title="Folios"
+                    showFilter
+                    class="q-mt-md"
+                    @value-changed="onValueChange"
+                  >
+                    <RecordPages overview :pages="pageData" />
+                  </DetailCard>
+
+                  <DetailCard
+                    v-if="agentData.length"
+                    icon="people"
+                    title="Agents"
+                    showFilter
+                    class="q-mt-md"
+                    @value-changed="onValueChange"
+                  >
+                    <RecordAgents overview :agents="agentData" />
+                  </DetailCard>
+                </template>
               </div>
             </q-tab-panel>
-            <q-tab-panel name="pages" class="q-pt-sm q-px-none">
+            <q-tab-panel name="pages" class="q-pt-sm q-px-none editor-panel">
               <RecordPages :pages="pageData" />
             </q-tab-panel>
             <q-tab-panel name="entities" class="q-pt-none q-px-none">
@@ -219,8 +281,13 @@
             <DetailElement label="Created">
               <template v-slot:content>
                 <div>
-                  <UserPill :user="recordData.creationUser.value" text-size="13px" :bold="false" />
-                  <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
+                  <UserPill
+                    :user="recordData.creationUser.value"
+                    text-size="13px"
+                    :bold="false"
+                    :show-avatar="false"
+                  />
+                  <div class="text-detail text-grey-7 text-weight-medium">
                     {{ recordData.creationTimestamp.value.date }} @
                     {{ recordData.modificationTimestamp.value.time }}
                   </div>
@@ -234,8 +301,9 @@
                     :user="recordData.modificationUser.value"
                     text-size="13px"
                     :bold="false"
+                    :show-avatar="false"
                   />
-                  <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
+                  <div class="text-detail text-grey-7 text-weight-medium">
                     {{ recordData.modificationTimestamp.value.date }} @
                     {{ recordData.modificationTimestamp.value.time }}
                   </div>
@@ -357,7 +425,7 @@ export default defineComponent({
           commentCount.value = validated.commentCount;
           folioCount.value = validated.noFolios;
           recordData.value = dataset;
-          agentData.value = validated.agents;
+          agentData.value = validated.agents || [];
           pageData.value = validated.pages;
           collectionData.value = validated.collections;
           workflowData.value = validated.workflow;
