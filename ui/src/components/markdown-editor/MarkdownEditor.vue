@@ -4,7 +4,7 @@
       <div v-if="isEditable" class="md-editor-header">
         <q-tabs v-model="mdTab" dense indicator-color="transparent" no-caps>
           <q-tab name="write" label="Write" />
-          <q-tab name="preview" label="Preview" :disable="!hasChanged" />
+          <q-tab name="preview" label="Preview" :disable="!mdText" />
         </q-tabs>
 
         <MDEToolbar
