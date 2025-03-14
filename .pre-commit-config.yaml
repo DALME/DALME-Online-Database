@@ -8,7 +8,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
     - id: check-added-large-files
       args: ['--maxkb=10000']
@@ -33,7 +33,7 @@ repos:
       require_serial: true
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.3
+    rev: v4.0.0-alpha.8
     hooks:
     - id: prettier
       types_or: [javascript, vue, scss, html, json]
@@ -41,7 +41,7 @@ repos:
   # Python
   # Needs to run before anything else (for Python).
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.9.10
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
