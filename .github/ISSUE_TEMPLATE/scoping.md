@@ -1,3 +1,12 @@
+---
+name: Scoping ticket
+about: Create a ticket to start scoping changed to the codebase
+title: 'IDA/#??? | TITLE'
+labels: ''
+assignees: ''
+
+---
+
 # `ida/#???`
 <!-- Add the issue code here. -->
 <!-- Replace '???' with the issue number itself, eg. `ida/#12`. -->
