@@ -1,14 +1,13 @@
 <template>
-  <q-expansion-item
-    :label="label"
-    :default-opened="defaultOpened"
-    header-class="drawer_expansion_header"
-    expand-icon="mdi-plus-box-outline"
-    expanded-icon="mdi-minus-box-outline"
-  >
+  <q-item header-class="drawer_expansion_header" class="collections-item">
+    <q-item class="drawer_expansion_header">
+      <q-item-section class="justify-center">
+        <q-item-label>{{ label }}</q-item-label>
+      </q-item-section>
+    </q-item>
     <q-scroll-area
       dark
-      :style="`height: ${scrollHeight}px; width: ${width}px; min-width: ${width}px`"
+      :style="`height: 100%; width: ${width}px; min-width: ${width}px`"
       class="scroll-area"
     >
       <template v-if="!loading">
@@ -18,7 +17,7 @@
           :collection="collection"
           :in-drawer="inDrawer"
         />
-        <div class="flex">
+        <div class="flex task-list-actions">
           <q-btn
             v-if="totalCount > currentCount"
             flat
@@ -43,7 +42,7 @@
         </template>
       </template>
     </q-scroll-area>
-  </q-expansion-item>
+  </q-item>
 </template>
 
 <script>
@@ -56,11 +55,11 @@ import CollectionTile from "./CollectionTile.vue";
 export default defineComponent({
   name: "CollectionsManager",
   props: {
-    userCollectionsOnly: {
+    userCollections: {
       type: Boolean,
       default: false,
     },
-    teamCollectionsOnly: {
+    teamCollections: {
       type: Boolean,
       default: false,
     },
@@ -68,7 +67,6 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    defaultOpened: Boolean,
     label: {
       type: String,
       default: "Collections",
@@ -89,9 +87,9 @@ export default defineComponent({
     const currentCount = ref(0);
 
     const request = computed(() => {
-      if (props.userCollectionsOnly) {
+      if (props.userCollections) {
         return requests.collections.getUserCollections(auth.user.userId, limit.value);
-      } else if (props.teamCollectionsOnly) {
+      } else if (props.teamCollections) {
         return requests.collections.getTeamCollections(auth.user.userId, limit.value);
       } else {
         return requests.collections.getCollections();
@@ -131,3 +129,14 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.collections-item {
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--dark-border-base-colour);
+  border-radius: 0;
+}
+</style>

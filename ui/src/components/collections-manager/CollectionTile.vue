@@ -1,6 +1,6 @@
 <template>
   <q-item dense clickable v-if="collection.id" class="collection-tile">
-    <q-item-section avatar>
+    <q-item-section avatar top>
       <q-icon :name="avatarIcon[0]" :color="avatarIcon[1]" size="sm" />
     </q-item-section>
     <q-item-section :no-wrap="inDrawer">
@@ -15,7 +15,7 @@
           class="q-ml-auto"
         />
       </q-item-label>
-      <q-item-label caption :lines="inDrawer ? 1 : 2">
+      <q-item-label caption class="collection-description" lines="3">
         {{ collection.attributes[0].value }}
       </q-item-label>
     </q-item-section>
@@ -111,3 +111,19 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.q-item.collection-tile .q-item__label {
+  display: flex;
+  text-wrap: auto;
+  list-style: none;
+}
+.custom-drawer.app-drawer .collection-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+.collection-description {
+  line-height: 1.3 !important;
+}
+</style>
