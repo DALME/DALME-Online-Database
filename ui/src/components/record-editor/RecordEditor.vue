@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lhh lpr lff" container :style="`height: ${containerHeight}px`">
+  <q-layout view="lhh lpr lff" container :style="`height: ${compositeHeight + 4}px`">
     <q-drawer
       v-model="drawer"
       side="left"
@@ -8,7 +8,7 @@
       :width="parseInt(141)"
       :mini-width="parseInt(0)"
     >
-      <div v-if="pageChooser" class="page-container" :style="`height: ${containerHeight}px`">
+      <div v-if="pageChooser" class="page-container" :style="`height: ${compositeHeight}px`">
         <q-table
           grid
           hide-bottom
@@ -47,14 +47,15 @@
     </q-drawer>
 
     <q-page-container>
-      <q-page :class="!view.pageDrawerMini ? 'q-pl-sm' : 'q-pa-none'">
+      <q-page :class="!view.pageDrawerMini ? 'q-pl-sm q-pr-none' : 'q-pa-none'">
         <q-splitter
           v-model="view.editorSplitter"
           unit="px"
           :horizontal="view.splitterHorizontal"
           separator-class="splitter-separator"
           :limits="view.splitterLimits"
-          :style="`height: ${containerHeight}px; width: ${containerWidth}px`"
+          emit-immediately
+          :class="orientationClass"
         >
           <template v-slot:before>
             <IiifViewer
@@ -83,7 +84,7 @@
             <div
               v-show="!currentPageData.editOn"
               class="render-panel"
-              :style="`height: ${editorHeight}px`"
+              :style="`height: ${compositeHeight}px`"
             >
               <TeiRenderer :text="currentPageData.tei" />
             </div>
@@ -95,7 +96,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, inject, nextTick, onMounted, provide, ref } from "vue";
+import { computed, defineComponent, inject, onMounted, provide, ref } from "vue";
 import { useEventHandling, useStores } from "@/use";
 import { AdaptiveSpinner, IiifViewer, TeiRenderer } from "@/components";
 import TeiEditor from "./TeiEditor.vue";
@@ -110,11 +111,12 @@ export default defineComponent({
     TeiRenderer,
   },
   setup() {
-    const { currentPageData, containerHeight, containerWidth, pageCount, settings, views, view } =
+    const { currentPageData, contentHeight, contentWidth, pageCount, settings, views, view } =
       useStores();
     const { eventBus } = useEventHandling();
     const columns = inject("columns");
     const pages = inject("pages");
+    const showInfoArea = inject("showInfoArea");
     const pagination = ref({ rowsPerPage: 0 });
 
     const getPages = () => {
@@ -122,7 +124,7 @@ export default defineComponent({
         page.ref = idx;
         page.editorTab = "write";
         page.editOn = false;
-        page.tei = page.transcription.transcription;
+        page.tei = page.transcription?.transcription;
         page.hasChanges = false;
         page.viewerZoom = 0;
       });
@@ -142,67 +144,77 @@ export default defineComponent({
 
     const drawer = ref(pageCount.value > 1);
     const pageChooser = computed(() => pageCount.value > 1);
-    const tagMenuDrawer = computed(() => {
-      return view.value.showTagMenu ? 300 : 0;
-    });
-
     const editor = ref(null);
 
-    if (!view.value.editorSplitter) {
-      view.value.editorSplitter = Math.round(containerHeight.value / 2);
-    }
-
-    /* eslint-disable */
-    const editorHeight = computed(() =>
-      view.value.splitterHorizontal
-        ? currentPageData.value.editOn
-          ? Math.round(containerHeight.value - view.value.editorSplitter - 48)
-          : Math.round(containerHeight.value - view.value.editorSplitter - 8)
-        : containerHeight.value - 40,
+    const infoAreaHeight = computed(() => (showInfoArea.value ? 75 : 0));
+    const pageDrawerWidth = computed(() => (view.value.pageDrawerMini ? 0 : 141));
+    const orientationClass = computed(() =>
+      view.value.splitterHorizontal ? "editor-horizontal" : "editor-vertical",
     );
-    /* eslint-enable */
-    const editorWidth = computed(() => {
-      return view.value.splitterHorizontal
-        ? containerWidth.value - tagMenuDrawer.value - 2
-        : Math.round(containerWidth.value - view.value.editorSplitter) - tagMenuDrawer.value - 8;
+
+    const compositeHeight = computed(() => {
+      const tabs = 37 + 16; // tab-bar + margin;
+      return Math.round(contentHeight.value - infoAreaHeight.value - tabs);
     });
 
-    const viewerHeight = computed(() =>
-      view.value.splitterHorizontal ? view.value.editorSplitter : containerHeight.value,
+    if (!view.value.editorSplitter) {
+      view.value.editorSplitter = Math.round(compositeHeight.value / 2);
+    }
+
+    const editorHeight = computed(() => {
+      const editorToolbar = 40;
+      return view.value.splitterHorizontal
+        ? Math.round(compositeHeight.value - editorToolbar - view.value.editorSplitter)
+        : compositeHeight.value - editorToolbar;
+    });
+
+    const editorWidth = computed(() =>
+      view.value.splitterHorizontal
+        ? Math.round(contentWidth.value)
+        : Math.round(contentWidth.value - view.value.editorSplitter),
+    );
+
+    const viewerHeight = computed(
+      () =>
+        view.value.splitterHorizontal
+          ? compositeHeight.value - editorHeight.value
+          : compositeHeight.value + 4, // border adjustment
     );
 
     const viewerWidth = computed(() =>
-      view.value.splitterHorizontal ? containerWidth.value : view.value.editorSplitter,
+      view.value.splitterHorizontal
+        ? contentWidth.value - pageDrawerWidth.value
+        : view.value.editorSplitter,
     );
 
     const separatorHeight = computed(() =>
-      view.value.splitterHorizontal ? 4 : viewerHeight.value,
+      view.value.splitterHorizontal ? 4 : compositeHeight.value,
     );
 
     const separatorWidth = computed(() => (view.value.splitterHorizontal ? viewerWidth.value : 4));
 
     const splitterLimits = computed(() =>
       view.value.splitterHorizontal
-        ? [40, containerHeight.value - 10]
-        : [70, containerWidth.value - 10],
+        ? [40, compositeHeight.value - 10]
+        : [70, contentWidth.value - 10],
     );
 
     const currentSplitterPercentage = computed(() => {
-      let total = view.value.splitterHorizontal ? containerHeight.value : containerWidth.value;
+      let total = view.value.splitterHorizontal ? compositeHeight.value : contentWidth.value;
       return Math.round((view.value.editorSplitter * 100) / total);
     });
 
     const nextSplitterPixels = computed(() => {
-      let total = view.value.splitterHorizontal ? containerWidth.value : containerHeight.value;
+      let total = view.value.splitterHorizontal ? contentWidth.value : compositeHeight.value;
       return view.value.lastSplitter ? Math.round((view.value.lastSplitter * total) / 100) : 0;
     });
 
     const toggleSplitter = () => {
       let targetSplit = nextSplitterPixels.value
         ? nextSplitterPixels.value
-        : view.value.splitterHorizontal //eslint-disable-line
-        ? Math.round(containerWidth.value / 2) //eslint-disable-line
-        : Math.round(containerHeight.value / 2); //eslint-disable-line
+        : view.value.splitterHorizontal
+          ? Math.round(contentWidth.value / 2)
+          : Math.round(compositeHeight.value / 2);
       view.value.lastSplitter = currentSplitterPercentage.value;
       view.value.splitterHorizontal = !view.value.splitterHorizontal;
       view.value.editorSplitter = targetSplit;
@@ -210,6 +222,11 @@ export default defineComponent({
 
     const toggleMini = () => {
       view.value.pageDrawerMini = !view.value.pageDrawerMini;
+      if (!view.value.splitterHorizontal) {
+        view.value.editorSplitter = view.value.pageDrawerMini
+          ? view.value.editorSplitter + 141
+          : view.value.editorSplitter - 141;
+      }
     };
 
     const toggleEditor = () => {
@@ -225,7 +242,7 @@ export default defineComponent({
       });
     };
 
-    const changePage = async (para) => {
+    const changePage = (para) => {
       let targetPage = null;
       if (Number.isInteger(para)) targetPage = para;
       if (para === "first") targetPage = 0;
@@ -233,10 +250,10 @@ export default defineComponent({
       if (para === "prev") targetPage = view.value.currentPageRef - 1;
       if (para === "next") targetPage = view.value.currentPageRef + 1;
 
-      if (currentPageData.value.editOn) await editor.value.updateStoreText();
+      // if (currentPageData.value.editOn) await editor.value.updateStoreText();
       view.value.currentPageRef = targetPage;
-      await nextTick();
-      if (currentPageData.value.editOn) await editor.value.loadSession();
+      // await nextTick();
+      // if (currentPageData.value.editOn) await editor.value.loadSession();
     };
 
     eventBus.on("changePage", (page) => changePage(page));
@@ -244,20 +261,17 @@ export default defineComponent({
 
     provide("editorDimensions", { editorHeight, editorWidth });
     provide("viewerDimensions", { viewerHeight, viewerWidth });
-    provide("pageDrawerOpen", drawer);
 
     onMounted(async () => {
       if (!settings.teiReady) {
         const data = await settings.fetchTeiElements();
         if (data) {
-          console.log("fetchTeiElements", data);
           settings.teiElementSetData = data.sets;
           settings.teiElementData = data.elements;
           settings.teiTagData = data.tags;
           // temp workaround - this should be set by the UI
           settings.currentSetId = data.sets[0].id;
         }
-        console.log("settings.teiReady", settings.teiReady);
       }
     });
 
@@ -268,8 +282,9 @@ export default defineComponent({
       columns,
       drawer,
       editor,
-      containerHeight,
-      containerWidth,
+      contentHeight,
+      contentWidth,
+      compositeHeight,
       editorHeight,
       editorWidth,
       pageChooser,
@@ -283,6 +298,7 @@ export default defineComponent({
       toggleMini,
       toggleSplitter,
       view,
+      orientationClass,
     };
   },
 });
@@ -393,6 +409,20 @@ export default defineComponent({
   border-top: 1px solid #d1d1d1;
   border-bottom: 1px solid #d1d1d1;
   border-right: 1px solid #d1d1d1;
-  overflow: hidden !important;
+}
+.q-layout-container,
+.q-splitter {
+  transition: height 0.2s ease-in-out;
+}
+.q-splitter__before {
+  background-color: rgb(71, 71, 71);
+}
+.editor-horizontal .q-splitter__before {
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+.editor-vertical .q-splitter__before {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 </style>

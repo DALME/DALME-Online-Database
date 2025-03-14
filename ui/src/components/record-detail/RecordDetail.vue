@@ -1,9 +1,9 @@
 <template>
-  <div class="full-width full-height q-px-content-visual">
+  <div class="full-width full-height">
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">
-          <div class="info-area row" v-if="!ui.globalLoading">
+          <div class="info-area row" v-if="showInfoArea && !ui.globalLoading">
             <div class="column">
               <div class="row items-center text-h5">
                 <template v-if="!ui.globalLoading">
@@ -124,8 +124,8 @@
         </div>
       </template>
     </div>
-    <div class="row q-pt-sm">
-      <div class="col">
+    <div class="row q-pt-sm content-container-row">
+      <div class="col content-container">
         <template v-if="!ui.globalLoading">
           <q-tab-panels
             v-model="view.tab"
@@ -311,8 +311,11 @@ export default defineComponent({
       standalone: [],
     });
 
+    const showInfoArea = ref(true);
+
     provide("model", "Record");
     provide("id", id);
+    provide("showInfoArea", showInfoArea);
 
     useMeta(() => ({
       title: !nully(recordData.value) ? recordData.value.name.value : `Record ${id.value}`,
@@ -466,12 +469,13 @@ export default defineComponent({
       fieldPlacements,
       registerComponent,
       onValueChange,
+      showInfoArea,
     };
   },
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .record-actions {
   border-bottom: 1px solid #d1d1d1;
   margin-top: auto;

@@ -1,6 +1,6 @@
 <template>
   <transition name="collapse">
-    <div v-if="view.showTagMenu" class="col tag-menu" :style="`height: ${editorHeight + 20}px`">
+    <div v-if="view.showTagMenu" class="col tag-menu" :style="`height: ${editorHeight + 1}px`">
       <q-input
         dense
         borderless
@@ -11,8 +11,8 @@
         autocorrect="off"
         autocapitalize="off"
         spellcheck="false"
-        :placeholder="`Filter tags`"
-        class="tag-search-box full-width"
+        placeholder="Search tags"
+        class="tag-search-box"
       >
         <template v-slot:append>
           <q-icon
@@ -89,8 +89,11 @@ export default defineComponent({
 .tag-menu {
   overflow: scroll;
   border-left: 1px solid #d1d1d1;
-  margin-left: 8px;
   max-width: 300px !important;
+  position: absolute;
+  right: 0;
+  background-color: rgb(255 255 255 / 89%);
+  backdrop-filter: blur(1px) grayscale(70%);
 }
 .tag-menu .q-btn-group {
   width: 100%;
@@ -103,6 +106,13 @@ export default defineComponent({
 .tag-menu-popup {
   max-width: 200px;
 }
+.tag-menu .tag-search-box {
+  position: fixed;
+  width: 100%;
+  max-width: 300px !important;
+  background: white;
+  z-index: 99;
+}
 .tag-search-box .q-field__control {
   font-size: 13px;
   height: 30px;
@@ -113,5 +123,8 @@ export default defineComponent({
 .tag-search-box .q-field__native {
   height: 28px;
   padding: 6px 10px;
+}
+.tag-menu .q-list {
+  margin-top: 31px;
 }
 </style>

@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { useViewStore } from "@/stores/views";
 import { EventBus, debounce } from "quasar";
 
 export const useUiStore = defineStore(
@@ -37,17 +36,15 @@ export const useUiStore = defineStore(
 
     const isSameRoute = computed(() => previousPath.value === currentPath.value);
 
-    const containerHeight = computed(() => {
-      const headerHeight = 279;
-      const chrome = headerHeight + 32;
-      return windowHeight.value - chrome;
+    const contentHeight = computed(() => {
+      const headerHeight = 117;
+      const footerSpace = 40;
+      return windowHeight.value - headerHeight - footerSpace;
     });
 
-    const containerWidth = computed(() => {
-      const views = useViewStore();
-      let chrome = 152;
-      if ("pageDrawerMini" in views.view && views.view.pageDrawerMini.value) chrome = chrome + 149;
-      return windowWidth.value - chrome;
+    const contentWidth = computed(() => {
+      const padding = 68;
+      return windowWidth.value - padding;
     });
 
     // actions
@@ -122,8 +119,8 @@ export const useUiStore = defineStore(
       currentPageEdit,
       breadcrumb,
       isSameRoute,
-      containerHeight,
-      containerWidth,
+      contentHeight,
+      contentWidth,
       onWindowResize,
       resizeListener,
       setUiState,

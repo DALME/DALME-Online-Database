@@ -19,7 +19,7 @@
         <q-tab name="preview" label="Preview" :disable="disabled" />
       </q-tabs>
     </div>
-    <q-btn @click="parse" label="parse" />
+    <!--q-btn @click="parse" label="parse" /-->
     <div class="column">
       <ToolBar />
     </div>
@@ -33,10 +33,10 @@
     transition-prev="jump-up"
     transition-next="jump-up"
     class="editor-panel text-body2"
-    :style="`height: ${editorHeight}px;`"
+    :style="`height: ${editorHeight + 1}px;`"
   >
     <q-tab-panel name="write" class="row q-pa-none">
-      <div class="col">
+      <div class="col editor-container-col" :style="`background-color: ${editorBackground};`">
         <div class="v-codemirror editor-container" ref="container"></div>
       </div>
       <TeiSidebar />
@@ -91,7 +91,7 @@ export default defineComponent({
     ToolBar,
   },
   setup() {
-    const { currentPageData, view, preferences } = useStores();
+    const { currentPageData, view, preferences, settings } = useStores();
     const { editorHeight, editorWidth } = inject("editorDimensions");
     const disabled = computed(() => isEmpty(currentPageData.value.tei));
     const currentInstance = getCurrentInstance();
@@ -103,7 +103,12 @@ export default defineComponent({
       preferences.value.theme.value ? themes[preferences.value.theme.value] : themes["oneDark"],
     );
 
-    window.testText = currentPageData.value.tei;
+    const editorBackground = computed(() => {
+      const themeOpts = settings.getOptions("theme");
+      return themeOpts.find((x) => x.value == preferences.value.theme.value).bg;
+    });
+
+    // window.testText = currentPageData.value.tei;
 
     // editorView.value.updateState: 0 = Idle, 1 = Measuring, 2 = Updating
     const updateTag = (changes) => {
@@ -388,12 +393,16 @@ export default defineComponent({
       view,
       test,
       parse,
+      editorBackground,
     };
   },
 });
 </script>
 
 <style lang="scss">
+.q-tab-panels.editor-panel {
+  transition: height 0.2s ease-in-out;
+}
 .editor-container {
   display: contents;
 }
