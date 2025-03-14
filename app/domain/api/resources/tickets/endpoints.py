@@ -43,7 +43,7 @@ class Tickets(BaseViewSet):
             lookup_value = self.kwargs[lookup_url_kwarg]
             if str(lookup_value).isdigit():
                 filter_kwargs = {'number': lookup_value}
-                obj = get_object_or_404(self.queryset, **filter_kwargs)
+                obj = get_object_or_404(self.get_queryset(), **filter_kwargs)
                 self.check_object_permissions(self.request, obj)
                 return obj
         return super().get_object()

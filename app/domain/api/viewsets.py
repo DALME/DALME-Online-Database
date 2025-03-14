@@ -84,7 +84,7 @@ class BaseViewSet(viewsets.ModelViewSet):
         """Edit records inline."""
         pks = [str(pk) for pk in request.data]
         for pk in pks:
-            obj = self.queryset.filter(pk=pk)
+            obj = self.get_queryset().filter(pk=pk)
             obj_data = request.data[pk]
             obj.update(**obj_data)
 
