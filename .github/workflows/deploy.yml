@@ -2,7 +2,7 @@ name: Deploy
 on:
   workflow_dispatch:
     branches:
-      - development.v2
+      - origin/development.v2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
