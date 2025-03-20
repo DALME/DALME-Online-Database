@@ -200,7 +200,7 @@ jobs:
           fetch-depth: 0
 
       - id: changed-tf
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v46
         with:
           since_last_remote_commit: true
           files: tf/**/*.{tf,hcl}
@@ -392,7 +392,7 @@ jobs:
           fetch-depth: 0
 
       - id: changed-docs
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v46
         with:
           since_last_remote_commit: true
           files: docs/**/*.{md,py,rst,txt}
