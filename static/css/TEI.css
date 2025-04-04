@@ -2130,6 +2130,9 @@ tei-metamark[function="hr"] {
   flex-direction: row-reverse;
   white-space: pre-wrap;
 }
+.tei-leader-line div:first-of-type > span {
+  white-space: pre;
+}
 section.transcription.soft-wrap .tei-leader-line div:first-of-type {
   flex-wrap: wrap-reverse;
   justify-content: flex-end;
@@ -2253,9 +2256,6 @@ tei-quote span ~ tei-lb:last-of-type {
 tei-expan {
   color: #888888;
   font-style: italic;
-}
-.tei-leader-line tei-expan ~ span {
-  white-space: pre;
 }
 
 tei-note[type="brace"] {
