@@ -2130,6 +2130,15 @@ tei-metamark[function="hr"] {
   flex-direction: row-reverse;
   white-space: pre-wrap;
 }
+section.transcription.soft-wrap .tei-leader-line div:first-of-type {
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
+}
+section.transcription.soft-wrap .tei-leader-line div:last-of-type {
+  display: inline-flex;
+  align-items: flex-end;
+  white-space: pre;
+}
 tei-metamark[function="hhr"] + tei-lb,
 tei-metamark[function="hr"] + tei-lb,
 .tei-leader-line + tei-lb {
@@ -2245,6 +2254,10 @@ tei-expan {
   color: #888888;
   font-style: italic;
 }
+.tei-leader-line tei-expan ~ span {
+  white-space: pre;
+}
+
 tei-note[type="brace"] {
   font-size: 12px;
   text-align: end;
