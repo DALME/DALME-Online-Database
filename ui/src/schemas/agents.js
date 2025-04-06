@@ -5,7 +5,10 @@ export const agentSchema = yup
   .shape({
     id: yup.string().uuid().required(),
     name: yup.string().required(),
-    agentType: yup.number().required(),
+    agentType: yup
+      .string()
+      .matches(/(Person|Organization)/, { excludeEmptyString: true })
+      .required(),
     user: yup.string().default(null).nullable(),
   })
   .camelCase();
