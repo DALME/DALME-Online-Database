@@ -14,10 +14,10 @@ infra.help:
 infra.bootstrap:
 ifndef dump
 	$(error No local dump specified to restore. \
-		Usage: make bootstrap dump='dalme-20231025-T1698276955.dump')
+		Usage: make infra.bootstrap dump='dalme-20231025-T1698276955.dump')
 else
 	@$(MAKE) db.migrate
-	@$(MAKE) db.load dump='$(dump)'
+	@$(MAKE) db.load.restore dump='$(dump)'
 	@$(MAKE) app.migrate_data
 	@$(MAKE) app.manage args='tenant_command update_index --schema=dalme'
 endif

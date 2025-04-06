@@ -7,7 +7,8 @@ RESTORE_SCHEMA := restore
 db.help:
 	@echo "  db.drop                  drop the db volume"
 	@echo "  db.dump                  dump the dev database to sql (data only, no schema)"
-	@echo "  db.load                  restore a local sql dump"
+	@echo "  db.load                  load a local sql dump"
+	@echo "  db.load.restore          load a local sql dump into restore schema"
 	@echo "  db.migrations.empty      generate an empty database revision"
 	@echo "  db.migrations.make       generate a database revision"
 	@echo "  db.migrations.merge      merge database revisions"
@@ -39,10 +40,26 @@ db.dump:
 		-f $(DUMPS)/$(NAMESPACE)-$$(date -u +"%Y%m%d-T%s").dump
 .PHONY: db.dump
 
-db.load: _db.create_restore_schema
+db.load:
 ifndef dump
 	$(error No local dump specified to restore. \
-		Usage: make db.load dump='dalme-20231025-T1698276955.dump')
+		Usage: make db.load dump='ida-20231025-T1698276955.dump')
+else
+	docker exec -i \
+		$(NAMESPACE).db \
+		pg_restore \
+		--clean \
+		--if-exists \
+		--dbname=$(NAMESPACE) \
+		--username=$(NAMESPACE) \
+		$(DUMPS)/$(dump)
+endif
+.PHONY: db.load
+
+db.load.restore: _db.create_restore_schema
+ifndef dump
+	$(error No local dump specified to restore. \
+		Usage: make db.load.restore dump='dalme-20231025-T1698276955.dump')
 else
 	docker exec -i \
 		$(NAMESPACE).db \
@@ -54,7 +71,7 @@ else
 		--username=$(NAMESPACE) \
 		$(DUMPS)/$(dump)
 endif
-.PHONY: db.load
+.PHONY: db.load.restore
 
 db.migrate:
 	docker compose run --rm \
