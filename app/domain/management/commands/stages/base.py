@@ -7,6 +7,7 @@ import json
 import re
 import uuid
 
+import lxml.etree as et
 import markdown
 import structlog
 from bs4 import BeautifulSoup
@@ -16,10 +17,22 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
 
-from domain.models import SavedSearch
+from domain.models import Agent, Attribute, AttributeType, EntityPhrase, LocaleReference, Location, Place, SavedSearch
 from oauth.models import User
 
-from .fixtures import ALTERED_APP_MAP, ALTERED_MODEL_MAP, REF_CITATIONS, SOURCES_MODEL_MAP, USER_NAME_CONCORDANCE
+from .fixtures import (
+    ALTERED_APP_MAP,
+    ALTERED_MODEL_MAP,
+    CONTENT_CLEANUP_EXPRESSIONS,
+    ONE_OFF_TRANSFORMS,
+    ORG_NAME_PATTERNS,
+    PERSONAL_NAME_PATTERNS,
+    PLACE_CONCORDANCE,
+    REF_CITATIONS,
+    RS_TYPES,
+    SOURCES_MODEL_MAP,
+    USER_NAME_CONCORDANCE,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -370,3 +383,218 @@ class BaseStage(abc.ABC):
             else:
                 return match.get()
         return None
+
+    @staticmethod
+    def clean_rs_content(ent):
+        et.strip_elements(ent, ['del', 'gap', 'space'], with_tail=False)
+        content = ' '.join(ent.itertext()).strip()
+        for p in CONTENT_CLEANUP_EXPRESSIONS:
+            content = re.sub(p[0], p[1], content)
+
+        return content if content else None
+
+    @staticmethod
+    def remove_rs_entity(ent):
+        parent = ent.getparent()
+        tail = ent.tail
+        text = ent.text
+        content = text if text else ''
+        content += tail if tail else ''
+        prev = ent.getprevious()
+        if prev is not None:
+            prev.tail = (prev.tail or '') + content
+        else:
+            parent.text = (parent.text or '') + content
+
+        parent.remove(ent)
+
+    @staticmethod
+    def capitalize_string(result, ops):
+        for op in ops:
+            if op == 'cap_first':
+                result = result[0].upper() + result[1:]
+
+            if op == 'cap_name':
+                tokens = result.split()
+                if len(tokens) == 3:  # noqa: PLR2004
+                    result = f'{tokens[0].capitalize()} {tokens[1]} {tokens[2].capitalize()}'
+                elif len(tokens) == 2 and ("'" in result or '’' in result):  # noqa: PLR2004, RUF001
+                    for sp in ["'", '’']:  # noqa: RUF001
+                        if sp in result:
+                            tokens = result.split(f'd{sp}')
+                            result = f'{tokens[0].capitalize()} d’{tokens[1].capitalize()}'  # noqa: RUF001
+                else:
+                    tokens = [t.capitalize() for t in tokens]
+                    result = ' '.join(tokens)
+
+            if op == 'cap_org':
+                skip = ['du', 'de']
+                tokens = [t.strip() for t in result.split()]
+                tokens = [t.capitalize() if t not in skip else t for t in tokens]
+                result = ' '.join(tokens)
+
+        return result
+
+    @staticmethod
+    def process_agent_element(el, match, type_id, ep_id):
+        rs_type = RS_TYPES[type_id]
+        wrapper = el.getparent()
+        matched_text = match.group(0)
+        wrapper_text = wrapper.text
+        wrapper_tail = wrapper.tail
+        in_tail = matched_text in wrapper_tail if wrapper_tail else False
+        remainder_list = wrapper_tail.split(matched_text) if in_tail else wrapper_text.split(matched_text)
+
+        if in_tail:
+            new_tag = et.Element('rs', type=rs_type, key=str(ep_id))
+            new_tag.text = matched_text
+            wrapper.addnext(new_tag)
+            if len(remainder_list):
+                if len(remainder_list[0]):
+                    wrapper.tail = remainder_list[0]
+                if len(remainder_list) == 2 and len(remainder_list[1]):  # noqa: PLR2004
+                    new_tag.tail = remainder_list[1]
+
+        else:
+            new_tag = et.SubElement(wrapper, 'rs', type=rs_type, key=str(ep_id))
+            new_tag.text = matched_text
+
+            if len(remainder_list):
+                wrapper.text = remainder_list[0] if len(remainder_list[0]) else None
+                new_tag.tail = remainder_list[1] if len(remainder_list[1]) else None
+
+    def get_agent_name(self, text):
+        name = text.strip()
+
+        if name.lower().startswith('comun') or name.lower().startswith('homin'):
+            result = self.capitalize_string(name, ['cap_first'])
+            return (result, True)
+
+        if name in ONE_OFF_TRANSFORMS:
+            return (ONE_OFF_TRANSFORMS[name], False)
+
+        for pattern in ORG_NAME_PATTERNS:
+            match = pattern[0].match(name)
+            if match:
+                if pattern[1] is None:
+                    result = match.group(0)
+                else:
+                    values = [match.group(i) for i in pattern[1][1]]
+                    result = pattern[1][0].format(*values)
+
+                result = self.capitalize_string(result, pattern[2]) if pattern[2] is not None else result
+                return (result, True)
+
+        for pattern in PERSONAL_NAME_PATTERNS:
+            match = pattern[0].search(name)
+            if match:
+                if pattern[1] is None:
+                    result = match.group(0)
+                else:
+                    values = [match.group(i) for i in pattern[1][1]]
+                    result = pattern[1][0].format(*values)
+
+                result = self.capitalize_string(result, pattern[2]) if pattern[2] is not None else result
+                return (result, False)
+
+        return (None, False)
+
+    def clean_org_name(self, name):
+        name = name.replace('-', ' ')
+        return self.capitalize_string(name, ['cap_org'])
+
+    @staticmethod
+    def check_locus(string):
+        return any(string.lower().startswith(w) for w in ['in', 'nel', 'item nel', 'sotto', 'certe', 'ancora'])
+
+    @staticmethod
+    def get_placename(string):
+        place_data = PLACE_CONCORDANCE.get(string)
+        if place_data is None:
+            return None
+        return place_data['name']
+
+    @staticmethod
+    def get_place(name):
+        locale = LocaleReference.objects.filter(name=name)
+        locale = locale.first() if locale.exists() else None
+        place = Place.objects.filter(name=name)
+        place = place.first() if place.exists() else None
+
+        if place is not None and locale is not None:
+            p_loc = place.location.attributes.filter(attribute_type__name='locale')
+            if p_loc.exists() and p_loc.first().id == locale.id:
+                return place
+
+        if locale is None:
+            return Place.objects.create(
+                name=name,
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+
+        location_ctype = ContentType.objects.get(app_label='domain', model='location')
+        atype_locale = AttributeType.objects.get(name='locale')
+
+        location = Attribute.objects.filter(
+            content_type=location_ctype,
+            attribute_type=atype_locale,
+            value__value__id=str(locale.id),
+        )
+        location = location.first().content_object if location.exists() else None
+
+        if location is None:
+            location_type = 4  # locale
+            location = Location.objects.create(
+                location_type=location_type,
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            Attribute.objects.create(
+                content_object=location,
+                attribute_type=atype_locale,
+                value=locale,
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+
+        return Place.objects.create(
+            name=name,
+            location=location,
+            creation_user_id=1,
+            modification_user_id=1,
+        )
+
+    @staticmethod
+    def get_agent(name, agent_type):
+        # create Agent instance (if necessary)
+        # check if exists : scope to record?
+        agent, _created = Agent.objects.get_or_create(
+            name=name,
+            agent_type=agent_type,
+            defaults={
+                'creation_user_id': 1,
+                'modification_user_id': 1,
+            },
+        )
+
+        return agent
+
+    def create_phrase(self, transcription, object_type, data=None):
+        if object_type == 'agent':
+            obj = self.get_agent(**data)
+        elif object_type == 'place':
+            obj = self.get_place(data['name'])
+        else:
+            obj = None
+
+        payload = {
+            'transcription': transcription,
+            'creation_user_id': 1,
+            'modification_user_id': 1,
+        }
+        if obj is not None:
+            payload['content_object'] = obj
+
+        ep = EntityPhrase.objects.create(**payload)
+        return str(ep.id)

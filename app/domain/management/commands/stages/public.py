@@ -25,7 +25,7 @@ CLONED_SCHEMA = 'cloned'
 class Stage(BaseStage):
     """Data migration for public/cms models."""
 
-    name = '12 Public/CMS'
+    name = '11 Public/CMS'
 
     @transaction.atomic
     def apply(self):

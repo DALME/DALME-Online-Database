@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
+from django.utils import timezone
 
 from domain.models import (
     Attribute,
@@ -12,6 +13,7 @@ from domain.models import (
     PageNode,
     Permission,
     Publication,
+    PublicRegister,
     Record,
     RecordGroup,
     Workflow,
@@ -60,6 +62,8 @@ class Stage(BaseStage):
         self.migrate_page_nodes()
         self.migrate_worklog()
         self.migrate_workflow()
+        self.ensure_workflow()
+        self.sync_public_register()
 
     @transaction.atomic
     def migrate_record(self):
@@ -81,6 +85,7 @@ class Stage(BaseStage):
             record_ct = ContentType.objects.get(app_label='domain', model='record')
             has_inv_type = AttributeType.objects.get(name='has_inventory')
             rec_count = 0
+            other_count = 0
 
             with connection.cursor() as cursor:
                 self.logger.info('Migrating records')
@@ -188,9 +193,14 @@ class Stage(BaseStage):
                             att.content_type = new_ct
                             att.save(update_fields=['content_type'])
 
-                        rec_count += 1
+                        other_count += 1
 
-            self.logger.info('Created %s Record instances', rec_count)
+            self.logger.info(
+                'Migrated %s source instances, %s record and %s non-record instances',
+                rec_count + other_count,
+                rec_count,
+                other_count,
+            )
         else:
             self.logger.warning('Record data already exists')
 
@@ -249,6 +259,51 @@ class Stage(BaseStage):
                     objs.append(Workflow(**row))
 
                 Workflow.objects.bulk_create(objs)
-                self.logger.info('Created %s Workflow instances', Workflow.objects.count())
+            self.logger.info('Created %s Workflow instances', len(objs))
         else:
             self.logger.warning('Workflow data already exists')
+
+    @transaction.atomic
+    def ensure_workflow(self):
+        """Ensure every record instance has an associated workflow instance."""
+        self.logger.info('Ensuring records have associated workflow instances...')
+
+        for record in Record.unattributed.all():
+            try:
+                wf = record.workflow
+            except Workflow.DoesNotExist:
+                self.logger.warning('Record %s was missing its workflow instance.', record.id)
+                wf = Workflow(
+                    record=record,
+                    last_modified=timezone.now(),
+                    last_user_id=1,
+                )
+                wf.save()
+
+    @transaction.atomic
+    def sync_public_register(self):
+        """Synchronize public register."""
+        self.logger.info('Synchronizing public register...')
+        registered = 0
+        unregistered = 0
+
+        for record in Record.unattributed.all():
+            public = record.workflow.is_public
+            registration = PublicRegister.objects.filter(object_id=record.id)
+
+            if public and not registration.exists():
+                PublicRegister.objects.create(
+                    object_id=record.id,
+                    content_type=ContentType.objects.get_for_model(record),
+                )
+                registered += 1
+
+            if not public and registration.exists():
+                registration.first().delete()
+                unregistered += 1
+        if registered > 0 or unregistered > 0:
+            self.logger.warning(
+                'Public register was stale: %s records registered, %s unregistered.', registered, unregistered
+            )
+        else:
+            self.logger.info('Public register was current.')

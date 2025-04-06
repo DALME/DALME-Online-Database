@@ -7,8 +7,8 @@ from .auth import Stage as AuthStage
 from .bootstrap_pharmacopeias import Stage as PharmaStage
 from .collections import Stage as CollectionsStage
 from .content_fixes import Stage as ContentFixes
+from .entities import Stage as EntitiesStage
 from .finalize import Stage as FinalizeStage
-from .named_agents import Stage as NamedAgentsStage
 from .public import Stage as PublicStage
 from .rank_0 import Stage as RankZeroStage
 from .rank_1 import Stage as RankOneStage
@@ -23,8 +23,8 @@ __all__ = [
     'AuthStage',
     'CollectionsStage',
     'ContentFixes',
+    'EntitiesStage',
     'FinalizeStage',
-    'NamedAgentsStage',
     'PharmaStage',
     'PublicStage',
     'RankOneStage',

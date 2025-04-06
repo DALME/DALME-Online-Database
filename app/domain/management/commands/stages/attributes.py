@@ -14,7 +14,7 @@ from domain.historical_date import HistoricalDate
 from domain.models import Attribute, AttributeType, ContentAttributes, RecordType
 
 from .base import BaseStage
-from .fixtures import ATYPES_KEEP, RECORD_TYPE_COVERSIONS
+from .fixtures import ATYPES_KEEP, DUPLICATES, RECORD_TYPE_COVERSIONS
 
 
 class Stage(BaseStage):
@@ -194,3 +194,12 @@ class Stage(BaseStage):
             object_id='31ea1698-bcfc-434f-8172-72f8ed82eb91', attribute_type_id=att_type.id, value__value='not known'
         )
         target.delete()
+
+        for dset in DUPLICATES:
+            att_1 = Attribute.objects.get(pk=dset[0])
+            att_2 = Attribute.objects.get(pk=dset[1])
+
+            att_1.value = f'{att_1.value} | {att_2.value}'
+            att_1.save()
+
+            att_2.delete()

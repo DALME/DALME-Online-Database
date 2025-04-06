@@ -20,7 +20,7 @@ from .fixtures import TEI_ATTRIBUTE_OPTIONS, TEI_ELEMENTS
 class Stage(BaseStage):
     """Data migration for attributes."""
 
-    name = '15 TEI Elements'
+    name = '14 TEI Elements'
 
     @transaction.atomic
     def apply(self):

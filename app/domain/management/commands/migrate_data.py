@@ -19,8 +19,8 @@ from .stages import (
     AuthStage,
     CollectionsStage,
     ContentFixes,
+    EntitiesStage,
     FinalizeStage,
-    NamedAgentsStage,
     PharmaStage,
     PublicStage,
     RankOneStage,
@@ -42,12 +42,12 @@ STAGES = [
     AttributesStage,
     RecordsStage,
     FinalizeStage,
-    NamedAgentsStage,
     CollectionsStage,
     PublicStage,
     ContentFixes,
     PharmaStage,
     TeiElements,
+    EntitiesStage,
 ]
 
 

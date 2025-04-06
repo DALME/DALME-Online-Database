@@ -22,7 +22,7 @@ from .fixtures import (
 class Stage(BaseStage):
     """Bootstraps pharmacopeias site."""
 
-    name = '14 Bootstrapping pharmacopeias public site'
+    name = '13 Bootstrapping pharmacopeias public site'
 
     @transaction.atomic
     def apply(self):
