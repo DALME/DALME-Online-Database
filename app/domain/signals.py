@@ -89,14 +89,14 @@ def transcription_post_save(sender, instance, created, **kwargs):  # noqa: ARG00
     """Run after save method on Transcription objects."""
     if instance.pagenodes.exists() and not os.environ.get('DATA_MIGRATION'):
         for node in instance.pagenodes.all():
-            source = node.source
+            record = node.record
 
             # Update source tracking.
-            source.modification_timestamp = timezone.now()
-            source.modification_user = get_current_user()
-            source.save()
+            record.modification_timestamp = timezone.now()
+            record.modification_user = get_current_user()
+            record.save()
 
-            # Emit the post_save signal on source_page for indexing purposes.
+            # Emit the post_save signal on page_node for indexing purposes.
             models.signals.post_save.send(sender=PageNode, instance=node, created=False)
 
 
