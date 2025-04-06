@@ -2134,6 +2134,10 @@ tei-metamark[function="hr"] {
   flex-direction: row-reverse;
   white-space: pre-wrap;
 }
+.tei-leader-line div:first-of-type > span {
+  white-space: pre;
+}
+
 tei-metamark[function="hhr"] + tei-lb,
 tei-metamark[function="hr"] + tei-lb,
 .tei-leader-line + tei-lb {
@@ -2485,6 +2489,17 @@ section.transcription.soft-wrap tei-text > tei-body {
 section.transcription.soft-wrap tei-lb::after {
   white-space: pre-line;
 }
+section.transcription.soft-wrap .tei-leader-line div:first-of-type {
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
+}
+section.transcription.soft-wrap .tei-leader-line div:last-of-type {
+  display: inline-flex;
+  align-items: flex-end;
+  white-space: pre;
+}
+
+/* new lines */
 section.transcription.show-newlines tei-lb::before {
   content: ' ';
   background-image: url(/static/images/newline-icon.svg);
