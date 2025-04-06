@@ -13,6 +13,7 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Case, Exists, ExpressionWrapper, OuterRef, When
+from django.db.utils import ProgrammingError
 
 from app.context import get_current_tenant
 
@@ -54,7 +55,7 @@ class CustomQuerySet(models.QuerySet):
                     .contenttypes.get(content_type=ContentType.objects.get_for_model(model))
                     .is_unique
                 )
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, ProgrammingError):
                 is_unique = True  # True is default value for is_unique
 
             if is_unique:
