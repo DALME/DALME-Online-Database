@@ -1,6 +1,7 @@
 """Serializers for agent data."""
 
 from drf_writable_nested.serializers import WritableNestedModelSerializer
+from rest_framework import serializers
 
 from domain.api.resources.users import UserSerializer
 from domain.api.serializers import DynamicSerializer
@@ -11,6 +12,7 @@ class AgentSerializer(DynamicSerializer, WritableNestedModelSerializer):
     """Serializer for Agents."""
 
     user = UserSerializer(required=False)
+    agent_type = serializers.CharField(source='get_agent_type_display')
 
     class Meta:
         model = Agent

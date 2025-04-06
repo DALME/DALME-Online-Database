@@ -176,7 +176,6 @@ class RecordSerializer(DynamicSerializer):
             'credit_line',
             'credits',
             'source',
-            # 'agents',
         ]
         field_sets = {
             'attribute': [
