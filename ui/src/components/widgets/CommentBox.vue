@@ -99,7 +99,7 @@
       </q-item>
     </q-card-section>
   </q-card>
-  <AdaptiveSpinner v-else />
+  <AdaptiveSpinner v-else class="q-ma-auto" />
 </template>
 
 <script>

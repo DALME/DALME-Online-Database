@@ -38,7 +38,7 @@
           </div>
         </q-img>
       </q-card-section>
-      <AdaptiveSpinner :showing="!attachment" />
+      <AdaptiveSpinner :showing="!attachment" class="q-ma-auto" />
     </q-card>
   </template>
 </template>

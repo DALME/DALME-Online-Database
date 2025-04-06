@@ -79,7 +79,7 @@
           <template v-slot:after>
             <div v-show="currentPageData.editOn" class="editor-box">
               <TeiEditor v-if="settings.teiReady" ref="editor" />
-              <AdaptiveSpinner type="bars" position="absolute" v-else />
+              <AdaptiveSpinner type="bars" position="absolute" v-else class="q-ma-auto" />
             </div>
             <div
               v-show="!currentPageData.editOn"

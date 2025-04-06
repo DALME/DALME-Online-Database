@@ -162,7 +162,6 @@ export default defineComponent({
   justify-content: center;
   justify-items: center;
   color: #5c5c5c2e;
-  margin: auto;
 }
 .spinner-container .adaptive {
   display: flex;

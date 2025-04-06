@@ -211,4 +211,15 @@ export default defineComponent({
 .value-display .q-field--labeled .q-field__native {
   padding-bottom: 0;
 }
+.value-display .q-chip {
+  font-size: 12px;
+  padding: 0.5em 0.9em;
+  height: 1.7em;
+  background: transparent;
+  border: 1px solid #303f9f;
+}
+.value-display .q-chip--dense .q-chip__icon--remove {
+  margin-left: 0.3em;
+  margin-right: -0.5em;
+}
 </style>

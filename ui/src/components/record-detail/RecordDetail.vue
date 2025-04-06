@@ -99,7 +99,7 @@
                 />
               </q-tab>
             </template>
-            <AdaptiveSpinner v-else type="bars" size="sm" class="q-ml-md" />
+            <AdaptiveSpinner v-else size="xs" class="q-ml-md" color="indigo-3" />
           </q-tabs>
         </div>
       </div>
@@ -257,7 +257,13 @@
             </q-tab-panel>
           </q-tab-panels>
         </template>
-        <AdaptiveSpinner v-else />
+        <AdaptiveSpinner
+          v-else
+          type="hourglass"
+          color="indigo-5"
+          size="50px"
+          class="q-mt-xl q-pt-xl"
+        />
       </div>
       <div v-if="!ui.globalLoading && view.tab !== 'pages'" class="col-3 q-pl-md q-pt-md">
         <DetailSidebar :fields="fieldPlacements.sidebar" :data="recordData">

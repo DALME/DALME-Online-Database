@@ -7,6 +7,7 @@
       v-model="value"
       :label="data.label"
       :placeholder="data.description ? data.description : null"
+      color="indigo-8"
     >
       <template v-slot:append>
         <EditButtons
@@ -32,6 +33,7 @@
       v-model="value"
       :options="options"
       :label="data.label"
+      color="indigo-8"
       hide-dropdown-icon
       map-options
       options-dense
@@ -71,8 +73,33 @@
         />
       </template>
     </q-select>
+    <q-field v-if="data.dataType === 'BOOL'" :borderless="!editOn" :readonly="!editOn">
+      <q-checkbox
+        left-label
+        :disable="!editOn"
+        v-model="value"
+        :label="data.label"
+        checked-icon="task_alt"
+        unchecked-icon="highlight_off"
+      />
+      <template v-slot:append>
+        <EditButtons
+          :linkable="data.link"
+          cancellable
+          :main-icon="editIcon"
+          :main-color="editColour"
+          :show-main="data.editable && !saving"
+          :show-cancel="editOn && hasChanged"
+          :show-spinner="saving"
+          :show-link="!saving && !editOn"
+          @navigate="router.push(linkTarget)"
+          @action="onAction"
+          @cancel="onCancel"
+        />
+      </template>
+    </q-field>
     <q-field
-      v-if="data.dataType === 'BOOL'"
+      v-if="data.dataType === 'DATE'"
       :borderless="!editOn"
       :readonly="!editOn"
       :label="data.label"

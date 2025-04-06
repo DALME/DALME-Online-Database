@@ -92,6 +92,7 @@
           type="facebook"
           color="indigo-3"
           size="100px"
+          class="q-ma-auto"
           :container-height="240"
           :container-width="250"
         />

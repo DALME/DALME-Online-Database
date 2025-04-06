@@ -8,7 +8,7 @@
           </div>
         </template>
       </q-img>
-      <AdaptiveSpinner type="facebook" v-else thickness="3" />
+      <AdaptiveSpinner type="facebook" v-else thickness="3" class="q-ma-auto" />
     </template>
   </BaseModal>
 </template>
