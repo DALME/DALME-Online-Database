@@ -125,15 +125,13 @@ class Record(
             i.transcription.entity_phrases.filter(content_type__in=content_type)
             for i in self.pagenodes.filter(transcription__isnull=False)
         ]
-        if len(results):
+        if len(results) > 0:
             return [i.content_object for i in list(results[0].union(*results[1:]))]
         return None
 
     def agents(self):
         """Return list of agents associated with the record, if any."""
-        return self.get_related_resources(
-            [ContentType.objects.get(model='person'), ContentType.objects.get(model='organization')]
-        )
+        return self.get_related_resources(ContentType.objects.get(model='agent'))
 
     def places(self):
         """Return list of places associated with the record, if any."""
