@@ -73,7 +73,7 @@
 
 <script>
 import { computed } from "vue";
-import { defineComponent, onMounted, ref, useTemplateRef } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 
 export default defineComponent({
   name: "AdaptiveSpinner",
@@ -94,40 +94,36 @@ export default defineComponent({
       type: String,
       default: "relative",
     },
-    size: {
-      type: String,
-      default: "2rem",
-    },
+    size: String,
     color: {
       type: String,
       default: "currentColor",
     },
     thickness: {
-      type: Number,
+      type: [Number, String],
       default: 5,
     },
     top: {
-      type: Number,
+      type: [Number, String],
       default: 0,
     },
     right: {
-      type: Number,
+      type: [Number, String],
       default: 0,
     },
     bottom: {
-      type: Number,
+      type: [Number, String],
       default: 0,
     },
     left: {
-      type: Number,
+      type: [Number, String],
       default: 0,
     },
-    containerHeight: Number,
-    containerWidth: Number,
+    containerHeight: [Number, String],
+    containerWidth: [Number, String],
   },
   setup(props) {
-    const container = useTemplateRef("container");
-    const cSize = ref(props.size);
+    const cSize = ref(props.size || "2rem");
     const style = computed(() => {
       let result = "";
       if (props.top) result += `top: ${props.top}px;`;
@@ -140,10 +136,9 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      if (props.adaptive) {
-        cSize.value = `${container.value.clientWidth / 10}px`;
+      if (props.adaptive && !props.size) {
+        cSize.value = "50%";
       }
-      console.log(style.value);
     });
 
     return {
@@ -163,8 +158,10 @@ export default defineComponent({
   justify-items: center;
   color: #5c5c5c2e;
 }
-.spinner-container .adaptive {
+.spinner-container.adaptive {
   display: flex;
+  height: 100%;
+  width: 100%;
 }
 .spinner-container.relative {
   position: relative;
