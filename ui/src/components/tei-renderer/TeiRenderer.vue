@@ -1,14 +1,15 @@
 <template>
-  <div v-html="renderedContent" class="transcription" />
+  <div v-show="!rendering" ref="rendered-tei" class="transcription" />
+  <AdaptiveSpinner v-show="rendering" type="hourglass" adaptive color="grey-5" size="10%" />
 </template>
 
 <script>
-import { computed, defineComponent, nextTick, onMounted, ref, watch } from "vue";
+import { computed, defineComponent, nextTick, ref, watch, useTemplateRef } from "vue";
 import { useConstants, useStores } from "@/use";
-import { nully } from "@/utils";
 import CETEI from "CETEIcean";
 import { idaTeiBehaviours } from "./behaviours.js";
 import { createPopper } from "@popperjs/core";
+import { AdaptiveSpinner } from "@/components";
 
 export default defineComponent({
   name: "TeiRenderer",
@@ -16,45 +17,41 @@ export default defineComponent({
     text: {
       type: String,
       required: false,
-      default: "",
+      default: null,
     },
   },
+  components: { AdaptiveSpinner },
   setup(props) {
-    const { currentPageData, view } = useStores();
+    const { currentPageData } = useStores();
     const { teiSelectors } = useConstants();
-    const renderedContent = ref("");
+    const teiContainer = useTemplateRef("rendered-tei");
     const hasBraces = ref(false);
     const hasMarginalNotes = ref(false);
     const hasRenvois = ref(false);
     const hasColumns = ref(false);
     const hasLeaders = ref(false);
     const teiRenderer = new CETEI();
+    const rendering = ref(false);
+    const tooltipInstances = ref([]);
 
     teiRenderer.addBehaviors(idaTeiBehaviours);
-    /* eslint-disable */
-    // const teiDoc = computed(() => {
-    //   let transcription = "";
-    //   try {
-    //     transcription = currentPageData.value.tei;
-    //   } finally {
-    //     return `<TEI xmlns="http://www.tei-c.org/ns/1.0">\
-    //                 <text>\
-    //                   <body>${transcription.replace(/\n/g, "<lb/>")}</body>\
-    //                 </text>\
-    //               </TEI>`;
-    //   }
-    // });
+
     const teiDoc = computed(() => {
+      const transcription = props.text
+        ? props.text
+        : currentPageData.value.tei
+          ? currentPageData.value.tei
+          : "";
       return `<TEI xmlns="http://www.tei-c.org/ns/1.0">\
                   <text>\
-                    <body>${props.text.replace(/\n/g, "<lb/>")}</body>\
+                    <body>${transcription.replace(/\n/g, "<lb/>")}</body>\
                   </text>\
                 </TEI>`;
     });
-    /* eslint-disable */
+
     const generateTei = () => {
-      if (!nully(currentPageData.value))
-        teiRenderer.makeHTML5(teiDoc.value, processTei, addSpans);
+      rendering.value = true;
+      teiRenderer.makeHTML5(teiDoc.value, processTei, addSpans);
     };
 
     const addSpans = (newElement) => {
@@ -70,13 +67,21 @@ export default defineComponent({
     };
 
     const processTei = (html) => {
-      hasBraces.value = Boolean(html.querySelectorAll(teiSelectors.braces).length);
-      // hasMarginalNotes.value = Boolean(html.querySelectorAll(teiSelectors.marginalNotes).length);
-      // hasRenvois.value = Boolean(html.querySelectorAll(teiSelectors.renvois).length);
-      hasColumns.value = Boolean(html.querySelectorAll(teiSelectors.columns).length);
-      hasLeaders.value = Boolean(html.querySelectorAll(teiSelectors.leaders).length);
-      applyFixes(html).then((result) => {
-        renderedContent.value = result.outerHTML;
+      return new Promise((resolve) => {
+        hasBraces.value = Boolean(html.querySelectorAll(teiSelectors.braces).length);
+        hasMarginalNotes.value = Boolean(html.querySelectorAll(teiSelectors.marginalNotes).length);
+        hasRenvois.value = Boolean(html.querySelectorAll(teiSelectors.renvois).length);
+        hasColumns.value = Boolean(html.querySelectorAll(teiSelectors.columns).length);
+        hasLeaders.value = Boolean(html.querySelectorAll(teiSelectors.leaders).length);
+        applyFixes(html).then((result) => {
+          teiContainer.value.innerHTML = "";
+          teiContainer.value.append(result);
+          nextTick().then(() => {
+            applyTooltips();
+            rendering.value = false;
+            resolve();
+          });
+        });
       });
     };
 
@@ -171,13 +176,11 @@ export default defineComponent({
               el.setAttribute("title", note.innerHTML);
               el.setAttribute("data-toggle", "tooltip");
               el.setAttribute("data-html", true);
-              /* eslint-disable */
               el.setAttribute(
                 "data-template",
                 '<div class="tooltip note" role="tooltip"><div class="arrow">\
                 </div><div class="tooltip-inner"></div></div>',
               );
-              /* eslint-enable */
             }
           });
         }
@@ -185,20 +188,28 @@ export default defineComponent({
       });
     };
 
-    const showTooltip = (evt) =>
-      evt.target.querySelector("div.tei-tooltip").setAttribute("data-show", "");
+    const showTooltip = (evt) => {
+      const tooltip = evt.target.querySelector("div.tei-tooltip");
+      const popinstance = tooltipInstances.value[parseInt(tooltip.id.slice(8))];
+      tooltip.setAttribute("data-show", "");
+      popinstance.update();
+    };
 
-    const hideTooltip = (evt) =>
-      evt.target.querySelector("div.tei-tooltip").removeAttribute("data-show");
+    const hideTooltip = (evt) => {
+      const tooltip = evt.target.querySelector("div.tei-tooltip");
+      tooltip.removeAttribute("data-show");
+    };
 
     const applyTooltips = () => {
-      /* eslint-disable */
-      document.querySelectorAll('[data-toggle="tooltip"]').forEach((el) => {
-        createPopper(el.parentNode, el);
+      document.querySelectorAll('[data-toggle="tooltip"]').forEach((el, idx) => {
+        tooltipInstances.value.push(
+          createPopper(el.parentNode, el, { scroll: true, resize: true }),
+        );
+        el.id = `tooltip-${idx}`;
+        el.classList.add("tei-tooltip-arrow");
         el.parentNode.addEventListener("mouseenter", showTooltip);
         el.parentNode.addEventListener("mouseleave", hideTooltip);
       });
-      /* eslint-enable */
     };
 
     // const dir = (elem, dir, until) => {
@@ -260,26 +271,67 @@ export default defineComponent({
     //   }
     // },
 
-    onMounted(() => generateTei());
-
     watch(
-      () => view.value.currentPageRef,
+      () => currentPageData.value.tei,
       () => generateTei(),
+      { immediate: true },
     );
 
-    watch(renderedContent, async () => {
-      await nextTick();
-      applyTooltips();
-    });
-
     return {
-      renderedContent,
+      rendering,
     };
   },
 });
 </script>
 
-<style scoped>
+<style>
 @import "./tei.css";
+.transcription {
+  position: relative;
+  width: 100%;
+  padding: 30px;
+  display: flex;
+}
+.tei-tooltip {
+  background: #333;
+  color: white;
+  font-weight: bold;
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+  display: none;
+}
+.tei-tooltip[data-show] {
+  display: block;
+}
+.tei-tooltip-arrow::after {
+  content: "";
+  position: absolute;
+  border-width: 8px;
+  border-style: solid;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+.tei-tooltip-arrow[data-popper-placement^="top"]::after {
+  left: calc(50% - 8px);
+  border-top-color: #333;
+  top: 100%;
+}
+.tei-tooltip-arrow[data-popper-placement^="left"]::after {
+  top: calc(50% - 8px);
+  border-left-color: #333;
+  left: 100%;
+}
+.tei-tooltip-arrow[data-popper-placement^="right"]::after {
+  top: calc(50% - 8px);
+  border-right-color: #333;
+  right: 100%;
+}
+.tei-tooltip-arrow[data-popper-placement^="bottom"]::after {
+  left: calc(50% - 8px);
+  bottom: 100%;
+  border-bottom-color: #333;
+}
 </style>
-@popperjs/core/index.js@popperjs/core/index.js
