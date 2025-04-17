@@ -1,4 +1,4 @@
-import { useConstants } from "@/use";
+import { useConstants } from "@/use/constants";
 
 const { dateFormats } = useConstants();
 
