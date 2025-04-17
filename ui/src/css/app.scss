@@ -228,6 +228,24 @@ pre {
     }
 }
 
+.q-table th:not(.sorted) .q-table__sort-icon::before {
+    content: "swap_vert";
+    font-family: "Material Icons";
+    position: absolute;
+    background-color: white;
+    font-weight: 900;
+    color: rgb(0 0 0 / 18%);
+}
+
+.q-table th .q-table__sort-icon {
+    opacity: 1;
+}
+
+.q-table th {
+    font-weight: 900;
+    color: #616161;
+}
+
 .menu-item-search .q-field__control {
     font-size: 13px;
     height: 30px;
