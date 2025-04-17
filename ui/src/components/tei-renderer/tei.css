@@ -1,20 +1,29 @@
 tei-TEI {
-  font-family: 'PT Serif';
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 17px;
-  margin-right: 30px;
-  margin-left: 30px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-right: auto;
+  margin-left: auto;
   color: #111;
+  display: flex; /* width of page adapts to text */
+}
+
+@-moz-document url-prefix() {
+  tei-TEI {
+    font-family: "Times New Roman", serif;
+    font-size: 19px;
+  }
 }
 
 tei-TEI > tei-text {
-  display: block;
+  display: flex;
   line-height: 1.5;
+  margin-right: 30px;
+  position: relative;
 }
 
 tei-body {
   line-height: 1.8;
+  position: relative;
   /* display: block;
   width: fit-content;
   min-width: 100%; */
@@ -22,7 +31,7 @@ tei-body {
 
 tei-hi[rend="superscript"],
 hi[rend="superscript"] {
-  font-size: 90%;
+  font-size: 70%;
   position: relative;
   top: -5px;
 }
@@ -30,7 +39,7 @@ hi[rend="superscript"] {
 tei-hi[rend="subscript"],
 hi[rend="subscript"] {
   vertical-align: sub;
-  font-size: 90%;
+  font-size: 70%;
 }
 
 tei-hi[rend="underscore"],
@@ -44,9 +53,13 @@ unclear {
   border-bottom: 1px dashed #6d6d6d;
 }
 
-tei-del,
+tei-del[rend=overstrike],
 del {
   text-decoration: line-through;
+}
+
+tei-del[rend=rubout] {
+  filter: blur(2px);
 }
 
 tei-supplied:before,
@@ -59,9 +72,60 @@ supplied:after {
   content: "]"
 }
 
-tei-rs {
-  font-style: italic;
-  font-weight: 500;
+tei-rs[type=person]::before {
+  content: "\f007";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=organization]::before {
+  content: "\f1ad";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=object]::before {
+  content: "\f5a7";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=place]::before {
+  content: "\f3c5";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=locus]::before {
+  content: "\f015";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
 }
 
 tei-num[type="cardinal"] {
@@ -71,7 +135,7 @@ tei-num[type="cardinal"] {
 }
 
 tei-num[type="cardinal"]:before {
-    content: attr(value);
+  content: attr(value);
 }
 
 tei-cb {
@@ -91,8 +155,8 @@ tei-cb:before {
 tei-seg[type="brace"] {
   border-left: 2px solid #aaa;
   display: inline-block;
-  padding-left: 10px;
-  margin-left: -10px;
+  padding-left: 15px;
+  margin-left: -15px;
   position: relative;
   border-radius: 5px;
 }
@@ -121,7 +185,7 @@ tei-gap {
   color: #ababab;
   font-weight: 700;
   font-size: 13px;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
 }
 gap {
   color: #ababab;
@@ -151,27 +215,49 @@ tei-item > tei-list {
   margin-top: 0;
 }
 tei-abbr {
-
+  color: #6c6b6b;
+}
+tei-add {
+  font-style: italic;
 }
 tei-add[place="above"] {
   vertical-align: super;
+  font-size: medium;
   line-height: 90%;
 }
 tei-add[place="below"] {
   vertical-align: sub;
+  font-size: medium;
   line-height: 90%;
+}
+tei-lb + tei-add[place="above"],
+tei-lb + tei-add[place="below"] {
+  vertical-align: unset;
+}
+tei-add[place="inline"] {
+  border-right: 2px dotted #aaa;
+  border-left: 2px dotted #aaa;
+  padding: 0px 3px;
+}
+tei-add[place="inline-block"] {
+  border-right: 2px dotted #aaa;
+  border-left: 2px dotted #aaa;
+  padding: 0px 3px;
+  font-size: smaller;
+  line-height: 1.2;
+  float: right;
 }
 tei-add[place="below"]:before,
 tei-add[place="below"]:after {
   content: "\21a7";
-  font-family: 'FontAwesome';
+  font-family: "Font Awesome 5 Free";
   font-size: 18px;
   color: #aaa;
 }
 tei-add[place="above"]:before,
 tei-add[place="above"]:after {
   content: "\21a5";
-  font-family: 'FontAwesome';
+  font-family: "Font Awesome 5 Free";
   font-size: 18px;
   color: #aaa;
 }
@@ -190,23 +276,23 @@ tei-add:after {
 /* CETEIcean CSS */
 /* language support */
 /* render Arabic, Persian, Ottoman, Hebrew  as rtl */
-[lang = "ar"],
-[lang = "ota"],
-[lang = "fa"],
-[lang = "he"],
-[lang *="-Arab-AR"]{
-    direction:rtl;
-    text-align:right;
+[lang="ar"],
+[lang="ota"],
+[lang="fa"],
+[lang="he"],
+[lang *="-Arab-AR"] {
+  direction: rtl;
+  text-align: right;
 }
 /* display latin scripts as ltr  */
-[lang = "en"],
-[lang = "fr"],
-[lang = "de"],
-[lang = "it"],
+[lang="en"],
+[lang="fr"],
+[lang="de"],
+[lang="it"],
 [lang *="ar-Latn-"],
-[lang *="ota-Latn-"]{
-    direction:ltr;
-    text-align:left;
+[lang *="ota-Latn-"] {
+  direction: ltr;
+  text-align: left;
 }
 
 /* Choice elements */
@@ -274,7 +360,8 @@ tei-addrLine {
 tei-address {
   /* Empty Rule Set */
 }
-tei-address[data-tei-rend~="block"], addresss[data-tei-rendition~="#block"] {
+tei-address[data-tei-rend~="block"],
+addresss[data-tei-rendition~="#block"] {
   display: block;
 }
 tei-adminInfo {
@@ -330,7 +417,7 @@ tei-argument {
   display: block;
 }
 tei-att {
-  font-family: Courier,monospace;
+  font-family: Courier, monospace;
 }
 tei-att:before {
   content: "@";
@@ -372,7 +459,8 @@ tei-back {
 tei-bibl {
   /* Empty Rule Set */
 }
-tei-bibl[data-tei-rend~="block"], bibl[data-tei-rendition~="#block"] {
+tei-bibl[data-tei-rend~="block"],
+bibl[data-tei-rendition~="#block"] {
   display: block;
   padding-left: 2em;
   text-indent: -2em;
@@ -543,7 +631,7 @@ tei-closer {
   /* Empty Rule Set */
 }
 tei-code {
-  font-family: Courier,monospace;
+  font-family: Courier, monospace;
 }
 /* jawalsh:
 For things like collation, condition, etc. that can have text or paragraphs as
@@ -640,7 +728,7 @@ tei-date[data-tei-when]:empty:before {
 }
 /* e */
 tei-editionStmt {
-  display:block;
+  display: block;
 }
 tei-egXML {
   display: block;
@@ -706,7 +794,7 @@ tei-geogName {
   /* Empty Rule Set */
 }
 tei-gi {
-  font-family: Courier,monospace;
+  font-family: Courier, monospace;
 }
 tei-gi:before {
   content: "<";
@@ -732,8 +820,7 @@ tei-gramGrp {
 tei-graph {
   /* Empty for now */
 }
-tei-graphic {
-}
+tei-graphic {}
 tei-group {
   /* Empty Rule Set */
 }
@@ -748,7 +835,24 @@ tei-handNotes {
   /* Empty Rule Set */
 }
 tei-handShift {
-  /* Empty Rule Set */
+  padding-right: 2px;
+  font-family: "Font Awesome 5 Free";
+  font-size: 12px;
+  font-weight: 400;
+  color: #a0a0a0;
+  display: inline-block;
+  vertical-align: super;
+}
+tei-lb + tei-handShift {
+  position: relative;
+  left: -14px;
+  margin-right: -14px;
+}
+tei-handShift::before {
+  content: "\f256";
+}
+tei-handShift + tei-lb {
+  display: none;
 }
 /* Need head with TEI parent to distinguish from HTML head */
 tei-TEI tei-head {
@@ -773,7 +877,8 @@ tei-div > tei-div > tei-head {
 tei-div > tei-div > tei-div > tei-head {
   font-size: 140%;
 }
-tei-div > tei-div > tei-div > tei-div > tei-head, list > tei-head {
+tei-div > tei-div > tei-div > tei-div > tei-head,
+list > tei-head {
   font-size: 130%;
 }
 tei-div > tei-div > tei-div > tei-div > tei-div > tei-head {
@@ -836,7 +941,7 @@ tei-iType {
   /* Empty Rule Set */
 }
 tei-ident {
-  font-family: Courier,monospace;
+  font-family: Courier, monospace;
 }
 tei-idno {
   /* Empty Rule Set */
@@ -936,8 +1041,7 @@ tei-lbl {
 tei-leaf {
   /* Empty Rule Set */
 }
-tei-app[data-tei-type=inline] tei-lem {
-}
+tei-app[data-tei-type=inline] tei-lem {}
 tei-lg {
   display: block;
   margin-top: 1em;
@@ -1007,7 +1111,7 @@ tei-listApp {
 
 /* sourceDesc lists */
 tei-listBibl {
-  display:block;
+  display: block;
   list-style-type: none;
   margin-left: .5 em;
   margin-top: .5em;
@@ -1021,7 +1125,7 @@ tei-listBibl > tei-bibl {
   margin-left: .5em;
 }
 tei-listWit {
-  display:block;
+  display: block;
   list-style-type: none;
   margin-left: .5em;
 }
@@ -1377,13 +1481,24 @@ tei-q[data-tei-prev]:before {
   content: "" !important;
 }
 tei-quotation {
-  /* Empty Rule Set */
+  font-family: "Times New Roman", serif;
+  color: #4b4b4b;
+  white-space: pre-line;
+  margin: 5px 20px;
+  font-size: larger;
+}
+tei-quotation + tei-lb {
+  display: none;
+}
+tei-lb + tei-quotation {
+  margin-top: -15px;
 }
 
+tei-*/
 /* r */
 tei-app tei-rdg {
   /*perhaps choice */
-  display:none;
+  display: none;
 }
 tei-rdgGrp {
   /* Empty Rule Set */
@@ -1466,9 +1581,7 @@ tei-root {
 tei-row {
   display: table-row;
 }
-tei-rs {
-  /* Empty Rule Set */
-}
+
 /*label*/
 /* s */
 /* When TEI document is embedded in HTML page,
@@ -1524,13 +1637,12 @@ tei-secFol:before {
   font-weight: bold;
   content: "Second Folio: ";
 }
-tei-secl {
-}
-tei-secl>*:first-child:before {
+tei-secl {}
+tei-secl > *:first-child:before {
   content: "\a[";
   white-space: pre;
 }
-tei-secl>*:last-child:after {
+tei-secl > *:last-child:after {
   content: "]\a\a";
   white-space: pre;
 }
@@ -1570,7 +1682,7 @@ tei-shift {
   /* seems a bit to complex to do anything with */
 }
 tei-sic {
-  /* rend as choice when contained within a choice tag, perhaps as label with parenthesis after when alone */
+  font-variant: small-caps;
 }
 tei-signatures {
   /* DON't KNOW, look again later */
@@ -1714,13 +1826,12 @@ tei-surface {
 tei-surname {
   /* Empty Set Rule */
 }
-tei-surplus {
-}
-tei-surplus>*:first-child:before {
+tei-surplus {}
+tei-surplus > *:first-child:before {
   content: "\a[";
   white-space: pre;
 }
-tei-surplus>*:last-child:after {
+tei-surplus > *:last-child:after {
   content: "]\a\a";
   white-space: pre;
 }
@@ -1739,16 +1850,28 @@ tei-table {
   border-collapse: separate;
   border-spacing: 2px;
 }
-/* Why is this selector "TEI table" instead of just "table"? */
-tei-TEI tei-table {
-  display: block;
-  margin-top: 2em;
-  margin-bottom: 2em;
-  font-size: 12pt;
+tei-table tei-lb {
+  display: none;
 }
 tei-table > head {
   text-align: center;
 }
+tei-table table {
+  border-collapse: collapse;
+}
+tei-table table td {
+  padding: 0px 10px;
+}
+tei-table[rend~=boxed] table {
+  border: 1px solid #d7d7d7;
+}
+tei-table[rend~=vdiv] table td:not(:last-of-type) {
+  border-right: 1px solid #d7d7d7;
+}
+tei-table[rend~=hdiv] table tr:not(:last-of-type) {
+  border-bottom: 1px solid #d7d7d7;
+}
+
 tei-teiHeader {
   display: block;
   /*
@@ -1870,7 +1993,7 @@ tei-wit {
   display: none;
 }
 tei-witDetail {
-  display:none;
+  display: none;
   /* Empty Rule Set */
 }
 tei-witEnd {
@@ -1892,9 +2015,7 @@ tei-zone {
 }
 
 /* TEI Common */
-.transcription tei-TEI {
-  margin: 0;
-}
+
 .ab-content {
   padding: 1.5rem;
 }
@@ -1918,7 +2039,7 @@ tei-zone {
   position: absolute;
   left: 0;
   top: 0;
-  font-family: "Open Sans",sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   white-space: nowrap;
   height: 100%;
   width: 30px;
@@ -1958,13 +2079,34 @@ tei-body span {
 tei-hi[rend*=indent] tei-lb + span,
 tei-hi[rend*=indent] tei-lb + tei-w,
 tei-hi[rend*=indent] tei-lb + tei-hi[rend="underscore"] {
-    padding: inherit;
+  padding: inherit;
 }
 /* tei-hi[rend*=indent] tei-w[type=elision] + span {
     padding: inherit;
 } */
+/* LEADERS */
 tei-w[type=elision] + span {
   padding: 0;
+}
+tei-metamark[function="ditto"]::before {
+  content: "\3003";
+}
+tei-metamark[function="ellipsis"]::before {
+  content: "\2026";
+}
+tei-metamark[function="leader"] {
+  height: 1px;
+  display: inline-flex;
+  margin-left: 5px;
+  margin-right: 5px;
+  flex-grow: 1;
+  margin-top: auto;
+  margin-bottom: 9px;
+  min-width: 30px;
+}
+tei-metamark[function="leader"]::before {
+  background-size: 50px 1px;
+  border-bottom: 1px solid #aaa;
 }
 tei-metamark[rend="line"] {
   background-size: 50px 1px;
@@ -1972,27 +2114,42 @@ tei-metamark[rend="line"] {
 }
 tei-metamark[rend="dashes"] {
   background-size: 20px 1px;
-  background-image: radial-gradient(1px 1px at center, #aaa 5px,transparent 6px);
+  background-image: radial-gradient(1px 1px at center, #aaa 5px, transparent 6px);
 }
 tei-metamark[rend="dots"] {
   background-size: 6px 1px;
   background-image: radial-gradient(1px 1px at center, #aaa 1px, transparent 2px);
-}
-tei-metamark[function="leader"] {
-  height: 1px;
-  display: inline-flex;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-tei-metamark[function="leader"]::before {
-  background-size: 50px 1px;
-  border-bottom: 1px solid #aaa;
 }
 tei-metamark[function="hr"] {
   background-size: 50px 1px;
   border-bottom: 1px solid #aaa;
   display: block;
   margin: 1rem 0;
+}
+.tei-leader-line {
+  display: flex;
+}
+.tei-leader-line div:first-of-type {
+  display: flex;
+  flex-direction: row-reverse;
+  white-space: pre-wrap;
+}
+.tei-leader-line div:first-of-type > span {
+  white-space: pre;
+}
+
+tei-metamark[function="hhr"] + tei-lb,
+tei-metamark[function="hr"] + tei-lb,
+.tei-leader-line + tei-lb {
+  display: none;
+}
+tei-metamark[function="hhr"] {
+  background-size: 50px 1px;
+  border-bottom: 1px solid #aaa;
+  display: block;
+  margin: 1rem 0;
+  width: 30%;
+  margin-left: -10%;
 }
 
 tei-ab {
@@ -2022,8 +2179,10 @@ tei-ab[type="context"] {
   border-bottom: 1px dotted #d4d4d4;
   padding: 1rem;
 }
-
 tei-mute {
+  display: none;
+}
+tei-mute + tei-lb {
   display: none;
 }
 tei-quote {
@@ -2033,36 +2192,45 @@ tei-quote {
   color: #6b6b6b;
   border-top: 1px dotted #d4d4d4;
   border-bottom: 1px dotted #d4d4d4;
-  padding: 1rem;
-  display: block;
+  padding: 1rem 1rem 1.3rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
   width: 100%;
   font-family: 'Lora';
-  white-space: normal;
-  text-align: center;
+  white-space: pre-wrap;
+  justify-content: center;
+  line-height: 1.5;
+  align-items: baseline;
+}
+tei-quote > span + tei-rs {
+  margin-left: 2px;
+}
+tei-quote > span + tei-rs::before {
+  font-style: unset !important;
 }
 tei-quote:not(:first-child) {
   margin-top: 1rem;
 }
 tei-quote:not(:last-child) {
-  margin-bottom: 1rem;
+  margin-bottom: -1rem;
 }
-tei-quote:before {
-  content: "\f10d";
-  font-family: 'FontAwesome';
-  font-size: 11px;
-  margin-right: .5rem;
+tei-quote > span:first-of-type::before {
+  content: "\201c\00a0";
+  font-family: 'Lora', 'PT Serif', serif;
+  font-size: 35px;
   color: #bbbbbb;
   position: relative;
-  top: 5px;
+  display: contents;
+  line-height: 0.8;
 }
-tei-quote:after {
-  content: "\f10e";
-  font-family: 'FontAwesome';
-  font-size: 11px;
-  margin-left: .3rem;
+tei-quote > span:last-of-type::after {
+  content: "\00a0\201e";
+  font-family: 'Lora', 'PT Serif', serif;
+  font-size: 35px;
   color: #bbbbbb;
   position: relative;
-  bottom: 5px;
+  display: contents;
+  line-height: 0.3;
 }
 tei-quote[next]:after {
   content: "" !important;
@@ -2072,20 +2240,20 @@ tei-quote[prev]:before {
 }
 tei-quote span {
   display: contents;
+  text-wrap: nowrap;
 }
-
-tei-note:not([type]) {
-  border-top: 1px dotted #6b6b6b;
-  padding: 5px 10px;
-  display: inline-block;
-  min-width: 100%;
-  font-size: 14px;
+tei-quote span:only-of-type {
+  text-wrap: wrap !important;
 }
-tei-note:not([type]):before {
-  content: attr(id)":";
-  font-weight: 600;
-  color: #757876;
-  margin-right: 5px;
+tei-quote tei-lb:first-of-type {
+  display: none;
+}
+tei-quote span ~ tei-lb:last-of-type {
+  display: none;
+}
+tei-expan {
+  color: #888888;
+  font-style: italic;
 }
 
 tei-note[type="brace"] {
@@ -2100,77 +2268,84 @@ tei-note[type="brace"] {
   border-right: none;
   border-left: none;
   line-height: 17px;
+  cursor: pointer;
 }
+
 #notebar {
   position: absolute;
-  right: 4rem;
-  display: block;
   z-index: 2;
-  overflow: scroll;
-  padding-left: 8px;
+  overflow: hidden;
+  width: 31px;
+  padding-left: 31px;
+  transition: width 2s;
+  background: linear-gradient(90deg, #ffffff, #9b9b9b, #ffffff) no-repeat top/1px 100% #ffffff91;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 .notes_container {
   position: relative;
   display: block;
-  width: auto;
-  border-left: 1px dashed #bfbfbf41;
+  width: max-content;
+  border-left: 1px dotted #c9c9c9;
+}
+.note-anchor {
+  display: inline;
+  position: relative;
 }
 tei-note[type="marginal"] {
   font-size: 14px;
   position: relative;
-  background-color: #ffffffd4;
-  border: 1px solid #d4d4d4;
-  border-right: none;
-  margin-left: -1px;
   color: #d4d4d4;
-  min-width: 28px;
   display: flex;
   flex-direction: row;
-  border-top-left-radius: .2rem;
-  border-bottom-left-radius: .2rem;
-
 }
-tei-note[type="marginal"] > div > i:first-child {
+tei-note[type="marginal"] > div:first-of-type {
+  color: #9b9b9b;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  left: -7px;
-  top: 1px;
-  font-size: 18px;
-}
-tei-note[type="marginal"] > div > i:not(first-child) {
-  margin-top: .3rem;
-  margin-bottom: .5rem;
+  left: -32px;
+  margin-right: -31px;
+  transition: opacity 0.5s;
 }
 .notes_container tei-note[type="marginal"] .note_content {
-  display: none;
   color: #6b6b6b;
-  max-width: 200px;
   line-height: 1.3;
-  padding: .5rem;
-  font-family: "PT Serif";
+  padding: 6px 10px;
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1rem;
-  background-color: #fbfbfb5c;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  width: max-content;
+  border-top: 1px dotted #c9c9c9;
+  border-bottom: 1px dotted #c9c9c9;
+  white-space: pre-wrap;
 }
-.notes_container:hover tei-note[type="marginal"] {
-  color: #354d87;
-  border-color: #354d87;
-  background-color: #fbfbfb;
+#notebar:hover {
+  width: auto;
+  background: none;
+  backdrop-filter: unset;
+  -webkit-backdrop-filter: unset;
 }
-.notes_container:hover {
-  border-color: transparent;
+#notebar:hover .notes_container {
+  background: linear-gradient(90deg, #fbfbfbe3, #ffffff8a) no-repeat left/100%;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
-.notes_container:hover tei-note[type="marginal"] .note_content {
-  display: block;
+#notebar:hover tei-note[type="marginal"] > div:first-of-type {
+  opacity: 0;
 }
+
 .tooltip.note {
-  font-family: "PT Serif";
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1rem;
 }
 .tooltip.note.show {
   opacity: .95;
 }
 .tooltip.note .tooltip-inner {
+  font-family: "PT Serif", "Times New Roman", serif;
   max-width: 400px;
   padding: .75rem .75rem;
   color: #000;
@@ -2191,15 +2366,36 @@ tei-note[type="marginal"] > div > i:not(first-child) {
   border-bottom-color: #aaa;
 }
 
+.tooltip.gloss .tooltip-inner {
+  background-color: #dfebee;
+}
+.tooltip.gloss .tooltip-inner .fa-link {
+  color: #0e62b7;
+}
+
+tei-i {
+  font-style: italic;
+}
 tei-ref {
-  font-size: 20px;
-  font-weight: 400;
-  margin-left: 2px;
-  font-family: "Open Sans";
-  position: relative;
-  top: -5px;
   text-decoration: none !important;
-  display: inline-block;
+  color: #8a8a8a;
+  cursor: pointer;
+}
+tei-ref[rend~=superscript] {
+  position: relative;
+  top: -3px;
+}
+tei-ref[rend~=subscript] {
+  position: relative;
+  bottom: -10px;
+}
+tei-ref[rend~=bold] {
+  font-weight: 900;
+}
+tei-ref[rend~=oversized] {
+  font-size: 32px;
+  line-height: 18px;
+  vertical-align: bottom;
 }
 
 tei-hi[rend=indent] {
@@ -2211,14 +2407,34 @@ tei-hi[rend=indent1] {
 tei-hi[rend=indent2] {
   padding-left: 3em;
 }
+tei-hi[rend=indent3] {
+  padding-left: 4em;
+}
+tei-hi[rend=indent4] {
+  padding-left: 5em;
+}
 tei-hi[rend=underline] {
   text-decoration: underline;
 }
-tei-hi[rend=center] {
-  display: inline-block;
-  text-align: center;
+tei-hi[rend=overline] {
+  text-decoration: overline;
+}
+
+tei-hi[rend=center],
+tei-hi[rend=right] {
+  display: inline-flex;
   width: 100%;
 }
+tei-hi[rend=center] {
+  justify-content: center;
+}
+tei-hi[rend=center] div:first-of-type {
+  text-align: center;
+}
+tei-hi[rend=right] {
+  justify-content: end;
+}
+
 tei-w[type=elision]:empty {
   margin-right: .25rem;
 }
@@ -2236,21 +2452,63 @@ tei-lb:after {
   content: '\a';
   white-space: pre;
 }
+tei-term {
+  display: inline-flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+tei-term + tei-term,
+tei-term + tei-del,
+tei-term + tei-hi {
+  margin-left: 5px;
+}
+
+tei-del + tei-term,
+tei-hi + tei-term {
+  margin-left: 5px;
+}
+
+tei-term::after {
+  content: "\f06e";
+  font-family: "Font Awesome 5 Free";
+  font-size: 8px;
+  color: #a2a2a2;
+  position: relative;
+  height: 1px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(90deg, #dddddd, #a2a2a2) no-repeat left/40% 2px, linear-gradient(90deg, #a2a2a2, #dddddd) no-repeat right/40% 2px;
+  margin-top: -2px;
+  width: 100%;
+  align-self: end;
+}
 
 /* independent soft-wrap */
 section.transcription.soft-wrap tei-text > tei-body {
-  white-space: pre-wrap !important;
+  white-space: pre-line !important;
 }
 section.transcription.soft-wrap tei-lb::after {
-  white-space: pre-wrap;
+  white-space: pre-line;
 }
+section.transcription.soft-wrap .tei-leader-line div:first-of-type {
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
+}
+section.transcription.soft-wrap .tei-leader-line div:last-of-type {
+  display: inline-flex;
+  align-items: flex-end;
+  white-space: pre;
+}
+
+/* new lines */
 section.transcription.show-newlines tei-lb::before {
   content: ' ';
-  background-image: url(@/assets/newline-icon.svg);
+  background-image: url(/static/images/newline-icon.svg);
   background-position: center 9px;
   background-repeat: no-repeat;
   width: 15px;
-  height: 23px;
+  height: 20px;
   display: inline-block;
   background-size: contain;
 }
@@ -2266,7 +2524,7 @@ div.ab-content > tei-lb:first-child {
 }
 section.transcription.show-newlines tei-hi[rend=center]::after {
   content: ' ';
-  background-image: url(@/assets/newline-icon.svg);
+  background-image: url(/static/images/newline-icon.svg);
   background-position: center 9px;
   background-repeat: no-repeat;
   width: 15px;
@@ -2280,15 +2538,15 @@ section.transcription.scholarly {
   overflow: auto;
 }
 section.transcription.scholarly tei-text > tei-body {
-  white-space: pre;
+  white-space: nowrap;
 }
 
 /* TEI Basic */
 section.transcription.basic {
-  overflow: scroll;
+  overflow: auto;
 }
 section.transcription.basic tei-text > tei-body {
-  white-space: pre-wrap;
+  white-space: pre-line;
 }
 section.transcription.basic tei-del,
 section.transcription.basic tei-pc {
@@ -2297,20 +2555,121 @@ section.transcription.basic tei-pc {
 section.transcription.basic tei-pc + tei-lb {
   display: none;
 }
+
 section.transcription.basic tei-hi[rend-basic="1"],
 section.transcription.basic tei-hi[rend="subscript"] {
   vertical-align: unset;
   font-size: 100%;
 }
-.tei-tooltip {
-  background: #333;
-  color: white;
-  font-weight: bold;
-  padding: 4px 8px;
-  font-size: 13px;
-  border-radius: 4px;
-  display: none;
+
+.popover {
+  display: flex;
+  flex-direction: column;
+  max-width: 47%;
+  max-height: 50%;
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-break: normal;
+  word-spacing: normal;
+  white-space: normal;
+  line-break: auto;
+  font-size: 14px;
+  word-wrap: break-word;
 }
-.tei-tooltip[data-show] {
-  display: block;
+.popover-body {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 0.5rem 0.75rem;
+  color: #858796;
+}
+.popover-header-wrapper {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #ebebeb;
+}
+.popover-header-wrapper .popover-header {
+  display: inline-flex;
+  flex-grow: 1;
+  border-bottom: none;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0;
+  font-size: 1rem;
+  background-color: #f7f7f7;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+}
+.popover-header-wrapper .popover-header-closer {
+  display: inline-flex;
+  background: #f7f7f7;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  border-top-right-radius: calc(0.3rem - 1px);
+  border-left: 1px solid #ebebeb;
+}
+.popover-header-wrapper .popover-header-closer:hover {
+  background: #e2e2e2;
+  color: black;
+}
+.popover-header-wrapper .popover-header-closer::before {
+  content: 'x';
+}
+
+.gloss-container {
+  font-family: Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Segoe UI Symbol";
+  display: flex;
+  flex-direction: column;
+}
+.inline-gloss {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+.gloss-lang {
+  display: inline-flex;
+  margin-right: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 0 4px;
+  color: #1e5782;
+  background: #c0d7eb;
+  border: 1px solid #2770a4;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  border-right-width: 2px;
+}
+.gloss-text {
+  color: #313131;
+  font-size: 14px;
+  font-weight: 400;
+}
+.inline-gloss-note {
+  font-family: 'PT Serif', 'Times New Roman', serif;
+  border-top: 1px dashed #c4c4c4;
+  margin-top: 8px;
+  padding-top: 5px;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  #notebar {
+    right: 13px;
+  }
+}
+@media only screen and (min-width: 1200px) {
+  #notebar {
+    right: calc(4rem + 13px);
+  }
+}
+@media only screen and (min-width: 1600px) {
+  #notebar {
+    right: calc(12rem + 13px);
+  }
 }

@@ -2179,8 +2179,10 @@ tei-ab[type="context"] {
   border-bottom: 1px dotted #d4d4d4;
   padding: 1rem;
 }
-
 tei-mute {
+  display: none;
+}
+tei-mute + tei-lb {
   display: none;
 }
 tei-quote {
