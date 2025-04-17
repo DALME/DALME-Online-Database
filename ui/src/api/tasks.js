@@ -4,8 +4,8 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/tasks`;
 
 const tasks = {
-  getTasks(query = false) {
-    const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=0&offset=0`;
+  getTasks(query, limit, offset) {
+    const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=${limit}&offset=${offset}`;
     return {
       url: url,
       method: "GET",
@@ -17,27 +17,27 @@ const tasks = {
       method: "GET",
     };
   },
-  getUserTasks(userId, limit) {
+  getUserTasks(userId, limit, offset) {
     return {
-      url: `${endpoint}/?user=${userId}&limit=${limit}`,
+      url: `${endpoint}/?user=${userId}&limit=${limit}&offset=${offset}`,
       method: "GET",
     };
   },
-  getCreatedTasks(userId, limit, offset = 0) {
+  getCreatedTasks(userId, limit, offset) {
     return {
       url: `${endpoint}/?creation_user=${userId}&completed=false&limit=${limit}&offset=${offset}`,
       method: "GET",
     };
   },
-  getAssignedTasks(userId, limit) {
+  getAssignedTasks(userId, limit, offset) {
     return {
-      url: `${endpoint}/?assignees=${userId}&completed=false&limit=${limit}`,
+      url: `${endpoint}/?assignees=${userId}&completed=false&limit=${limit}&offset=${offset}`,
       method: "GET",
     };
   },
-  getCompletedTasks(userId, limit) {
+  getCompletedTasks(userId, limit, offset) {
     return {
-      url: `${endpoint}/?completed=true&completed_by=${userId}&limit=${limit}`,
+      url: `${endpoint}/?completed=true&completed_by=${userId}&limit=${limit}&offset=${offset}`,
       method: "GET",
     };
   },
@@ -62,15 +62,18 @@ const tasks = {
       data: { action: S(action).underscore().s },
     };
   },
-  getUserTaskLists(userId) {
+  getUserTaskLists(userId, limit, offset) {
     return {
-      url: `${apiUrl}/tasklists/?user=${userId}`,
+      url: `${apiUrl}/tasklists/?user=${userId}&limit=${limit}&offset=${offset}`,
       method: "GET",
     };
   },
-  getTaskLists() {
+  getTaskLists(query, limit, offset) {
+    const url = query
+      ? `${apiUrl}/tasklists/?${query}`
+      : `${apiUrl}/tasklists/?limit=${limit}&offset=${offset}`;
     return {
-      url: `${apiUrl}/tasklists/`,
+      url: url,
       method: "GET",
     };
   },
