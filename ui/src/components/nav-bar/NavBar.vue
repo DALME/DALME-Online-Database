@@ -176,6 +176,17 @@
         >
           <ToolTip>Full screen</ToolTip>
         </q-btn>
+        <q-btn
+          v-if="showInfoAreaToggle"
+          size="13px"
+          :text-color="showInfoArea ? 'grey-7' : 'indigo-7'"
+          :icon="showInfoArea ? 'mdi-arrow-collapse-vertical' : 'mdi-arrow-expand-vertical'"
+          class="mc-button"
+          :class="{ 'bg-indigo-1': !showInfoArea }"
+          @click="showInfoArea = !showInfoArea"
+        >
+          <ToolTip>Shrink info area to maximize editing space.</ToolTip>
+        </q-btn>
       </q-toolbar>
     </div>
   </q-header>
@@ -189,6 +200,7 @@ import { navRoutes } from "@/router";
 import { ToolTip } from "@/components";
 import { useStores } from "@/use";
 import { nully } from "@/utils";
+import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "NavBar",
@@ -201,6 +213,7 @@ export default defineComponent({
       auth,
       globalLoading,
       isFullscreen,
+      showInfoArea,
       ui,
       userDrawerOpen,
       appDrawerOpen,
@@ -210,14 +223,14 @@ export default defineComponent({
       windowIndexShow,
     } = useStores();
 
+    const route = useRoute();
     const submitting = ref(false);
     const searchQuery = ref("");
     const currentSubsection = ref(ui.currentSubsection);
     const ongoingEdit = computed(
       () => pageIndexShow.value || inlineIndexShow.value || windowIndexShow.value,
     );
-
-    window.test = preferences;
+    const showInfoAreaToggle = computed(() => route.name === "Record");
 
     const openKB = () => {
       openURL("https://kb.dalme.org/", null, { target: "_blank" });
@@ -256,6 +269,7 @@ export default defineComponent({
       preferences,
       submitting,
       isFullscreen,
+      showInfoArea,
       isNil,
       isEmpty,
       toggleFullscreen,
@@ -266,6 +280,7 @@ export default defineComponent({
       appDrawerOpen,
       nully,
       ongoingEdit,
+      showInfoAreaToggle,
     };
   },
 });
