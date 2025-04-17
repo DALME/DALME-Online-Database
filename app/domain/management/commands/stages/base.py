@@ -523,14 +523,18 @@ class BaseStage(abc.ABC):
 
         if place is not None and locale is not None:
             p_loc = place.location.attributes.filter(attribute_type__name='locale')
-            if p_loc.exists() and p_loc.first().id == locale.id:
+            if p_loc.exists() and p_loc.first().value.id == locale.id:
                 return place
 
         if locale is None:
-            return Place.objects.create(
-                name=name,
-                creation_user_id=1,
-                modification_user_id=1,
+            return (
+                Place.objects.create(
+                    name=name,
+                    creation_user_id=1,
+                    modification_user_id=1,
+                )
+                if place is None
+                else place
             )
 
         location_ctype = ContentType.objects.get(app_label='domain', model='location')
