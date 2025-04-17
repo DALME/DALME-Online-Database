@@ -155,6 +155,7 @@ export default defineComponent({
           maxZoomLevel: maxZoomLevel.value,
           defaultZoomLevel: defaultZoomLevel.value,
           sequenceMode: false,
+          crossOriginPolicy: "Anonymous",
           prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
           tileSources: [currentPageData.value.manifestUrl],
         }),
