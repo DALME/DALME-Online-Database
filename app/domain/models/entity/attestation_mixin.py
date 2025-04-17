@@ -17,3 +17,8 @@ class AttestationMixin(models.Model):
     def attestation_count(self):
         """Return count of attestations."""
         return self.attestations.count()
+
+    def get_attestations_for_record(self, record):
+        """Return count of attestations in a specific record."""
+        tr_ids = [pn.transcription_id for pn in record.pagenodes.all()]
+        return self.attestations.filter(transcription__id__in=tr_ids).count()
