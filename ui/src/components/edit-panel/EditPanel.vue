@@ -11,8 +11,8 @@
       <EditSubmit />
       <q-btn
         icon="edit_note"
-        :class="{ 'edit-on': currentPageEditOn }"
-        :disable="!showEditPageBtn"
+        :class="{ 'edit-on': editOn }"
+        :disable="!showEditBtn"
         square
         @click="eventBus.emit('toggleEditor')"
       />
@@ -45,8 +45,8 @@
       <EditUpdate />
       <q-btn
         icon="edit_note"
-        :class="{ 'edit-on': currentPageEditOn }"
-        :disable="!showEditPageBtn"
+        :class="{ 'edit-on': editOn }"
+        :disable="!showEditBtn"
         square
         @click="eventBus.emit('toggleEditor')"
       />
@@ -93,8 +93,8 @@ export default defineComponent({
   setup() {
     const {
       isAdmin,
-      showEditPageBtn,
-      currentPageEditOn,
+      showEditBtn,
+      editOn,
       drawerExpanded,
       pageIndexShow,
       inlineIndexShow,
@@ -108,8 +108,8 @@ export default defineComponent({
     );
 
     return {
-      showEditPageBtn,
-      currentPageEditOn,
+      showEditBtn,
+      editOn,
       drawerExpanded,
       isAdmin,
       hideEditing,

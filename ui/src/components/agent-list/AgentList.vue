@@ -14,11 +14,11 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:render-cell-standardName="props">
-      <span v-html="props.row.standardName"></span>
+      <span v-html="props.row.name"></span>
     </template>
 
     <template v-slot:render-cell-type="props">
-      {{ props.row.type.name }}
+      {{ props.row.agentType }}
     </template>
   </DataTable>
 </template>

@@ -47,10 +47,9 @@
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent, ref } from "vue";
+import { computed, defineComponent, defineAsyncComponent, ref } from "vue";
 import ChooserMenu from "./ChooserMenu.vue";
 import { ticketFetcher, userFetcher } from "./fetchers.js";
-import { computed } from "vue";
 
 export default defineComponent({
   name: "GeneralChooser",

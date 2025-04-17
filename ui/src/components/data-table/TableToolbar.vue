@@ -361,7 +361,6 @@ export default defineComponent({
     });
 
     watch(isEditModeOn, (newValue) => {
-      console.log("watcher: isEditModeOn", newValue);
       context.emit("changeFilters", newValue);
     });
 
