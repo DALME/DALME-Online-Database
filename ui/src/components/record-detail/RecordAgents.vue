@@ -1,7 +1,7 @@
 <template>
   <q-table
     flat
-    :dense="overview"
+    dense
     :rows="agents"
     :columns="columns"
     :no-data-label="noData"
@@ -22,14 +22,9 @@
 </template>
 
 <script>
-import { keys, map } from "ramda";
 import { defineComponent, inject, ref } from "vue";
-
-const columnMap = {
-  name: "Standard Name",
-  type: "Type",
-  legalPersona: "Legal Persona",
-};
+import { getColumns } from "@/utils";
+import { columnMap } from "./agentColumns";
 
 export default defineComponent({
   name: "RecordAgents",
@@ -44,30 +39,14 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(props) {
-    const columns = ref([]);
-    const visibleColumns = ref([]);
+  setup() {
+    const columns = ref(getColumns(columnMap));
     const filter = inject("cardFilter");
-
     const noData = "No agents found.";
-    const pagination = { rowsPerPage: props.overview ? 5 : 0 }; // 0 = all rows
-
-    const getColumns = () => {
-      const toColumn = (key) => ({
-        align: "left",
-        field: key,
-        label: columnMap[key],
-        name: key,
-        sortable: true,
-        headerClasses: "text-no-wrap",
-      });
-      return map(toColumn, keys(columnMap));
-    };
-    columns.value = getColumns();
+    const pagination = { rowsPerPage: 10 }; // 0 = all rows
 
     return {
       columns,
-      visibleColumns,
       filter,
       noData,
       pagination,
