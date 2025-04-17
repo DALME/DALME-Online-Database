@@ -35,13 +35,19 @@ export const ElementSchema = yup.object().shape({
   kbReference: yup.string().required(),
   compound: yup.boolean().required(),
   icon: yup.string().nullable(),
-  tags: yup
-    .array()
-    .transform((tags) => tags.map((tag) => tag.id))
-    .required(),
 });
 
 export const ElementListSchema = yup.array().of(ElementSchema);
+
+export const ElementSetMemberSchema = yup.object().shape({
+  set: yup.string().uuid().required(),
+  element: yup.string().uuid().required(),
+  inContextMenu: yup.boolean().required(),
+  inToolbar: yup.boolean().required(),
+  shortcut: yup.string().nullable(),
+});
+
+export const ElementSetMemberListSchema = yup.array().of(ElementSetMemberSchema);
 
 export const ElementSetSchema = yup.object().shape({
   id: yup.string().uuid().required(),
@@ -49,23 +55,13 @@ export const ElementSetSchema = yup.object().shape({
   description: yup.string().required(),
   project: yup.string().nullable(),
   isDefault: yup.boolean().required(),
-  members: yup
-    .array()
-    .of(
-      yup.object().shape({
-        element: yup.string().uuid().required(),
-        inContextMenu: yup.boolean().required(),
-        inToolbar: yup.boolean().required(),
-        shortcut: yup.string().nullable(),
-      }),
-    )
-    .required(),
 });
 
 export const ElementSetListSchema = yup.array().of(ElementSetSchema);
 
 export const UserElementSetsSchema = yup.object().shape({
   sets: ElementSetListSchema.required(),
+  setMembers: ElementSetMemberListSchema.required(),
   elements: ElementListSchema.required(),
   tags: ElementTagListSchema.required(),
 });
