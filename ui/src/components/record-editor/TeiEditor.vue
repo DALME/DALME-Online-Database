@@ -179,7 +179,7 @@ export default defineComponent({
         currentPageData.value.tei = editorTools.value.getDoc();
       } else {
         editorTools.value.setDoc(currentPageData.value.tei);
-        editorView.value.requestMeasure();
+        // editorView.value.requestMeasure();
       }
     };
 
@@ -441,7 +441,6 @@ export default defineComponent({
 }
 .editor-panel {
   padding: 0;
-  background: linear-gradient(120deg, #fefefe, #efefef) no-repeat 0px/40px 100%;
 }
 :deep(.ͼ1 .cm-scroller) {
   line-height: 2;
