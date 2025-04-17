@@ -201,7 +201,21 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+/* container */
+#viewer-container {
+  display: inline-flex;
+  background-color: #474747;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  transition: height 0.2s ease-in-out;
+}
+.q-splitter--vertical #viewer-container {
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 3px;
+}
+/* toolbar */
 .viewer-toolbar {
   display: flex;
   position: absolute;
@@ -280,30 +294,7 @@ export default defineComponent({
   transform: rotate(180deg);
   writing-mode: tb;
 }
-#viewer-container {
-  display: inline-flex;
-  background-color: #474747;
-  border-top: 1px solid #919191;
-  border-left: 1px solid #919191;
-  border-right: 1px solid #919191;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  transition: height 0.2s ease-in-out;
-}
-.q-splitter--vertical #viewer-container {
-  border-right: none;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 4px;
-  border-bottom: 1px solid #919191;
-}
-.openseadragon-canvas {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-.q-splitter--vertical .openseadragon-canvas {
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 3px;
-}
+/* crossed-out icon */
 .crossed-out .q-btn__content::after {
   content: "";
   width: 2px;
