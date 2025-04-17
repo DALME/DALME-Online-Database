@@ -1,32 +1,18 @@
 import * as yup from "yup";
+import { attributeSchema, locationSchema, timeStampSchema, userAttributeSchema } from "@/schemas";
 
-export const placeListSchema = yup.array().of(
-  yup
-    .object()
-    .shape({
-      id: yup.string().uuid().required(),
-      standardName: yup.string().required(),
-      notes: yup.string().default(null).nullable(),
-      locale: yup
-        .object()
-        .shape({
-          id: yup.number().required(),
-          name: yup.string().required(),
-          administrativeRegion: yup.string().required(),
-          country: yup.string().required(),
-        })
-        .default({})
-        .nullable()
-        .camelCase(),
-      administrativeRegion: yup.string().default(null).nullable(),
-      country: yup.string().default(null).nullable(),
-    })
-    .transform((data) => {
-      return {
-        ...data,
-        administrativeRegion: data.locale ? data.locale.administrativeRegion : null,
-        country: data.locale ? data.locale.country : null,
-      };
-    })
-    .camelCase(),
-);
+export const placeSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  name: yup.string().required(),
+  attributes: yup.array().of(attributeSchema).required(),
+  location: locationSchema.default(null).nullable(),
+  commentCount: yup.number().required(),
+  attestationCount: yup.number().default(null).nullable(),
+  recordAttestationCount: yup.number().default(null).nullable(),
+  creationTimestamp: timeStampSchema.required(),
+  creationUser: userAttributeSchema.required(),
+  modificationTimestamp: timeStampSchema.required(),
+  modificationUser: userAttributeSchema.required(),
+});
+
+export const placeListSchema = yup.array().of(placeSchema);

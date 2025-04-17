@@ -18,6 +18,7 @@ import {
   workflowSchema,
   recordGroupAttributeSchema,
   publicationAttributeSchema,
+  placeListSchema,
 } from "@/schemas";
 
 export const recordSchema = yup.object().shape({
@@ -45,7 +46,7 @@ export const recordAttributeSchema = yup.object().shape({
 });
 
 export const recordDetailSchema = yup.object().shape({
-  agents: agentListSchema,
+  agents: agentListSchema.default(null).nullable(),
   attributes: yup.array().of(attributeSchema).required(),
   collections: yup.array().of(collectionAttributeSchema).required(),
   commentCount: yup.number().required(),
@@ -61,6 +62,7 @@ export const recordDetailSchema = yup.object().shape({
   noTranscriptions: yup.number().required(),
   owner: userAttributeSchema.required(),
   pages: yup.array().of(pageSchema).nullable(),
+  places: placeListSchema.default(null).nullable(),
   shortName: yup.string().required(),
   parent: yup.lazy((value) =>
     "parent" in value ? recordGroupAttributeSchema : publicationAttributeSchema,

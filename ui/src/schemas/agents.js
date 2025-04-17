@@ -10,6 +10,8 @@ export const agentSchema = yup
       .matches(/(Person|Organization)/, { excludeEmptyString: true })
       .required(),
     user: yup.string().default(null).nullable(),
+    attestationCount: yup.number().default(null).nullable(),
+    recordAttestationCount: yup.number().default(null).nullable(),
   })
   .camelCase();
 
