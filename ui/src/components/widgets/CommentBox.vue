@@ -42,7 +42,7 @@
                 <q-card flat bordered :class="containerClasses(entry.creationUser.id)">
                   <q-card-section class="comment-head">
                     <DetailPopover :dark="dark" :userData="entry.creationUser" :showAvatar="true" />
-                    commented {{ formatDate(entry.creationTimestamp) }}
+                    commented on {{ formatDate(entry.creationTimestamp, "DATETIME_AT") }}
                   </q-card-section>
                   <q-card-section class="q-pa-none">
                     <MarkdownEditor :text="entry.body" :dark="dark" in-card />
@@ -226,7 +226,7 @@ export default defineComponent({
         const verb = event.endsWith("commenced") ? "started" : "completed";
         text = `${verb} ${action} of this record`;
       }
-      return timestamp ? `${text} on ${timestamp.date} @ ${timestamp.time}` : text;
+      return timestamp ? `${text} on ${formatDate(timestamp, "DATETIME_AT")}` : text;
     };
 
     const fetchData = async () => {

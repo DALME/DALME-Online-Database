@@ -16,7 +16,7 @@
             class="q-ml-none q-mr-xs"
           />
           <DetailPopover :userData="ticket.creationUser" :showAvatar="false" />
-          created this ticket {{ formatDate(ticket.creationTimestamp) }}
+          created this ticket on {{ formatDate(ticket.creationTimestamp, "DATETIME_AT") }}
         </div>
       </div>
       <div v-if="isAdmin" class="col-auto">
@@ -60,7 +60,7 @@
                   <q-card flat bordered class="box-arrow top">
                     <q-card-section class="bg-grey-2 comment-head">
                       <DetailPopover :userData="ticket.creationUser" :showAvatar="false" />
-                      commented {{ formatDate(ticket.creationTimestamp) }}
+                      commented on {{ formatDate(ticket.creationTimestamp, "DATETIME_AT") }}
                     </q-card-section>
                     <q-separator />
                     <q-card-section class="text-body2 q-pa-none">
@@ -83,7 +83,7 @@
                   </div>
                   <div class="closing-dot-label">
                     <DetailPopover :userData="ticket.closingUser" />
-                    closed this ticket {{ formatDate(ticket.closingDate) }}
+                    closed this ticket on {{ formatDate(ticket.closingDate, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>

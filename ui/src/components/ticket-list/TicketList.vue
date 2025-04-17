@@ -35,7 +35,7 @@
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
           {{ props.row.creationUser.username }}
-          {{ formatDate(props.row.creationTimestamp, false) }}
+          {{ formatDate(props.row.creationTimestamp, "DATETIME_AT") }}
         </div>
         <div class="text-h8 q-mb-xs">
           <span class="text-grey-7">#{{ props.row.number }}</span>
@@ -60,12 +60,15 @@
       <div class="text-detail text-weight-medium text-grey-8">
         <span
           v-text="
-            `#${props.row.number} opened ${formatDate(props.row.creationTimestamp, false)} by `
+            `#${props.row.number} opened on ${formatDate(
+              props.row.creationTimestamp,
+              'DATETIME_AT',
+            )} by `
           "
         />
         <DetailPopover showAvatar :userData="props.row.creationUser" />
         <template v-if="props.row.status && props.row.closingUser">
-          <span v-text="`, closed ${formatDate(props.row.closingDate, false)} by `" />
+          <span v-text="`, closed on ${formatDate(props.row.closingDate, 'DATETIME_AT')} by `" />
           <DetailPopover :userData="props.row.closingUser" />
         </template>
       </div>

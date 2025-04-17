@@ -34,8 +34,8 @@
         :linkText="props.row.name"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
-          Created by {{ props.row.creationUser.username }}
-          {{ formatDate(props.row.creationTimestamp, false) }}
+          Created on {{ formatDate(props.row.creationTimestamp, "DATETIME_AT") }} by
+          {{ props.row.creationUser.username }}
         </div>
         <div v-if="props.row.rightsHolder" class="text-h8 q-mb-xs">
           <span class="text-grey-7">Rights Holder:</span>

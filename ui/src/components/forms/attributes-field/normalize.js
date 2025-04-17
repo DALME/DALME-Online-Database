@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import { filter as rFilter, isNil, pipe, reduce } from "ramda";
 import * as yup from "yup";
 
@@ -75,7 +74,7 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
       case "Date":
         return {
           attribute: attributeType,
-          value: DateTime.fromISO(data.name).toISODate(),
+          value: new Date(data.name).toISOString(),
         };
 
       default:

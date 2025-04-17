@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import { isNil } from "ramda";
 import * as yup from "yup";
 
@@ -7,6 +6,7 @@ import {
   taskListSchema,
   userAttributeSchema,
   collectionAttributeSchema,
+  timeStampSchema,
 } from "@/schemas";
 
 // Field-level validation rules/schemas.
@@ -21,11 +21,7 @@ export const taskFieldValidation = {
       return isNil(option) ? null : option.value;
     })
     .label("Task list"),
-  dueDate: yup
-    .string()
-    .nullable()
-    .transform((value) => (value ? DateTime.fromISO(value).toISODate() : null))
-    .label("Date due"),
+  dueDate: yup.date().default(null).nullable().label("Date due"),
   assignedTo: yup
     .object()
     .shape({ value: yup.number().nullable() })
@@ -38,10 +34,7 @@ export const taskEditSchema = yup.object().shape({
   id: yup.number().required(),
   title: yup.string().required(),
   description: yup.string().required(),
-  dueDate: yup
-    .string()
-    .nullable()
-    .transform((value) => (value ? DateTime.fromISO(value).toISODate() : null)),
+  dueDate: yup.date().default(null).nullable(),
   assignedTo: yup.string().nullable(),
 });
 
@@ -56,19 +49,23 @@ export const taskSchema = yup
       taskIndex: yup.array().of(yup.number()).default(null).nullable(),
     }),
     description: yup.string().required(),
-    dueDate: yup.string().default(null).nullable(),
+    dueDate: yup
+      .date()
+      .transform((value) => (value == null ? null : new Date(value)))
+      .default(null)
+      .nullable(),
     completed: yup.boolean().required(),
-    completedDate: yup.string().default(null).nullable(),
+    completedDate: timeStampSchema.default(null).nullable(),
     completedBy: userAttributeSchema.default(null).nullable(),
-    overdue: yup.boolean().default(null).nullable(),
+    overdue: yup.boolean().default(false).nullable(),
     files: yup.array().of(attachmentSchema).default(null).nullable(),
     resources: yup.array().of(collectionAttributeSchema).default(null).nullable(),
     assignees: yup.array().of(userAttributeSchema).default(null).nullable(),
     url: yup.string().url().default(null).nullable(),
-    commentCount: yup.number().default(null).nullable(),
-    creationTimestamp: yup.string().required(),
+    commentCount: yup.number().default(0).nullable(),
+    creationTimestamp: timeStampSchema.required(),
     creationUser: userAttributeSchema.required(),
-    modificationTimestamp: yup.string().required(),
+    modificationTimestamp: timeStampSchema.required(),
     modificationUser: userAttributeSchema.required(),
   })
   .camelCase();

@@ -1,5 +1,4 @@
 /* Schemas for system list pages. */
-import { DateTime } from "luxon";
 import * as yup from "yup";
 
 export const usersSchema = yup
@@ -9,10 +8,7 @@ export const usersSchema = yup
     fullName: yup.string().required(),
     email: yup.string().email().required(),
     username: yup.string().required(),
-    lastLogin: yup
-      .string()
-      .required()
-      .transform((value) => DateTime.fromISO(value).toISO()),
+    lastLogin: yup.date().default(null).nullable(),
     active: yup.boolean().required(),
     staff: yup.boolean().required(),
   })

@@ -71,7 +71,6 @@
 <script>
 import { openURL } from "quasar";
 import { computed, defineComponent } from "vue";
-import { formatDate } from "@/utils";
 import { TagPill } from "@/components";
 
 export default defineComponent({
@@ -104,7 +103,6 @@ export default defineComponent({
     });
 
     return {
-      formatDate,
       openURL,
       avatarIcon,
     };

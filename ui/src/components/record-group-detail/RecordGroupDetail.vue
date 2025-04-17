@@ -14,8 +14,8 @@
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!ui.globalLoading">
                   <span
-                    >Created on {{ recordGroup.creationTimestamp.date }} @
-                    {{ recordGroup.creationTimestamp.time }} by
+                    >Created on
+                    {{ formatDate(recordGroup.creationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
                     :user="recordGroup.creationUser"
@@ -24,8 +24,8 @@
                     inline
                   />
                   <span
-                    >, last modified on {{ recordGroup.modificationTimestamp.date }} @
-                    {{ recordGroup.modificationTimestamp.time }} by
+                    >, last modified on
+                    {{ formatDate(recordGroup.modificationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
                     :user="recordGroup.modificationUser"
@@ -166,8 +166,7 @@
                 <div>
                   <UserPill :user="recordGroup.creationUser" text-size="13px" :bold="false" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ recordGroup.creationTimestamp.date }} @
-                    {{ recordGroup.modificationTimestamp.time }}
+                    {{ formatDate(recordGroup.creationTimestamp.value, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>
@@ -177,8 +176,7 @@
                 <div>
                   <UserPill :user="recordGroup.modificationUser" text-size="13px" :bold="false" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ recordGroup.modificationTimestamp.date }} @
-                    {{ recordGroup.modificationTimestamp.time }}
+                    {{ formatDate(recordGroup.modificationTimestamp.value, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>

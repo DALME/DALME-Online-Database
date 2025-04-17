@@ -1,5 +1,4 @@
 import { camelCase } from "camel-case";
-import { DateTime } from "luxon";
 import { isNil } from "ramda";
 import * as yup from "yup";
 
@@ -7,10 +6,7 @@ export const attributeDateSchema = yup.object().shape({
   day: yup.number().nullable(),
   month: yup.number().nullable(),
   year: yup.number().nullable(),
-  date: yup
-    .date()
-    .transform((value) => (value == null ? null : new Date(value)))
-    .nullable(),
+  date: yup.date().default(null).nullable(),
   text: yup.string().required(),
 });
 
@@ -22,6 +18,9 @@ export const attributeSchema = yup.object().shape({
     .transform((value) => camelCase(value)),
   label: yup.string().required(),
   description: yup.string().nullable(),
+  attributeType: yup.number().required(),
+  dataType: yup.string().required(),
+  isUnique: yup.boolean().nullable().default(true),
   value: yup
     .mixed()
     .when("dataType", ([dataType], _schema) => {
@@ -43,9 +42,6 @@ export const attributeSchema = yup.object().shape({
       }
     })
     .required(),
-  attributeType: yup.number().required(),
-  dataType: yup.string().required(),
-  isUnique: yup.boolean().nullable().default(true),
 });
 
 export const attributeListSchema = yup.array().of(attributeSchema);
@@ -68,12 +64,7 @@ export const attributeValidators = {
   archivalNumber: yup.string().nullable().required().label("Archival number"),
   archivalSeries: yup.string().nullable().required().label("Archival series"),
   authority: yup.string().nullable().required().label("Authority"),
-  date: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => DateTime.fromISO(value).toISODate())
-    .label("Date"),
+  date: yup.date().default(null).nullable().required().label("Date"),
   defaultRights: yup
     .object()
     .shape({ value: yup.string().uuid().required().label("Default rights") })
@@ -83,12 +74,7 @@ export const attributeValidators = {
     .label("Default rights"),
   description: yup.string().nullable().required().label("Description"),
   email: yup.string().email().nullable().required().label("Email"),
-  endDate: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => DateTime.fromISO(value).toISODate())
-    .label("End date"),
+  endDate: yup.date().default(null).nullable().required().label("End date"),
   format: yup.string().nullable().required().label("Format"),
   hasLanding: yup
     .boolean()
@@ -142,12 +128,7 @@ export const attributeValidators = {
     .nullable()
     .required()
     .label("Record type"),
-  startDate: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => DateTime.fromISO(value).toISODate())
-    .label("Start date"),
+  startDate: yup.date().default(null).nullable().required().label("Start date"),
   statText: yup.string().nullable().required().label("Stat text"),
   statTitle: yup.string().nullable().required().label("Stat title"),
   status: yup.string().nullable().required().label("Status"),
@@ -180,7 +161,6 @@ export const attributeTypeSchema = yup
         const optionsType = shortName[1] || forceOptions.includes(shortName[0]) ? "Options" : false;
 
         // Booleans are a subset of INT so let's sort those out for clarity.
-        console.log(shortName, schema);
         const booleanType = shortName[2].toLowerCase().includes("boolean") ? "Boolean" : false;
 
         return schema.transform(

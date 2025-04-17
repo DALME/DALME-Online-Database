@@ -40,7 +40,6 @@
 </template>
 
 <script>
-import { DateTime } from "luxon";
 import { computed, defineComponent, watch } from "vue";
 import { useEditing, useStores, useTransport } from "@/use";
 
@@ -58,7 +57,7 @@ export default defineComponent({
     const disableRedo = computed(() => (transport.canRedo.value ? false : true));
     const isFocus = computed(() => focus.value === "inline");
     const { inlineIndexShow } = useStores();
-    const fromUnixTs = (unixTs) => DateTime.fromMillis(unixTs).toISO();
+    const fromUnixTs = (unixTs) => new Date(unixTs * 1000).toISOString();
     const handleFocus = () => send({ type: "SET_FOCUS", value: "inline" });
 
     watch(

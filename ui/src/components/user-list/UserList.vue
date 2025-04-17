@@ -75,14 +75,13 @@
 
     <template v-slot:grid-counter="props">
       <div class="text-detail text-weight-medium text-grey-8 q-ml-auto">
-        Joined {{ formatDate(props.row.dateJoined, false) }}
+        Joined on {{ formatDate(props.row.dateJoined, "DATETIME_AT") }}
       </div>
     </template>
 
     <template v-slot:grid-counter-extra="props">
       <div class="text-detail text-weight-medium text-grey-8 q-ml-auto">
-        Last active
-        {{ formatDate(props.row.lastLogin, false) }}
+        Last active on {{ formatDate(props.row.lastLogin, "DATETIME_AT") }}
       </div>
     </template>
 

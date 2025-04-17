@@ -22,8 +22,7 @@
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!loading">
                   <span
-                    >Created on {{ policy.creationTimestamp.date }} @
-                    {{ policy.creationTimestamp.time }} by
+                    >Created on {{ formatDate(policy.creationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
                     :user="policy.creationUser"
@@ -32,8 +31,8 @@
                     inline
                   />
                   <span
-                    >, last modified on {{ policy.modificationTimestamp.date }} @
-                    {{ policy.modificationTimestamp.time }} by
+                    >, last modified on
+                    {{ formatDate(policy.modificationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
                     :user="policy.modificationUser"
@@ -162,8 +161,7 @@ AD_Savoie_-_Autorisation_de_publication.pdf"
                 <div>
                   <UserPill :user="policy.creationUser" text-size="13px" :bold="false" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ policy.creationTimestamp.date }} @
-                    {{ policy.modificationTimestamp.time }}
+                    {{ formatDate(policy.creationTimestamp.value, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>
@@ -173,8 +171,7 @@ AD_Savoie_-_Autorisation_de_publication.pdf"
                 <div>
                   <UserPill :user="policy.modificationUser" text-size="13px" :bold="false" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ policy.modificationTimestamp.date }} @
-                    {{ policy.modificationTimestamp.time }}
+                    {{ formatDate(policy.modificationTimestamp.value, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>
