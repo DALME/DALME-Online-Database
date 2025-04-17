@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.conf import settings
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 
 from app.access_policies import RecordAccessPolicy, WebAccessPolicy
@@ -108,6 +109,13 @@ class Records(BaseViewSet):
             qs = Record.unattributed.all()
         else:
             qs = Record.objects.all()
+
+        if self.request and hasattr(self.request, 'user'):
+            user = self.request.user
+            if not user.is_superuser:
+                q = Q(is_private=False) & ~Q(owner=user)
+                return qs.exclude(q)
+
         return qs
 
     @action(detail=True, methods=['post', 'get'])
@@ -143,6 +151,12 @@ class Records(BaseViewSet):
         if self.action in ['create', 'update', 'partial_update', 'update_related']:
             kwargs['field_set'] = 'retrieve'
         return kwargs
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.action == 'retrieve':
+            context['record'] = self.get_object()
+        return context
 
 
 class WebRecords(Records):

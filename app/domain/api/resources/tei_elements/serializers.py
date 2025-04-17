@@ -52,7 +52,7 @@ class ElementTagSerializer(DynamicSerializer):
 class ElementSerializer(serializers.ModelSerializer):
     """Serializer for TEI elements."""
 
-    tags = ElementTagSerializer(fields=['id'], many=True, read_only=True)
+    # tags = ElementTagSerializer(fields=['id'], many=True, read_only=True)
 
     class Meta:
         model = Element
@@ -62,7 +62,7 @@ class ElementSerializer(serializers.ModelSerializer):
             'section',
             'description',
             'kb_reference',
-            'tags',
+            # 'tags',
             'compound',
             'icon',
         ]
@@ -71,9 +71,12 @@ class ElementSerializer(serializers.ModelSerializer):
 class ElementSetMemberSerializer(serializers.ModelSerializer):
     """Serializer for TEI element set members."""
 
+    set = serializers.ReadOnlyField(source='element_set.id')
+
     class Meta:
         model = ElementSetMembership
         fields = [
+            'set',
             'element',
             'in_context_menu',
             'in_toolbar',
@@ -84,7 +87,6 @@ class ElementSetMemberSerializer(serializers.ModelSerializer):
 class ElementSetSerializer(serializers.ModelSerializer):
     """Serializer for TEI element sets."""
 
-    members = ElementSetMemberSerializer(many=True, read_only=True)
     project = serializers.ReadOnlyField(source='project.name')
 
     class Meta:
@@ -95,5 +97,4 @@ class ElementSetSerializer(serializers.ModelSerializer):
             'description',
             'project',
             'is_default',
-            'members',
         ]

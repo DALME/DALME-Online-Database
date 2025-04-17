@@ -7,9 +7,10 @@ from domain.api.resources.attributes import AttributeSerializer
 from domain.api.resources.languages import LanguageReferenceSerializer
 from domain.api.resources.locales import LocaleReferenceSerializer
 from domain.api.resources.pages import PageSerializer
+from domain.api.resources.places import PlaceSerializer
 from domain.api.resources.users import UserSerializer
 from domain.api.resources.workflows import WorkflowSerializer
-from domain.api.serializers import DynamicSerializer
+from domain.api.serializers import DynamicSerializer, PermissionsSerializer
 from domain.models import Collection, Record, RecordType, Workflow
 from domain.models.resourcespace import rs_resource
 
@@ -115,17 +116,19 @@ class RecordSerializer(DynamicSerializer):
     image_urls = serializers.SerializerMethodField(required=False)
     collections = RecordAttributeCollectionSerializer(many=True, required=False)
     parent = RecordParentSerializer(required=False)
+    agents = AgentSerializer(many=True, required=False)
+    places = PlaceSerializer(many=True, required=False)
     # annotated fields
     description = serializers.ReadOnlyField(required=False)
     record_type = RecordTypeSerializer(field_set='attribute')
     locale = LocaleReferenceSerializer(many=True, required=False)
     language = LanguageReferenceSerializer(many=True, required=False)
     # method fields
-    agents = AgentSerializer(many=True, required=False)
     credit_line = serializers.SerializerMethodField(required=False)
     credits = serializers.SerializerMethodField(required=False)
     source = serializers.SerializerMethodField(required=False)
     date = serializers.SerializerMethodField(required=False)
+    permissions = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = Record
@@ -161,6 +164,8 @@ class RecordSerializer(DynamicSerializer):
             'source',
             'agents',
             'parent',
+            'places',
+            'permissions',
         ]
         default_exclude = [
             'has_images',
@@ -231,6 +236,8 @@ class RecordSerializer(DynamicSerializer):
                 'credit_line',
                 'parent',
                 'agents',
+                'places',
+                'permissions',
             ],
             'web': [
                 'id',
@@ -277,3 +284,11 @@ class RecordSerializer(DynamicSerializer):
 
     def get_date(self, obj):
         return obj.get_date()
+
+    def get_permissions(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            perms = obj.get_user_permissions(request.user)
+            serializer = PermissionsSerializer(perms)
+            return serializer.data
+        return None

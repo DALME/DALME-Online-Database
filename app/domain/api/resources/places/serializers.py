@@ -1,8 +1,11 @@
 """Serializers for place data."""
 
+from rest_framework import serializers
+
 from domain.api.resources.attributes import AttributeSerializer
 from domain.api.resources.locations import LocationSerializer
 from domain.api.resources.tags import TagSerializer
+from domain.api.resources.users import UserSerializer
 from domain.api.serializers import DynamicSerializer
 from domain.models import Place
 
@@ -13,6 +16,9 @@ class PlaceSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True, required=False)
     location = LocationSerializer(field_set='attribute')
     tags = TagSerializer(many=True, required=False)
+    creation_user = UserSerializer(field_set='attribute', required=False)
+    modification_user = UserSerializer(field_set='attribute', required=False)
+    record_attestation_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Place
@@ -21,8 +27,14 @@ class PlaceSerializer(DynamicSerializer):
             'name',
             'attributes',
             'location',
+            'creation_timestamp',
+            'creation_user',
+            'modification_timestamp',
+            'modification_user',
             'comment_count',
             'tags',
+            'attestation_count',
+            'record_attestation_count',
         ]
         field_sets = {
             'option': [

@@ -56,3 +56,23 @@ class BaseContentTypeSerializer(DynamicSerializer):
             'app_label',
             'model',
         ]
+
+
+class PermissionsSerializer(serializers.Serializer):
+    """Serializer for object level permissions."""
+
+    can_view = serializers.BooleanField()
+    can_edit = serializers.BooleanField()
+    can_delete = serializers.BooleanField()
+    can_add = serializers.BooleanField()
+    can_remove = serializers.BooleanField()
+
+    class Meta:
+        model = ContentType
+        fields = [
+            'can_view',
+            'can_edit',
+            'can_delete',
+            'can_add',
+            'can_remove',
+        ]
