@@ -9,7 +9,8 @@ import { configure } from "quasar/wrappers";
 const getDevCSP = () => {
   const defaultSrc =
     "default-src 'self' data: ws://0.0.0.0:8000 https://dam.dalme.org https://ka-f.fontawesome.com/";
-  const imgSrc = "img-src 'self' https://dam.dalme.org";
+  const imgSrc =
+    "img-src 'self' https://dam.dalme.org https://tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com";
   const scriptSrc =
     "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net/ https://kit.fontawesome.com/ https://code.jquery.com/ https://cdnjs.cloudflare.com/ https://maxcdn.bootstrapcdn.com/ https://unpkg.com/";
   const styleSrc =
@@ -28,7 +29,7 @@ export default configure((ctx) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ["axios", "markdown"],
+    boot: ["axios", "markdown", "openLayers"],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ["app.scss"],
@@ -52,7 +53,7 @@ export default configure((ctx) => {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
       target: {
-        browser: ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
+        browser: ["es2022", "edge88", "firefox78", "chrome87", "safari14"],
         node: "node20",
       },
 
@@ -74,11 +75,11 @@ export default configure((ctx) => {
 
       extendViteConf(viteConf) {
         viteConf.build = {
-          target: "es2020",
+          target: "es2022",
           ...viteConf.build,
         };
         viteConf.optimizeDeps.esbuildOptions = {
-          target: "es2020",
+          target: "es2022",
           supported: { bigint: true },
           ...viteConf.optimizeDeps.esbuildOptions,
         };
