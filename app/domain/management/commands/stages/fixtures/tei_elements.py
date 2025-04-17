@@ -202,6 +202,15 @@ TEI_ATTRIBUTE_OPTIONS = [
         ],
     },
     {
+        'key': 'mute_types',
+        'name': 'TEI list of mute tag types',
+        'payload_type': 'static_list',
+        'description': 'List of types for TEI mute element.',
+        'payload': [
+            {'label': 'Named agents', 'value': 'named_agents_wrapper'},
+        ],
+    },
+    {
         'key': 'table_renderings',
         'name': 'TEI list of table renderings',
         'payload_type': 'static_list',
@@ -398,6 +407,16 @@ TEI_ELEMENTS = [
                 'name': 'mute',
                 'kind': 'enclosing',
                 'placeholder': 'CONTENT TO MUTE',
+                'attributes': [
+                    {
+                        'value': 'type',
+                        'label': 'Type',
+                        'editable': True,
+                        'required': False,
+                        'kind': 'choice',
+                        'options': 'mute_types',
+                    }
+                ],
             }
         ],
     },
