@@ -12,3 +12,4 @@ export { default as CommentBox } from "./CommentBox.vue";
 export { default as AttachmentWidget } from "./AttachmentWidget.vue";
 export { default as CustomIcon } from "./CustomIcon.vue";
 export { default as IDALogo } from "./IdaLogo.vue";
+export { default as MapWidget } from "./MapWidget.vue";
