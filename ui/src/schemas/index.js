@@ -18,6 +18,7 @@ export * from "./images";
 export * from "./languages";
 export * from "./library";
 export * from "./locales";
+export * from "./locations";
 export * from "./transcriptions";
 export * from "./pages";
 export * from "./places";
