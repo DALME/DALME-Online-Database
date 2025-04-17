@@ -31,5 +31,7 @@ class LocaleReferenceSerializer(DynamicSerializer):
                 'name',
                 'administrative_region',
                 'country',
+                'latitude',
+                'longitude',
             ],
         }
