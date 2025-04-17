@@ -9,6 +9,8 @@ from app.abstract import TrackingMixin, UuidMixin
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
+PERMISSION_TYPES = ['can_view', 'can_edit', 'can_delete', 'can_add', 'can_remove']
+
 
 class Permission(UuidMixin, TrackingMixin):
     """Stores object-level permissions information."""

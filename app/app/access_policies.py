@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Exists, OuterRef, Q
 
-from domain.models import Permission
+from domain.models.permission import PERMISSION_TYPES, Permission
 
 
 class BaseAccessPolicy(AccessPolicy):
@@ -20,7 +20,6 @@ class BaseAccessPolicy(AccessPolicy):
     targets = []
     fail_target_string = None
     error = None
-    perm_types = ['can_view', 'can_edit', 'can_delete', 'can_add', 'can_remove']
 
     def _evaluate_statements(self, statements, request, view, action):
         result = super()._evaluate_statements(statements, request, view, action)
@@ -115,10 +114,10 @@ class BaseAccessPolicy(AccessPolicy):
                     principal_type=ct_group,
                     principal_id__in=group_ids,
                 )
-                perm_obj = Permission.objects.filter(default_perms | user_perms | group_perms).values(*self.perm_types)
+                perm_obj = Permission.objects.filter(default_perms | user_perms | group_perms).values(*PERMISSION_TYPES)
 
                 permissions[target.id] = {}
-                for pt in self.perm_types:
+                for pt in PERMISSION_TYPES:
                     permissions[target.id][pt] = len([i[pt] for i in perm_obj if i[pt] is True]) > 0
 
             self.permissions = permissions
@@ -154,8 +153,8 @@ class BaseAccessPolicy(AccessPolicy):
             self.error = '"has_perm" condition requires a parameter, none was supplied.'
             return False
 
-        if arg not in self.perm_types:
-            self.error = f'{arg} is not a valid argument for the "has_perm" condition. Must be one of {", ".join(self.perm_types)}'
+        if arg not in PERMISSION_TYPES:
+            self.error = f'{arg} is not a valid argument for the "has_perm" condition. Must be one of {", ".join(PERMISSION_TYPES)}'
             return False
 
         perms = self.get_permissions(request, view)
