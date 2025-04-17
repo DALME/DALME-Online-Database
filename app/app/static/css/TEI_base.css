@@ -5,6 +5,7 @@ tei-TEI {
   margin-left: auto;
   color: #111;
   display: flex; /* width of page adapts to text */
+  flex-direction: column;
 }
 
 @-moz-document url-prefix() {
@@ -20,7 +21,23 @@ tei-TEI > tei-text {
   margin-right: 30px;
   position: relative;
 }
-
+tei-TEI ns1-parsererror {
+  display: flex !important;
+  border: 1px solid #c77 !important;
+  padding: 1em !important;
+  margin: 0 0 1em 0 !important;
+  flex-direction: column;
+}
+tei-TEI ns1-parsererror ns1-h3 {
+  font-family: 'Roboto';
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 2;
+  color: #400707;
+}
+tei-TEI ns1-parsererror ns1-div {
+  font-family: "Menlo", "Consolas", "Monaco", monospace;
+}
 tei-body {
   line-height: 1.8;
   position: relative;
