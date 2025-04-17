@@ -98,30 +98,26 @@
         />
       </template>
     </q-field>
-    <q-field
-      v-if="data.dataType === 'DATE'"
-      :borderless="!editOn"
-      :readonly="!editOn"
-      :label="data.label"
-      stack-label
-    >
-      <q-toggle :disable="!editOn" v-model="value" color="green" />
-      <template v-slot:append>
+    <div v-if="data.dataType === 'DATE'" class="field-date-container">
+      <div class="field-date-wrapper">
+        <div class="field-date-label q-field__label">
+          <div>{{ data.label }}</div>
+        </div>
+        <DateChooser :data="value" :editable="editOn" @changed="updateValue" />
+      </div>
+      <div class="field-date-buttons">
         <EditButtons
-          :linkable="data.link"
           cancellable
           :main-icon="editIcon"
           :main-color="editColour"
           :show-main="data.editable && !saving"
           :show-cancel="editOn && hasChanged"
           :show-spinner="saving"
-          :show-link="!saving && !editOn"
-          @navigate="router.push(linkTarget)"
           @action="onAction"
           @cancel="onCancel"
         />
-      </template>
-    </q-field>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -134,6 +130,7 @@ import { OptionListSchema } from "@/schemas";
 import { snakeCase } from "change-case";
 import { nully } from "@/utils";
 import EditButtons from "./EditButtons.vue";
+import { DateChooser } from "@/components";
 
 export default defineComponent({
   name: "ValueDisplay",
@@ -145,7 +142,7 @@ export default defineComponent({
     field: String,
   },
   emits: ["valueChanged"],
-  components: { EditButtons },
+  components: { EditButtons, DateChooser },
 
   setup(props, context) {
     const router = useRouter();
@@ -241,6 +238,11 @@ export default defineComponent({
       });
     };
 
+    const updateValue = (val) => {
+      console.log("update VALUE", val);
+      value.value = val;
+    };
+
     onBeforeMount(() => {
       if (props.data.dataType === "FKEY") {
         loading.value = true;
@@ -253,6 +255,9 @@ export default defineComponent({
           value.value = ogValue.value;
           loading.value = false;
         });
+      } else if (props.data.dataType === "DATE") {
+        ogValue.value = props.data.value;
+        value.value = ogValue.value;
       } else {
         ogValue.value = props.data.value;
         value.value = ogValue.value;
@@ -275,6 +280,7 @@ export default defineComponent({
       onCancel,
       editIcon,
       editColour,
+      updateValue,
     };
   },
 });
@@ -289,5 +295,31 @@ export default defineComponent({
 }
 .value-display label {
   flex-grow: 1;
+}
+.field-date-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.24);
+  height: 56px;
+}
+.field-date-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.field-date-buttons {
+  display: flex;
+  margin-left: auto;
+}
+.field-date-label {
+  transform: scale(0.75);
+  height: 24px;
+}
+.field-date-label div:first-child {
+  position: absolute;
+  bottom: -10px;
+}
+.date-chooser-wrapper {
+  height: 32px;
 }
 </style>
