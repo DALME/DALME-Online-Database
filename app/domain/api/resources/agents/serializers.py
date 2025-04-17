@@ -13,6 +13,7 @@ class AgentSerializer(DynamicSerializer, WritableNestedModelSerializer):
 
     user = UserSerializer(required=False)
     agent_type = serializers.CharField(source='get_agent_type_display')
+    record_attestation_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Agent
@@ -21,6 +22,8 @@ class AgentSerializer(DynamicSerializer, WritableNestedModelSerializer):
             'agent_type',
             'name',
             'user',
+            'attestation_count',
+            'record_attestation_count',
         ]
         extra_kwargs = {
             'notes': {
@@ -30,6 +33,12 @@ class AgentSerializer(DynamicSerializer, WritableNestedModelSerializer):
                 'required': False,
             },
         }
+
+    def get_record_attestation_count(self, obj):
+        """Return count of attestations for current record."""
+        if self.context.get('record'):
+            return obj.get_attestations_for_record(self.context['record'])
+        return None
 
     # def to_internal_value(self, data):
     #     """Transform incoming data."""

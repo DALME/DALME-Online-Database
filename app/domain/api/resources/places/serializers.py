@@ -35,3 +35,9 @@ class PlaceSerializer(DynamicSerializer):
                 'location',
             ],
         }
+
+    def get_record_attestation_count(self, obj):
+        """Return count of attestations for current record."""
+        if self.context.get('record'):
+            return obj.get_attestations_for_record(self.context['record'])
+        return None
