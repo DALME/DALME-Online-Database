@@ -1,5 +1,7 @@
 """Serializers for location data."""
 
+from rest_framework import serializers
+
 from domain.api.resources.attributes import AttributeSerializer
 from domain.api.resources.tags import TagSerializer
 from domain.api.resources.users import UserSerializer
@@ -11,6 +13,7 @@ class LocationSerializer(DynamicSerializer):
     """Serializer for places."""
 
     attributes = AttributeSerializer(many=True, required=False)
+    location_type = serializers.CharField(source='get_location_type_display')
     tags = TagSerializer(many=True, required=False)
     creation_user = UserSerializer(field_set='attribute')
     modification_user = UserSerializer(field_set='attribute')
