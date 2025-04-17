@@ -1,7 +1,7 @@
 export const columnMap = {
   damId: {
     label: "DAM Id",
-    align: "center",
+    align: "left",
     sortable: true,
     sortOrder: "ad",
     isSortDefault: true,
@@ -11,12 +11,12 @@ export const columnMap = {
   },
   name: {
     label: "Folio",
-    align: "left",
+    align: "center",
     sortable: true,
     sortOrder: "ad",
     isSortDefault: false,
     classes: null,
-    headerClasses: "text-no-wrap",
+    headerClasses: "text-no-wrap text-center",
     isDefaultVisible: true,
   },
   order: {
@@ -26,7 +26,7 @@ export const columnMap = {
     sortOrder: "ad",
     isSortDefault: false,
     classes: null,
-    headerClasses: "text-no-wrap",
+    headerClasses: "text-no-wrap text-center",
     isDefaultVisible: true,
   },
   hasImage: {
@@ -36,7 +36,7 @@ export const columnMap = {
     sortOrder: "ad",
     isSortDefault: false,
     classes: null,
-    headerClasses: "text-no-wrap",
+    headerClasses: "text-no-wrap text-center",
     isDefaultVisible: true,
   },
   hasTranscription: {
@@ -46,7 +46,7 @@ export const columnMap = {
     sortOrder: "ad",
     isSortDefault: false,
     classes: null,
-    headerClasses: "text-no-wrap",
+    headerClasses: "text-no-wrap text-center",
     isDefaultVisible: true,
   },
 };
