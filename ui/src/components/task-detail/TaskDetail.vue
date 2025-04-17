@@ -15,7 +15,7 @@
             class="q-ml-none q-mr-xs"
           />
           <DetailPopover :userData="task.creationUser" :showAvatar="false" />
-          created this task {{ formatDate(task.creationTimestamp) }}
+          created this task on {{ formatDate(task.creationTimestamp, "DATETIME_AT") }}
         </div>
       </div>
       <div v-if="isAdmin" class="col-auto">
@@ -60,7 +60,7 @@
                   <q-card flat bordered class="box-left-arrow">
                     <q-card-section class="bg-grey-2 comment-head">
                       <DetailPopover :userData="task.creationUser" :showAvatar="false" />
-                      commented {{ formatDate(task.creationTimestamp) }}
+                      commented on {{ formatDate(task.creationTimestamp, "DATETIME_AT") }}
                     </q-card-section>
                     <q-separator />
                     <q-card-section class="text-body2">
@@ -78,7 +78,7 @@
                     <q-icon name="o_check_circle" color="white" size="20px" />
                   </div>
                   <div class="closing-dot-label">
-                    this task was completed {{ formatDate(task.completedDate) }}
+                    this task was completed {{ formatDate(task.completedDate, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>

@@ -1,37 +1,37 @@
 <template>
-  <template v-if="tm.tasksReady">
+  <template v-if="taskStore.ready">
     <TaskList
       add-new-button
-      :data="tm.created"
-      :loading="tm.loading"
+      :data="taskStore.created"
+      :loading="taskStore.loading"
       label="Your tasks"
       in-user-drawer
       :no-data-message="createdNoData"
-      :more-button="tm.moreCreated"
-      @show-more="tm.onShowMore('created')"
-      @change-status="tm.onChangeStatus"
+      :more-button="taskStore.moreCreated"
+      @show-more="taskStore.onShowMore('created')"
+      @change-status="taskStore.onChangeStatus"
       @view-detail="onViewDetail"
     />
     <TaskList
-      :data="tm.assigned"
-      :loading="tm.loading"
+      :data="taskStore.assigned"
+      :loading="taskStore.loading"
       label="Tasks assigned to you"
       in-user-drawer
       :no-data-message="assignedNoData"
-      :more-button="tm.moreAssigned"
-      @show-more="tm.onShowMore('assigned')"
-      @change-status="tm.onChangeStatus"
+      :more-button="taskStore.moreAssigned"
+      @show-more="taskStore.onShowMore('assigned')"
+      @change-status="taskStore.onChangeStatus"
       @view-detail="onViewDetail"
     />
     <TaskList
-      :data="tm.completed"
-      :loading="tm.loading"
+      :data="taskStore.completed"
+      :loading="taskStore.loading"
       label="Tasks you completed"
       in-user-drawer
       no-data-message="You have not completed any tasks yet."
-      :more-button="tm.moreCompleted"
-      @show-more="tm.onShowMore('completed')"
-      @change-status="tm.onChangeStatus"
+      :more-button="taskStore.moreCompleted"
+      @show-more="taskStore.onShowMore('completed')"
+      @change-status="taskStore.onChangeStatus"
       @view-detail="onViewDetail"
     />
   </template>
@@ -39,7 +39,7 @@
 
 <script>
 import { computed, defineComponent } from "vue";
-import { useTasks } from "@/stores/tasks";
+import { useStores } from "@/use";
 import TaskList from "./TaskList.vue";
 
 export default defineComponent({
@@ -48,15 +48,15 @@ export default defineComponent({
     TaskList,
   },
   setup() {
-    const tm = useTasks();
+    const { taskStore } = useStores();
 
     const onViewDetail = (task) => {
-      tm.setViewing(task);
-      tm.showTaskModal();
+      taskStore.setViewer(task);
+      taskStore.showTaskModal();
     };
 
     const createdNoData = computed(() => {
-      if (tm.tasksMeta.user > 0) {
+      if (taskStore.meta.user > 0) {
         return "There are no pending tasks.";
       } else {
         return "You have not created any tasks yet.";
@@ -64,7 +64,7 @@ export default defineComponent({
     });
 
     const assignedNoData = computed(() => {
-      if (tm.tasksMeta.assigned > 0) {
+      if (taskStore.meta.assigned > 0) {
         return "There are no pending tasks assigned to you.";
       } else {
         return "You have not been assigned any tasks yet.";
@@ -72,7 +72,7 @@ export default defineComponent({
     });
 
     return {
-      tm,
+      taskStore,
       onViewDetail,
       createdNoData,
       assignedNoData,

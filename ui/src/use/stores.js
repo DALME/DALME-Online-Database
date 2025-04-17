@@ -5,6 +5,8 @@ import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
 import { useSettingsStore } from "@/stores/settings";
+import { useEditorStore } from "@/stores/editor";
+import { useTaskStore } from "@/stores/tasks";
 
 const StoresSymbol = Symbol();
 
@@ -14,6 +16,8 @@ export const provideStores = () => {
   const ui = useUiStore();
   const views = useViewStore();
   const settings = useSettingsStore();
+  const editorStore = useEditorStore();
+  const taskStore = useTaskStore();
 
   provide(StoresSymbol, {
     eventBus,
@@ -21,10 +25,14 @@ export const provideStores = () => {
     ui,
     views,
     settings,
+    editorStore,
+    taskStore,
     ...storeToRefs(auth),
     ...storeToRefs(ui),
     ...storeToRefs(views),
     ...storeToRefs(settings),
+    ...storeToRefs(editorStore),
+    ...storeToRefs(taskStore),
   });
   return {
     eventBus,
@@ -32,10 +40,14 @@ export const provideStores = () => {
     ui,
     views,
     settings,
+    editorStore,
+    taskStore,
     ...storeToRefs(auth),
     ...storeToRefs(ui),
     ...storeToRefs(views),
     ...storeToRefs(settings),
+    ...storeToRefs(editorStore),
+    ...storeToRefs(taskStore),
   };
 };
 

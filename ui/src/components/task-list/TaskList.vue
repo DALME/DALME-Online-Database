@@ -39,7 +39,7 @@
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
           {{ props.row.creationUser.username }}
-          {{ formatDate(props.row.creationTimestamp, false) }}
+          {{ formatDate(props.row.creationTimestamp, "DATETIME_AT") }}
         </div>
         <div class="text-h8 q-mb-xs">{{ props.row.title }}</div>
         <div class="text-detail ellipsis-3-lines">
@@ -70,11 +70,11 @@
 
     <template v-slot:grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
-        <span v-text="`Created ${formatDate(props.row.creationTimestamp, false)} by `" />
+        <span v-text="`Created on ${formatDate(props.row.creationTimestamp, 'DATETIME_AT')} by `" />
         <!-- <DetailPopover showAvatar :userData="props.row.creationUser" /> -->
         <span
           v-if="props.row.completed && props.row.completedDate"
-          v-text="`, completed ${formatDate(props.row.completedDate, false)}`"
+          v-text="`, completed ${formatDate(props.row.completedDate, 'DATETIME_AT')}`"
         />
       </div>
     </template>

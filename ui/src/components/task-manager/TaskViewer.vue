@@ -9,14 +9,18 @@
   >
     <div :class="fullHeight ? 'action-modal-card full-height' : 'action-modal-card'">
       <div class="card-drawer" :class="openDrawer ? 'show' : ''">
-        <template v-if="openDrawer && tm.listsReady">
+        <template v-if="openDrawer && taskStore.ready">
           <div class="q-mb-md">
             <div
-              v-if="!nully(tm.listGroups) || tm.tasks.length > 0 || tm.tasksMeta.user > 0"
+              v-if="
+                !nully(taskStore.listGroups) ||
+                taskStore.tasks.length > 0 ||
+                taskStore.meta.user > 0
+              "
               class="tasklist-toolbar"
             >
-              <TasklistManager v-if="!nully(tm.listGroups)" :lists="tm.listGroups" />
-              <template v-if="tm.tasks.length > 0 || tm.tasksMeta.user > 0">
+              <TasklistManager v-if="!nully(taskStore.listGroups)" :lists="taskStore.listGroups" />
+              <template v-if="taskStore.tasks.length > 0 || taskStore.meta.user > 0">
                 <q-btn-dropdown
                   label="Filter"
                   size="12px"
@@ -28,7 +32,13 @@
                     <q-item dense class="header">
                       <q-item-section>Status</q-item-section>
                       <q-item-section side>
-                        <q-btn flat dense size="xs" icon="close" @click.stop="tm.clearFilters" />
+                        <q-btn
+                          flat
+                          dense
+                          size="xs"
+                          icon="close"
+                          @click.stop="taskStore.clearFilters"
+                        />
                       </q-item-section>
                     </q-item>
                     <q-item dense clickable v-close-popup class="inset-item">
@@ -75,7 +85,7 @@
                           dense
                           size="xs"
                           icon="close"
-                          @click.stop="tm.activeSort == ''"
+                          @click.stop="taskStore.activeSort == ''"
                         />
                       </q-item-section>
                     </q-item>
@@ -86,8 +96,8 @@
                       clickable
                       v-close-popup
                       class="inset-item"
-                      :active="item.value == tm.activeSort"
-                      @click.stop="tm.activeSort == item.value"
+                      :active="item.value == taskStore.activeSort"
+                      @click.stop="taskStore.activeSort == item.value"
                     >
                       <q-item-section>{{ item.label }}</q-item-section>
                     </q-item>
@@ -99,20 +109,20 @@
           </div>
           <q-scroll-area dark class="scroll-area">
             <TaskList
-              :data="tm.tasks"
-              :more-button="tm.moreTasks"
+              :data="taskStore.tasks()"
+              :more-button="taskStore.moreTasks"
               :no-data-message="noTasksData"
-              :scroll-off="tm.viewing == null"
-              @show-more="tm.onShowMore('all')"
-              @change-status="tm.onChangeStatus"
-              @view-detail="tm.setViewing"
+              :scroll-off="taskStore.onViewer == null"
+              @show-more="taskStore.onShowMore('all')"
+              @change-status="taskStore.onChangeStatus"
+              @view-detail="taskStore.setViewer"
             />
           </q-scroll-area>
         </template>
       </div>
       <div class="separator" />
       <div class="card-main">
-        <div :class="tm.viewing ? 'task-wrapper border' : 'task-wrapper'">
+        <div :class="taskStore.onViewer ? 'task-wrapper border' : 'task-wrapper'">
           <q-item class="task-title">
             <q-item-section avatar>
               <q-btn
@@ -125,9 +135,9 @@
                 @click="openDrawer = !openDrawer"
               />
             </q-item-section>
-            <q-item-section v-if="tm.viewing">
+            <q-item-section v-if="taskStore.onViewer">
               <q-item-label>
-                {{ tm.viewing.title }}
+                {{ taskStore.onViewer.title }}
                 <q-chip
                   :icon="taskStatus[0]"
                   :label="taskStatus[1]"
@@ -138,11 +148,22 @@
                 />
               </q-item-label>
               <q-item-label caption>
-                <span v-text="`Created ${fDate(tm.viewing.creationTimestamp)} by `" />
-                <DetailPopover dark show-avatar :user-data="tm.viewing.creationUser" />
-                <template v-if="tm.viewing.completed">
-                  <span v-text="`, completed ${fDate(tm.viewing.completedDate)} by `" />
-                  <DetailPopover dark show-avatar :user-data="tm.viewing.completedBy" />
+                <span
+                  v-text="
+                    `Created ${formatDate(taskStore.onViewer.creationTimestamp, 'DATETIME_AT')} by `
+                  "
+                />
+                <DetailPopover dark show-avatar :user-data="taskStore.onViewer.creationUser" />
+                <template v-if="taskStore.onViewer.completed">
+                  <span
+                    v-text="
+                      `, completed ${formatDate(
+                        taskStore.onViewer.completedDate,
+                        'DATETIME_AT',
+                      )} by `
+                    "
+                  />
+                  <DetailPopover dark show-avatar :user-data="taskStore.onViewer.completedBy" />
                 </template>
               </q-item-label>
             </q-item-section>
@@ -150,21 +171,29 @@
               <q-btn icon="mdi-close" flat round dense v-close-popup />
             </q-item-section>
           </q-item>
-          <template v-if="tm.viewing">
+          <template v-if="taskStore.onViewer">
             <q-item class="task-container">
               <q-item-section top avatar>
                 <q-icon name="mdi-note-outline" />
               </q-item-section>
               <q-item-section>
-                <MarkdownEditor v-if="tm.viewing.description" :text="tm.viewing.description" dark />
+                <MarkdownEditor
+                  v-if="taskStore.onViewer.description"
+                  :text="taskStore.onViewer.description"
+                  dark
+                />
                 <span v-else>No description provided.</span>
               </q-item-section>
               <q-item-section top side>
                 <div class="task-meta">
-                  <div v-if="tm.viewing.assignees.length">
+                  <div v-if="taskStore.onViewer.assignees.length">
                     <div class="meta-label">Assignees</div>
                     <div class="meta-content">
-                      <q-avatar v-for="(user, i) in tm.viewing.assignees" :key="i" size="30px">
+                      <q-avatar
+                        v-for="(user, i) in taskStore.onViewer.assignees"
+                        :key="i"
+                        size="30px"
+                      >
                         <q-img
                           v-if="!nully(user.avatar)"
                           :src="user.avatar"
@@ -175,11 +204,11 @@
                       </q-avatar>
                     </div>
                   </div>
-                  <div v-if="tm.viewing.files.length">
+                  <div v-if="taskStore.onViewer.files.length">
                     <div class="meta-label">Attachments</div>
                     <div class="meta-content">
                       <AttachmentWidget
-                        v-for="(file, i) in tm.viewing.files"
+                        v-for="(file, i) in taskStore.onViewer.files"
                         :key="i"
                         :file="file"
                         compact
@@ -187,21 +216,29 @@
                       />
                     </div>
                   </div>
-                  <div v-if="tm.viewing.resources.length">
+                  <div v-if="taskStore.onViewer.resources.length">
                     <div class="meta-label">Resources</div>
                   </div>
                 </div>
               </q-item-section>
             </q-item>
             <div class="task-footer">
-              <div v-if="tm.viewing.dueDate" class="text-caption">
+              <div v-if="taskStore.onViewer.dueDate" class="text-caption">
                 <q-btn flat dense icon="mdi-calendar-edit-outline" @click="changeDueDate" />
-                <span v-text="`Due ${fDate(tm.viewing.dueDate, 0, 'h')} `" />
-                <span v-text="`(${fDate(tm.viewing.dueDate, 0, 'd', null)})`" />
+                <span
+                  v-text="
+                    `Due on ${formatDate(taskStore.onViewer.dueDate, 'DATE_MED_WITH_WEEKDAY')} `
+                  "
+                />
               </div>
-              <q-btn v-if="tm.viewing.url" flat icon="mdi-link" @click="openURL(tm.viewing.url)" />
               <q-btn
-                v-if="tm.viewing.canChange"
+                v-if="taskStore.onViewer.url"
+                flat
+                icon="mdi-link"
+                @click="openURL(taskStore.onViewer.url)"
+              />
+              <q-btn
+                v-if="taskStore.onViewer.canChange"
                 flat
                 :class="`action-button ${action[1]}`"
                 :label="capitalize(action[0])"
@@ -216,20 +253,29 @@
             </div>
           </div>
         </div>
-        <q-scroll-area dark class="scroll-area q-px-lg" v-if="tm.viewing">
-          <CommentBox dark :author="tm.viewing.creationUser.id">
-            <template v-if="tm.viewing.completed" v-slot:comment-stream-end>
-              <q-item class="comment-box" :class="tm.viewing.completedByAuthor ? 'op-post' : ''">
-                <q-item-section v-if="tm.viewing.completedByAuthor" avatar>
+        <q-scroll-area dark class="scroll-area q-px-lg" v-if="taskStore.onViewer">
+          <CommentBox dark :author="taskStore.onViewer.creationUser.id">
+            <template v-if="taskStore.onViewer.completed" v-slot:comment-stream-end>
+              <q-item
+                class="comment-box"
+                :class="taskStore.onViewer.completedByAuthor ? 'op-post' : ''"
+              >
+                <q-item-section v-if="taskStore.onViewer.completedByAuthor" avatar>
                   <q-avatar size="40px" class="closing-dot">
                     <q-icon name="mdi-check-circle" color="white" size="20px" />
                   </q-avatar>
                 </q-item-section>
-                <q-item-section :style="!tm.viewing.completedByAuthor ? 'align-content: end;' : ''">
-                  <span v-text="`completed ${fDate(tm.viewing.completedDate)} by `" />
-                  <DetailPopover dark show-avatar :user-data="tm.viewing.completedBy" />
+                <q-item-section
+                  :style="!taskStore.onViewer.completedByAuthor ? 'align-content: end;' : ''"
+                >
+                  <span
+                    v-text="
+                      `completed ${formatDate(taskStore.onViewer.completedDate, 'DATETIME_AT')} by `
+                    "
+                  />
+                  <DetailPopover dark show-avatar :user-data="taskStore.onViewer.completedBy" />
                 </q-item-section>
-                <q-item-section v-if="!tm.viewing.completedByAuthor" side>
+                <q-item-section v-if="!taskStore.onViewer.completedByAuthor" side>
                   <q-avatar size="40px" class="closing-dot">
                     <q-icon name="mdi-check-circle" color="white" size="20px" />
                   </q-avatar>
@@ -246,9 +292,9 @@
 <script>
 import { useDialogPluginComponent, format, openURL } from "quasar";
 import { computed, provide, onMounted, ref } from "vue";
-import { formatDate as fDate, nully } from "@/utils";
+import { formatDate, nully } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
-import { useTasks } from "@/stores/tasks";
+import { useTaskStore } from "@/stores/tasks";
 import TasklistManager from "./TasklistManager.vue";
 import TaskList from "./TaskList.vue";
 import {
@@ -273,26 +319,28 @@ export default {
   setup() {
     const { dialogRef, onDialogHide } = useDialogPluginComponent();
     const auth = useAuthStore();
+    const taskStore = useTaskStore();
     const { capitalize } = format;
-    const tm = useTasks();
     const openDrawer = ref(false);
     const attachment = ref(null);
-    const id = computed(() => (tm.viewing ? tm.viewing.id : null));
+    const id = computed(() => (taskStore.onViewer ? taskStore.onViewer.id : null));
 
     const action = computed(() =>
-      tm.viewing
-        ? tm.viewing.completed
+      taskStore.onViewer
+        ? taskStore.onViewer.completed
           ? ["mark pending", "open"]
           : ["mark done", "close"]
         : null,
     );
 
     const taskStatus = computed(() => {
-      if (tm.viewing) {
-        let label = tm.viewing.completed ? "DONE" : "PENDING";
-        let colour = tm.viewing.completed ? "light-green-9" : "deep-purple-6";
-        let icon = tm.viewing.completed ? "mdi-check-circle" : "mdi-dots-horizontal-circle-outline";
-        return tm.viewing.overdue == true
+      if (taskStore.onViewer) {
+        let label = taskStore.onViewer.completed ? "DONE" : "PENDING";
+        let colour = taskStore.onViewer.completed ? "light-green-9" : "deep-purple-6";
+        let icon = taskStore.onViewer.completed
+          ? "mdi-check-circle"
+          : "mdi-dots-horizontal-circle-outline";
+        return taskStore.onViewer.overdue == true
           ? ["mdi-clock-alert-outline", "OVERDUE", "red-5"]
           : [icon, label, colour];
       } else {
@@ -301,10 +349,12 @@ export default {
     });
 
     const fullHeight = computed(() => {
-      if (tm.viewing) {
-        return (openDrawer.value && tm.tasks.length > 5) || tm.viewing.commentCount > 0;
+      if (taskStore.onViewer) {
+        return (
+          (openDrawer.value && taskStore.tasks.length > 5) || taskStore.onViewer.commentCount > 0
+        );
       } else {
-        return tm.tasks.length > 5;
+        return taskStore.tasks.length > 5;
       }
     });
 
@@ -318,7 +368,7 @@ export default {
     ];
 
     const noTasksData = computed(() => {
-      if (tm.tasksMeta.user > 0) {
+      if (taskStore.meta.user > 0) {
         return "No tasks match the current filter or search criteria.";
       } else {
         // eslint-disable-next-line max-len
@@ -339,7 +389,7 @@ export default {
     provide("id", id);
 
     onMounted(() => {
-      if (!tm.viewing) {
+      if (!taskStore.onViewer) {
         openDrawer.value = true;
       }
     });
@@ -348,13 +398,13 @@ export default {
       action,
       attachment,
       capitalize,
-      fDate,
+      formatDate,
       dialogRef,
       onDialogHide,
       onAction,
       auth,
       openDrawer,
-      tm,
+      taskStore,
       taskStatus,
       nully,
       openURL,

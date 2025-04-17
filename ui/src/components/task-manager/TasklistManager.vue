@@ -10,7 +10,7 @@
       <q-item dense class="header">
         <q-item-section>Task lists</q-item-section>
         <q-item-section side>
-          <q-btn flat dense size="xs" icon="close" @click.stop="tm.clearListFilters" />
+          <q-btn flat dense size="xs" icon="close" @click.stop="taskStore.clearListFilters" />
         </q-item-section>
       </q-item>
 
@@ -19,8 +19,8 @@
           dense
           clickable
           :group="group"
-          :active="tm.activeGroups.has(group)"
-          @click.stop="tm.setFilterList(group, true)"
+          :active="taskStore.activeGroups.has(group)"
+          @click.stop="taskStore.setFilterList(group, true)"
         >
           <q-item-section avatar>
             <q-icon name="mdi-account-group-outline" size="xs" />
@@ -38,8 +38,11 @@
           class="inset-item"
           :group="group"
           :list="taskList.name"
-          :active="tm.activeGroups.has(group) || tm.activeLists.has(`${group}-${taskList.name}`)"
-          @click.stop="tm.setFilterList(`${group}-${taskList.name}`)"
+          :active="
+            taskStore.activeGroups.has(group) ||
+            taskStore.activeLists.has(`${group}-${taskList.name}`)
+          "
+          @click.stop="taskStore.setFilterList(`${group}-${taskList.name}`)"
         >
           <q-item-section>
             {{ taskList.name }}
@@ -94,7 +97,7 @@
 import { defineComponent } from "vue";
 import { ToolTip } from "@/components";
 import { useAuthStore } from "@/stores/auth";
-import { useTasks } from "@/stores/tasks";
+import { useTaskStore } from "@/stores/tasks";
 
 export default defineComponent({
   name: "TasklistList",
@@ -110,8 +113,8 @@ export default defineComponent({
   emits: ["onReload"],
   setup() {
     const auth = useAuthStore();
+    const taskStore = useTaskStore();
     const title = "Task Lists";
-    const tm = useTasks();
 
     // const filter = (e) => {
     //   let group = e.currentTarget.getAttribute("group");
@@ -143,7 +146,7 @@ export default defineComponent({
     return {
       isAdmin: auth.user.isAdmin,
       title,
-      tm,
+      taskStore,
     };
   },
 });

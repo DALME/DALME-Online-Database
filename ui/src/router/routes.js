@@ -1,4 +1,4 @@
-import { useTasks } from "@/stores/tasks";
+import { useTaskStore } from "@/stores/tasks";
 
 const routes = [
   {
@@ -229,9 +229,9 @@ const routes = [
             if ("id" in to.params) state["taskId"] = to.params.id;
             return { name: "Dashboard", state: state };
           } else {
-            const tm = useTasks();
-            if ("id" in to.params) tm.setViewing(to.params.id, true);
-            tm.showTaskModal();
+            const taskStore = useTaskStore();
+            if ("id" in to.params) taskStore.setViewer(to.params.id, true);
+            taskStore.showTaskModal();
             return false;
           }
         },

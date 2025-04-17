@@ -27,7 +27,7 @@ export const columnMap = {
     sortOrder: "ad",
     isSortDefault: false,
     classes: null,
-    headerClasses: "text-no-wrap",
+    headerClasses: "text-no-wrap text-center",
     isDefaultVisible: true,
   },
   title: {

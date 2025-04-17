@@ -29,20 +29,20 @@
       </q-item-label>
       <q-item-label caption :lines="mini ? 1 : 2">
         <template v-if="mini">
-          <span v-if="task.completed" v-text="`${formatDate(task.completedDate, false, 'd')}`" />
+          <span v-if="task.completed" v-text="`${formatDate(task.completedDate, 'DATETIME_AT')}`" />
           <span
             v-else
             v-text="
-              `${formatDate(task.creationTimestamp, false, 'd')} | ${task.creationUser.username}`
+              `${formatDate(task.creationTimestamp, 'DATETIME_AT')} | ${task.creationUser.username}`
             "
           />
         </template>
         <template v-else>
-          <span v-text="`Created ${formatDate(task.creationTimestamp, false)} by `" />
+          <span v-text="`Created on ${formatDate(task.creationTimestamp, 'DATETIME_AT')} by `" />
           <DetailPopover show-avatar :user-data="task.creationUser" />
           <span
             v-if="task.completed"
-            v-text="`, completed ${formatDate(task.completedDate, false)} by `"
+            v-text="`, completed on ${formatDate(task.completedDate, 'DATETIME_AT')} by `"
           />
           <DetailPopover v-if="task.completed" show-avatar :user-data="task.completedBy" />
         </template>
