@@ -1,38 +1,31 @@
 <template>
-  <template v-if="overview">
-    <q-table
-      flat
-      :dense="overview"
-      :rows="pages"
-      :columns="columns"
-      :no-data-label="noData"
-      :filter="filter"
-      :pagination="pagination"
-      :rows-per-page-options="[0]"
-      row-key="id"
-      class="sticky-header"
-      table-colspan="5"
-      wrap-cells
-    >
-      <template v-slot:body-cell-hasImage="props">
-        <q-td :props="props"><BooleanValue :value="props.value" /></q-td>
-      </template>
+  <q-table
+    flat
+    dense
+    :rows="pages"
+    :columns="columns"
+    :no-data-label="noData"
+    :filter="filter"
+    :pagination="pagination"
+    :rows-per-page-options="[0]"
+    row-key="id"
+    class="sticky-header"
+    table-colspan="5"
+    wrap-cells
+  >
+    <template v-slot:body-cell-hasImage="props">
+      <q-td :props="props"><BooleanValue :value="props.value" /></q-td>
+    </template>
 
-      <template v-slot:body-cell-hasTranscription="props">
-        <q-td :props="props"><BooleanValue :value="props.value" /></q-td>
-      </template>
-    </q-table>
-  </template>
-  <template v-else>
-    <RecordEditor />
-  </template>
+    <template v-slot:body-cell-hasTranscription="props">
+      <q-td :props="props"><BooleanValue :value="props.value" /></q-td>
+    </template>
+  </q-table>
 </template>
 
 <script>
-import { defineComponent, inject, provide, ref } from "vue";
-import { getColumns } from "@/utils";
-import { BooleanValue, RecordEditor } from "@/components";
-import { columnMap } from "./pageColumns";
+import { defineComponent, inject } from "vue";
+import { BooleanValue } from "@/components";
 
 export default defineComponent({
   name: "RecordPages",
@@ -41,24 +34,15 @@ export default defineComponent({
       type: Array,
       required: true,
     },
-    overview: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   components: {
     BooleanValue,
-    RecordEditor,
   },
-  setup(props) {
-    const columns = ref(getColumns(columnMap));
-    const filter = props.overview ? inject("cardFilter") : ref("");
+  setup() {
+    const columns = inject("pageColumns");
+    const filter = inject("cardFilter");
     const noData = "No folios found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
-
-    provide("pages", props.pages);
-    provide("columns", columns);
 
     return {
       columns,

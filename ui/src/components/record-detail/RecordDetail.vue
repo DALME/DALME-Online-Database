@@ -22,9 +22,9 @@
               </div>
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!ui.globalLoading">
-                  <span
-                    >Created on {{ recordData.creationTimestamp.value.date }} @
-                    {{ recordData.creationTimestamp.value.time }} by
+                  <span>
+                    Created on
+                    {{ formatDate(recordData.creationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
                     :user="recordData.creationUser.value"
@@ -33,8 +33,9 @@
                     inline
                   />
                   <span
-                    >, last modified on {{ recordData.modificationTimestamp.value.date }} @
-                    {{ recordData.modificationTimestamp.value.time }} by
+                    >, last modified on
+                    {{ formatDate(recordData.modificationTimestamp.value, "DATETIME_AT") }}
+                    by
                   </span>
                   <UserPill
                     :user="recordData.modificationUser.value"
@@ -76,7 +77,7 @@
                 />
               </q-tab>
               <q-tab
-                v-if="agentData.length"
+                v-if="entityCount > 0"
                 name="entities"
                 label="Entities"
                 icon="o_person_pin_circle"
@@ -86,7 +87,7 @@
                   color="indigo-1"
                   rounded
                   class="text-grey-8 q-mx-xs"
-                  :label="agentData.length"
+                  :label="entityCount"
                 />
               </q-tab>
               <q-tab name="comments" icon="o_forum" label="Discussion & Activity">
@@ -121,14 +122,14 @@
               @state-changed="updateWorkflow"
             />
             <q-btn
-              v-if="view.tab === 'pages'"
+              v-if="showEditBtn"
               dense
               outline
               size="sm"
-              :icon="showInfoArea ? 'mdi-arrow-collapse-vertical' : 'mdi-arrow-expand-vertical'"
+              :icon="editOn ? 'mdi-pencil-off' : 'mdi-pencil'"
               text-color="grey-7"
               class="bg-grey-2 q-ml-xs"
-              @click="showInfoArea = !showInfoArea"
+              @click="eventBus.emit('toggleEditor')"
             />
           </div>
         </div>
@@ -180,18 +181,7 @@
                         class="q-mt-md"
                         @value-changed="onValueChange"
                       >
-                        <RecordPages overview :pages="pageData" />
-                      </DetailCard>
-
-                      <DetailCard
-                        v-if="agentData.length"
-                        icon="people"
-                        title="Agents"
-                        showFilter
-                        class="q-mt-md"
-                        @value-changed="onValueChange"
-                      >
-                        <RecordAgents overview :agents="agentData" />
+                        <RecordPages :pages="pageData" />
                       </DetailCard>
                     </div>
                   </div>
@@ -228,30 +218,41 @@
                     class="q-mt-md"
                     @value-changed="onValueChange"
                   >
-                    <RecordPages overview :pages="pageData" />
-                  </DetailCard>
-
-                  <DetailCard
-                    v-if="agentData.length"
-                    icon="people"
-                    title="Agents"
-                    showFilter
-                    class="q-mt-md"
-                    @value-changed="onValueChange"
-                  >
-                    <RecordAgents overview :agents="agentData" />
+                    <RecordPages :pages="pageData" />
                   </DetailCard>
                 </template>
               </div>
             </q-tab-panel>
             <q-tab-panel name="pages" class="q-pt-sm q-px-none editor-panel">
-              <RecordPages :pages="pageData" />
+              <RecordEditor />
             </q-tab-panel>
+
             <q-tab-panel name="entities" class="q-pt-none q-px-none">
-              <div v-if="agentData.length">
-                <RecordAgents :agents="agentData" />
+              <div class="col-9 q-pr-sm">
+                <DetailCard
+                  v-if="agentData.length"
+                  icon="people"
+                  title="Agents"
+                  showFilter
+                  class="q-mt-md"
+                  @value-changed="onValueChange"
+                >
+                  <RecordAgents :agents="agentData" />
+                </DetailCard>
+
+                <DetailCard
+                  v-if="placeData.length"
+                  icon="mdi-map-marker"
+                  title="Places"
+                  showFilter
+                  class="q-mt-md"
+                  @value-changed="onValueChange"
+                >
+                  <RecordPlaces :places="placeData" />
+                </DetailCard>
               </div>
             </q-tab-panel>
+
             <q-tab-panel name="comments" class="q-pt-md q-px-lg">
               <CommentBox @on-count-changed="updateCommentCount" :worklog="workflowData.workLog" />
             </q-tab-panel>
@@ -259,10 +260,13 @@
         </template>
         <AdaptiveSpinner
           v-else
+          adaptive
+          position="absolute"
           type="hourglass"
           color="indigo-5"
           size="50px"
-          class="q-mt-xl q-pt-xl"
+          top="0"
+          left="0"
         />
       </div>
       <div v-if="!ui.globalLoading && view.tab !== 'pages'" class="col-3 q-pl-md q-pt-md">
@@ -294,8 +298,7 @@
                     :show-avatar="false"
                   />
                   <div class="text-detail text-grey-7 text-weight-medium">
-                    {{ recordData.creationTimestamp.value.date }} @
-                    {{ recordData.modificationTimestamp.value.time }}
+                    {{ formatDate(recordData.creationTimestamp.value, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>
@@ -310,8 +313,7 @@
                     :show-avatar="false"
                   />
                   <div class="text-detail text-grey-7 text-weight-medium">
-                    {{ recordData.modificationTimestamp.value.date }} @
-                    {{ recordData.modificationTimestamp.value.time }}
+                    {{ formatDate(recordData.modificationTimestamp.value, "DATETIME_AT") }}
                   </div>
                 </div>
               </template>
@@ -336,16 +338,20 @@ import {
   DetailCard,
   DetailSidebar,
   DetailElement,
+  RecordEditor,
   TagPill,
   WorkflowManager,
   UserPill,
 } from "@/components";
-import { nully, isObject } from "@/utils";
+import { nully, isObject, getColumns, formatDate } from "@/utils";
 import RecordAgents from "./RecordAgents.vue";
 import RecordPages from "./RecordPages.vue";
+import RecordPlaces from "./RecordPlaces.vue";
+import { columnMap } from "./pageColumns";
 import { metadata } from "./metadata.js";
 import { recordDetailSchema, workflowSchema, attributeSchema } from "@/schemas";
 import { snakeCase } from "change-case";
+import { computed } from "vue";
 
 export default defineComponent({
   name: "RecordDetail",
@@ -357,19 +363,22 @@ export default defineComponent({
     DetailElement,
     DetailSidebar,
     RecordAgents,
+    RecordEditor,
     RecordPages,
+    RecordPlaces,
     TagPill,
     UserPill,
     WorkflowManager,
   },
   setup() {
     const $route = useRoute();
-    const { notifier } = useEventHandling();
+    const { eventBus, notifier } = useEventHandling();
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard, resource } = useEditing();
-    const { auth, ui, view } = useStores();
+    const { auth, ui, view, views, showEditBtn, showInfoArea, editOn } = useStores();
     const { success, data, fetchAPI } = apiInterface();
     const id = ref($route.params.id);
+    const pageColumns = ref(getColumns(columnMap));
     const refRegister = ref({});
     const isPrivate = ref(false);
     const commentCount = ref(0);
@@ -377,6 +386,7 @@ export default defineComponent({
     const recordData = ref({});
     const agentData = ref([]);
     const pageData = ref([]);
+    const placeData = ref([]);
     const collectionData = ref([]);
     const workflowData = ref({});
     const fieldPlacements = ref({
@@ -385,15 +395,22 @@ export default defineComponent({
       standalone: [],
     });
 
-    const showInfoArea = ref(true);
-
-    provide("model", "Record");
-    provide("id", id);
-    provide("showInfoArea", showInfoArea);
+    const entityCount = computed(() => agentData.value.length + placeData.value.length);
 
     useMeta(() => ({
       title: !nully(recordData.value) ? recordData.value.name.value : `Record ${id.value}`,
     }));
+
+    const getPages = (pages) => {
+      pages.forEach((page, idx) => {
+        page.ref = idx;
+        page.editorTab = "preview";
+        page.dbTei = page.transcription?.transcription;
+        page.tei = page.transcription?.transcription;
+        page.viewerZoom = 0;
+      });
+      return pages;
+    };
 
     const fetchData = async () => {
       ui.globalLoading = true;
@@ -433,12 +450,53 @@ export default defineComponent({
           recordData.value = dataset;
           agentData.value = validated.agents || [];
           pageData.value = validated.pages;
+          placeData.value =
+            validated.places?.map((p) => Object.assign(p, formatLocation(p.location))) || [];
           collectionData.value = validated.collections;
           workflowData.value = validated.workflow;
           ui.breadcrumbTail.push(validated.shortName);
+
+          views.mergeValues(views, {
+            pages: getPages(pageData.value),
+            currentPageRef: 0,
+            pageDrawerMini: true,
+            showTagMenu: false,
+            splitterHorizontal: true,
+            editorSplitter: 0,
+            lastSplitter: 0,
+            editOn: false,
+          });
+
           ui.globalLoading = false;
-          console.log("recordData", recordData.value);
+          // console.log("recordData", recordData.value);
+          // console.log(agentData.value);
+          // console.log(pageData.value);
+          // console.log(placeData.value);
+          // console.log(collectionData.value);
+          // console.log(workflowData.value);
         });
+      }
+    };
+
+    const formatLocation = (loc) => {
+      if (loc.locationType == "Locale") {
+        const locale = loc.attributes.filter((x) => x.name == "locale");
+        const name = locale[0].value.name;
+        const region = locale[0].value.administrativeRegion;
+        const country = locale[0].value.country.name;
+        const lat = locale[0].value.latitude;
+        const lon = locale[0].value.longitude;
+        return {
+          locationName: name,
+          locationRegion: region,
+          locationCountry: country,
+          latitude: lat,
+          longitude: lon,
+          locationDetail: `${name}, ${region} (${country})`,
+          locationGeometry: `POINT (${lon}, ${lat})`,
+        };
+      } else {
+        return {};
       }
     };
 
@@ -527,6 +585,11 @@ export default defineComponent({
 
     editingDetailRouteGuard();
 
+    provide("model", "Record");
+    provide("id", id);
+    provide("pages", pageData.value);
+    provide("pageColumns", pageColumns);
+
     return {
       commentCount,
       updateCommentCount,
@@ -535,6 +598,7 @@ export default defineComponent({
       recordData,
       agentData,
       pageData,
+      placeData,
       collectionData,
       workflowData,
       ui,
@@ -544,6 +608,11 @@ export default defineComponent({
       registerComponent,
       onValueChange,
       showInfoArea,
+      entityCount,
+      showEditBtn,
+      editOn,
+      eventBus,
+      formatDate,
     };
   },
 });
