@@ -26,7 +26,7 @@ export const useViewStore = defineStore(
     const stored = ref({});
 
     // getters
-    const showEditPageBtn = computed(() => {
+    const showEditBtn = computed(() => {
       return (
         "tab" in view.value &&
         view.value.tab === "pages" &&
@@ -45,7 +45,11 @@ export const useViewStore = defineStore(
       }
     });
 
-    const currentPageEditOn = computed(() => showEditPageBtn.value && currentPageData.value.editOn);
+    const editOn = computed(() => showEditBtn.value && view.value.editOn);
+
+    const hasChanges = computed(
+      () => "pages" in view.value && view.value.pages.some((p) => p.dbTei !== p.tei),
+    );
 
     // actions
     const $reset = () => {
@@ -93,14 +97,15 @@ export const useViewStore = defineStore(
       mergeValues,
       view,
       stored,
-      showEditPageBtn,
+      showEditBtn,
       pageCount,
       currentPageData,
-      currentPageEditOn,
+      editOn,
       saveViewState,
       deleteViewState,
       retrieveViewState,
       setViewState,
+      hasChanges,
       $reset,
     };
   },

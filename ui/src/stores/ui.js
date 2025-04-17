@@ -17,6 +17,7 @@ export const useUiStore = defineStore(
     const currentPageIcon = ref("");
     const globalLoading = ref(false);
     const isFullscreen = ref(false);
+    const showInfoArea = ref(true);
     const userDrawerOpen = ref(false);
     const appDrawerOpen = ref(false);
     const windowHeight = ref(window.innerHeight);
@@ -126,6 +127,7 @@ export const useUiStore = defineStore(
       setUiState,
       resetBreadcrumbTail,
       setPageState,
+      showInfoArea,
       $reset,
     };
   },

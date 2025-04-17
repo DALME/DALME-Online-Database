@@ -49,7 +49,7 @@ export default defineComponent({
     const $route = useRoute();
     const pageBackdrop = useTemplateRef("page-backdrop");
 
-    const render = computed(() => (auth.authorized || auth.reauthenticate) && settings.loaded);
+    const render = computed(() => (auth.authorized || auth.reauthenticate) && settings.ready);
     const originPage = window.localStorage.getItem("origin_background");
     const showMap = computed(() => auth.authenticate && !originPage);
     const pageBackdropLoaded = ref(originPage ? false : true);
@@ -86,7 +86,7 @@ export default defineComponent({
     watch(
       () => auth.authorized,
       () => {
-        if (auth.authorized && !settings.loaded) {
+        if (auth.authorized && !settings.ready) {
           settings.fetchPreferences();
         }
       },
