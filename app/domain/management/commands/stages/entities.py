@@ -40,6 +40,7 @@ class Stage(BaseStage):
         self.process_unattached_named_agents()
         self.create_new_locales()
         self.sync_entities_and_rs_tags()
+        self.swap_ab_mute_wrappers()
 
     @transaction.atomic
     def fix_existing_rs_tags(self):
@@ -440,3 +441,27 @@ class Stage(BaseStage):
                 tr.save(update_fields=['transcription'])
 
         self.logger.info('Synchronized tags in %s out of %s transcriptions.', count_fixed, total)
+
+    @transaction.atomic
+    def swap_ab_mute_wrappers(self):
+        """Replace <ab type="context"></ab> with: <mute type="named_agents_wrapper"></mute>."""
+        self.logger.info('Replacing ab:context with mute:named_agents_wrapper...')
+
+        transcriptions = Transcription.objects.all()
+        total = transcriptions.count()
+        count_fixed = 0
+
+        for tr in tqdm(transcriptions, total=total, desc='                     completed', leave=False):
+            xml_parser = et.XMLParser(recover=True)
+            tree = et.fromstring('<xml>' + tr.transcription + '</xml>', xml_parser)
+            targets = tree.findall('.//ab[@type="context"]')
+            if len(targets) > 0:
+                for target in targets:
+                    target.tag = 'mute'
+                    target.set('type', 'named_agents_wrapper')
+
+            tr.transcription = et.tostring(tree, encoding='utf8', xml_declaration=False).decode('utf-8')[5:-6]
+            tr.save(update_fields=['transcription'])
+            count_fixed += 1
+
+        self.logger.info('Fixed %s transcriptions.', count_fixed)
