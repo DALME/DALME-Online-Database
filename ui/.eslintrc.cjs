@@ -2,7 +2,7 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    ecmaVersion: 2021, // Allows for the parsing of modern ECMAScript features
+    ecmaVersion: 2022, // Allows for the parsing of modern ECMAScript features
   },
 
   env: {
@@ -48,7 +48,7 @@ module.exports = {
         printWidth: 100,
       },
     ],
-    quotes: ["error", "double"],
+    quotes: ["error", "double", { "avoidEscape": true }],
     semi: ["error", "always"],
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
