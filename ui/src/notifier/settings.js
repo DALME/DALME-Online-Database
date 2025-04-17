@@ -22,13 +22,6 @@ const settings = {
       position: "top-right",
       icon: "speaker_notes",
     }),
-  teiElementSetsRetrievalFailed: () =>
-    Notify.create({
-      color: "red",
-      message: "Failed to retrieve user TEI tag setttings",
-      position: "top-right",
-      icon: "block",
-    }),
 };
 
 export default settings;

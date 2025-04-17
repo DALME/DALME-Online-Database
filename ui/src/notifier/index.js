@@ -10,6 +10,7 @@ import settings from "./settings";
 import workflow from "./workflow";
 import records from "./records";
 import attributes from "./attributes";
+import editor from "./editor";
 
 const notifier = {
   attributes,
@@ -24,6 +25,7 @@ const notifier = {
   transcriptions,
   users,
   workflow,
+  editor,
 };
 
 export default notifier;
