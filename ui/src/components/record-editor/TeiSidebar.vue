@@ -64,16 +64,16 @@
 </template>
 
 <script>
-import { defineComponent, inject, ref } from "vue";
+import { computed, defineComponent, inject, ref } from "vue";
 import { useStores } from "@/use";
 
 export default defineComponent({
   name: "TeiSidebar",
   setup() {
-    const { settings, view } = useStores();
+    const { editorStore, view } = useStores();
     const { editorHeight } = inject("editorDimensions");
     const elementFilter = ref("");
-    const teiElements = settings.elements.filter(elementFilter.value);
+    const teiElements = computed(() => editorStore.elements(elementFilter.value));
 
     return {
       editorHeight,
@@ -85,11 +85,11 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .tag-menu {
   overflow: scroll;
   border-left: 1px solid #d1d1d1;
-  max-width: 300px !important;
+  width: 300px !important;
   position: absolute;
   right: 0;
   background-color: rgb(255 255 255 / 89%);
@@ -103,7 +103,7 @@ export default defineComponent({
 .tag-menu .q-btn-group:last-of-type {
   border-bottom: none;
 }
-.tag-menu-popup {
+:deep(.tag-menu-popup) {
   max-width: 200px;
 }
 .tag-menu .tag-search-box {
@@ -113,14 +113,14 @@ export default defineComponent({
   background: white;
   z-index: 99;
 }
-.tag-search-box .q-field__control {
+:deep(.tag-search-box .q-field__control) {
   font-size: 13px;
   height: 30px;
   padding: 0px 0px 0px 5px !important;
   border-bottom: 1px solid #d1d1d1;
 }
-.tag-search-box .q-field__marginal,
-.tag-search-box .q-field__native {
+:deep(.tag-search-box .q-field__marginal),
+:deep(.tag-search-box .q-field__native) {
   height: 28px;
   padding: 6px 10px;
 }

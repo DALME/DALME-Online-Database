@@ -1,6 +1,6 @@
 <template>
   <div class="row text-grey-7 toolbar">
-    <template v-for="(els, section) in buttons" :key="section">
+    <template v-for="(els, section) in editorStore.toolbar" :key="section">
       <q-btn-group flat class="editor-tb-group">
         <template v-for="(el, idx) in els" :key="idx">
           <q-btn flat size="xs" :icon="el.icon" class="editor-tb-button">
@@ -69,39 +69,29 @@
 </template>
 
 <script>
-import { computed, defineComponent, inject } from "vue";
+import { defineComponent, inject } from "vue";
 import { useStores } from "@/use";
 import TeiTagMenu from "./TeiTagMenu.vue";
-import { prop, groupBy } from "ramda";
 
 export default defineComponent({
   name: "ToolBar",
   components: { TeiTagMenu },
 
   setup() {
-    const { view, settings } = useStores();
+    const { view, settings, editorStore } = useStores();
     const insertTag = inject("insertTag");
-    const buttons = computed(() => {
-      return groupBy(
-        prop("section"),
-        settings.elements.toolbar.map((x) => {
-          const tags = x.tags;
-          return Object.assign(x, { tags: tags.map((y) => settings.tags.get(y)) });
-        }),
-      );
-    });
 
     return {
       view,
       settings,
       insertTag,
-      buttons,
+      editorStore,
     };
   },
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .text-overline {
   font-size: 11px;
   text-transform: uppercase;

@@ -1,10 +1,10 @@
 <template>
-  <q-layout view="lhh lpr lff" container :style="`height: ${compositeHeight + 4}px`">
+  <q-layout view="lhh lpr lff" container :style="`height: ${compositeHeight + 2}px`">
     <q-drawer
       v-model="drawer"
       side="left"
       :mini="view.pageDrawerMini"
-      class="detail-drawer-left q-mini-drawer-hide"
+      class="page-selector-drawer q-mini-drawer-hide"
       :width="parseInt(141)"
       :mini-width="parseInt(0)"
     >
@@ -77,15 +77,11 @@
           </template>
 
           <template v-slot:after>
-            <div v-show="currentPageData.editOn" class="editor-box">
-              <TeiEditor v-if="settings.teiReady" ref="editor" />
+            <div v-if="editOn" class="editor-box">
+              <TeiEditor v-if="editorStore.ready" ref="editor" />
               <AdaptiveSpinner type="bars" position="absolute" v-else class="q-ma-auto" />
             </div>
-            <div
-              v-show="!currentPageData.editOn"
-              class="render-panel"
-              :style="`height: ${compositeHeight}px`"
-            >
+            <div v-else class="render-panel" :style="`height: ${compositeHeight}px`">
               <TeiRenderer :text="currentPageData.tei" />
             </div>
           </template>
@@ -96,9 +92,10 @@
 </template>
 
 <script>
+import { useQuasar } from "quasar";
 import { computed, defineComponent, inject, onMounted, provide, ref } from "vue";
 import { useEventHandling, useStores } from "@/use";
-import { AdaptiveSpinner, IiifViewer, TeiRenderer } from "@/components";
+import { AdaptiveSpinner, CustomDialog, IiifViewer, TeiRenderer } from "@/components";
 import TeiEditor from "./TeiEditor.vue";
 import { nully } from "@/utils";
 
@@ -111,36 +108,44 @@ export default defineComponent({
     TeiRenderer,
   },
   setup() {
-    const { currentPageData, contentHeight, contentWidth, pageCount, settings, views, view } =
-      useStores();
+    const $q = useQuasar();
+    const {
+      currentPageData,
+      editOn,
+      contentHeight,
+      contentWidth,
+      pageCount,
+      views,
+      view,
+      showInfoArea,
+      editorStore,
+    } = useStores();
     const { eventBus } = useEventHandling();
-    const columns = inject("columns");
-    const pages = inject("pages");
-    const showInfoArea = inject("showInfoArea");
+    const columns = inject("pageColumns");
+    const pages = view.pages;
     const pagination = ref({ rowsPerPage: 0 });
 
-    const getPages = () => {
-      pages.forEach((page, idx) => {
-        page.ref = idx;
-        page.editorTab = "write";
-        page.editOn = false;
-        page.tei = page.transcription?.transcription;
-        page.hasChanges = false;
-        page.viewerZoom = 0;
-      });
-      return pages;
-    };
+    // const getPages = () => {
+    //   pages.forEach((page, idx) => {
+    //     page.ref = idx;
+    //     page.editorTab = "preview";
+    //     page.dbTei = page.transcription?.transcription;
+    //     page.tei = page.transcription?.transcription;
+    //     page.viewerZoom = 0;
+    //   });
+    //   return pages;
+    // };
 
-    views.mergeValues(views, {
-      pages: getPages(),
-      currentPageRef: 0,
-      pageDrawerMini: true,
-      showTagMenu: false,
-      splitterHorizontal: true,
-      editorSplitter: 0,
-      lastSplitter: 0,
-      editorTab: "write",
-    });
+    // views.mergeValues(views, {
+    //   pages: getPages(),
+    //   currentPageRef: 0,
+    //   pageDrawerMini: true,
+    //   showTagMenu: false,
+    //   splitterHorizontal: true,
+    //   editorSplitter: 0,
+    //   lastSplitter: 0,
+    //   editOn: false,
+    // });
 
     const drawer = ref(pageCount.value > 1);
     const pageChooser = computed(() => pageCount.value > 1);
@@ -153,7 +158,7 @@ export default defineComponent({
     );
 
     const compositeHeight = computed(() => {
-      const tabs = 37 + 16; // tab-bar + margin;
+      const tabs = 37 + 8; // tab-bar + padding;
       return Math.round(contentHeight.value - infoAreaHeight.value - tabs);
     });
 
@@ -162,10 +167,11 @@ export default defineComponent({
     }
 
     const editorHeight = computed(() => {
-      const editorToolbar = 40;
+      const toolbar = 40;
+      const splitter = 7;
       return view.value.splitterHorizontal
-        ? Math.round(compositeHeight.value - editorToolbar - view.value.editorSplitter)
-        : compositeHeight.value - editorToolbar;
+        ? Math.round(compositeHeight.value - view.value.editorSplitter - toolbar - splitter)
+        : compositeHeight.value - toolbar;
     });
 
     const editorWidth = computed(() =>
@@ -174,11 +180,10 @@ export default defineComponent({
         : Math.round(contentWidth.value - view.value.editorSplitter),
     );
 
-    const viewerHeight = computed(
-      () =>
-        view.value.splitterHorizontal
-          ? compositeHeight.value - editorHeight.value
-          : compositeHeight.value + 4, // border adjustment
+    const viewerHeight = computed(() =>
+      view.value.splitterHorizontal
+        ? compositeHeight.value - editorHeight.value
+        : compositeHeight.value,
     );
 
     const viewerWidth = computed(() =>
@@ -230,16 +235,26 @@ export default defineComponent({
     };
 
     const toggleEditor = () => {
-      return new Promise((resolve) => {
-        if (!currentPageData.value.editOn) {
-          editor.value.createSession().then(() => {
-            currentPageData.value.editOn = true;
-          });
-        } else {
-          currentPageData.value.editOn = false;
-        }
-        resolve();
-      });
+      if (view.value.editOn && views.hasChanges) {
+        $q.dialog({
+          component: CustomDialog,
+          componentProps: {
+            isPersistent: true,
+            title: "Save changes",
+            closeIcon: false,
+            message:
+              "There is unsaved data in the current record. Do you wish to save your changes?",
+            icon: "exit_to_app",
+            okayButtonLabel: "Save",
+          },
+        }).onOk(() => {
+          console.log("Save changes");
+          eventBus.emit("destroyEditor");
+          view.value.editOn = !view.value.editOn;
+        });
+      } else {
+        view.value.editOn = !view.value.editOn;
+      }
     };
 
     const changePage = (para) => {
@@ -249,11 +264,7 @@ export default defineComponent({
       if (para === "last") targetPage = pages.length - 1;
       if (para === "prev") targetPage = view.value.currentPageRef - 1;
       if (para === "next") targetPage = view.value.currentPageRef + 1;
-
-      // if (currentPageData.value.editOn) await editor.value.updateStoreText();
       view.value.currentPageRef = targetPage;
-      // await nextTick();
-      // if (currentPageData.value.editOn) await editor.value.loadSession();
     };
 
     eventBus.on("changePage", (page) => changePage(page));
@@ -263,15 +274,11 @@ export default defineComponent({
     provide("viewerDimensions", { viewerHeight, viewerWidth });
 
     onMounted(async () => {
-      if (!settings.teiReady) {
-        const data = await settings.fetchTeiElements();
-        if (data) {
-          settings.teiElementSetData = data.sets;
-          settings.teiElementData = data.elements;
-          settings.teiTagData = data.tags;
-          // temp workaround - this should be set by the UI
-          settings.currentSetId = data.sets[0].id;
-        }
+      if (!editorStore.ready) {
+        editorStore.initialize().then(() => {
+          // TODO: temp workaround - this should be set by the UI
+          editorStore.currentSetId = editorStore.sets()[0].id;
+        });
       }
     });
 
@@ -279,6 +286,7 @@ export default defineComponent({
       nully,
       changePage,
       currentPageData,
+      editOn,
       columns,
       drawer,
       editor,
@@ -292,64 +300,134 @@ export default defineComponent({
       pagination,
       separatorHeight,
       separatorWidth,
-      settings,
       splitterLimits,
       toggleEditor,
       toggleMini,
       toggleSplitter,
       view,
       orientationClass,
+      editorStore,
     };
   },
 });
 </script>
 
-<style lang="scss">
-.drag-button-h {
-  transform: rotate(90deg) translate(-30px, -10px);
+<style lang="scss" scoped>
+/* Splitter */
+.q-layout-container,
+.q-splitter {
+  transition: height 0.2s ease-in-out;
 }
-.splitter-separator.q-splitter__separator {
+.q-splitter {
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+}
+/* Splitter - IIIF Viewer */
+:deep(.q-splitter__before) {
+  background-color: rgb(71, 71, 71);
+}
+:deep(.editor-horizontal .q-splitter__before) {
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+:deep(.editor-vertical .q-splitter__before) {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+:deep(.q-splitter__panel.q-splitter__before) {
+  display: flex;
+}
+:deep(.q-splitter--horizontal .q-splitter__panel.q-splitter__before) {
+  flex-direction: column;
+}
+/* Splitter - Editor */
+:deep(.q-splitter__after) {
+  border-bottom-right-radius: 3px;
+}
+:deep(.q-splitter--horizontal .q-splitter__after) {
+  border-bottom-left-radius: 3px;
+}
+:deep(.q-splitter--vertical .q-splitter__after) {
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 3px;
+}
+:deep(.editor-box),
+:deep(.q-splitter__panel.q-splitter__after) {
+  overflow: hidden;
+}
+/* Splitter - TEI renderer */
+.render-panel {
+  background: #ffffff;
+  padding: 16px;
+  overflow: scroll;
+}
+/* Splitter separator */
+:deep(.splitter-separator.q-splitter__separator) {
   background-color: #c5cae9;
   border: 1px solid #5c6bc0;
 }
-.q-splitter--horizontal > .splitter-separator.q-splitter__separator {
+:deep(.q-splitter--horizontal > .splitter-separator.q-splitter__separator) {
   height: 7px;
+  margin-right: -1px;
+  margin-left: -1px;
+  border-left-color: transparent;
+  border-right-color: transparent;
   box-shadow:
     0px 1px 0px 0px #dee2fc inset,
     0px -1px 0px 0px #aeb7e7 inset;
 }
-.q-splitter--vertical > .splitter-separator.q-splitter__separator {
+:deep(.q-splitter--vertical > .splitter-separator.q-splitter__separator) {
   width: 7px;
+  margin-top: -1px;
+  margin-bottom: -1px;
+  border-top-color: transparent;
+  border-top-color: transparent;
   box-shadow:
     1px 0px 0px 0px #dee2fc inset,
     -1px 0px 0px 0px #aeb7e7 inset;
 }
-.splitter-separator-button {
+/* Splitter separator button */
+:deep(.splitter-separator-button) {
   height: 60px;
   padding: 0;
   background-color: #c5cae9;
   color: #5c6bc0;
   border: 1px solid #5c6bc0;
 }
-.q-splitter--horizontal .splitter-separator-button {
+:deep(.drag-button-h) {
+  transform: rotate(90deg) translate(-30px, -10px);
+}
+:deep(.q-splitter--horizontal .splitter-separator-button) {
   box-shadow:
     1px 0px 0px 0px #dee2fc inset,
     -1px 0px 0px 0px #aeb7e7 inset;
 }
-.q-splitter--vertical .splitter-separator-button {
+:deep(.q-splitter--vertical .splitter-separator-button) {
   box-shadow:
     0px 1px 0px 0px #dee2fc inset,
     0px -1px 0px 0px #aeb7e7 inset;
 }
-.splitter-separator-button i {
+:deep(.splitter-separator-button i) {
   font-size: 1.3em !important;
 }
-.splitter-separator-button i:first-of-type {
+:deep(.splitter-separator-button i:first-of-type) {
   bottom: -0.25em;
 }
-.splitter-separator-button span.q-btn__content {
+:deep(.splitter-separator-button span.q-btn__content) {
   flex-direction: column;
 }
+/* Page selector */
+:deep(.page-selector-drawer) {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-top: 1px solid #d1d1d1;
+  border-bottom: 1px solid #d1d1d1;
+  border-right: 1px solid #d1d1d1;
+}
+.page-container {
+  overflow-y: scroll;
+}
+/* Page selector card */
 .grid-card {
   width: 110px;
   margin-top: 12px;
@@ -370,59 +448,5 @@ export default defineComponent({
 }
 .grid-card.current-page .q-img__container {
   border-bottom: 1px solid #3949ab;
-}
-.q-splitter__after {
-  border-bottom: 1px solid #d1d1d1;
-  border-right: 1px solid #d1d1d1;
-  border-bottom-right-radius: 4px;
-}
-.q-splitter--horizontal .q-splitter__after {
-  border-left: 1px solid #d1d1d1;
-  border-bottom-left-radius: 4px;
-}
-.q-splitter--vertical .q-splitter__after {
-  border-top: 1px solid #d1d1d1;
-  border-bottom-left-radius: 0;
-  border-top-right-radius: 4px;
-}
-.editor-box,
-.q-splitter__panel.q-splitter__after {
-  overflow: hidden;
-}
-.q-splitter__panel.q-splitter__before {
-  display: flex;
-}
-.q-splitter--horizontal .q-splitter__panel.q-splitter__before {
-  flex-direction: column;
-}
-.render-panel {
-  background: #ffffff;
-  padding: 16px;
-  overflow: scroll;
-}
-.page-container {
-  overflow-y: scroll;
-}
-.detail-drawer-left {
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border-top: 1px solid #d1d1d1;
-  border-bottom: 1px solid #d1d1d1;
-  border-right: 1px solid #d1d1d1;
-}
-.q-layout-container,
-.q-splitter {
-  transition: height 0.2s ease-in-out;
-}
-.q-splitter__before {
-  background-color: rgb(71, 71, 71);
-}
-.editor-horizontal .q-splitter__before {
-  border-top-right-radius: 4px;
-  border-top-left-radius: 4px;
-}
-.editor-vertical .q-splitter__before {
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
 }
 </style>

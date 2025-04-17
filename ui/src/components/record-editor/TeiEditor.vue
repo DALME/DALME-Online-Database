@@ -2,7 +2,7 @@
   <div class="bg-grey-2 q-px-sm row justify-between items-center">
     <div class="column q-pt-xs">
       <q-tabs
-        v-model="view.editorTab"
+        v-model="currentPageData.editorTab"
         dense
         shrink
         class="text-grey md-editor-tabs"
@@ -15,35 +15,40 @@
         content-class="q-px-sm"
         @update:model-value="onTabSwitch"
       >
-        <q-tab name="write" label="Write" />
         <q-tab name="preview" label="Preview" :disable="disabled" />
+        <q-tab name="edit" label="Edit" class="editor-tab-edit" />
       </q-tabs>
     </div>
     <!--q-btn @click="parse" label="parse" /-->
     <div class="column">
-      <ToolBar />
+      <transition
+        appear
+        enter-active-class="animated slideInRight"
+        leave-active-class="animated slideOutRight"
+      >
+        <ToolBar v-show="currentPageData.editorTab === 'edit'" />
+      </transition>
     </div>
   </div>
   <q-separator />
   <q-tab-panels
-    v-model="view.editorTab"
+    v-model="currentPageData.editorTab"
     keep-alive
-    keep-alive-exclude="TeiRenderer"
     animated
     transition-prev="jump-up"
     transition-next="jump-up"
     class="editor-panel text-body2"
-    :style="`height: ${editorHeight + 1}px;`"
+    :style="`height: ${editorHeight}px;`"
   >
-    <q-tab-panel name="write" class="row q-pa-none">
-      <div class="col editor-container-col" :style="`background-color: ${editorBackground};`">
+    <q-tab-panel name="edit" class="row q-pa-none">
+      <div class="col editor-container-col">
         <div class="v-codemirror editor-container" ref="container"></div>
       </div>
       <TeiSidebar />
       <ContextMenu />
     </q-tab-panel>
     <q-tab-panel name="preview" class="render-panel" :style="`height: ${editorHeight}px`">
-      <TeiRenderer :text="currentPageData.tei" />
+      <TeiRenderer />
     </q-tab-panel>
   </q-tab-panels>
 </template>
@@ -62,7 +67,7 @@ import {
   shallowRef,
   watch,
 } from "vue";
-import { useStores } from "@/use";
+import { useEventHandling, useStores } from "@/use";
 import { TeiRenderer } from "@/components";
 import {
   createEditorState,
@@ -79,7 +84,6 @@ import ContextMenu from "./ContextMenu.vue";
 import ToolBar from "./ToolBar.vue";
 import { tagDecoratorPlugin } from "./tag-decorator.js";
 import * as themes from "./themes.js";
-import { syntaxTree } from "@codemirror/language";
 import { getCompletions } from "./transcription-tools.js";
 
 export default defineComponent({
@@ -92,12 +96,14 @@ export default defineComponent({
   },
   setup() {
     const { currentPageData, view, preferences, settings } = useStores();
+    const { eventBus } = useEventHandling();
     const { editorHeight, editorWidth } = inject("editorDimensions");
     const disabled = computed(() => isEmpty(currentPageData.value.tei));
     const currentInstance = getCurrentInstance();
     const container = shallowRef();
     const editorState = shallowRef();
     const editorView = shallowRef();
+    const editorTools = shallowRef();
 
     const currentTheme = computed(() =>
       preferences.value.theme.value ? themes[preferences.value.theme.value] : themes["oneDark"],
@@ -107,8 +113,6 @@ export default defineComponent({
       const themeOpts = settings.getOptions("theme");
       return themeOpts.find((x) => x.value == preferences.value.theme.value).bg;
     });
-
-    // window.testText = currentPageData.value.tei;
 
     // editorView.value.updateState: 0 = Idle, 1 = Measuring, 2 = Updating
     const updateTag = (changes) => {
@@ -130,8 +134,6 @@ export default defineComponent({
       console.log("Editor blur:");
     };
     const onEditorChange = (newDoc, _update) => {
-      // console.log("Editor change:", newDoc, update);
-      console.log("Is text the same?", newDoc === currentPageData.value.tei);
       if (newDoc !== currentPageData.value.tei) {
         currentPageData.value.tei = newDoc;
       }
@@ -173,8 +175,12 @@ export default defineComponent({
     }));
 
     const onTabSwitch = (value) => {
-      // if (value === "preview") currentPageData.value.tei = editor.getValue();
-      console.log(`Switching tab to ${value}`);
+      if (value === "preview") {
+        currentPageData.value.tei = editorTools.value.getDoc();
+      } else {
+        editorTools.value.setDoc(currentPageData.value.tei);
+        editorView.value.requestMeasure();
+      }
     };
 
     // eslint-disable-next-line unused-imports/no-unused-vars
@@ -300,9 +306,6 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      console.log("mounted TEIeditor");
-      view.value.editorTab = "write";
-      currentPageData.value.editOn = true;
       editorState.value = createEditorState({
         doc: currentPageData.value.tei,
         onUpdate: onEditorUpdate,
@@ -316,17 +319,14 @@ export default defineComponent({
         parent: container.value,
       });
 
-      window.testEditor = editorView.value;
-
-      const editorTools = getEditorTools(editorView.value);
-      editorTools.focus();
+      editorTools.value = getEditorTools(editorView.value);
+      editorTools.value.focus();
 
       watch(
         () => currentPageData.value.tei,
         (newValue) => {
-          console.log("currentPageData.value.tei changed");
-          if (newValue !== editorTools.getDoc()) {
-            editorTools.setDoc(newValue);
+          if (newValue !== editorTools.value.getDoc()) {
+            editorTools.value.setDoc(newValue);
           }
         },
       );
@@ -334,23 +334,33 @@ export default defineComponent({
       watch(
         () => extensions.value,
         (extensions) => {
-          console.log("watcher: props.extensions", extensions);
-          editorTools.reExtensions(extensions || []);
+          editorTools.value.reExtensions(extensions || []);
         },
         { immediate: true },
       );
 
       watch(
         () => disabled.value,
-        (disabled) => editorTools.toggleDisabled(disabled),
+        (disabled) => editorTools.value.toggleDisabled(disabled),
         { immediate: true },
       );
 
       watch(
         () => style.value,
-        (style) => editorTools.setStyle(style),
+        (style) => editorTools.value.setStyle(style),
         { immediate: true },
       );
+
+      const destroyEditor = () => {
+        destroyEditorView(editorView.value);
+      };
+
+      const updateEditorRendering = () => {
+        editorView.value.requestMeasure();
+      };
+
+      eventBus.on("updateEditorRendering", updateEditorRendering);
+      eventBus.on("destroyEditor", destroyEditor);
     });
 
     onBeforeUnmount(() => {
@@ -361,27 +371,27 @@ export default defineComponent({
 
     provide("insertTag", insertTag);
 
-    const test = () => {
-      console.log("test");
-      currentPageData.value.tei = "BOO!";
-    };
+    // const test = () => {
+    //   console.log("test");
+    //   currentPageData.value.tei = "BOO!";
+    // };
 
-    const parse = () => {
-      // const tree = ensureSyntaxTree(editorState.value, editorState.value.doc.length, 5000);
-      // const from = editorView.value.viewport.from;
-      // const to = editorView.value.viewport.to;
-      // console.log("PARSING:", from, to);
-      syntaxTree(editorState.value).iterate({
-        enter: (node) => {
-          // if (cursor.name === "MissingCloseTag") {
-          console.log(
-            node.node.name,
-            editorState.value.doc.sliceString(node.node.from, node.node.to),
-            node.node,
-          );
-        },
-      });
-    };
+    // const parse = () => {
+    //   // const tree = ensureSyntaxTree(editorState.value, editorState.value.doc.length, 5000);
+    //   // const from = editorView.value.viewport.from;
+    //   // const to = editorView.value.viewport.to;
+    //   // console.log("PARSING:", from, to);
+    //   syntaxTree(editorState.value).iterate({
+    //     enter: (node) => {
+    //       // if (cursor.name === "MissingCloseTag") {
+    //       console.log(
+    //         node.node.name,
+    //         editorState.value.doc.sliceString(node.node.from, node.node.to),
+    //         node.node,
+    //       );
+    //     },
+    //   });
+    // };
 
     return {
       container,
@@ -391,30 +401,53 @@ export default defineComponent({
       editorWidth,
       onTabSwitch,
       view,
-      test,
-      parse,
       editorBackground,
     };
   },
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.q-tabs {
+  margin-bottom: -1px;
+}
+.q-tab {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-top: 1px solid #d1d1d1;
+  border-left: 1px solid #d1d1d1;
+  border-right: 1px solid #d1d1d1;
+  margin-right: -1px;
+}
+.q-tab .q-focus-helper {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+.q-tab:last-of-type {
+  border-right: 1px solid #d1d1d1;
+}
 .q-tab-panels.editor-panel {
   transition: height 0.2s ease-in-out;
 }
+.editor-tab-edit.q-tab--active {
+  background-color: v-bind(editorBackground) !important;
+  color: #94abd6 !important;
+}
 .editor-container {
   display: contents;
+}
+.editor-container-col {
+  background-color: v-bind(editorBackground);
 }
 .editor-panel {
   padding: 0;
   background: linear-gradient(120deg, #fefefe, #efefef) no-repeat 0px/40px 100%;
 }
-.ͼ1 .cm-scroller {
+:deep(.ͼ1 .cm-scroller) {
   line-height: 2;
   font-family: "Menlo", "Consolas", "Monaco", monospace;
 }
-.cm-tag-widget-container {
+:deep(.cm-tag-widget-container) {
   display: inline-block;
   margin: 0 5px;
   vertical-align: middle;
@@ -422,7 +455,7 @@ export default defineComponent({
 // .cm-widgetBuffer:first-child + .cm-tag-widget-container {
 //   margin-left: 0;
 // }
-.cm-tag-widget {
+:deep(.cm-tag-widget) {
   border: 2px solid rgb(171 178 191);
   border-radius: 6px;
   height: 20px;
@@ -430,7 +463,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
 }
-.cm-tag-widget .tag-marker {
+:deep(.cm-tag-widget .tag-marker) {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
@@ -441,58 +474,58 @@ export default defineComponent({
   padding-left: 2px;
   padding-right: 2px;
 }
-.cm-tag-widget .tag-marker .tag-text {
+:deep(.cm-tag-widget .tag-marker .tag-text) {
   font-size: 10px;
   font-family: "Roboto";
   font-weight: 400;
 }
-.cm-tag-widget.open {
+:deep(.cm-tag-widget.open) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   border-right: none;
 }
-.cm-tag-widget.close {
+:deep(.cm-tag-widget.close) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   border-left: none;
 }
-.cm-tag-widget.annotation {
+:deep(.cm-tag-widget.annotation) {
   border-color: #684545;
   color: #b08181;
   // background-color: #342828;
 }
-.cm-tag-widget.editorial {
+:deep(.cm-tag-widget.editorial) {
   border-color: #3c7072;
   color: #749ba5;
   // background-color: #253335;
 }
-.cm-tag-widget.formatting {
+:deep(.cm-tag-widget.formatting) {
   border-color: #4b6391;
   color: #9eb5e7;
   // background-color: #2b343b;
 }
-.cm-tag-widget.layout {
+:deep(.cm-tag-widget.layout) {
   border-color: #3d7746;
   color: #71b572;
   // background-color: #273124;
 }
-.cm-tag-widget.marks {
+:deep(.cm-tag-widget.marks) {
   border-color: #704b91;
   color: #9e73ae;
   // background-color: #362b3b;
 }
-.cm-tag-widget.other {
+:deep(.cm-tag-widget.other) {
   border-color: #615f5f;
   color: #9c9797;
   // background-color: #2d2c2c;
 }
-.cm-tag-widget.self-close:hover,
-.cm-tag-widget.open:hover {
+:deep(.cm-tag-widget.self-close:hover),
+:deep(.cm-tag-widget.open:hover) {
   // background-color: #ffffff1a;
   border-color: #ffffffc9;
   color: #e7e3e3;
 }
-.cm-tag-widget i {
+:deep(.cm-tag-widget i) {
   font-size: 10px;
 }
 </style>

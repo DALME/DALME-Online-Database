@@ -1,7 +1,7 @@
 import { h, render } from "vue";
 import { Decoration, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
 import { matchBrackets, ensureSyntaxTree, syntaxTree } from "@codemirror/language";
-import { useSettingsStore } from "@/stores/settings";
+import { useEditorStore } from "@/stores/editor";
 import TeiTagMenu from "./TeiTagMenu.vue";
 
 const tagPattern = /<(\/)?([a-z]+)([^>]+?)?(\/)?>/gi;
@@ -60,15 +60,14 @@ const getTagDetail = (tag, attributes) => {
 };
 
 class TagPill extends WidgetType {
-  constructor({ tagData, elData, type, attributes, from, to, instance, handler }) {
+  constructor({ tagData, type, attributes, from, to, instance, handler }) {
     super();
     this.tagData = tagData;
-    this.elData = elData;
     this.type = type;
     this.attributes = attributes;
     this.from = from;
     this.to = to;
-    this.icon = tagData.icon || elData.icon;
+    this.icon = tagData.icon || tagData.elementObj.icon;
     this.detail = getTagDetail(tagData.name, attributes);
     this.container = this.getElement();
     this.menu = this.type.close ? null : this.getMenu(instance, handler);
@@ -80,7 +79,7 @@ class TagPill extends WidgetType {
 
     const tagDiv = document.createElement("div");
     const typeClass = this.type.open ? "open" : this.type.selfClose ? "self-close" : "close";
-    tagDiv.className = `cm-tag-widget ${typeClass} ${this.elData.section}`;
+    tagDiv.className = `cm-tag-widget ${typeClass} ${this.tagData.elementObj.section}`;
 
     const icon = document.createElement("i");
     icon.className = `q-icon ${this.icon} q-mx-auto`;
@@ -109,7 +108,7 @@ class TagPill extends WidgetType {
   getMenu(instance, handler) {
     const component = h(TeiTagMenu, {
       tagData: this.tagData,
-      elData: this.elData,
+      elData: this.tagData.elementObj,
       attributes: this.attributes,
       from: this.from,
       to: this.to,
@@ -157,7 +156,7 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
     class {
       constructor(view) {
         console.log("creating tagPlugin");
-        this.settings = useSettingsStore();
+        this.store = useEditorStore();
         this.compInstance = currentInstance;
         this.updateTag = updateTag;
         this.tags = this.getDecorations(view.state);
@@ -182,25 +181,28 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
               const pairedTag = getPairedTag(state, node, type);
               // console.log("parser: node|paired", node.name, pairedTag);
               if (pairedTag !== null) {
-                const { tag, attributes, tagData, elData } = this.getTagData(
+                const { tag, attributes, tagData } = this.getTagData(
                   state,
                   type.close ? pairedTag : node,
                 );
                 // only continue if this is a TEI tag
-                if (this.settings.tags.names.includes(tag)) {
-                  const deco = Decoration.replace({
-                    widget: new TagPill({
-                      tagData: tagData,
-                      elData: elData,
-                      type: type,
-                      attributes: attributes,
-                      from: node.from,
-                      to: node.to,
-                      instance: this.compInstance,
-                      handler: this.updateTag,
-                    }),
-                  });
-                  ranges.push(deco.range(node.from, node.to));
+                if (this.store.tagNames.includes(tag)) {
+                  try {
+                    const deco = Decoration.replace({
+                      widget: new TagPill({
+                        tagData: tagData,
+                        type: type,
+                        attributes: attributes,
+                        from: node.from,
+                        to: node.to,
+                        instance: this.compInstance,
+                        handler: this.updateTag,
+                      }),
+                    });
+                    ranges.push(deco.range(node.from, node.to));
+                  } catch (e) {
+                    console.log("TagPill error", e, tag, attributes, tagData);
+                  }
                 }
               } else {
                 console.log("ORPHAN TAG", node.name, node.from, node.to);
@@ -218,12 +220,11 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
       getTagData(state, node) {
         // console.log("getTagData", node);
         const { tag, attributes } = deconstructTag(state.doc.sliceString(node.from, node.to));
-        const tagData = this.settings.tags.filter(tag, attributes);
+        const tagData = this.store.tags(tag, attributes);
         return {
           tag: tag,
           attributes: attributes,
           tagData: tagData.length ? tagData[0] : null,
-          elData: tagData.length ? this.settings.elements.get(tagData[0].element) : null,
         };
       }
 

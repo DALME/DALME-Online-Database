@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref, onMounted, watch } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { nully } from "@/utils";
 import { useSettingsStore } from "@/stores/settings";
 import { CustomIcon } from "@/components";
@@ -230,7 +230,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .cm-tag-menu {
   max-width: 300px;
 }
