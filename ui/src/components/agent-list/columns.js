@@ -1,6 +1,6 @@
 export const columnMap = {
-  standardName: {
-    label: "Standard Name",
+  name: {
+    label: "Name",
     align: "left",
     sortable: true,
     sortOrder: "ad",
@@ -9,7 +9,7 @@ export const columnMap = {
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
   },
-  type: {
+  agentType: {
     label: "Type",
     align: "left",
     sortable: true,
@@ -28,5 +28,16 @@ export const columnMap = {
     classes: null,
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
+  },
+  attestationCount: {
+    label: "Attestations",
+    align: "center",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap text-center",
+    isDefaultVisible: true,
+    key: "attestationCount",
   },
 };
