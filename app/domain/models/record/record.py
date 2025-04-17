@@ -6,13 +6,14 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import Q, options
+from django.db.models import Q, Subquery, options
 from django.utils.functional import cached_property
 
 from app.abstract import OwnedMixin, TrackingMixin, UuidMixin
 from domain.historical_date import HistoricalDateRange
 from domain.models.attribute.attribute_mixin import AttributeMixin
 from domain.models.comment import CommentMixin
+from domain.models.entity import EntityPhrase
 from domain.models.permission import PermissionMixin
 from domain.models.relationship import RelationshipMixin
 from domain.models.tag import TagMixin
@@ -117,17 +118,22 @@ class Record(
             return not getattr(self.permissions.filter(is_default=True).first(), 'can_view', True)
         return False
 
-    def get_related_resources(self, content_type):
-        """Return list of resources of type__in=[content_type] associated with the record, if any."""
-        if not isinstance(content_type, list):
-            content_type = [content_type]
-        results = [
-            i.transcription.entity_phrases.filter(content_type__in=content_type)
-            for i in self.pagenodes.filter(transcription__isnull=False)
-        ]
-        if len(results) > 0:
-            return [i.content_object for i in list(results[0].union(*results[1:]))]
-        return None
+    def get_related_resources(self, content_type, distinct=True):
+        """Return resources of type__in=[content_type] associated with the record, if any."""
+        model = content_type.model_class()
+        resources = model.objects.filter(
+            attestations__in=Subquery(
+                EntityPhrase.objects.filter(
+                    transcription__id__in=Subquery(
+                        self.pagenodes.filter(transcription__isnull=False).values('transcription__id')
+                    ),
+                    content_type=content_type,
+                ).values('id')
+            )
+        )
+        if not resources.exists():
+            return None
+        return resources.distinct() if distinct else resources
 
     def agents(self):
         """Return list of agents associated with the record, if any."""
@@ -135,7 +141,7 @@ class Record(
 
     def places(self):
         """Return list of places associated with the record, if any."""
-        return self.get_related_resources([ContentType.objects.get(model='place')])
+        return self.get_related_resources(ContentType.objects.get(model='place'))
 
     @cached_property
     def has_images(self):
