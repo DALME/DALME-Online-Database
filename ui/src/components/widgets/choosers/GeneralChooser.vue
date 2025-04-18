@@ -5,54 +5,59 @@
     </q-item-section>
     <q-item-section v-if="label">{{ label }}</q-item-section>
     <ChooserMenu
-      :asItem="item"
-      :label="label"
-      :dark="dark"
-      :type="type"
-      :returnField="returnField"
-      :showAvatar="showAvatar"
-      :searchable="searchable"
-      :showSelected="showSelected"
-      :fetcher="fetcher"
-      @item-chosen="(v) => $emit('itemChosen', v)"
       @clear-filters="$emit('clearFilters')"
+      @item-chosen="(v) => $emit('itemChosen', v)"
+      :as-item="item"
+      :dark="dark"
+      :fetcher="fetcher"
+      :label="label"
+      :return-field="returnField"
+      :searchable="searchable"
+      :show-avatar="showAvatar"
+      :show-selected="showSelected"
+      :type="type"
     />
   </q-item>
   <q-btn
     v-else
-    flat
-    dense
-    :label="label"
-    :icon="icon && !label ? icon : null"
-    :class="toggle ? 'text-capitalize' : 'text-capitalize no-toggle'"
-    content-class="menu-shadow"
-    :icon-right="toggle ? (show ? 'arrow_drop_up' : 'arrow_drop_down') : 'none'"
     @click="show = !show"
+    :class="toggle ? 'text-capitalize' : 'text-capitalize no-toggle'"
+    :icon="icon && !label ? icon : null"
+    :icon-right="toggle ? (show ? 'arrow_drop_up' : 'arrow_drop_down') : 'none'"
+    :label="label"
+    content-class="menu-shadow"
+    dense
+    flat
   >
     <ToolTip v-if="tooltip">{{ tooltip }}</ToolTip>
     <ChooserMenu
-      :asItem="item"
-      :dark="dark"
-      :type="type"
-      :label="label"
-      :returnField="returnField"
-      :showAvatar="showAvatar"
-      :searchable="searchable"
-      :showSelected="showSelected"
-      :fetcher="fetcher"
-      @item-chosen="(v) => $emit('itemChosen', v)"
       @clear-filters="$emit('clearFilters')"
+      @item-chosen="(v) => $emit('itemChosen', v)"
+      :as-item="item"
+      :dark="dark"
+      :fetcher="fetcher"
+      :label="label"
+      :return-field="returnField"
+      :searchable="searchable"
+      :show-avatar="showAvatar"
+      :show-selected="showSelected"
+      :type="type"
     />
   </q-btn>
 </template>
 
 <script>
-import { computed, defineComponent, defineAsyncComponent, ref } from "vue";
+import { computed, defineAsyncComponent, defineComponent, ref } from "vue";
+
 import ChooserMenu from "./ChooserMenu.vue";
 import { ticketFetcher, userFetcher } from "./fetchers.js";
 
 export default defineComponent({
   name: "GeneralChooser",
+  components: {
+    ChooserMenu,
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     item: {
       type: Boolean,
@@ -70,8 +75,15 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    label: String,
-    tooltip: String,
+    label: {
+      type: String,
+      required: true,
+    },
+    tooltip: {
+      type: String,
+      required: false,
+      default: null,
+    },
     icon: {
       type: String,
       default: null,
@@ -93,10 +105,7 @@ export default defineComponent({
       default: false,
     },
   },
-  components: {
-    ChooserMenu,
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+
   emits: ["itemChosen", "clearFilters"],
   setup(props) {
     const show = ref(false);
@@ -110,7 +119,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .no-toggle > span.q-btn__content > .q-icon:nth-of-type(2) {
   display: none;
 }

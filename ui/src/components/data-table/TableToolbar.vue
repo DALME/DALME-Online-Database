@@ -4,42 +4,42 @@
       <slot name="tableToolbar-special" />
       <q-btn-dropdown
         v-if="filterList && filterList.preset"
-        unelevated
-        no-caps
-        label="Filters"
-        size="12px"
-        menu-anchor="bottom right"
-        menu-self="top middle"
         class="bg-grey-1 text-grey-9 table-toolbar-button"
         content-class="menu-shadow"
+        label="Filters"
+        menu-anchor="bottom right"
+        menu-self="top middle"
+        size="12px"
+        no-caps
+        unelevated
       >
-        <q-list bordered separator class="text-grey-9">
-          <q-item dense class="q-pr-sm">
+        <q-list class="text-grey-9" bordered separator>
+          <q-item class="q-pr-sm" dense>
             <q-item-section class="text-weight-bold">
               Filter {{ title.toLowerCase() }}
             </q-item-section>
             <q-item-section avatar>
               <q-btn
-                flat
-                dense
-                size="xs"
+                @click="$emit('clearFilters')"
                 color="grey-6"
                 icon="close"
-                @click="$emit('clearFilters')"
+                size="xs"
+                dense
+                flat
               />
             </q-item-section>
           </q-item>
           <template v-for="(filter, idx) in filterList.preset" :key="idx">
             <q-item
-              clickable
               v-close-popup
-              dense
               @click="$emit('changeFilters', filter)"
               :class="
                 filter.field in activeFilters && activeFilters[filter.field] == filter.value
                   ? 'text-weight-bold bg-indigo-1 text-indigo-5'
                   : 'text-grey-8'
               "
+              clickable
+              dense
             >
               <q-item-section>
                 {{ filter.label }}
@@ -49,35 +49,35 @@
         </q-list>
       </q-btn-dropdown>
       <q-input
+        @update:model-value="onChangeSearchValue"
         :model-value="searchValue"
-        borderless
-        bg-color="grey-1"
-        color="grey-9"
-        hide-bottom-space
-        debounce="300"
-        placeholder="Search"
+        autocapitalize="off"
         autocomplete="off"
         autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
+        bg-color="grey-1"
         class="table-toolbar-searchbox strong-focus table-toolbar-button col-grow"
-        @update:modelValue="onChangeSearchValue"
+        color="grey-9"
+        debounce="300"
+        placeholder="Search"
+        spellcheck="false"
+        borderless
+        hide-bottom-space
       >
-        <template v-slot:append>
+        <template #append>
           <q-icon
             v-if="searchValue === ''"
-            name="search"
-            color="indigo-5"
-            size="xs"
             class="border-radius-right"
+            color="indigo-5"
+            name="search"
+            size="xs"
           />
           <q-icon
             v-else
-            name="close"
+            @click="onChangeSearchValue('')"
             class="cursor-pointer border-radius-right"
             color="indigo-5"
+            name="close"
             size="xs"
-            @click="onChangeSearchValue('')"
           />
         </template>
       </q-input>
@@ -85,13 +85,13 @@
     <div class="table-toolbar-button-group q-ml-sm">
       <q-btn
         v-if="editable && !showGrid"
-        unelevated
-        :icon="isEditModeOn ? 'edit_off' : 'edit'"
-        size="10px"
+        @click="isEditModeOn = !isEditModeOn"
         :color="isEditModeOn ? 'red-2' : 'white'"
+        :icon="isEditModeOn ? 'edit_off' : 'edit'"
         :text-color="isEditModeOn ? 'red-4' : 'grey-9'"
         class="btn-icon table-toolbar-button"
-        @click="isEditModeOn = !isEditModeOn"
+        size="10px"
+        unelevated
       >
         <ToolTip v-if="editable">
           Click on this button to enable editing data in place for supported columns (marked with
@@ -100,26 +100,26 @@
       </q-btn>
       <q-btn-dropdown
         v-if="!showGrid"
-        unelevated
+        class="table-toolbar-button"
+        color="white"
+        content-class="menu-shadow"
         icon="o_view_week"
         size="10px"
-        color="white"
         text-color="grey-8"
-        class="table-toolbar-button"
-        content-class="menu-shadow"
+        unelevated
       >
-        <q-list padding bordered dense>
+        <q-list bordered dense padding>
           <q-item
             v-for="(value, idx) in columns"
             :key="idx"
-            dense
-            clickable
-            v-ripple
             v-close-popup
-            class="text-grey-8"
+            v-ripple
             @click="onChangeColumnVisibility(value.name)"
+            class="text-grey-8"
+            clickable
+            dense
           >
-            <q-item-section side class="q-pr-sm">
+            <q-item-section class="q-pr-sm" side>
               <q-icon
                 :name="
                   visibleColumns.includes(value.name) ? 'check_box' : 'check_box_outline_blank'
@@ -136,31 +136,31 @@
         <ToolTip>Select which columns should be displayed.</ToolTip>
       </q-btn-dropdown>
       <q-btn-dropdown
-        unelevated
-        no-caps
-        size="10px"
-        color="white"
-        text-color="grey-8"
         class="table-toolbar-button"
+        color="white"
         content-class="menu-shadow"
+        size="10px"
+        text-color="grey-8"
+        no-caps
+        unelevated
       >
-        <template v-slot:label>
+        <template #label>
           <span style="font-size: 12px">Show {{ currentRpP }} rows</span>
         </template>
-        <q-list padding bordered dense>
+        <q-list bordered dense padding>
           <q-item
             v-for="(value, idx) in rowsPerPageOptions"
             :key="idx"
-            dense
-            clickable
-            v-ripple
             v-close-popup
+            v-ripple
+            @click="onChangeRowsPerPageValue(value.value)"
             :class="
               value.value === rowsPerPageValue
                 ? 'text-weight-bold bg-indigo-1 text-indigo-5'
                 : 'text-grey-8'
             "
-            @click="onChangeRowsPerPageValue(value.value)"
+            clickable
+            dense
           >
             <q-item-section>
               <q-item-label>{{ value.label }}</q-item-label>
@@ -171,13 +171,13 @@
       </q-btn-dropdown>
       <q-btn
         v-if="grid"
-        unelevated
-        :icon="showGrid ? 'o_table_chart' : 'o_table_rows'"
-        size="10px"
-        color="white"
-        text-color="grey-9"
-        class="btn-icon table-toolbar-button"
         @click="showGrid = !showGrid"
+        :icon="showGrid ? 'o_table_chart' : 'o_table_rows'"
+        class="btn-icon table-toolbar-button"
+        color="white"
+        size="10px"
+        text-color="grey-9"
+        unelevated
       >
         <ToolTip>Switch between table and grid view.</ToolTip>
       </q-btn>
@@ -194,7 +194,7 @@
     <template v-if="filterList && filterList.filters">
       <template v-for="(filterSet, idx) in filterList.filters" :key="idx">
         <FilterChooser
-          v-bind="filterSet"
+          @clear-filters="$emit('clearFilters')"
           @item-chosen="
             (v) =>
               $emit('changeFilters', {
@@ -204,35 +204,35 @@
                 isolation: filterSet.isolation,
               })
           "
-          @clear-filters="$emit('clearFilters')"
+          v-bind="filterSet"
         />
       </template>
     </template>
     <q-btn-dropdown
       v-if="sortList"
-      flat
-      dense
+      class="text-capitalize"
+      content-class="menu-shadow"
       label="Sort"
       menu-anchor="bottom right"
       menu-self="top right"
-      class="text-capitalize"
-      content-class="menu-shadow"
+      dense
+      flat
     >
-      <q-list bordered separator class="text-grey-9">
+      <q-list class="text-grey-9" bordered separator>
         <q-item dense>
           <q-item-section class="text-weight-bold">Sort by</q-item-section>
         </q-item>
         <template v-for="(item, idx) in sortList" :key="idx">
           <q-item
-            clickable
             v-close-popup
-            dense
+            @click="$emit('changeSort', item.value)"
             :class="
               item.value.column === pagination.sortBy && item.value.desc === pagination.descending
                 ? 'text-no-wrap text-weight-bold bg-indigo-1 text-indigo-5'
                 : 'text-no-wrap text-grey-8'
             "
-            @click="$emit('changeSort', item.value)"
+            clickable
+            dense
           >
             <q-item-section>
               {{ item.label }}
@@ -245,13 +245,18 @@
 </template>
 
 <script>
-import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
 import { computed, defineComponent, inject, ref, watch } from "vue";
-import { ToolTip, FilterChooser } from "@/components";
+import { useRoute } from "vue-router";
+
+import { FilterChooser, ToolTip } from "@/components";
 
 export default defineComponent({
   name: "TableToolbar",
+  components: {
+    FilterChooser,
+    ToolTip,
+  },
   props: {
     editable: {
       type: Boolean,
@@ -265,6 +270,7 @@ export default defineComponent({
     filterList: {
       type: Object,
       required: false,
+      default: () => ({}),
     },
     grid: {
       type: Boolean,
@@ -281,6 +287,7 @@ export default defineComponent({
     sortList: {
       type: Array,
       required: false,
+      default: () => [],
     },
     title: {
       type: String,
@@ -290,10 +297,6 @@ export default defineComponent({
       type: String,
       default: "",
     },
-  },
-  components: {
-    FilterChooser,
-    ToolTip,
   },
   emits: [
     "changeRowsPerPage",
@@ -384,7 +387,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .table-toolbar-button-group {
   display: inline-flex;
 }

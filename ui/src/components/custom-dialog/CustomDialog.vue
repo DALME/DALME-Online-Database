@@ -1,19 +1,19 @@
 <template>
   <q-dialog
     ref="dialogRef"
+    @hide="onDialogHide"
+    :class="`frosted-background ${classes} ${colourScheme}`"
     :persistent="isPersistent"
     :position="position"
     :seamless="seamless"
-    transition-show="scale"
     transition-hide="scale"
-    :class="`frosted-background ${classes} ${colourScheme}`"
-    @hide="onDialogHide"
+    transition-show="scale"
   >
     <q-card class="q-dialog-plugin">
       <q-card-section v-if="title || icon" class="hero-bg">
         <q-icon v-if="icon" :name="icon" class="hero-icon" />
         <div v-if="title" class="hero-text">{{ title }}</div>
-        <q-btn v-if="closeIcon" icon="close" flat round dense v-close-popup class="hero-button" />
+        <q-btn v-if="closeIcon" v-close-popup class="hero-button" icon="close" dense flat round />
       </q-card-section>
 
       <q-card-section :class="message ? 'row items-center dialogue-body' : null">
@@ -24,24 +24,24 @@
       </q-card-section>
 
       <q-card-section v-if="prompt" class="q-pt-none">
-        <q-input dense v-model="promptValue" autofocus />
+        <q-input v-model="promptValue" autofocus dense />
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="q-pa-md">
         <q-btn
+          @click="onCancelClick"
+          :label="cancelButtonLabel"
           :outline="colourScheme !== 'warning'"
           :unelevated="colourScheme === 'warning'"
-          no-caps
           class="dialogue-button cancel"
-          :label="cancelButtonLabel"
-          @click="onCancelClick"
+          no-caps
         />
         <q-btn
-          unelevated
-          no-caps
-          class="dialogue-button okay"
-          :label="okayButtonLabel"
           @click="onOkayClick"
+          :label="okayButtonLabel"
+          class="dialogue-button okay"
+          no-caps
+          unelevated
         />
       </q-card-actions>
     </q-card>
@@ -120,7 +120,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .hero-bg {
   height: 150px;
   overflow: hidden;

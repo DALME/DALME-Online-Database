@@ -1,32 +1,32 @@
 <template>
   <q-input
+    @blur="handleBlur"
+    @update:model-value="onUpdate"
+    :error="errorMessage && meta.touched"
+    :model-value="modelValue"
     label="Date (YYYY-MM-DD)"
     mask="####-##-##"
-    :model-value="modelValue"
-    :error="errorMessage && meta.touched"
-    @blur="handleBlur"
-    @update:modelValue="onUpdate"
   >
     <ToolTip v-if="description">
       {{ description }}
     </ToolTip>
 
-    <template v-slot:error>
+    <template #error>
       <div>{{ errorMessage }}</div>
     </template>
 
-    <template v-slot:append>
-      <q-icon name="event" class="cursor-pointer">
+    <template #append>
+      <q-icon class="cursor-pointer" name="event">
         <q-popup-proxy
           ref="qDateProxy"
-          cover
-          transition-show="scale"
-          transition-hide="scale"
           class="z-max"
+          transition-hide="scale"
+          transition-show="scale"
+          cover
         >
-          <q-date mask="YYYY-MM-DD" :model-value="modelValue" @update:modelValue="onUpdate">
+          <q-date @update:model-value="onUpdate" :model-value="modelValue" mask="YYYY-MM-DD">
             <div class="row items-center justify-end">
-              <q-btn v-close-popup label="Close" color="primary" flat />
+              <q-btn v-close-popup color="primary" label="Close" flat />
             </div>
           </q-date>
         </q-popup-proxy>
@@ -37,7 +37,7 @@
 
 <script>
 import { useField } from "vee-validate";
-import { defineComponent, defineAsyncComponent } from "vue";
+import { defineAsyncComponent, defineComponent } from "vue";
 
 export default defineComponent({
   name: "DateField",
@@ -62,6 +62,7 @@ export default defineComponent({
       default: () => "",
     },
   },
+  emits: ["update:modelValue"],
   setup(props, context) {
     const { errorMessage, meta, handleBlur } = useField(props.field, props.validation);
 

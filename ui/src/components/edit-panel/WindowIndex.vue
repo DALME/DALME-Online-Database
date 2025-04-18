@@ -3,25 +3,25 @@
     <div class="index-header">
       <div class="index-title">WINDOWS</div>
       <div class="index-btn-group">
-        <q-btn icon="visibility_off" :disable="disableHideAll" @click.stop="hideAll" />
-        <q-btn icon="visibility" :disable="disableShowAll" @click.stop="showAll" />
+        <q-btn @click.stop="hideAll" :disable="disableHideAll" icon="visibility_off" />
+        <q-btn @click.stop="showAll" :disable="disableShowAll" icon="visibility" />
       </div>
     </div>
 
     <q-list>
       <q-item
-        clickable
-        class="q-px-sm q-py-none"
+        v-for="(actor, cuid) in actors"
         :key="cuid"
+        @click.stop="() => handleFocus(cuid)"
         :class="{
           focussed: cuid === focus,
           pulse: !disabled && mouseoverSubmit && cuid === focus,
         }"
-        v-for="(actor, cuid) in actors"
-        @click.stop="() => handleFocus(cuid)"
+        class="q-px-sm q-py-none"
+        clickable
       >
         <q-item-section side>
-          <q-icon class="mode-icon" :name="editorModeIcons[actor.context.mode]" />
+          <q-icon :name="editorModeIcons[actor.context.mode]" class="mode-icon" />
         </q-item-section>
         <q-item-section class="column">
           <div :class="actor.context.mode === 'create' ? 'row name text-capitalize' : 'row kind'">
@@ -35,19 +35,19 @@
         <q-item-section side>
           <div class="row items-center">
             <q-icon
-              class="q-mr-xs"
               v-if="!actor.context.visible"
+              class="q-mr-xs"
+              color="grey-6"
               name="o_visibility_off"
               size="xs"
-              color="grey-6"
             />
             <q-btn
-              icon="center_focus_weak"
               @click.stop.stop="() => handleRecenter(cuid)"
-              size="sm"
               class="text-orange-edit"
-              unelevated
+              icon="center_focus_weak"
+              size="sm"
               round
+              unelevated
             >
               <ToolTip self="center left">Recenter</ToolTip>
             </q-btn>
@@ -60,11 +60,12 @@
 
 <script>
 // eslint-disable-next-line unused-imports/no-unused-imports
-import { all, keys, map as rMap, none, values } from "ramda";
-import { defineComponent, ref } from "vue";
 import { useActor } from "@xstate/vue";
-import { useConstants, useEditing, useStores } from "@/use";
+import { all, keys, none, map as rMap, values } from "ramda";
+import { defineComponent, ref } from "vue";
+
 import { ToolTip } from "@/components";
+import { useConstants, useEditing, useStores } from "@/use";
 
 export default defineComponent({
   name: "WindowIndex",

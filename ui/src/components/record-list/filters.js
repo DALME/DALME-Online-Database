@@ -1,6 +1,6 @@
 import { requests } from "@/api";
-import { OptionListSchema } from "@/schemas";
 import { filterItemClass, filterItemClassSelected, optionFetcher, userFetcher } from "@/components";
+import { OptionListSchema } from "@/schemas";
 
 const recordTypes = () =>
   optionFetcher(

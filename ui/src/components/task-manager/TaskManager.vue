@@ -1,45 +1,47 @@
 <template>
   <template v-if="taskStore.ready">
     <TaskList
-      add-new-button
+      @change-status="taskStore.onChangeStatus"
+      @show-more="taskStore.onShowMore('created')"
+      @view-detail="onViewDetail"
       :data="taskStore.created"
       :loading="taskStore.loading"
-      label="Your tasks"
-      in-user-drawer
-      :no-data-message="createdNoData"
       :more-button="taskStore.moreCreated"
-      @show-more="taskStore.onShowMore('created')"
-      @change-status="taskStore.onChangeStatus"
-      @view-detail="onViewDetail"
+      :no-data-message="createdNoData"
+      label="Your tasks"
+      add-new-button
+      in-user-drawer
     />
     <TaskList
+      @change-status="taskStore.onChangeStatus"
+      @show-more="taskStore.onShowMore('assigned')"
+      @view-detail="onViewDetail"
       :data="taskStore.assigned"
       :loading="taskStore.loading"
+      :more-button="taskStore.moreAssigned"
+      :no-data-message="assignedNoData"
       label="Tasks assigned to you"
       in-user-drawer
-      :no-data-message="assignedNoData"
-      :more-button="taskStore.moreAssigned"
-      @show-more="taskStore.onShowMore('assigned')"
-      @change-status="taskStore.onChangeStatus"
-      @view-detail="onViewDetail"
     />
     <TaskList
+      @change-status="taskStore.onChangeStatus"
+      @show-more="taskStore.onShowMore('completed')"
+      @view-detail="onViewDetail"
       :data="taskStore.completed"
       :loading="taskStore.loading"
-      label="Tasks you completed"
-      in-user-drawer
-      no-data-message="You have not completed any tasks yet."
       :more-button="taskStore.moreCompleted"
-      @show-more="taskStore.onShowMore('completed')"
-      @change-status="taskStore.onChangeStatus"
-      @view-detail="onViewDetail"
+      label="Tasks you completed"
+      no-data-message="You have not completed any tasks yet."
+      in-user-drawer
     />
   </template>
 </template>
 
 <script>
 import { computed, defineComponent } from "vue";
+
 import { useStores } from "@/use";
+
 import TaskList from "./TaskList.vue";
 
 export default defineComponent({

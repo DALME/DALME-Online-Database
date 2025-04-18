@@ -1,21 +1,21 @@
 <template>
   <router-link
+    @mouseleave="showPopover = false"
+    @mouseover="showPopover = true"
     :class="`${linkClasses}`"
     :to="target"
-    @mouseover="showPopover = true"
-    @mouseleave="showPopover = false"
   >
     <span v-text="text" />
     <q-menu
       v-model="showPopover"
-      no-parent-event
-      anchor="top left"
-      self="bottom left"
-      class="popover-container"
       :class="dark ? 'dark' : ''"
+      anchor="top left"
+      class="popover-container"
       max-width="50%"
+      self="bottom left"
+      no-parent-event
     >
-      <q-card bordered class="box-small-arrow q-pa-sm" :class="dark ? 'dark' : ''">
+      <q-card :class="dark ? 'dark' : ''" class="box-small-arrow q-pa-sm" bordered>
         <slot>
           <q-item v-if="userData">
             <q-item-section v-if="showAvatar" avatar>
@@ -26,7 +26,7 @@
                   fit="cover"
                   ratio="1"
                 />
-                <q-icon v-else size="30px" name="mdi-account-circle" />
+                <q-icon v-else name="mdi-account-circle" size="30px" />
               </q-avatar>
             </q-item-section>
             <q-item-section>
@@ -46,6 +46,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+
 import { nully } from "@/utils";
 
 export default defineComponent({
@@ -63,10 +64,12 @@ export default defineComponent({
     linkTarget: {
       type: Object,
       required: false,
+      default: null,
     },
     linkText: {
       type: String,
       required: false,
+      default: null,
     },
     showAvatar: {
       type: Boolean,
@@ -76,6 +79,7 @@ export default defineComponent({
     userData: {
       type: Object,
       required: false,
+      default: null,
     },
   },
   setup(props) {
@@ -99,7 +103,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .popover-container {
   --bg-colour: var(--light-bg-base-colour);
   --border-colour: var(--ligth-border-base-colour);

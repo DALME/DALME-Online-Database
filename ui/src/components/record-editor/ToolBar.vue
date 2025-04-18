@@ -1,18 +1,18 @@
 <template>
   <div class="row text-grey-7 toolbar">
     <template v-for="(els, section) in editorStore.toolbar" :key="section">
-      <q-btn-group flat class="editor-tb-group">
+      <q-btn-group class="editor-tb-group" flat>
         <template v-for="(el, idx) in els" :key="idx">
-          <q-btn flat size="xs" :icon="el.icon" class="editor-tb-button">
-            <TeiTagMenu action="create" :tagData="el.tags[0]" :elData="el" @insert="insertTag" />
+          <q-btn :icon="el.icon" class="editor-tb-button" size="xs" flat>
+            <TeiTagMenu @insert="insertTag" :el-data="el" :tag-data="el.tags[0]" action="create" />
           </q-btn>
         </template>
       </q-btn-group>
-      <q-separator vertical inset class="q-mx-xs" />
+      <q-separator class="q-mx-xs" inset vertical />
     </template>
     <div class="editor-tb-right">
-      <q-btn-dropdown flat icon="settings" size="sm" class="editor-tb-button">
-        <q-list dense bordered padding>
+      <q-btn-dropdown class="editor-tb-button" icon="settings" size="sm" flat>
+        <q-list bordered dense padding>
           <q-item>
             <q-item-section>
               <q-item-label class="text-overline">Editor Preferences</q-item-label>
@@ -22,7 +22,7 @@
             <q-item v-if="setting.group === 'Record Editor' && setting.dataType != 'JSON'">
               <q-item-section>
                 <q-item-label overline><span v-text="setting.label"></span></q-item-label>
-                <q-item-label caption lines="2"
+                <q-item-label lines="2" caption
                   ><span v-text="setting.description"></span
                 ></q-item-label>
               </q-item-section>
@@ -35,20 +35,20 @@
                 <q-slider
                   v-else-if="setting.dataType === 'INT'"
                   v-model="setting.value"
-                  :min="settings.getOptions(setting.name).min"
                   :max="settings.getOptions(setting.name).max"
-                  label
-                  dense
-                  label-always
+                  :min="settings.getOptions(setting.name).min"
                   class="editor-prefs-slider"
+                  dense
+                  label
+                  label-always
                 />
                 <q-select
                   v-else
                   v-model="setting.value"
                   :options="settings.getOptions(setting.name)"
                   dense
-                  options-dense
                   map-options
+                  options-dense
                   outlined
                 />
               </q-item-section>
@@ -57,12 +57,12 @@
         </q-list>
       </q-btn-dropdown>
       <q-btn
-        flat
+        @click="view.showTagMenu = !view.showTagMenu"
+        :icon-right="view.showTagMenu ? 'arrow_drop_up' : 'arrow_drop_down'"
         class="editor-tb-button"
         icon="code"
         size="sm"
-        :icon-right="view.showTagMenu ? 'arrow_drop_up' : 'arrow_drop_down'"
-        @click="view.showTagMenu = !view.showTagMenu"
+        flat
       />
     </div>
   </div>
@@ -70,7 +70,9 @@
 
 <script>
 import { defineComponent, inject } from "vue";
+
 import { useStores } from "@/use";
+
 import TeiTagMenu from "./TeiTagMenu.vue";
 
 export default defineComponent({

@@ -1,19 +1,20 @@
 <template>
   <q-form class="q-px-md">
-    <SchemaForm :schema="schema" useCustomFormWrapper />
+    <SchemaForm :schema="schema" use-custom-form-wrapper />
   </q-form>
 </template>
 
 <script>
+import { useStorage } from "@vueuse/core";
+import { useActor } from "@xstate/vue";
 import { SchemaForm, useSchemaForm } from "formvuelate";
 import { useForm } from "vee-validate";
 import { provide, watch } from "vue";
-import { useStorage } from "@vueuse/core";
-import { useActor } from "@xstate/vue";
 
 import { useEditing } from "@/use";
 
 export default {
+  components: { SchemaForm },
   props: {
     cuid: {
       type: String,
@@ -28,7 +29,6 @@ export default {
       required: true,
     },
   },
-  components: { SchemaForm },
   setup(props) {
     const fieldsKey = `form-fields:${props.cuid}`;
     const { forms } = useEditing();

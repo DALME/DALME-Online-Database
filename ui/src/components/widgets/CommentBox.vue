@@ -4,7 +4,7 @@
       <template v-if="comments.length">
         <template v-for="(entry, idx) in comments" :key="idx">
           <template v-if="'event' in entry">
-            <q-item class="event-box" :class="entry.user.id == op ? 'op-post' : ''">
+            <q-item :class="entry.user.id == op ? 'op-post' : ''" class="event-box">
               <q-item-section avatar>
                 <q-icon :class="getEventClass(entry.event)" :name="getEventIcon(entry.event)" />
               </q-item-section>
@@ -15,9 +15,9 @@
                   text-size="13px"
                 />
                 <q-icon
-                  color="deep-purple-6"
-                  class="avatar-icon"
                   v-else
+                  class="avatar-icon"
+                  color="deep-purple-6"
                   name="smart_toy"
                   size="12px"
                 />
@@ -26,7 +26,7 @@
             </q-item>
           </template>
           <template v-else>
-            <q-item class="comment-box" :class="entry.creationUser.id == op ? 'op-post' : ''">
+            <q-item :class="entry.creationUser.id == op ? 'op-post' : ''" class="comment-box">
               <q-item-section v-if="entry.creationUser.id == op" avatar>
                 <q-avatar size="40px">
                   <q-img
@@ -35,17 +35,21 @@
                     fit="cover"
                     ratio="1"
                   />
-                  <q-icon v-else size="36px" name="mdi-account-circle" />
+                  <q-icon v-else name="mdi-account-circle" size="36px" />
                 </q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-card flat bordered :class="containerClasses(entry.creationUser.id)">
+                <q-card :class="containerClasses(entry.creationUser.id)" bordered flat>
                   <q-card-section class="comment-head">
-                    <DetailPopover :dark="dark" :userData="entry.creationUser" :showAvatar="true" />
+                    <DetailPopover
+                      :dark="dark"
+                      :show-avatar="true"
+                      :user-data="entry.creationUser"
+                    />
                     commented on {{ formatDate(entry.creationTimestamp, "DATETIME_AT") }}
                   </q-card-section>
                   <q-card-section class="q-pa-none">
-                    <MarkdownEditor :text="entry.body" :dark="dark" in-card />
+                    <MarkdownEditor :dark="dark" :text="entry.body" in-card />
                   </q-card-section>
                 </q-card>
               </q-item-section>
@@ -57,7 +61,7 @@
                     fit="cover"
                     ratio="1"
                   />
-                  <q-icon v-else size="36px" name="mdi-account-circle" />
+                  <q-icon v-else name="mdi-account-circle" size="36px" />
                 </q-avatar>
               </q-item-section>
             </q-item>
@@ -71,29 +75,29 @@
     <q-card-section
       :class="`comment-thread ${dark ? 'dark' : ''} ${auth.user.userId == op ? 'op' : 'not-op'}`"
     >
-      <q-item class="comment-box" :class="auth.user.userId == op ? 'op-post' : ''">
+      <q-item :class="auth.user.userId == op ? 'op-post' : ''" class="comment-box">
         <q-item-section v-if="auth.user.userId == op" avatar>
           <q-avatar size="40px">
             <q-img v-if="!nully(auth.user.avatar)" :src="auth.user.avatar" fit="cover" ratio="1" />
-            <q-icon v-else size="36px" name="mdi-account-circle" />
+            <q-icon v-else name="mdi-account-circle" size="36px" />
           </q-avatar>
         </q-item-section>
         <q-item-section>
           <MarkdownEditor
             ref="commentEditor"
-            editable
-            placeholder="Leave a comment..."
-            :help="helpLine"
-            submit-label="Comment"
             @on-save-text="onSubmit"
             :dark="dark"
+            :help="helpLine"
             :right="auth.user.userId != op"
+            placeholder="Leave a comment..."
+            submit-label="Comment"
+            editable
           />
         </q-item-section>
         <q-item-section v-if="auth.user.userId != op" side>
           <q-avatar size="40px">
             <q-img v-if="!nully(auth.user.avatar)" :src="auth.user.avatar" fit="cover" ratio="1" />
-            <q-icon v-else size="36px" name="mdi-account-circle" />
+            <q-icon v-else name="mdi-account-circle" size="36px" />
           </q-avatar>
         </q-item-section>
       </q-item>
@@ -104,35 +108,41 @@
 
 <script>
 import { defineComponent, inject, onMounted, ref, watch } from "vue";
+
 import { API as apiInterface, requests } from "@/api";
+import { UserPill } from "@/components";
 import MarkdownEditor from "@/components/markdown-editor/MarkdownEditor.vue";
 import { AdaptiveSpinner, DetailPopover } from "@/components/widgets";
-import { formatDate, nully } from "@/utils";
-import { commentPayloadSchema, commentsSchema, commentSchema } from "@/schemas";
-import { useAuthStore } from "@/stores/auth";
 import notifier from "@/notifier";
+import { commentPayloadSchema, commentSchema, commentsSchema } from "@/schemas";
+import { useAuthStore } from "@/stores/auth";
 import { useConstants } from "@/use";
-import { UserPill } from "@/components";
+import { formatDate, nully } from "@/utils";
 
 export default defineComponent({
   name: "CommentBox",
+  components: {
+    AdaptiveSpinner,
+    DetailPopover,
+    MarkdownEditor,
+    UserPill,
+  },
   props: {
     author: {
       type: Number,
       required: false,
+      default: null,
     },
     dark: {
       type: Boolean,
       required: false,
       default: false,
     },
-    worklog: Array,
-  },
-  components: {
-    AdaptiveSpinner,
-    DetailPopover,
-    MarkdownEditor,
-    UserPill,
+    worklog: {
+      type: Array,
+      required: false,
+      default: null,
+    },
   },
   emits: ["onCountChanged"],
   setup(props, context) {
@@ -275,7 +285,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .comment-thread {
   --bg-colour: var(--light-bg-base-colour);
   --bg-raised: var(--light-bg-raised-colour);

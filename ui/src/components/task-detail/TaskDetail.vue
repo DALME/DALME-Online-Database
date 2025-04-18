@@ -7,34 +7,34 @@
         </div>
         <div class="row detail-row-subheading text-grey-8">
           <q-chip
+            :color="task.completed ? 'red-6' : 'green-7'"
             :icon="task.completed ? 'o_check_circle' : 'o_error_outline'"
             :label="task.completed ? 'Completed' : 'Incomplete'"
-            :color="task.completed ? 'red-6' : 'green-7'"
-            text-color="white"
-            size="sm"
             class="q-ml-none q-mr-xs"
+            size="sm"
+            text-color="white"
           />
-          <DetailPopover :userData="task.creationUser" :showAvatar="false" />
+          <DetailPopover :show-avatar="false" :user-data="task.creationUser" />
           created this task on {{ formatDate(task.creationTimestamp, "DATETIME_AT") }}
         </div>
       </div>
       <div v-if="isAdmin" class="col-auto">
         <q-btn
-          dense
-          outline
-          no-caps
-          :color="buttonColours.colour"
-          :class="`action-button bg-${buttonColours.colour}`"
-          :text-color="buttonColours.text"
-          :label="capitalize(action)"
           @click.stop="onAction"
+          :class="`action-button bg-${buttonColours.colour}`"
+          :color="buttonColours.colour"
+          :label="capitalize(action)"
+          :text-color="buttonColours.text"
+          dense
+          no-caps
+          outline
         />
       </div>
     </div>
     <q-separator class="q-mb-lg" />
     <div class="row">
       <div class="col-9 q-pr-md">
-        <q-card flat class="q-mb-md">
+        <q-card class="q-mb-md" flat>
           <q-card-section
             :class="
               task.commentCount > 0
@@ -44,22 +44,22 @@
           >
             <div class="comment-thread q-mt-none q-pb-lg">
               <q-item class="q-pb-sm q-pt-none q-px-none">
-                <q-item-section top avatar>
+                <q-item-section avatar top>
                   <q-avatar v-if="task.creationUser.avatar" size="40px">
                     <q-img :src="task.creationUser.avatar" fit="cover" ratio="1" />
                   </q-avatar>
                   <q-avatar
                     v-else
-                    size="40px"
-                    icon="account_circle"
                     color="grey-4"
+                    icon="account_circle"
+                    size="40px"
                     text-color="grey-6"
                   />
                 </q-item-section>
                 <q-item-section>
-                  <q-card flat bordered class="box-left-arrow">
+                  <q-card class="box-left-arrow" bordered flat>
                     <q-card-section class="bg-grey-2 comment-head">
-                      <DetailPopover :userData="task.creationUser" :showAvatar="false" />
+                      <DetailPopover :show-avatar="false" :user-data="task.creationUser" />
                       commented on {{ formatDate(task.creationTimestamp, "DATETIME_AT") }}
                     </q-card-section>
                     <q-separator />
@@ -72,10 +72,10 @@
               </q-item>
             </div>
             <CommentBox>
-              <template v-if="task.completed" v-slot:comment-stream-end>
+              <template v-if="task.completed" #comment-stream-end>
                 <div class="comment-thread row items-center q-mt-none q-pb-lg">
                   <div class="closing-dot bg-deep-purple-6">
-                    <q-icon name="o_check_circle" color="white" size="20px" />
+                    <q-icon color="white" name="o_check_circle" size="20px" />
                   </div>
                   <div class="closing-dot-label">
                     this task was completed {{ formatDate(task.completedDate, "DATETIME_AT") }}
@@ -111,10 +111,11 @@
 </template>
 
 <script>
+import { format, useMeta } from "quasar";
 import { isEmpty } from "ramda";
-import { useMeta, format } from "quasar";
 import { computed, defineComponent, onMounted, provide, readonly, ref } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
+
 import { requests } from "@/api";
 import {
   AttachmentWidget,
@@ -123,9 +124,9 @@ import {
   MarkdownEditor,
   OpaqueSpinner,
 } from "@/components";
-import { formatDate } from "@/utils";
 import { taskSchema } from "@/schemas";
 import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
+import { formatDate } from "@/utils";
 
 export default defineComponent({
   name: "TaskDetail",
@@ -207,7 +208,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .action-button {
   padding: 0px 10px 0px 10px;
   font-weight: 600;

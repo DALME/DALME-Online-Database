@@ -1,108 +1,106 @@
 <template>
   <DataTable
-    grid
-    useExpansion
     :columns="columns"
-    :search="search"
-    :filterList="filterList"
+    :filter-list="filterList"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onChangeFilters="onChangeFilters"
-    :onClearFilters="onClearFilters"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-filters="onChangeFilters"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-clear-filters="onClearFilters"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
-    :sortList="sortList"
+    :search="search"
+    :sort-list="sortList"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
+    grid
+    use-expansion
   >
-    <template v-slot:grid-avatar>
-      <q-icon name="mdi-archive" color="grey-5" size="22px" />
+    <template #grid-avatar>
+      <q-icon color="grey-5" name="mdi-archive" size="22px" />
     </template>
 
-    <template v-slot:grid-main="props">
+    <template #grid-main="props">
       <DetailPopover
-        linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Record Group', params: { id: props.row.id } }"
-        :linkText="props.row.shortName"
+        :link-target="{ name: 'Record Group', params: { id: props.row.id } }"
+        :link-text="props.row.shortName"
+        link-class="text-h7 title-link"
       >
         <div class="text-h8 q-mb-xs">
           {{ props.row.shortName }}
         </div>
       </DetailPopover>
-      <template>
-        <TagPill
-          v-if="props.row.isPrivate"
-          name="private"
-          colour="deep-orange-1"
-          textColour="deep-orange-8"
-          size="xs"
-          module="standalone"
-          class="q-ml-sm"
-        />
-      </template>
+      <TagPill
+        v-if="props.row.isPrivate"
+        class="q-ml-sm"
+        colour="deep-orange-1"
+        module="standalone"
+        name="private"
+        size="xs"
+        text-colour="deep-orange-8"
+      />
     </template>
 
-    <template v-slot:grid-detail="props">
+    <template #grid-detail="props">
       <span class="text-detail text-weight-medium text-grey-8">
         {{ props.row.name }} | {{ props.row.id }}
       </span>
     </template>
 
-    <template v-slot:grid-counter="props">
+    <template #grid-counter="props">
       <q-icon
-        name="o_import_contacts"
-        size="17px"
         v-if="props.row.noRecords"
         class="text-weight-bold q-mr-xs"
+        name="o_import_contacts"
+        size="17px"
       />
       <div class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.noRecords }}
       </div>
     </template>
 
-    <template v-slot:grid-counter-extra="props">
+    <template #grid-counter-extra="props">
       <q-icon
+        v-if="props.row.workflow"
+        class="text-weight-bold q-mr-xs"
+        color="red-4"
         name="flag"
         size="17px"
-        v-if="props.row.workflow"
-        color="red-4"
-        class="text-weight-bold q-mr-xs"
       />
     </template>
 
-    <template v-slot:render-cell-name="props">
+    <template #render-cell-name="props">
       <router-link
-        class="text-subtitle2 text-link"
         :to="{ name: 'Record', params: { id: props.row.id } }"
+        class="text-subtitle2 text-link"
       >
         {{ props.row.name }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-owner="props">
+    <template #render-cell-owner="props">
       <router-link
-        class="text-link"
         :to="{
           name: 'User',
           params: { username: props.row.owner.username },
         }"
+        class="text-link"
       >
         {{ props.row.owner.fullName }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-activity="props">
+    <template #render-cell-activity="props">
       <span>
         <router-link
-          class="text-link"
           :to="{
             name: 'User',
             params: { username: props.row.workflow.lastUser.username },
           }"
+          class="text-link"
         >
           {{ props.row.workflow.lastUser.fullName }}
         </router-link>
@@ -111,12 +109,12 @@
       </span>
     </template>
 
-    <template v-slot:render-cell-isPrivate="props">
+    <template #render-cell-isPrivate="props">
       <BooleanValue
+        :only-true="true"
+        :only-true-green="false"
         :value="props.row.isPrivate"
-        :onlyTrue="true"
-        :onlyTrueGreen="false"
-        trueIcon="lock"
+        true-icon="lock"
       />
     </template>
   </DataTable>
@@ -126,13 +124,15 @@
 import { useMeta } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
+
 import { requests } from "@/api";
-import { getColumns, getDefaults } from "@/utils";
 import { BooleanValue, DataTable, DetailPopover, TagPill } from "@/components";
+import { recordGroupListSchema } from "@/schemas";
 import { useAPI, usePagination, useStores } from "@/use";
+import { getColumns, getDefaults } from "@/utils";
+
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
-import { recordGroupListSchema } from "@/schemas";
 
 export default defineComponent({
   name: "RecordGroupList",

@@ -1,14 +1,14 @@
 <template>
   <q-btn
-    square
-    size="11px"
-    :icon="underEdit ? 'edit_off' : 'edit'"
     :class="underEdit ? 'editing' : 'orange'"
     :disable="!isDetail || underEdit"
+    :icon="underEdit ? 'edit_off' : 'edit'"
     :loading="loading"
     :onclick="handleClick"
+    size="11px"
+    square
   >
-    <template v-slot:loading>
+    <template #loading>
       <q-spinner-facebook />
     </template>
   </q-btn>
@@ -16,10 +16,11 @@
 
 <script>
 import { createId as cuid } from "@paralleldrive/cuid2";
+import { useActor } from "@xstate/vue";
 import { isNil, keys } from "ramda";
 import { computed, defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import { useActor } from "@xstate/vue";
+
 import { requests } from "@/api";
 import { normalizeAttributesInput } from "@/components/forms/attributes-field/normalize";
 import forms from "@/forms";

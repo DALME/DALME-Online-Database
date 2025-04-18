@@ -1,8 +1,9 @@
-import S from "string";
 import { equals, isEmpty } from "ramda";
+import S from "string";
 import { computed, ref, unref, watch } from "vue";
-import { nully, isObject, isInList, addToList, removeFromList } from "@/utils";
+
 import { useSettingsStore } from "@/stores/settings";
+import { addToList, isInList, isObject, nully, removeFromList } from "@/utils";
 
 const transformField = (field) => S(field).underscore().s;
 

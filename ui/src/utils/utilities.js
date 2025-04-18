@@ -1,4 +1,5 @@
 import { isEmpty, isNil } from "ramda";
+
 import notifier from "@/notifier";
 
 export const nully = (value) => isNil(value) || isEmpty(value);

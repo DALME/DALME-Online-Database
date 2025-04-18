@@ -2,54 +2,54 @@
   <div v-if="!loading" class="value-display">
     <q-input
       v-if="data.dataType === 'STR'"
-      autogrow
-      :readonly="!editOn"
       v-model="value"
       :label="data.label"
       :placeholder="data.description ? data.description : null"
+      :readonly="!editOn"
       color="indigo-8"
+      autogrow
     >
-      <template v-slot:append>
+      <template #append>
         <EditButtons
-          :linkable="data.link"
-          cancellable
-          :main-icon="editIcon"
-          :main-color="editColour"
-          :show-main="data.editable && !saving"
-          :show-cancel="editOn && hasChanged"
-          :show-spinner="saving"
-          :show-link="!saving && !editOn"
-          @navigate="router.push(linkTarget)"
           @action="onAction"
           @cancel="onCancel"
+          @navigate="router.push(linkTarget)"
+          :linkable="data.link"
+          :main-color="editColour"
+          :main-icon="editIcon"
+          :show-cancel="editOn && hasChanged"
+          :show-link="!saving && !editOn"
+          :show-main="data.editable && !saving"
+          :show-spinner="saving"
+          cancellable
         />
       </template>
     </q-input>
     <q-select
       v-if="data.dataType === 'FKEY'"
-      :multiple="multiple"
-      :use-chips="multiple"
-      :readonly="!editOn"
       v-model="value"
-      :options="options"
+      @filter="optionsFilter"
       :label="data.label"
+      :multiple="multiple"
+      :options="options"
+      :readonly="!editOn"
+      :use-chips="multiple"
       color="indigo-8"
+      input-debounce="0"
+      emit-value
       hide-dropdown-icon
       map-options
+      menu-shrink
       options-dense
       use-input
-      emit-value
-      menu-shrink
-      input-debounce="0"
-      @filter="optionsFilter"
     >
-      <template v-if="data.model === 'User'" v-slot:option="scope">
+      <template v-if="data.model === 'User'" #option="scope">
         <q-item v-bind="scope.itemProps" dense>
           <q-item-section side>
             <q-avatar v-if="!nully(scope.opt.icon)" size="34px">
               <q-img :src="scope.opt.icon" class="chooser-avatar-image" fit="cover" ratio="1" />
             </q-avatar>
-            <q-icon v-else size="34px" name="mdi-account-circle" color="grey-4" />
+            <q-icon v-else color="grey-4" name="mdi-account-circle" size="34px" />
           </q-item-section>
           <q-item-section>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
@@ -57,44 +57,44 @@
           </q-item-section>
         </q-item>
       </template>
-      <template v-slot:append>
+      <template #append>
         <EditButtons
-          :linkable="data.link"
-          cancellable
-          :main-icon="editIcon"
-          :main-color="editColour"
-          :show-main="data.editable && !saving"
-          :show-cancel="editOn && hasChanged"
-          :show-spinner="saving"
-          :show-link="!saving && !editOn"
-          @navigate="router.push(linkTarget)"
           @action="onAction"
           @cancel="onCancel"
+          @navigate="router.push(linkTarget)"
+          :linkable="data.link"
+          :main-color="editColour"
+          :main-icon="editIcon"
+          :show-cancel="editOn && hasChanged"
+          :show-link="!saving && !editOn"
+          :show-main="data.editable && !saving"
+          :show-spinner="saving"
+          cancellable
         />
       </template>
     </q-select>
     <q-field v-if="data.dataType === 'BOOL'" :borderless="!editOn" :readonly="!editOn">
       <q-checkbox
-        left-label
-        :disable="!editOn"
         v-model="value"
+        :disable="!editOn"
         :label="data.label"
         checked-icon="task_alt"
         unchecked-icon="highlight_off"
+        left-label
       />
-      <template v-slot:append>
+      <template #append>
         <EditButtons
-          :linkable="data.link"
-          cancellable
-          :main-icon="editIcon"
-          :main-color="editColour"
-          :show-main="data.editable && !saving"
-          :show-cancel="editOn && hasChanged"
-          :show-spinner="saving"
-          :show-link="!saving && !editOn"
-          @navigate="router.push(linkTarget)"
           @action="onAction"
           @cancel="onCancel"
+          @navigate="router.push(linkTarget)"
+          :linkable="data.link"
+          :main-color="editColour"
+          :main-icon="editIcon"
+          :show-cancel="editOn && hasChanged"
+          :show-link="!saving && !editOn"
+          :show-main="data.editable && !saving"
+          :show-spinner="saving"
+          cancellable
         />
       </template>
     </q-field>
@@ -103,18 +103,18 @@
         <div class="field-date-label q-field__label">
           <div>{{ data.label }}</div>
         </div>
-        <DateChooser :data="value" :editable="editOn" @changed="updateValue" />
+        <DateChooser @changed="updateValue" :data="value" :editable="editOn" />
       </div>
       <div class="field-date-buttons">
         <EditButtons
-          cancellable
-          :main-icon="editIcon"
-          :main-color="editColour"
-          :show-main="data.editable && !saving"
-          :show-cancel="editOn && hasChanged"
-          :show-spinner="saving"
           @action="onAction"
           @cancel="onCancel"
+          :main-color="editColour"
+          :main-icon="editIcon"
+          :show-cancel="editOn && hasChanged"
+          :show-main="data.editable && !saving"
+          :show-spinner="saving"
+          cancellable
         />
       </div>
     </div>
@@ -122,27 +122,32 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref, onBeforeMount } from "vue";
-import { useRouter } from "vue-router";
-import { useAPI } from "@/use";
-import { requests } from "@/api";
-import { OptionListSchema } from "@/schemas";
 import { snakeCase } from "change-case";
-import { nully } from "@/utils";
-import EditButtons from "./EditButtons.vue";
+import { computed, defineComponent, onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+
+import { requests } from "@/api";
 import { DateChooser } from "@/components";
+import { OptionListSchema } from "@/schemas";
+import { useAPI } from "@/use";
+import { nully } from "@/utils";
+
+import EditButtons from "./EditButtons.vue";
 
 export default defineComponent({
   name: "ValueDisplay",
+  components: { EditButtons, DateChooser },
   props: {
     data: {
       type: Object,
       required: true,
     },
-    field: String,
+    field: {
+      type: String,
+      required: true,
+    },
   },
   emits: ["valueChanged"],
-  components: { EditButtons, DateChooser },
 
   setup(props, context) {
     const router = useRouter();

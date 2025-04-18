@@ -1,70 +1,70 @@
 <template>
   <div v-if="scope.pagesNumber" class="row full-width flex-center q-py-xs q-px-sm table-pager">
-    <q-btn-group unelevated class="list-footer-button-group">
+    <q-btn-group class="list-footer-button-group" unelevated>
       <q-btn
         v-if="scope.pagesNumber > 2"
-        flat
-        icon="skip_previous"
-        :text-color="scope.isFirstPage ? 'grey-8' : 'indigo-5'"
-        size="sm"
-        class="list-footer-button strong-focus"
-        :disable="scope.isFirstPage"
         @click="scope.firstPage"
-      />
-      <q-separator vertical class="bg-grey-4" />
-      <q-btn
-        flat
-        icon="fast_rewind"
-        :text-color="scope.isFirstPage ? 'grey-8' : 'indigo-5'"
-        size="sm"
-        class="list-footer-button strong-focus"
         :disable="scope.isFirstPage"
+        :text-color="scope.isFirstPage ? 'grey-8' : 'indigo-5'"
+        class="list-footer-button strong-focus"
+        icon="skip_previous"
+        size="sm"
+        flat
+      />
+      <q-separator class="bg-grey-4" vertical />
+      <q-btn
         @click="scope.prevPage"
+        :disable="scope.isFirstPage"
+        :text-color="scope.isFirstPage ? 'grey-8' : 'indigo-5'"
+        class="list-footer-button strong-focus"
+        icon="fast_rewind"
+        size="sm"
+        flat
       />
       <div class="row justify-center">
         <q-input
-          :model-value="newPage"
-          type="number"
-          :min="1"
-          :max="scope.pagesNumber"
-          :placeholder="placeHolder"
-          stack-label
-          borderless
-          class="inline page-input strong-focus"
-          :style="`width: ${placeHolder.length / 1.5}em`"
-          @update:modelValue="onUpdateModelValue"
-          @keyup="onKeyup"
           @blur="updateCurrentPageModel"
+          @keyup="onKeyup"
+          @update:model-value="onUpdateModelValue"
+          :max="scope.pagesNumber"
+          :min="1"
+          :model-value="newPage"
+          :placeholder="placeHolder"
+          :style="`width: ${placeHolder.length / 1.5}em`"
+          class="inline page-input strong-focus"
+          type="number"
+          borderless
+          stack-label
         >
         </q-input>
       </div>
       <q-btn
-        flat
-        icon="fast_forward"
-        :text-color="scope.isLastPage ? 'grey-8' : 'indigo-5'"
-        size="sm"
-        class="list-footer-button strong-focus"
-        :disable="scope.isLastPage"
         @click="scope.nextPage"
+        :disable="scope.isLastPage"
+        :text-color="scope.isLastPage ? 'grey-8' : 'indigo-5'"
+        class="list-footer-button strong-focus"
+        icon="fast_forward"
+        size="sm"
+        flat
       />
-      <q-separator vertical class="bg-grey-4" />
+      <q-separator class="bg-grey-4" vertical />
       <q-btn
         v-if="scope.pagesNumber > 2"
-        flat
-        icon="skip_next"
-        :text-color="scope.isLastPage ? 'grey-8' : 'indigo-5'"
-        size="sm"
-        class="list-footer-button strong-focus"
-        :disable="scope.isLastPage"
         @click="scope.lastPage"
+        :disable="scope.isLastPage"
+        :text-color="scope.isLastPage ? 'grey-8' : 'indigo-5'"
+        class="list-footer-button strong-focus"
+        icon="skip_next"
+        size="sm"
+        flat
       />
     </q-btn-group>
   </div>
 </template>
 
 <script>
-import { computed, defineComponent, ref } from "vue";
 import { format } from "quasar";
+import { computed, defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "TablePager",
@@ -127,7 +127,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .table-pager {
   border-top: 1px solid rgb(209, 209, 209);
 }

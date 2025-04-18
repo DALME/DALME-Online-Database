@@ -1,4 +1,5 @@
 import * as yup from "yup";
+
 import { attributeSchema } from "@/schemas";
 
 export const locationSchema = yup.object().shape({

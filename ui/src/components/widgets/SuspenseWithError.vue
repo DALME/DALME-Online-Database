@@ -10,14 +10,15 @@
     </template>
     <template #fallback>
       <div class="flex flex-center q-pa-lg">
-        <q-spinner color="primary" size="3em" :thickness="6" />
+        <q-spinner :thickness="6" color="primary" size="3em" />
       </div>
     </template>
   </Suspense>
 </template>
 
 <script>
-import { defineComponent, ref, onErrorCaptured } from "vue";
+import { defineComponent, onErrorCaptured, ref } from "vue";
+
 import logger from "@/logger";
 
 export default defineComponent({

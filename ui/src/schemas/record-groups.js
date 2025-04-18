@@ -1,8 +1,8 @@
 import * as yup from "yup";
 
 import {
-  attributeSchema,
   agentSchema,
+  attributeSchema,
   baseContentTypeSchema,
   recordAttributeSchema,
   timeStampSchema,

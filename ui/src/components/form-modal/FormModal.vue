@@ -1,20 +1,20 @@
 <template>
   <BaseModal :cuid="cuid" :x-pos="xPos" :y-pos="yPos">
-    <template v-slot:title> {{ mode }} {{ kind }} </template>
+    <template #title> {{ mode }} {{ kind }} </template>
 
-    <template v-slot:content>
-      <SchemaForm :cuid="cuid" :schema="formSchema" :form-model="formModel" />
+    <template #content>
+      <SchemaForm :cuid="cuid" :form-model="formModel" :schema="formSchema" />
     </template>
   </BaseModal>
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import { useActor, useSelector } from "@xstate/vue";
+import { defineComponent, ref } from "vue";
 
 import { BaseModal, SchemaForm } from "@/components";
-import { useAPI, useEditing, useDynamicForm } from "@/use";
+import { useAPI, useDynamicForm, useEditing } from "@/use";
 
 export default defineComponent({
   name: "FormModal",

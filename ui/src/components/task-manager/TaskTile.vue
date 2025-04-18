@@ -1,33 +1,33 @@
 <template>
   <q-item
-    dense
-    clickable
     v-if="task.id"
-    class="task-tile"
     :class="task.id == selectedId && !mini ? 'selected' : ''"
+    class="task-tile"
+    clickable
+    dense
   >
-    <q-item-section avatar @click="$emit('changeStatus')" class="cursor-pointer">
+    <q-item-section @click="$emit('changeStatus')" class="cursor-pointer" avatar>
       <q-icon
-        :name="task.completed ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline'"
         :color="task.completed ? 'light-green-8' : 'grey-8'"
-        size="xs"
+        :name="task.completed ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline'"
         class="task-checkbox"
+        size="xs"
       />
     </q-item-section>
-    <q-item-section :no-wrap="mini" @click="$emit('viewDetail')" class="cursor-pointer">
+    <q-item-section @click="$emit('viewDetail')" :no-wrap="mini" class="cursor-pointer">
       <q-item-label lines="1">
         {{ task.title }}
         <TagPill
           v-if="task.overdue && !mini"
-          outline
-          name="overdue"
-          text-colour="deep-orange-5"
-          size="xs"
-          module="standalone"
           class="q-ml-sm"
+          module="standalone"
+          name="overdue"
+          size="xs"
+          text-colour="deep-orange-5"
+          outline
         />
       </q-item-label>
-      <q-item-label caption :lines="mini ? 1 : 2">
+      <q-item-label :lines="mini ? 1 : 2" caption>
         <template v-if="mini">
           <span v-if="task.completed" v-text="`${formatDate(task.completedDate, 'DATETIME_AT')}`" />
           <span
@@ -39,21 +39,21 @@
         </template>
         <template v-else>
           <span v-text="`Created on ${formatDate(task.creationTimestamp, 'DATETIME_AT')} by `" />
-          <DetailPopover show-avatar :user-data="task.creationUser" />
+          <DetailPopover :user-data="task.creationUser" show-avatar />
           <span
             v-if="task.completed"
             v-text="`, completed on ${formatDate(task.completedDate, 'DATETIME_AT')} by `"
           />
-          <DetailPopover v-if="task.completed" show-avatar :user-data="task.completedBy" />
+          <DetailPopover v-if="task.completed" :user-data="task.completedBy" show-avatar />
         </template>
         <TagPill
           v-if="task.overdue && mini"
-          outline
-          name="overdue"
-          text-colour="deep-orange-5"
-          size="xs"
-          module="standalone"
           class="q-ml-sm"
+          module="standalone"
+          name="overdue"
+          size="xs"
+          text-colour="deep-orange-5"
+          outline
         />
       </q-item-label>
     </q-item-section>
@@ -64,9 +64,9 @@
       <div class="status-section">
         <q-icon
           v-if="task.commentCount"
+          class="text-weight-bold q-mr-xs"
           name="mdi-message-outline"
           size="16px"
-          class="text-weight-bold q-mr-xs"
         />
         <div v-if="task.commentCount" class="text-grey-8 text-weight-bold text-detail">
           {{ task.commentCount }}
@@ -75,46 +75,46 @@
       <div class="status-section">
         <q-btn
           v-if="task.files.length"
-          flat
-          dense
-          target="_blank"
           color="blue-gray-6"
-          size="sm"
           icon="mdi-paperclip"
+          size="sm"
+          target="_blank"
           text-color="blue-gray-6"
+          dense
+          flat
         />
         <q-btn
           v-if="task.url"
-          flat
-          dense
           @click.stop="openURL(task.url)"
-          target="_blank"
           color="blue-gray-6"
-          size="sm"
           icon="mdi-link"
+          size="sm"
+          target="_blank"
           text-color="blue-gray-6"
+          dense
+          flat
         />
         <q-btn
           v-if="task.resources.length"
-          flat
-          dense
-          target="_blank"
           color="blue-gray-6"
-          size="sm"
           icon="mdi-bookmark-outline"
+          size="sm"
+          target="_blank"
           text-color="blue-gray-6"
+          dense
+          flat
         />
       </div>
     </q-item-section>
   </q-item>
 
-  <q-item dense v-else>
+  <q-item v-else dense>
     <q-item-section avatar>
-      <q-skeleton type="rect" height="18px" width="18px" />
+      <q-skeleton height="18px" type="rect" width="18px" />
     </q-item-section>
     <q-item-section>
-      <q-skeleton type="text" height="18px" width="85%" />
-      <q-skeleton type="text" height="14px" width="65%" />
+      <q-skeleton height="18px" type="text" width="85%" />
+      <q-skeleton height="14px" type="text" width="65%" />
     </q-item-section>
   </q-item>
 </template>
@@ -122,11 +122,16 @@
 <script>
 import { openURL } from "quasar";
 import { defineComponent, inject, toRef } from "vue";
-import { formatDate } from "@/utils";
+
 import { DetailPopover, TagPill } from "@/components";
+import { formatDate } from "@/utils";
 
 export default defineComponent({
   name: "TaskTile",
+  components: {
+    DetailPopover,
+    TagPill,
+  },
   props: {
     data: {
       type: Object,
@@ -136,10 +141,6 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-  },
-  components: {
-    DetailPopover,
-    TagPill,
   },
   emits: ["changeStatus", "viewDetail"],
   setup(props) {
@@ -156,7 +157,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .task-checkbox.mdi-checkbox-blank-outline:hover::before {
   content: "\F0C52";
 }

@@ -2,15 +2,15 @@
   <div v-if="onlyTrue">
     <q-icon
       v-if="value"
-      :name="trueIcon"
       :color="onlyTrueGreen ? trueColour : falseColour"
+      :name="trueIcon"
       :size="size"
     />
   </div>
   <div v-else>
     <q-icon
-      :name="value ? trueIcon : falseIcon"
       :color="value ? trueColour : falseColour"
+      :name="value ? trueIcon : falseIcon"
       :size="size"
     />
   </div>

@@ -1,35 +1,35 @@
 <template>
   <DataTable
-    grid
     :columns="columns"
-    :search="search"
-    :filterList="filterList"
+    :filter-list="filterList"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onChangeFilters="onChangeFilters"
-    :onClearFilters="onClearFilters"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-filters="onChangeFilters"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-clear-filters="onClearFilters"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
-    :sortList="sortList"
+    :search="search"
+    :sort-list="sortList"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
+    grid
   >
-    <template v-slot:grid-avatar="props">
-      <q-avatar size="38px" class="q-pt-xs">
+    <template #grid-avatar="props">
+      <q-avatar class="q-pt-xs" size="38px">
         <q-img v-if="!nully(props.row.avatar)" :src="props.row.avatar" fit="cover" ratio="1" />
         <q-icon v-else color="blue-grey-3" name="mdi-account-circle" size="40px" />
       </q-avatar>
     </template>
 
-    <template v-slot:grid-main="props">
+    <template #grid-main="props">
       <DetailPopover
-        linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'User', params: { username: props.row.username } }"
-        :linkText="props.row.fullName"
+        :link-target="{ name: 'User', params: { username: props.row.username } }"
+        :link-text="props.row.fullName"
+        link-class="text-h7 title-link"
       >
         <div class="text-h8 q-mb-xs">
           {{ props.row.username }}
@@ -37,79 +37,79 @@
       </DetailPopover>
       <TagPill
         v-if="props.row.isActive"
-        name="active"
-        colour="light-green-1"
-        textColour="light-green-9"
-        size="xs"
-        module="standalone"
         class="q-ml-sm"
+        colour="light-green-1"
+        module="standalone"
+        name="active"
+        size="xs"
+        text-colour="light-green-9"
       />
       <TagPill
         v-if="props.row.isStaff"
-        name="staff"
-        colour="light-blue-1"
-        textColour="light-blue-8"
-        size="xs"
-        module="standalone"
         class="q-ml-sm"
+        colour="light-blue-1"
+        module="standalone"
+        name="staff"
+        size="xs"
+        text-colour="light-blue-8"
       />
       <TagPill
         v-if="props.row.isSuperuser"
-        name="super"
-        colour="orange-1"
-        textColour="orange-8"
-        size="xs"
-        module="standalone"
         class="q-ml-sm"
+        colour="orange-1"
+        module="standalone"
+        name="super"
+        size="xs"
+        text-colour="orange-8"
       />
     </template>
 
-    <template v-slot:grid-detail="props">
+    <template #grid-detail="props">
       <span class="text-detail text-weight-medium text-grey-8">
         #{{ props.row.id }} | {{ props.row.username }} |
-        <a class="text-link" :href="`mailto:${props.row.email}`">
+        <a :href="`mailto:${props.row.email}`" class="text-link">
           {{ props.row.email }}
         </a>
       </span>
     </template>
 
-    <template v-slot:grid-counter="props">
+    <template #grid-counter="props">
       <div class="text-detail text-weight-medium text-grey-8 q-ml-auto">
         Joined on {{ formatDate(props.row.dateJoined, "DATETIME_AT") }}
       </div>
     </template>
 
-    <template v-slot:grid-counter-extra="props">
+    <template #grid-counter-extra="props">
       <div class="text-detail text-weight-medium text-grey-8 q-ml-auto">
         Last active on {{ formatDate(props.row.lastLogin, "DATETIME_AT") }}
       </div>
     </template>
 
-    <template v-slot:render-cell-username="props">
+    <template #render-cell-username="props">
       <router-link
-        class="text-link"
         :to="{ name: 'User', params: { username: props.row.username } }"
+        class="text-link"
       >
         {{ props.row.username }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-id="props">
+    <template #render-cell-id="props">
       {{ props.row.id }}
     </template>
 
-    <template v-slot:render-cell-email="props">
-      <a class="text-link" :href="`mailto:${props.row.email}`">
+    <template #render-cell-email="props">
+      <a :href="`mailto:${props.row.email}`" class="text-link">
         {{ props.row.email }}
       </a>
     </template>
 
-    <template v-slot:render-cell-isActive="props">
-      <BooleanValue :value="props.row.isActive" :onlyTrue="true" trueIcon="check_circle" />
+    <template #render-cell-isActive="props">
+      <BooleanValue :only-true="true" :value="props.row.isActive" true-icon="check_circle" />
     </template>
 
-    <template v-slot:render-cell-isStaff="props">
-      <BooleanValue :value="props.row.isStaff" :onlyTrue="true" trueIcon="check_circle" />
+    <template #render-cell-isStaff="props">
+      <BooleanValue :only-true="true" :value="props.row.isStaff" true-icon="check_circle" />
     </template>
   </DataTable>
 </template>
@@ -118,11 +118,13 @@
 import { useMeta } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
-import { formatDate, getColumns, getDefaults, nully } from "@/utils";
 import { BooleanValue, DataTable, DetailPopover, TagPill } from "@/components";
 import { userListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
+import { formatDate, getColumns, getDefaults, nully } from "@/utils";
+
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 

@@ -1,7 +1,7 @@
 <template>
-  <q-item clickable v-close-popup dense :class="cls" @click="$emit('itemChosen', item)">
+  <q-item v-close-popup @click="$emit('itemChosen', item)" :class="cls" clickable dense>
     <q-item-section v-if="item.icon" side>
-      <q-icon :name="item.icon.name" :color="item.icon.color" :size="item.icon.size" />
+      <q-icon :color="item.icon.color" :name="item.icon.name" :size="item.icon.size" />
     </q-item-section>
     <q-item-section>
       {{ item.label }}

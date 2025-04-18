@@ -1,4 +1,5 @@
 import * as yup from "yup";
+
 import { OptionListSchema } from "@/schemas";
 
 export const ElementTagAttributeSchema = yup.object().shape({

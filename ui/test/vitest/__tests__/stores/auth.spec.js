@@ -1,9 +1,9 @@
 // Test the stores/auth module.
-import { oAuthMachine } from "@/stores/auth";
 import { createPinia, defineStore, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createActor } from "xstate";
 
+import { oAuthMachine } from "@/stores/auth";
 import { useStoreMachine } from "@/use";
 
 const VITE_OAUTH_CLIENT_ID = "oauth.ida.development";

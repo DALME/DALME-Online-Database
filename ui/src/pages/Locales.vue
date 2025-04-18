@@ -7,6 +7,7 @@
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
+
 import { LocaleList, PageContainer } from "@/components";
 
 export default defineComponent({

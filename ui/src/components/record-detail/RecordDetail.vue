@@ -3,22 +3,22 @@
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">
-          <div class="info-area row" v-if="showInfoArea && !ui.globalLoading">
+          <div v-if="showInfoArea && !ui.globalLoading" class="info-area row">
             <div class="column">
               <div class="row items-center text-h5">
                 <template v-if="!ui.globalLoading">
                   {{ recordData.name.value }}
                   <TagPill
                     v-if="workflowData.isPublic"
-                    name="public"
-                    colour="green-1"
-                    textColour="green-8"
-                    size="sm"
-                    module="standalone"
                     class="q-ml-md q-mt-xs"
+                    colour="green-1"
+                    module="standalone"
+                    name="public"
+                    size="sm"
+                    text-colour="green-8"
                   />
                 </template>
-                <q-skeleton v-else width="350px" height="30px" type="rect" />
+                <q-skeleton v-else height="30px" type="rect" width="350px" />
               </div>
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!ui.globalLoading">
@@ -27,9 +27,9 @@
                     {{ formatDate(recordData.creationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
+                    :show-avatar="false"
                     :user="recordData.creationUser.value"
                     text-size="12px"
-                    :show-avatar="false"
                     inline
                   />
                   <span
@@ -38,13 +38,13 @@
                     by
                   </span>
                   <UserPill
+                    :show-avatar="false"
                     :user="recordData.modificationUser.value"
                     text-size="12px"
-                    :show-avatar="false"
                     inline
                   />
                 </template>
-                <q-skeleton v-else width="500px" height="12px" type="rect" />
+                <q-skeleton v-else height="12px" type="rect" width="500px" />
               </div>
             </div>
           </div>
@@ -52,55 +52,55 @@
         <div class="row">
           <q-tabs
             v-model="view.tab"
-            dense
-            no-caps
-            inline-label
-            switch-indicator
+            active-class="active-tab"
             align="left"
             class="bg-white text-grey-8 tab-container"
-            active-class="active-tab"
+            dense
+            inline-label
+            no-caps
+            switch-indicator
           >
-            <q-tab name="info" icon="o_info" label="Info" />
+            <q-tab icon="o_info" label="Info" name="info" />
             <template v-if="!ui.globalLoading">
               <q-tab
                 v-if="pageData.length"
-                name="pages"
-                label="Folios"
-                icon="o_import_contacts"
                 class="side-tab"
+                icon="o_import_contacts"
+                label="Folios"
+                name="pages"
               >
                 <q-badge
+                  :label="pageData.length"
+                  class="text-grey-8 q-mx-xs"
                   color="indigo-1"
                   rounded
-                  class="text-grey-8 q-mx-xs"
-                  :label="pageData.length"
                 />
               </q-tab>
               <q-tab
                 v-if="entityCount > 0"
-                name="entities"
-                label="Entities"
-                icon="o_person_pin_circle"
                 class="side-tab"
+                icon="o_person_pin_circle"
+                label="Entities"
+                name="entities"
               >
                 <q-badge
+                  :label="entityCount"
+                  class="text-grey-8 q-mx-xs"
                   color="indigo-1"
                   rounded
-                  class="text-grey-8 q-mx-xs"
-                  :label="entityCount"
                 />
               </q-tab>
-              <q-tab name="comments" icon="o_forum" label="Discussion & Activity">
+              <q-tab icon="o_forum" label="Discussion & Activity" name="comments">
                 <q-badge
                   v-if="commentCount > 0"
+                  :label="commentCount"
+                  class="text-indigo-1 q-mx-xs"
                   color="indigo-5"
                   rounded
-                  class="text-indigo-1 q-mx-xs"
-                  :label="commentCount"
                 />
               </q-tab>
             </template>
-            <AdaptiveSpinner v-else size="xs" class="q-ml-md" color="indigo-3" />
+            <AdaptiveSpinner v-else class="q-ml-md" color="indigo-3" size="xs" />
           </q-tabs>
         </div>
       </div>
@@ -109,27 +109,27 @@
           <div class="row transition-all">
             <div class="row q-mr-sm">
               <BooleanValue
+                :only-true="true"
                 :value="workflowData.helpFlag"
-                :onlyTrue="true"
-                trueIcon="flag"
-                trueColour="red-4"
                 class="q-ml-xs"
+                true-colour="red-4"
+                true-icon="flag"
               />
             </div>
             <WorkflowManager
               v-if="auth.user.isAdmin"
-              :data="workflowData"
               @state-changed="updateWorkflow"
+              :data="workflowData"
             />
             <q-btn
               v-if="showEditBtn"
+              @click="eventBus.emit('toggleEditor')"
+              :icon="editOn ? 'mdi-pencil-off' : 'mdi-pencil'"
+              class="bg-grey-2 q-ml-xs"
+              size="sm"
+              text-color="grey-7"
               dense
               outline
-              size="sm"
-              :icon="editOn ? 'mdi-pencil-off' : 'mdi-pencil'"
-              text-color="grey-7"
-              class="bg-grey-2 q-ml-xs"
-              @click="eventBus.emit('toggleEditor')"
             />
           </div>
         </div>
@@ -140,46 +140,46 @@
         <template v-if="!ui.globalLoading">
           <q-tab-panels
             v-model="view.tab"
-            animated
-            transition-prev="jump-up"
             transition-next="jump-up"
+            transition-prev="jump-up"
+            animated
             keep-alive
           >
-            <q-tab-panel name="info" class="q-pt-none q-px-none">
+            <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div class="col-9 q-pr-lg q-pt-md">
                 <template v-if="ui.windowWidth > 1100">
                   <div class="row no-wrap">
                     <div class="col-6 q-mr-md">
                       <DetailCard
+                        @value-changed="onValueChange"
+                        :data="recordData"
+                        :fields="fieldPlacements.infocard"
+                        :register="registerComponent"
                         icon="bookmark"
                         title="Record"
                         pad-container
-                        :fields="fieldPlacements.infocard"
-                        :data="recordData"
-                        :register="registerComponent"
-                        @value-changed="onValueChange"
                       />
                     </div>
                     <div class="col-6">
                       <DetailCard
                         :ref="(el) => registerComponent(recordData.description.name, el)"
+                        @value-changed="onValueChange"
+                        :data="recordData.description"
                         :field-name="recordData.description.name"
                         icon="subject"
+                        no-data="No description assigned."
                         title="Description"
-                        noData="No description assigned."
-                        :data="recordData.description"
-                        markdown
                         editable
-                        @value-changed="onValueChange"
+                        markdown
                       />
 
                       <DetailCard
                         v-if="pageData.length"
+                        @value-changed="onValueChange"
+                        class="q-mt-md"
                         icon="auto_stories"
                         title="Folios"
-                        showFilter
-                        class="q-mt-md"
-                        @value-changed="onValueChange"
+                        show-filter
                       >
                         <RecordPages :pages="pageData" />
                       </DetailCard>
@@ -188,99 +188,99 @@
                 </template>
                 <template v-else>
                   <DetailCard
+                    @value-changed="onValueChange"
+                    :data="recordData"
+                    :fields="fieldPlacements.infocard"
+                    :register="registerComponent"
                     icon="bookmark"
                     title="Record"
                     pad-container
-                    :fields="fieldPlacements.infocard"
-                    :data="recordData"
-                    :register="registerComponent"
-                    @value-changed="onValueChange"
                   />
 
                   <DetailCard
                     :ref="(el) => registerComponent(recordData.description.name, el)"
-                    :field-name="recordData.description.name"
-                    icon="subject"
-                    title="Description"
-                    noData="No description assigned."
-                    class="q-mt-md"
-                    :data="recordData.description"
-                    markdown
-                    editable
                     @value-changed="onValueChange"
+                    :data="recordData.description"
+                    :field-name="recordData.description.name"
+                    class="q-mt-md"
+                    icon="subject"
+                    no-data="No description assigned."
+                    title="Description"
+                    editable
+                    markdown
                   />
 
                   <DetailCard
                     v-if="pageData.length"
+                    @value-changed="onValueChange"
+                    class="q-mt-md"
                     icon="auto_stories"
                     title="Folios"
-                    showFilter
-                    class="q-mt-md"
-                    @value-changed="onValueChange"
+                    show-filter
                   >
                     <RecordPages :pages="pageData" />
                   </DetailCard>
                 </template>
               </div>
             </q-tab-panel>
-            <q-tab-panel name="pages" class="q-pt-sm q-px-none editor-panel">
+            <q-tab-panel class="q-pt-sm q-px-none editor-panel" name="pages">
               <RecordEditor />
             </q-tab-panel>
 
-            <q-tab-panel name="entities" class="q-pt-none q-px-none">
+            <q-tab-panel class="q-pt-none q-px-none" name="entities">
               <div class="col-9 q-pr-sm">
                 <DetailCard
                   v-if="agentData.length"
+                  @value-changed="onValueChange"
+                  class="q-mt-md"
                   icon="people"
                   title="Agents"
-                  showFilter
-                  class="q-mt-md"
-                  @value-changed="onValueChange"
+                  show-filter
                 >
                   <RecordAgents :agents="agentData" />
                 </DetailCard>
 
                 <DetailCard
                   v-if="placeData.length"
+                  @value-changed="onValueChange"
+                  class="q-mt-md"
                   icon="mdi-map-marker"
                   title="Places"
-                  showFilter
-                  class="q-mt-md"
-                  @value-changed="onValueChange"
+                  show-filter
                 >
                   <RecordPlaces :places="placeData" />
                 </DetailCard>
               </div>
             </q-tab-panel>
 
-            <q-tab-panel name="comments" class="q-pt-md q-px-lg">
+            <q-tab-panel class="q-pt-md q-px-lg" name="comments">
               <CommentBox @on-count-changed="updateCommentCount" :worklog="workflowData.workLog" />
             </q-tab-panel>
           </q-tab-panels>
         </template>
         <AdaptiveSpinner
           v-else
-          adaptive
-          position="absolute"
-          type="hourglass"
           color="indigo-5"
+          left="0"
+          position="absolute"
           size="50px"
           top="0"
-          left="0"
+          type="hourglass"
+          adaptive
         />
       </div>
       <div v-if="!ui.globalLoading && view.tab !== 'pages'" class="col-3 q-pl-md q-pt-md">
-        <DetailSidebar :fields="fieldPlacements.sidebar" :data="recordData">
-          <template v-slot:extraElements>
+        <DetailSidebar :data="recordData" :fields="fieldPlacements.sidebar">
+          <template #extraElements>
             <DetailElement v-if="collectionData.length" label="Collections">
-              <template v-slot:content>
+              <template #content>
                 <template v-for="collection in collectionData" :key="collection.id">
                   <q-chip
-                    clickable
                     color="deep-purple-6"
-                    text-color="white"
-                    size="sm"
                     icon="mdi-folder-outline"
+                    size="sm"
+                    text-color="white"
+                    clickable
                     outline
                   >
                     {{ collection.name }}
@@ -289,13 +289,13 @@
               </template>
             </DetailElement>
             <DetailElement label="Created">
-              <template v-slot:content>
+              <template #content>
                 <div>
                   <UserPill
-                    :user="recordData.creationUser.value"
-                    text-size="13px"
                     :bold="false"
                     :show-avatar="false"
+                    :user="recordData.creationUser.value"
+                    text-size="13px"
                   />
                   <div class="text-detail text-grey-7 text-weight-medium">
                     {{ formatDate(recordData.creationTimestamp.value, "DATETIME_AT") }}
@@ -304,13 +304,13 @@
               </template>
             </DetailElement>
             <DetailElement label="Last modified">
-              <template v-slot:content>
+              <template #content>
                 <div>
                   <UserPill
-                    :user="recordData.modificationUser.value"
-                    text-size="13px"
                     :bold="false"
                     :show-avatar="false"
+                    :user="recordData.modificationUser.value"
+                    text-size="13px"
                   />
                   <div class="text-detail text-grey-7 text-weight-medium">
                     {{ formatDate(recordData.modificationTimestamp.value, "DATETIME_AT") }}
@@ -326,32 +326,33 @@
 </template>
 
 <script>
+import { snakeCase } from "change-case";
 import { useMeta } from "quasar";
-import { defineComponent, provide, ref, watch } from "vue";
+import { computed, defineComponent, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
-import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
 import {
   AdaptiveSpinner,
   BooleanValue,
   CommentBox,
   DetailCard,
-  DetailSidebar,
   DetailElement,
+  DetailSidebar,
   RecordEditor,
   TagPill,
-  WorkflowManager,
   UserPill,
+  WorkflowManager,
 } from "@/components";
-import { nully, isObject, getColumns, formatDate } from "@/utils";
+import { attributeSchema, recordDetailSchema, workflowSchema } from "@/schemas";
+import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
+import { formatDate, getColumns, isObject, nully } from "@/utils";
+
+import { metadata } from "./metadata.js";
+import { columnMap } from "./pageColumns";
 import RecordAgents from "./RecordAgents.vue";
 import RecordPages from "./RecordPages.vue";
 import RecordPlaces from "./RecordPlaces.vue";
-import { columnMap } from "./pageColumns";
-import { metadata } from "./metadata.js";
-import { recordDetailSchema, workflowSchema, attributeSchema } from "@/schemas";
-import { snakeCase } from "change-case";
-import { computed } from "vue";
 
 export default defineComponent({
   name: "RecordDetail",

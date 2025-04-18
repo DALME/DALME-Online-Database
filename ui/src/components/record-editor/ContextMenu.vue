@@ -1,5 +1,5 @@
 <template>
-  <q-menu touch-position context-menu transition-show="scale" transition-hide="scale">
+  <q-menu transition-hide="scale" transition-show="scale" context-menu touch-position>
     <q-list dense separator>
       <template v-for="(el, idx) in teiElements" :key="idx">
         <q-item clickable>
@@ -14,6 +14,7 @@
 
 <script>
 import { defineComponent } from "vue";
+
 import { useStores } from "@/use";
 
 export default defineComponent({

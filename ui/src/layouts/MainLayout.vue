@@ -1,6 +1,6 @@
 <template>
   <LoginModal />
-  <q-layout id="layout" view="lHr lpR lFr" :class="{ 'login-background': showMap }">
+  <q-layout id="layout" :class="{ 'login-background': showMap }" view="lHr lpR lFr">
     <template v-if="render">
       <NavBar />
       <AppDrawer />
@@ -22,18 +22,18 @@
 </template>
 
 <script>
-import { computed, defineComponent, provide, ref, onMounted, useTemplateRef } from "vue";
-import { useRoute } from "vue-router";
 import { find, isNotNil, propEq } from "ramda";
-import { LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
+import { computed, defineComponent, onMounted, provide, ref, useTemplateRef, watch } from "vue";
+import { useRoute } from "vue-router";
+
+import { AppDrawer, LoginModal, NavBar, UserDrawer } from "@/components";
 import {
   provideAPI,
   provideEditing,
   provideEventHandling,
-  provideTransport,
   provideStores,
+  provideTransport,
 } from "@/use";
-import { watch } from "vue";
 
 export default defineComponent({
   name: "MainLayout",
@@ -106,7 +106,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .login-background {
   background-image: url(@/assets/map_bg.png);
   background-color: #ddd5c3;

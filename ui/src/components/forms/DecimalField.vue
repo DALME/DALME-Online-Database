@@ -1,19 +1,19 @@
 <template>
   <q-input
+    v-model="value"
+    @blur="handleBlur"
+    :error="errorMessage && meta.touched"
+    debounce="500"
+    fill-mask="0"
+    mask="#.##"
     clearable
     reverse-fill-mask
-    debounce="500"
-    mask="#.##"
-    fill-mask="0"
-    v-model="value"
-    :error="errorMessage && meta.touched"
-    @blur="handleBlur"
   >
     <ToolTip v-if="description">
       {{ description }}
     </ToolTip>
 
-    <template v-slot:error>
+    <template #error>
       <span>{{ errorMessage }}</span>
     </template>
   </q-input>
@@ -21,10 +21,13 @@
 
 <script>
 import { useField } from "vee-validate";
-import { defineComponent, defineAsyncComponent } from "vue";
+import { defineAsyncComponent, defineComponent } from "vue";
 
 export default defineComponent({
   name: "DecimalField",
+  components: {
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     field: {
       type: String,
@@ -39,9 +42,7 @@ export default defineComponent({
       default: () => false,
     },
   },
-  components: {
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+
   setup(props) {
     const { errorMessage, meta, handleBlur, value } = useField(props.field, props.validation);
 

@@ -1,37 +1,37 @@
 <template>
   <DataTable
-    grid
     :columns="columns"
-    :search="search"
-    :filterList="filterList"
+    :filter-list="filterList"
     :loading="loading"
-    :noData="noData"
-    resource="rights policies"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onChangeFilters="onChangeFilters"
-    :onClearFilters="onClearFilters"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-filters="onChangeFilters"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-clear-filters="onClearFilters"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
-    :sortList="sortList"
+    :search="search"
+    :sort-list="sortList"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
+    resource="rights policies"
+    grid
   >
-    <template v-slot:grid-avatar="props">
+    <template #grid-avatar="props">
       <q-icon
-        :name="getStatusIcon(props.row.rightsStatus.id)"
         :color="getStatusColours(props.row.rightsStatus.id).text"
+        :name="getStatusIcon(props.row.rightsStatus.id)"
         size="22px"
       />
     </template>
 
-    <template v-slot:grid-main="props">
+    <template #grid-main="props">
       <DetailPopover
-        linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Rights Policy', params: { id: props.row.id } }"
-        :linkText="props.row.name"
+        :link-target="{ name: 'Rights Policy', params: { id: props.row.id } }"
+        :link-text="props.row.name"
+        link-class="text-h7 title-link"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
           Created on {{ formatDate(props.row.creationTimestamp, "DATETIME_AT") }} by
@@ -53,90 +53,90 @@
       </DetailPopover>
       <TagPill
         v-if="props.row.licence"
-        name="licence"
-        colour="orange-1"
-        textColour="orange-8"
-        size="xs"
-        module="standalone"
         class="q-ml-sm"
+        colour="orange-1"
+        module="standalone"
+        name="licence"
+        size="xs"
+        text-colour="orange-8"
       />
       <TagPill
         v-if="props.row.publicDisplay"
         :name="props.row.noticeDisplay ? 'display+notice' : 'display'"
-        colour="light-blue-1"
-        textColour="light-blue-8"
-        size="xs"
-        module="standalone"
         class="q-ml-sm"
+        colour="light-blue-1"
+        module="standalone"
+        size="xs"
+        text-colour="light-blue-8"
       />
     </template>
 
-    <template v-slot:grid-detail="props">
+    <template #grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
         <span v-if="props.row.rights" v-text="props.row.rights" />
         <span v-else>No rights specified</span>
       </div>
     </template>
 
-    <template v-slot:grid-counter="props">
+    <template #grid-counter="props">
       <q-icon
-        name="chat_bubble_outline"
-        size="17px"
         v-if="props.row.commentCount"
         class="text-weight-bold q-mr-xs"
+        name="chat_bubble_outline"
+        size="17px"
       />
       <div v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </div>
     </template>
 
-    <template v-slot:grid-counter-extra="props">
+    <template #grid-counter-extra="props">
       <q-btn
         v-if="props.row.attachments"
-        flat
-        dense
         @click.stop="openURL(props.row.attachments.source)"
-        target="_blank"
         color="blue-gray-6"
-        size="sm"
         icon="o_text_snippet"
+        size="sm"
+        target="_blank"
         text-color="blue-gray-6"
+        dense
+        flat
       />
     </template>
 
-    <template v-slot:render-cell-name="props">
-      <router-link class="text-link" :to="{ name: 'Rights', params: { id: props.row.id } }">
+    <template #render-cell-name="props">
+      <router-link :to="{ name: 'Rights', params: { id: props.row.id } }" class="text-link">
         {{ props.row.name }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-rightsStatus="props">
+    <template #render-cell-rightsStatus="props">
       {{ props.row.rightsStatus.name }}
     </template>
 
-    <template v-slot:render-cell-publicDisplay="props">
+    <template #render-cell-publicDisplay="props">
       <BooleanValue
+        :only-true="true"
+        :only-true-green="false"
         :value="!props.row.publicDisplay"
-        :onlyTrue="true"
-        :onlyTrueGreen="false"
-        trueIcon="remove_circle"
+        true-icon="remove_circle"
       />
     </template>
 
-    <template v-slot:render-cell-noticeDisplay="props">
-      <BooleanValue :value="props.row.noticeDisplay" :onlyTrue="true" trueIcon="verified" />
+    <template #render-cell-noticeDisplay="props">
+      <BooleanValue :only-true="true" :value="props.row.noticeDisplay" true-icon="verified" />
     </template>
 
-    <template v-slot:render-cell-attachments="props">
+    <template #render-cell-attachments="props">
       <q-btn
         v-if="props.row.attachments"
-        flat
         @click.stop="openURL(props.row.attachments.url)"
-        target="_blank"
         color="blue-gray-6"
-        size="sm"
         icon="text_snippet"
+        size="sm"
+        target="_blank"
         text-color="blue-gray-6"
+        flat
       />
     </template>
   </DataTable>
@@ -146,11 +146,13 @@
 import { openURL } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
-import { BooleanValue, DetailPopover, TagPill, DataTable } from "@/components";
-import { formatDate, getColumns, getDefaults } from "@/utils";
+import { BooleanValue, DataTable, DetailPopover, TagPill } from "@/components";
 import { rightsListSchema } from "@/schemas";
 import { useAPI, useConstants, usePagination, useStores } from "@/use";
+import { formatDate, getColumns, getDefaults } from "@/utils";
+
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 

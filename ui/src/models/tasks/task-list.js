@@ -1,4 +1,5 @@
 import { Model } from "pinia-orm";
+
 import Task from "./task";
 
 export default class TaskList extends Model {

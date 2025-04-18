@@ -1,99 +1,99 @@
 <template>
   <div class="q-pb-lg q-pt-xs full-width full-height">
     <TableToolbar
-      :title="title"
-      :embedded="embedded"
-      :search="search"
-      :filterList="filterList"
-      :grid="grid"
-      :rowsPerPage="pagination.rowsPerPage"
-      :sortList="sortList"
+      @change-edit-mode="onChangeEditMode"
+      @change-filters="onChangeFilters"
+      @change-rows-per-page="onChangeRowsPerPage"
+      @change-search="onChangeSearch"
+      @change-sort="onChangeSort"
+      @clear-filters="onClearFilters"
       :editable="!isEmpty(editable)"
+      :embedded="embedded"
+      :filter-list="filterList"
+      :grid="grid"
       :resource="resource"
-      @changeRowsPerPage="onChangeRowsPerPage"
-      @changeEditMode="onChangeEditMode"
-      @changeSearch="onChangeSearch"
-      @changeSort="onChangeSort"
-      @changeFilters="onChangeFilters"
-      @clearFilters="onClearFilters"
+      :rows-per-page="pagination.rowsPerPage"
+      :search="search"
+      :sort-list="sortList"
+      :title="title"
     >
-      <template v-slot:tableToolbar-special>
+      <template #tableToolbar-special>
         <slot name="toolbar-special" />
       </template>
 
-      <template v-slot:tableToolbar-filtersets>
+      <template #tableToolbar-filtersets>
         <slot name="toolbar-filtersets" />
       </template>
     </TableToolbar>
-    <q-card flat bordered class="no-border-radius-top no-border-top">
+    <q-card class="no-border-radius-top no-border-top" bordered flat>
       <q-table
-        flat
-        wrap-cells
-        :rows="rows"
+        v-model:expanded="expanded"
+        v-model:pagination="pagination"
+        @request="onRequest"
         :columns="columns"
-        :visible-columns="visibleColumns"
-        :no-data-label="noData"
-        :search="search"
         :grid="showGrid"
         :loading="loading"
-        @request="onRequest"
-        v-model:pagination="pagination"
-        v-model:expanded="expanded"
-        row-key="id"
+        :no-data-label="noData"
+        :rows="rows"
+        :search="search"
+        :visible-columns="visibleColumns"
         class="basic-list no-border-radius-top no-border-top"
+        row-key="id"
         table-header-class="bg-grey-2"
         table-header-style="height: 35px"
+        flat
+        wrap-cells
       >
-        <template v-slot:bottom="scope">
-          <TablePager :scope="scope" @changePage="onChangePage" />
+        <template #bottom="scope">
+          <TablePager @change-page="onChangePage" :scope="scope" />
         </template>
 
-        <template v-if="!showGrid" v-slot:header-cell="props">
+        <template v-if="!showGrid" #header-cell="props">
           <th style="padding: 0">
             <q-item
-              dense
-              style="height: 35px; padding-right: 10px"
               :class="
                 editMode && editable.includes(props.col.name)
                   ? `bg-red-1 ${props.col.headerClasses}`
                   : props.col.headerClasses
               "
+              style="height: 35px; padding-right: 10px"
+              dense
             >
               <q-item-section class="text-left">
                 {{ props.col.label }}
               </q-item-section>
               <q-item-section v-if="isAdmin && editable.includes(props.col.name)" side>
-                <q-icon name="edit" size="xs" :color="editMode ? 'red-4' : 'grey-5'" />
+                <q-icon :color="editMode ? 'red-4' : 'grey-5'" name="edit" size="xs" />
               </q-item-section>
-              <q-item-section v-if="props.col.sortable" side style="padding-left: 2px">
+              <q-item-section v-if="props.col.sortable" style="padding-left: 2px" side>
                 <q-btn
-                  flat
-                  dense
-                  stack
+                  @click="onChangeSort(props.col.name)"
                   size="sm"
                   style="height: 25px; width: 23px"
-                  @click="onChangeSort(props.col.name)"
+                  dense
+                  flat
+                  stack
                 >
                   <q-icon
-                    name="arrow_drop_up"
-                    size="sm"
-                    style="height: 9px; width: 16px"
                     :color="
                       pagination.sortBy === props.col.name && !pagination.sortDesc
                         ? 'indigo-5'
                         : 'grey-5'
                     "
+                    name="arrow_drop_up"
+                    size="sm"
+                    style="height: 9px; width: 16px"
                   />
                   <q-icon
                     v-if="props.col.sortable"
-                    name="arrow_drop_down"
-                    size="sm"
-                    style="height: 9px; width: 16px"
                     :color="
                       pagination.sortBy === props.col.name && pagination.sortDesc
                         ? 'indigo-5'
                         : 'grey-5'
                     "
+                    name="arrow_drop_down"
+                    size="sm"
+                    style="height: 9px; width: 16px"
                   />
                 </q-btn>
               </q-item-section>
@@ -101,11 +101,13 @@
           </th>
         </template>
 
-        <template v-if="!showGrid" v-slot:body="props">
+        <template v-if="!showGrid" #body="props">
           <q-tr :props="props">
             <q-td
               v-for="column in columns"
-              v-bind:class="
+              :key="column.field"
+              :auto-width="column.autoWidth"
+              :class="
                 isAdmin
                   ? {
                       'text-red-6': isDirty && cellIsDirty(props.row.id, column.field),
@@ -113,8 +115,6 @@
                     }
                   : null
               "
-              :key="column.field"
-              :auto-width="column.autoWidth"
               :props="props"
             >
               <slot :name="`render-cell-${column.field}`" v-bind="props">
@@ -131,23 +131,23 @@
                   v-if="editMode"
                   v-model="props.row[column.field]"
                   v-slot="scope"
-                  :validate="getValidation(column.field)"
                   @before-show="clearError"
                   @save="(value, prev) => onDiff(props.row.id, column.field, value, prev)"
+                  :validate="getValidation(column.field)"
                   buttons
                 >
                   <q-input
-                    :type="
-                      schemaTypes[column.field] === 'string' ? 'text' : schemaTypes[column.field]
-                    "
+                    v-model="scope.value"
+                    @keyup.enter="scope.set"
                     :error="editError"
                     :error-message="editErrorMessage"
                     :step="/\D/.test(props.row[column.field]) ? '0.01' : '1'"
-                    v-model="scope.value"
-                    @keyup.enter="scope.set"
-                    dense
-                    counter
+                    :type="
+                      schemaTypes[column.field] === 'string' ? 'text' : schemaTypes[column.field]
+                    "
                     autofocus
+                    counter
+                    dense
                   />
                 </q-popup-edit>
               </template>
@@ -155,20 +155,20 @@
           </q-tr>
         </template>
 
-        <template v-if="showGrid" v-slot:item="props">
-          <q-item dense class="full-width grid-item">
+        <template v-if="showGrid" #item="props">
+          <q-item class="full-width grid-item" dense>
             <q-item-section side top>
               <q-item-label>
                 <slot name="grid-avatar" v-bind="props" />
               </q-item-label>
               <q-item-label v-if="useExpansion">
                 <q-icon
-                  :name="props.expand ? 'visibility_off' : 'visibility'"
-                  size="18px"
-                  color="indigo-3"
-                  class="cursor-pointer q-pa-none text-weight-bold"
-                  style="width: 22px; height: 16px"
                   @click="props.expand = !props.expand"
+                  :name="props.expand ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer q-pa-none text-weight-bold"
+                  color="indigo-3"
+                  size="18px"
+                  style="width: 22px; height: 16px"
                 />
               </q-item-label>
             </q-item-section>
@@ -184,7 +184,7 @@
               </q-item-label>
             </q-item-section>
 
-            <q-item-section side style="min-width: 46px">
+            <q-item-section style="min-width: 46px" side>
               <q-item-label class="row q-mb-auto">
                 <slot name="grid-counter" v-bind="props" />
               </q-item-label>
@@ -196,9 +196,9 @@
           <q-item
             v-if="useExpansion"
             v-show="props.expand"
-            dense
             :props="props"
             class="bg-indigo-1 full-width grid-expansion-item"
+            dense
           >
             <q-item-section>TESTING!</q-item-section>
           </q-item>
@@ -210,15 +210,17 @@
 </template>
 
 <script>
+import { useActor } from "@xstate/vue";
 import { isEmpty, keys, map, mapObjIndexed } from "ramda";
 import { computed, defineComponent, inject, provide, ref, watch } from "vue";
-import { OpaqueSpinner } from "@/components";
-import TableToolbar from "./TableToolbar.vue";
-import TablePager from "./TablePager.vue";
 import { onBeforeRouteLeave } from "vue-router";
-import { useActor } from "@xstate/vue";
+
+import { OpaqueSpinner } from "@/components";
 import { useAPI, useEditing, useStores, useTransport } from "@/use";
-import { isObject, isNumber } from "@/utils";
+import { isNumber, isObject } from "@/utils";
+
+import TablePager from "./TablePager.vue";
+import TableToolbar from "./TableToolbar.vue";
 
 export default defineComponent({
   name: "DataTable",
@@ -245,6 +247,7 @@ export default defineComponent({
     filterList: {
       type: Object,
       required: false,
+      default: () => {},
     },
     grid: {
       type: Boolean,
@@ -275,10 +278,12 @@ export default defineComponent({
     onChangeFilters: {
       type: Function,
       required: false,
+      default: () => {},
     },
     onClearFilters: {
       type: Function,
       required: false,
+      default: () => {},
     },
     onRequest: {
       type: Function,
@@ -300,6 +305,7 @@ export default defineComponent({
     sortList: {
       type: Array,
       required: false,
+      default: () => [],
     },
     title: {
       type: String,
@@ -308,6 +314,7 @@ export default defineComponent({
     updateRequest: {
       type: Function,
       required: false,
+      default: () => {},
     },
     useExpansion: {
       type: Boolean,
@@ -317,6 +324,7 @@ export default defineComponent({
     visibleColumns: {
       type: Array,
       required: false,
+      default: () => [],
     },
     resource: {
       type: String,
@@ -502,7 +510,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .basic-list .q-table__bottom {
   min-height: 35px;
   padding: 0;

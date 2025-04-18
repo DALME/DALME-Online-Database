@@ -1,16 +1,17 @@
+import Cookies from "js-cookie";
+import { head, isEmpty, isNil, filter as rFilter } from "ramda";
 import {
-  createRouter,
   createMemoryHistory,
-  createWebHistory,
+  createRouter,
   createWebHashHistory,
+  createWebHistory,
 } from "vue-router";
-import { head, isEmpty, filter as rFilter } from "ramda";
-import routes from "./routes";
+
 import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
-import Cookies from "js-cookie";
-import { isNil } from "ramda";
+
+import routes from "./routes";
 
 const createHistory = process.env.SERVER
   ? createMemoryHistory

@@ -1,18 +1,21 @@
 <template>
   <div v-show="!rendering" ref="rendered-tei" class="transcription" />
-  <AdaptiveSpinner v-show="rendering" type="hourglass" adaptive color="grey-5" size="10%" />
+  <AdaptiveSpinner v-show="rendering" color="grey-5" size="10%" type="hourglass" adaptive />
 </template>
 
 <script>
-import { computed, defineComponent, nextTick, ref, watch, useTemplateRef } from "vue";
-import { useConstants, useStores } from "@/use";
-import CETEI from "CETEIcean";
-import { idaTeiBehaviours } from "./behaviours.js";
 import { createPopper } from "@popperjs/core";
+import CETEI from "CETEIcean";
+import { computed, defineComponent, nextTick, ref, useTemplateRef, watch } from "vue";
+
 import { AdaptiveSpinner } from "@/components";
+import { useConstants, useStores } from "@/use";
+
+import { idaTeiBehaviours } from "./behaviours.js";
 
 export default defineComponent({
   name: "TeiRenderer",
+  components: { AdaptiveSpinner },
   props: {
     text: {
       type: String,
@@ -20,7 +23,6 @@ export default defineComponent({
       default: null,
     },
   },
-  components: { AdaptiveSpinner },
   setup(props) {
     const { currentPageData } = useStores();
     const { teiSelectors } = useConstants();
@@ -284,7 +286,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 @import "./tei.css";
 .transcription {
   position: relative;

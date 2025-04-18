@@ -5,20 +5,20 @@ import * as yup from "yup";
 import { agentsNormalizeInputSchema } from "@/components/forms/agents-field/normalize";
 import { foliosNormalizeInputSchema } from "@/components/forms/folios-field/normalize";
 import {
-  attributeSchema,
   agentListSchema,
   agentsFieldSchema,
+  attributeSchema,
   attributesFieldSchema,
   collectionAttributeSchema,
   creditsFieldSchema,
   pageFieldSchema,
   pageSchema,
+  placeListSchema,
+  publicationAttributeSchema,
+  recordGroupAttributeSchema,
   timeStampSchema,
   userAttributeSchema,
   workflowSchema,
-  recordGroupAttributeSchema,
-  publicationAttributeSchema,
-  placeListSchema,
 } from "@/schemas";
 
 export const recordSchema = yup.object().shape({

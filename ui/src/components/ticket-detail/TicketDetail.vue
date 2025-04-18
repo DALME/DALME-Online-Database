@@ -8,34 +8,34 @@
         </div>
         <div class="row detail-row-subheading text-grey-8">
           <q-chip
+            :color="ticket.status ? 'deep-purple-6' : 'green-7'"
             :icon="ticket.status ? 'o_check_circle' : 'o_error_outline'"
             :label="ticket.status ? 'Closed' : 'Open'"
-            :color="ticket.status ? 'deep-purple-6' : 'green-7'"
-            text-color="white"
-            size="sm"
             class="q-ml-none q-mr-xs"
+            size="sm"
+            text-color="white"
           />
-          <DetailPopover :userData="ticket.creationUser" :showAvatar="false" />
+          <DetailPopover :show-avatar="false" :user-data="ticket.creationUser" />
           created this ticket on {{ formatDate(ticket.creationTimestamp, "DATETIME_AT") }}
         </div>
       </div>
       <div v-if="isAdmin" class="col-auto">
         <q-btn
-          dense
-          outline
-          no-caps
-          :color="buttonColours.colour"
-          :class="`action-button bg-${buttonColours.colour}`"
-          :text-color="buttonColours.text"
-          :label="capitalize(action)"
           @click.stop="onAction"
+          :class="`action-button bg-${buttonColours.colour}`"
+          :color="buttonColours.colour"
+          :label="capitalize(action)"
+          :text-color="buttonColours.text"
+          dense
+          no-caps
+          outline
         />
       </div>
     </div>
     <q-separator class="q-mb-lg" />
     <div class="row">
       <div class="col-9 q-pr-lg">
-        <q-card flat class="q-mb-md">
+        <q-card class="q-mb-md" flat>
           <q-card-section
             :class="
               ticket.commentCount > 0
@@ -45,7 +45,7 @@
           >
             <div class="comment-thread q-mt-none q-pb-lg">
               <q-item class="q-pb-sm q-pt-none q-px-none comment-box op-post">
-                <q-item-section top avatar>
+                <q-item-section avatar top>
                   <q-avatar size="40px">
                     <q-img
                       v-if="!nully(ticket.creationUser.avatar)"
@@ -53,13 +53,13 @@
                       fit="cover"
                       ratio="1"
                     />
-                    <q-icon v-else size="36px" name="mdi-account-circle" />
+                    <q-icon v-else name="mdi-account-circle" size="36px" />
                   </q-avatar>
                 </q-item-section>
                 <q-item-section>
-                  <q-card flat bordered class="box-arrow top">
+                  <q-card class="box-arrow top" bordered flat>
                     <q-card-section class="bg-grey-2 comment-head">
-                      <DetailPopover :userData="ticket.creationUser" :showAvatar="false" />
+                      <DetailPopover :show-avatar="false" :user-data="ticket.creationUser" />
                       commented on {{ formatDate(ticket.creationTimestamp, "DATETIME_AT") }}
                     </q-card-section>
                     <q-separator />
@@ -76,13 +76,13 @@
               </q-item>
             </div>
             <CommentBox>
-              <template v-if="ticket.status" v-slot:comment-stream-end>
+              <template v-if="ticket.status" #comment-stream-end>
                 <div class="comment-thread row items-center q-mt-none q-pb-lg">
                   <div class="closing-dot bg-deep-purple-6">
-                    <q-icon name="o_check_circle" color="white" size="20px" />
+                    <q-icon color="white" name="o_check_circle" size="20px" />
                   </div>
                   <div class="closing-dot-label">
-                    <DetailPopover :userData="ticket.closingUser" />
+                    <DetailPopover :user-data="ticket.closingUser" />
                     closed this ticket on {{ formatDate(ticket.closingDate, "DATETIME_AT") }}
                   </div>
                 </div>
@@ -93,9 +93,9 @@
       </div>
       <div class="col-3 q-pl-md">
         <DetailSidebar>
-          <template v-slot:extraElements>
+          <template #extraElements>
             <DetailElement label="Assignee">
-              <template v-slot:content>
+              <template #content>
                 <template v-if="ticket.assignedTo">
                   <router-link
                     :to="{
@@ -106,39 +106,39 @@
                     {{ ticket.assignedTo.fullName }}
                   </router-link>
                 </template>
-                <div class="text-13" v-else>No one assigned</div>
+                <div v-else class="text-13">No one assigned</div>
               </template>
             </DetailElement>
             <DetailElement label="Tags">
-              <template v-slot:content>
+              <template #content>
                 <template v-if="!isEmpty(cleanTags(ticket.tags))">
                   <TagPill
                     v-for="(tag, idx) in cleanTags(ticket.tags)"
                     :key="idx"
                     :name="tag.tag"
                     :type="tag.tag"
-                    size="xs"
-                    module="ticket"
                     class="q-ml-sm"
+                    module="ticket"
+                    size="xs"
                   />
                 </template>
-                <div class="text-13" v-else>None yet</div>
+                <div v-else class="text-13">None yet</div>
               </template>
             </DetailElement>
             <DetailElement label="Attachments">
-              <template v-slot:content>
+              <template #content>
                 <template v-if="!isEmpty(ticket.files)">
                   <AttachmentWidget v-for="file in ticket.files" :key="file.id" :file="file" />
                 </template>
-                <div class="text-13" v-else>None yet</div>
+                <div v-else class="text-13">None yet</div>
               </template>
             </DetailElement>
             <DetailElement label="Link">
-              <template v-slot:content>
+              <template #content>
                 <template v-if="ticket.url">
                   <ExternalLink :url="ticket.url" />
                 </template>
-                <div class="text-13" v-else>None yet</div>
+                <div v-else class="text-13">None yet</div>
               </template>
             </DetailElement>
           </template>
@@ -150,25 +150,26 @@
 </template>
 
 <script>
-import { filter as rFilter, isEmpty, isNil } from "ramda";
-import { useMeta, format } from "quasar";
-import { computed, defineComponent, onMounted, readonly, ref, provide } from "vue";
+import { format, useMeta } from "quasar";
+import { isEmpty, isNil, filter as rFilter } from "ramda";
+import { computed, defineComponent, onMounted, provide, readonly, ref } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
+
 import { requests } from "@/api";
 import {
   AttachmentWidget,
   CommentBox,
-  DetailSidebar,
   DetailElement,
   DetailPopover,
+  DetailSidebar,
   ExternalLink,
   MarkdownEditor,
   OpaqueSpinner,
   TagPill,
 } from "@/components";
-import { formatDate, nully } from "@/utils";
 import { ticketSchema } from "@/schemas";
 import { useAPI, useEventHandling, useStores } from "@/use";
+import { formatDate, nully } from "@/utils";
 
 export default defineComponent({
   name: "TicketDetail",
@@ -263,7 +264,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .action-button {
   padding: 0px 10px 0px 10px;
   font-weight: 600;

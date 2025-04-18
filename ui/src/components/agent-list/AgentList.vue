@@ -1,23 +1,23 @@
 <template>
   <DataTable
     :columns="columns"
-    :search="search"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
+    :search="search"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
   >
-    <template v-slot:render-cell-standardName="props">
+    <template #render-cell-standardName="props">
       <span v-html="props.row.name"></span>
     </template>
 
-    <template v-slot:render-cell-type="props">
+    <template #render-cell-type="props">
       {{ props.row.agentType }}
     </template>
   </DataTable>
@@ -26,11 +26,13 @@
 <script>
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
 import { DataTable } from "@/components";
-import { getColumns, getDefaults } from "@/utils";
 import { agentListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
+import { getColumns, getDefaults } from "@/utils";
+
 import { columnMap } from "./columns";
 
 export default defineComponent({

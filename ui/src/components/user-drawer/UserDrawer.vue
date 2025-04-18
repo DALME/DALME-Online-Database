@@ -1,21 +1,21 @@
 <template>
   <div
-    class="fullscreen frosted-background custom-drawer user-drawer"
     :class="userDrawerOpen ? '' : 'hide-modal'"
+    class="fullscreen frosted-background custom-drawer user-drawer"
   >
     <div class="q-dialog__backdrop fixed-full" tabindex="-1" />
-    <q-drawer overlay v-model="userDrawerOpen" side="right" :width="320">
-      <q-list padding class="drawer-menu-list full-height col">
-        <q-item dense class="no-shrink">
+    <q-drawer v-model="userDrawerOpen" :width="320" side="right" overlay>
+      <q-list class="drawer-menu-list full-height col" padding>
+        <q-item class="no-shrink" dense>
           <q-item-section avatar>
-            <q-avatar size="40px" class="greyscale-50">
+            <q-avatar class="greyscale-50" size="40px">
               <q-img
                 v-if="!nully(auth.user.avatar)"
                 :src="auth.user.avatar"
                 fit="cover"
                 ratio="1"
               />
-              <q-icon v-else size="40px" name="mdi-account-circle" />
+              <q-icon v-else name="mdi-account-circle" size="40px" />
             </q-avatar>
           </q-item-section>
           <q-item-section>
@@ -24,11 +24,11 @@
           </q-item-section>
           <q-item-section side>
             <q-btn
-              flat
+              @click="userDrawerOpen = !userDrawerOpen"
               class="drawer-close-button"
               icon="mdi-close"
               size="10px"
-              @click="userDrawerOpen = !userDrawerOpen"
+              flat
             >
               <ToolTip>Close user drawer.</ToolTip>
             </q-btn>
@@ -36,43 +36,43 @@
         </q-item>
         <q-separator spaced />
         <q-item
-          :to="{ name: 'User', params: { username: auth.user.username } }"
-          dense
-          clickable
           v-close-popup
+          :to="{ name: 'User', params: { username: auth.user.username } }"
+          clickable
+          dense
         >
           <q-item-section class="col-auto q-mr-xs">
-            <q-icon name="mdi-account-details-outline" size="xs" class="menu-icon" />
+            <q-icon class="menu-icon" name="mdi-account-details-outline" size="xs" />
           </q-item-section>
           <q-item-section>Your profile</q-item-section>
         </q-item>
         <q-item
-          :to="{ name: 'User', params: { username: auth.user.username } }"
-          dense
-          clickable
           v-close-popup
+          :to="{ name: 'User', params: { username: auth.user.username } }"
+          clickable
+          dense
         >
           <q-item-section class="col-auto q-mr-xs">
-            <q-icon name="mdi-account-cog-outline" size="xs" class="menu-icon" />
+            <q-icon class="menu-icon" name="mdi-account-cog-outline" size="xs" />
           </q-item-section>
           <q-item-section>Your preferences</q-item-section>
         </q-item>
 
-        <q-scroll-area dark :style="`height: ${scrollHeight}px;`" class="scroll-area">
+        <q-scroll-area :style="`height: ${scrollHeight}px;`" class="scroll-area" dark>
           <TaskManager />
         </q-scroll-area>
 
         <q-item
-          dense
-          clickable
           v-close-popup
           @click="logout"
           :loading="submitting"
           class="q-mt-auto"
+          clickable
+          dense
         >
           <q-item-section class="col-auto q-mr-xs">
-            <q-icon name="mdi-logout" size="xs" class="menu-icon" />
-            <template v-slot:loading>
+            <q-icon class="menu-icon" name="mdi-logout" size="xs" />
+            <template #loading>
               <q-spinner-oval size="sm" />
             </template>
           </q-item-section>
@@ -85,10 +85,11 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { computed, defineComponent, ref, onBeforeMount } from "vue";
 import { isEmpty, isNil } from "ramda";
+import { computed, defineComponent, onBeforeMount, ref } from "vue";
+
+import { CustomDialog, TaskManager, ToolTip } from "@/components";
 import { useStores } from "@/use";
-import { CustomDialog, ToolTip, TaskManager } from "@/components";
 import { nully } from "@/utils";
 
 export default defineComponent({

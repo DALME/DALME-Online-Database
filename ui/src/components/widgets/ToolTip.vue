@@ -1,5 +1,5 @@
 <template>
-  <q-tooltip class="bg-blue z-max" :anchor="anchor" :self="self" :offset="offset" v-if="showTips">
+  <q-tooltip v-if="showTips" :anchor="anchor" :offset="offset" :self="self" class="bg-blue z-max">
     <slot />
     {{ text }}
   </q-tooltip>
@@ -7,6 +7,7 @@
 
 <script>
 import { defineComponent } from "vue";
+
 import { useSettingsStore } from "@/stores/settings";
 
 export default defineComponent({
@@ -26,6 +27,7 @@ export default defineComponent({
     },
     text: {
       type: String,
+      required: true,
     },
   },
   setup() {

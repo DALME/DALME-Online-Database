@@ -1,7 +1,7 @@
 <!-- eslint-disable prettier/prettier -->
 <!-- eslint-disable max-len -->
 <template>
-  <svg id="#ida-logo" :style="`width: ${size};`" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 606.9 390.4">
+  <svg id="#ida-logo" :style="`width: ${size};`" version="1.1" viewBox="0 0 606.9 390.4" xmlns="http://www.w3.org/2000/svg">
     <g>
       <g id="Layer_1">
         <polygon :style="`fill: ${fill}; stroke: ${strokeColor}; stroke-miterlimit: 10;`" points="115.5 350.9 594.4 350.5 594.4 36.4 114.2 36.4 111.9 28.6 603.9 28.6 603.9 358.3 111.9 358.3 115.5 350.9"/>

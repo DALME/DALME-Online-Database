@@ -1,14 +1,14 @@
 <template>
-  <q-item header-class="drawer_expansion_header" class="collections-item">
+  <q-item class="collections-item" header-class="drawer_expansion_header">
     <q-item class="drawer_expansion_header">
       <q-item-section class="justify-center">
         <q-item-label>{{ label }}</q-item-label>
       </q-item-section>
     </q-item>
     <q-scroll-area
-      dark
       :style="`height: 100%; width: ${width}px; min-width: ${width}px`"
       class="scroll-area"
+      dark
     >
       <template v-if="!loading">
         <CollectionTile
@@ -20,11 +20,11 @@
         <div class="flex task-list-actions">
           <q-btn
             v-if="totalCount > currentCount"
+            @click="limit = limit + 5"
+            class="drawer-show-more"
+            label="Show more..."
             flat
             no-caps
-            label="Show more..."
-            class="drawer-show-more"
-            @click="limit = limit + 5"
           />
         </div>
       </template>
@@ -32,11 +32,11 @@
         <template v-for="idx in limit" :key="idx">
           <q-item dense>
             <q-item-section avatar>
-              <q-skeleton type="rect" height="18px" width="18px" />
+              <q-skeleton height="18px" type="rect" width="18px" />
             </q-item-section>
             <q-item-section>
-              <q-skeleton type="text" height="18px" width="85%" />
-              <q-skeleton type="text" height="14px" width="65%" />
+              <q-skeleton height="18px" type="text" width="85%" />
+              <q-skeleton height="14px" type="text" width="65%" />
             </q-item-section>
           </q-item>
         </template>
@@ -46,14 +46,19 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref, onMounted, watch } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
+
 import { requests } from "@/api";
-import { useStores, useAPI } from "@/use";
 import { collectionsSchema } from "@/schemas";
+import { useAPI, useStores } from "@/use";
+
 import CollectionTile from "./CollectionTile.vue";
 
 export default defineComponent({
   name: "CollectionsManager",
+  components: {
+    CollectionTile,
+  },
   props: {
     userCollections: {
       type: Boolean,
@@ -71,11 +76,6 @@ export default defineComponent({
       type: String,
       default: "Collections",
     },
-    scrollHeight: Number,
-    width: String,
-  },
-  components: {
-    CollectionTile,
   },
   setup(props, context) {
     const { auth } = useStores();

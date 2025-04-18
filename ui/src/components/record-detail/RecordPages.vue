@@ -1,23 +1,23 @@
 <template>
   <q-table
-    flat
-    dense
-    :rows="pages"
     :columns="columns"
-    :no-data-label="noData"
     :filter="filter"
+    :no-data-label="noData"
     :pagination="pagination"
+    :rows="pages"
     :rows-per-page-options="[0]"
-    row-key="id"
     class="sticky-header"
+    row-key="id"
     table-colspan="5"
+    dense
+    flat
     wrap-cells
   >
-    <template v-slot:body-cell-hasImage="props">
+    <template #body-cell-hasImage="props">
       <q-td :props="props"><BooleanValue :value="props.value" /></q-td>
     </template>
 
-    <template v-slot:body-cell-hasTranscription="props">
+    <template #body-cell-hasTranscription="props">
       <q-td :props="props"><BooleanValue :value="props.value" /></q-td>
     </template>
   </q-table>
@@ -25,18 +25,19 @@
 
 <script>
 import { defineComponent, inject } from "vue";
+
 import { BooleanValue } from "@/components";
 
 export default defineComponent({
   name: "RecordPages",
+  components: {
+    BooleanValue,
+  },
   props: {
     pages: {
       type: Array,
       required: true,
     },
-  },
-  components: {
-    BooleanValue,
   },
   setup() {
     const columns = inject("pageColumns");
@@ -54,7 +55,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-table__top {
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   padding-top: 8px;

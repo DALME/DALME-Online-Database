@@ -1,38 +1,38 @@
 <template>
   <DataTable
-    grid
     :columns="columns"
     :embedded="embedded"
-    :search="search"
-    :filterList="filterList"
+    :filter-list="filterList"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onChangeFilters="onChangeFilters"
-    :onClearFilters="onClearFilters"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-filters="onChangeFilters"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-clear-filters="onClearFilters"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
-    :sortList="sortList"
+    :search="search"
+    :sort-list="sortList"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
+    grid
   >
-    <template v-slot:toolbar-filtersets>
-      <GeneralChooser showSelected type="users" label="Author" @clear-filters="onClearFilters" />
-      <GeneralChooser showSelected type="users" label="Assignee" @clear-filters="onClearFilters" />
+    <template #toolbar-filtersets>
+      <GeneralChooser @clear-filters="onClearFilters" label="Author" type="users" show-selected />
+      <GeneralChooser @clear-filters="onClearFilters" label="Assignee" type="users" show-selected />
     </template>
 
-    <template v-slot:grid-avatar="props">
-      <q-icon name="check_circle_outline" color="purple-8" size="22px" :test="props.row.setType" />
+    <template #grid-avatar="props">
+      <q-icon :test="props.row.setType" color="purple-8" name="check_circle_outline" size="22px" />
     </template>
 
-    <template v-slot:grid-main="props">
+    <template #grid-main="props">
       <DetailPopover
-        linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Set', params: { id: props.row.id } }"
-        :linkText="props.row.name"
+        :link-target="{ name: 'Set', params: { id: props.row.id } }"
+        :link-text="props.row.name"
+        link-class="text-h7 title-link"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
           {{ props.row.owner.username }}
@@ -47,63 +47,63 @@
       </DetailPopover>
     </template>
 
-    <template v-slot:grid-detail="props">
+    <template #grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
         {{ props.row.detailString }}
       </div>
     </template>
 
-    <template v-slot:grid-counter="props">
-      <q-icon name="chat_bubble_outline" size="17px" class="text-weight-bold q-mr-xs" />
+    <template #grid-counter="props">
+      <q-icon class="text-weight-bold q-mr-xs" name="chat_bubble_outline" size="17px" />
       <div class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.memberCount }}
       </div>
     </template>
 
-    <template v-slot:grid-counter-extra="props">
-      <q-icon name="chat_bubble_outline" size="17px" class="text-weight-bold q-mr-xs" />
+    <template #grid-counter-extra="props">
+      <q-icon class="text-weight-bold q-mr-xs" name="chat_bubble_outline" size="17px" />
       <div class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.publicMemberCount }}
       </div>
     </template>
 
-    <template v-slot:render-cell-name="props">
+    <template #render-cell-name="props">
       <router-link
-        class="text-subtitle2 text-link"
         :to="{ name: 'Set', params: { id: props.row.id } }"
+        class="text-subtitle2 text-link"
       >
         {{ props.row.name }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-owner="props">
+    <template #render-cell-owner="props">
       <router-link
-        class="text-link"
         :to="{ name: 'User', params: { username: props.row.owner.username } }"
+        class="text-link"
       >
         {{ props.row.owner.fullName }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-isPublic="props">
-      <BooleanValue :value="props.row.isPublic" :onlyTrue="true" trueIcon="public" />
+    <template #render-cell-isPublic="props">
+      <BooleanValue :only-true="true" :value="props.row.isPublic" true-icon="public" />
     </template>
 
-    <template v-slot:render-cell-hasLanding="props">
-      <BooleanValue :value="props.row.hasLanding" :onlyTrue="true" trueIcon="check_circle" />
+    <template #render-cell-hasLanding="props">
+      <BooleanValue :only-true="true" :value="props.row.hasLanding" true-icon="check_circle" />
     </template>
 
-    <template v-slot:render-cell-endpoint="props">
-      <q-badge color="blue-grey-1" text-color="blue-grey-7" class="wf-tag">
+    <template #render-cell-endpoint="props">
+      <q-badge class="wf-tag" color="blue-grey-1" text-color="blue-grey-7">
         {{ props.row.endpoint }}
       </q-badge>
     </template>
 
-    <template v-slot:render-cell-permissions="props">
+    <template #render-cell-permissions="props">
       {{ props.row.permissions.name }}
     </template>
 
-    <template v-slot:render-cell-datasetUsergroup="props">
+    <template #render-cell-datasetUsergroup="props">
       {{ props.row.datasetUsergroup.name }}
     </template>
   </DataTable>
@@ -113,27 +113,29 @@
 import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
+
 import { requests } from "@/api";
-import { BooleanValue, GeneralChooser, DataTable, DetailPopover } from "@/components";
-import { formatDate, getColumns, getDefaults } from "@/utils";
+import { BooleanValue, DataTable, DetailPopover, GeneralChooser } from "@/components";
 import { setListSchema } from "@/schemas";
 import { useAPI, usePagination, useStores } from "@/use";
+import { formatDate, getColumns, getDefaults } from "@/utils";
+
 import { columnsByType } from "./columns";
 import { filterList, sortList } from "./filters";
 
 export default defineComponent({
   name: "SetList",
-  props: {
-    embedded: {
-      type: Boolean,
-      default: false,
-    },
-  },
   components: {
     GeneralChooser,
     DataTable,
     BooleanValue,
     DetailPopover,
+  },
+  props: {
+    embedded: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props, context) {
     const $route = useRoute();

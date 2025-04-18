@@ -1,12 +1,13 @@
 // Define the settings store
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { API as apiInterface, requests } from "@/api";
-import notifier from "@/notifier";
-import { UserElementSetsSchema } from "@/schemas";
 import { useRepo } from "pinia-orm";
 import { useCollect, usePluck } from "pinia-orm/helpers";
-import { TeiElement, TeiTag, TeiSet, TeiSetMember } from "@/models";
+import { computed, ref } from "vue";
+
+import { API as apiInterface, requests } from "@/api";
+import { TeiElement, TeiSet, TeiSetMember, TeiTag } from "@/models";
+import notifier from "@/notifier";
+import { UserElementSetsSchema } from "@/schemas";
 import { nully } from "@/utils";
 
 export const useEditorStore = defineStore(

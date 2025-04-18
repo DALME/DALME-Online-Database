@@ -1,48 +1,53 @@
 <template>
   <q-btn
     v-if="linkable && showLink"
+    @click="$emit('navigate')"
+    :ripple="false"
+    color="grey-5"
     icon="mdi-eye-outline"
     size="sm"
-    color="grey-5"
     dense
-    no-caps
     flat
-    :ripple="false"
-    @click="$emit('navigate')"
+    no-caps
   />
   <q-btn
     v-if="cancellable && showCancel"
-    icon="mdi-undo-variant"
+    @click="$emit('cancel')"
+    :ripple="false"
     color="orange-6"
+    icon="mdi-undo-variant"
     size="sm"
     dense
-    no-caps
     flat
-    :ripple="false"
-    @click="$emit('cancel')"
+    no-caps
   />
   <q-btn
     v-if="showMain"
-    :icon="mainIcon"
+    @click="$emit('action')"
     :color="mainColor"
+    :icon="mainIcon"
+    :ripple="false"
     size="sm"
     dense
-    no-caps
     flat
-    :ripple="false"
-    @click="$emit('action')"
+    no-caps
   />
-  <AdaptiveSpinner v-if="showSpinner" type="pie" color="green-6" size="14px" class="q-mr-xs" />
+  <AdaptiveSpinner v-if="showSpinner" class="q-mr-xs" color="green-6" size="14px" type="pie" />
 </template>
 
 <script>
 import { defineComponent } from "vue";
+
 import { AdaptiveSpinner } from "@/components";
 
 export default defineComponent({
   name: "EditButtons",
+  components: { AdaptiveSpinner },
   props: {
-    linkable: String,
+    linkable: {
+      type: String,
+      default: null,
+    },
     cancellable: {
       type: Boolean,
       default: false,
@@ -51,13 +56,15 @@ export default defineComponent({
     showCancel: Boolean,
     showMain: Boolean,
     showSpinner: Boolean,
-    mainIcon: String,
+    mainIcon: {
+      type: String,
+      required: true,
+    },
     mainColor: {
       type: String,
       default: "grey-5",
     },
   },
   emits: ["action", "cancel", "navigate"],
-  components: { AdaptiveSpinner },
 });
 </script>

@@ -1,62 +1,62 @@
 <template>
   <q-btn
-    flat
-    dense
+    @click="show = !show"
+    :icon-right="show ? 'arrow_drop_up' : 'arrow_drop_down'"
     :label="label"
     class="text-capitalize"
     content-class="menu-shadow"
-    :icon-right="show ? 'arrow_drop_up' : 'arrow_drop_down'"
-    @click="show = !show"
+    dense
+    flat
   >
     <ToolTip v-if="tooltip">{{ tooltip }}</ToolTip>
     <q-menu anchor="bottom right" self="top right">
-      <q-list bordered separator class="text-grey-9 choser-menu">
+      <q-list class="text-grey-9 choser-menu" bordered separator>
         <template v-if="ready">
-          <q-item dense class="q-pr-sm">
+          <q-item class="q-pr-sm" dense>
             <q-item-section class="text-weight-bold"> Filter by {{ label }} </q-item-section>
             <q-item-section avatar>
               <q-btn
-                flat
-                dense
-                size="xs"
+                @click="$emit('clearFilters')"
                 color="grey-6"
                 icon="close"
-                @click="$emit('clearFilters')"
+                size="xs"
+                dense
+                flat
               />
             </q-item-section>
           </q-item>
 
-          <q-item v-if="searchable" dense class="chooser-filter">
+          <q-item v-if="searchable" class="chooser-filter" dense>
             <q-input
-              :dark="dark"
-              borderless
-              square
-              dense
-              hide-bottom-space
               v-model="search"
-              debounce="300"
+              :dark="dark"
+              autocapitalize="off"
               autocomplete="off"
               autocorrect="off"
-              autocapitalize="off"
-              spellcheck="false"
-              placeholder="Type to search"
               class="chooser-filter-box"
+              debounce="300"
+              placeholder="Type to search"
+              spellcheck="false"
+              borderless
+              dense
+              hide-bottom-space
+              square
             >
-              <template v-slot:append>
+              <template #append>
                 <q-icon
                   v-if="search && !loading"
-                  name="mdi-close-circle"
+                  @click="search = ''"
                   class="cursor-pointer"
                   color="grey-5"
-                  @click="search = ''"
+                  name="mdi-close-circle"
                 />
                 <AdaptiveSpinner
                   v-if="loading"
-                  type="bars"
-                  size="20px"
                   :adaptive="false"
-                  color="indigo-3"
                   class="q-mr-sm"
+                  color="indigo-3"
+                  size="20px"
+                  type="bars"
                 />
               </template>
             </q-input>
@@ -64,34 +64,34 @@
 
           <template v-if="showSelected && !nully(selectedVal)">
             <template v-if="selection === 'single'">
-              <component :is="itemComponent" :item="selected" :class="classSelected" />
+              <component :is="itemComponent" :class="classSelected" :item="selected" />
             </template>
             <template v-else>
               <template v-for="(item, idx) in selected" :key="idx">
-                <component :is="itemComponent" :item="item" :class="classSelected" />
+                <component :is="itemComponent" :class="classSelected" :item="item" />
               </template>
             </template>
           </template>
-          <q-list separator v-if="!loading && !nully(itemData)" class="chooser-items-container">
+          <q-list v-if="!loading && !nully(itemData)" class="chooser-items-container" separator>
             <template v-for="(item, idx) in itemData" :key="idx">
               <template v-if="item.isGroup">
                 <q-item
+                  :class="groupIsActive(item.label) ? item.classSelected : item.class"
                   clickable
                   dense
-                  :class="groupIsActive(item.label) ? item.classSelected : item.class"
                 >
                   <q-item-section>{{ item.label }}</q-item-section>
                   <q-item-section side>
-                    <q-icon name="mdi-chevron-right" size="xs" color="grey-6" />
+                    <q-icon color="grey-6" name="mdi-chevron-right" size="xs" />
                   </q-item-section>
                   <q-menu anchor="top right" self="top left">
-                    <q-list bordered separator class="text-grey-9">
+                    <q-list class="text-grey-9" bordered separator>
                       <template v-for="(opt, oidx) in item.options" :key="oidx">
                         <component
                           :is="itemComponent"
+                          @item-chosen="selectItem"
                           :item="opt"
                           :item-class="getItemClass(opt)"
-                          @item-chosen="selectItem"
                         />
                       </template>
                     </q-list>
@@ -101,9 +101,9 @@
               <template v-else>
                 <component
                   :is="itemComponent"
+                  @item-chosen="selectItem"
                   :item="item"
                   :item-class="getItemClass(item)"
-                  @item-chosen="selectItem"
                 />
               </template>
             </template>
@@ -111,16 +111,16 @@
         </template>
         <template v-else>
           <q-item dense>
-            <q-skeleton type="text" height="28px" width="90%" />
+            <q-skeleton height="28px" type="text" width="90%" />
           </q-item>
           <q-item dense>
-            <q-skeleton type="text" height="28px" width="80%" />
+            <q-skeleton height="28px" type="text" width="80%" />
           </q-item>
           <q-item dense>
-            <q-skeleton type="text" height="28px" width="90%" />
+            <q-skeleton height="28px" type="text" width="90%" />
           </q-item>
           <q-item dense>
-            <q-skeleton type="text" height="28px" width="60%" />
+            <q-skeleton height="28px" type="text" width="60%" />
           </q-item>
         </template>
       </q-list>
@@ -129,25 +129,33 @@
 </template>
 
 <script>
-import { filter as rFilter } from "ramda";
+import { groupBy, prop, filter as rFilter } from "ramda";
 import {
   computed,
-  defineComponent,
   defineAsyncComponent,
+  defineComponent,
   inject,
   onBeforeMount,
   ref,
   watch,
 } from "vue";
+
 import { AdaptiveSpinner } from "@/components";
-import { nully, isNumber } from "@/utils";
+import { isNumber, nully } from "@/utils";
+
 import ItemGeneric from "./ItemGeneric.vue";
-import ItemUser from "./ItemUser.vue";
 import ItemTicket from "./ItemTicket.vue";
-import { groupBy, prop } from "ramda";
+import ItemUser from "./ItemUser.vue";
 
 export default defineComponent({
   name: "FilterChooser",
+  components: {
+    AdaptiveSpinner,
+    ItemGeneric,
+    ItemUser,
+    ItemTicket,
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     dark: {
       type: Boolean,
@@ -161,9 +169,20 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    field: String,
-    tooltip: String,
-    returnField: String,
+    field: {
+      type: String,
+      required: true,
+    },
+    tooltip: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    returnField: {
+      type: String,
+      required: false,
+      default: null,
+    },
     class: {
       type: String,
       default: "text-grey-8",
@@ -184,8 +203,16 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    fetcher: Function,
-    items: Array,
+    fetcher: {
+      type: Function,
+      required: false,
+      default: null,
+    },
+    items: {
+      type: Array,
+      required: false,
+      default: null,
+    },
     selection: {
       type: String,
       default: "single",
@@ -195,13 +222,7 @@ export default defineComponent({
       default: false,
     },
   },
-  components: {
-    AdaptiveSpinner,
-    ItemGeneric,
-    ItemUser,
-    ItemTicket,
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+
   emits: ["itemChosen", "clearFilters"],
   setup(props, context) {
     const show = ref(false);
@@ -356,7 +377,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .choser-menu {
   min-width: 250px;
 }

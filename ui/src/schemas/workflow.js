@@ -1,4 +1,5 @@
 import * as yup from "yup";
+
 import { timeStampSchema, userAttributeSchema } from "@/schemas";
 
 export const logEventSchema = yup.object().shape({

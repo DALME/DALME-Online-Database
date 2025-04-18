@@ -1,41 +1,41 @@
 <template>
   <DataTable
-    grid
     :columns="columns"
     :embedded="embedded"
-    :search="search"
-    :filterList="filterList"
+    :filter-list="filterList"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onChangeFilters="onChangeFilters"
-    :onClearFilters="onClearFilters"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-filters="onChangeFilters"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-clear-filters="onClearFilters"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="filteredRows"
-    :sortList="sortList"
+    :search="search"
+    :sort-list="sortList"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
+    grid
   >
-    <template v-slot:toolbar-special>
+    <template #toolbar-special>
       <TasklistList @on-reload="fetchTaskLists" />
     </template>
 
-    <template v-slot:grid-avatar="props">
+    <template #grid-avatar="props">
       <q-icon
-        :name="props.row.completed ? 'check_circle_outline' : 'error_outline'"
         :color="props.row.completed ? 'green-8' : 'red-8'"
+        :name="props.row.completed ? 'check_circle_outline' : 'error_outline'"
         size="22px"
       />
     </template>
 
-    <template v-slot:grid-main="props">
+    <template #grid-main="props">
       <DetailPopover
-        linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Task', params: { id: props.row.id } }"
-        :linkText="props.row.title"
+        :link-target="{ name: 'Task', params: { id: props.row.id } }"
+        :link-text="props.row.title"
+        link-class="text-h7 title-link"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
           {{ props.row.creationUser.username }}
@@ -49,26 +49,26 @@
           <TagPill
             v-if="props.row.workset"
             :name="`Workset: ${props.row.workset}`"
-            colour="light-blue-1"
-            textColour="light-blue-9"
-            size="sm"
-            module="standalone"
             class="q-mt-sm"
+            colour="light-blue-1"
+            module="standalone"
+            size="sm"
+            text-colour="light-blue-9"
           />
         </div>
       </DetailPopover>
       <TagPill
         v-if="props.row.overdueStatus"
-        name="overdue"
-        colour="red-1"
-        textColour="red-6"
-        size="xs"
-        module="standalone"
         class="q-ml-sm"
+        colour="red-1"
+        module="standalone"
+        name="overdue"
+        size="xs"
+        text-colour="red-6"
       />
     </template>
 
-    <template v-slot:grid-detail="props">
+    <template #grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
         <span v-text="`Created on ${formatDate(props.row.creationTimestamp, 'DATETIME_AT')} by `" />
         <!-- <DetailPopover showAvatar :userData="props.row.creationUser" /> -->
@@ -79,40 +79,40 @@
       </div>
     </template>
 
-    <template v-slot:grid-counter="props">
+    <template #grid-counter="props">
       <q-icon
         v-if="props.row.commentCount"
+        class="text-weight-bold q-mr-xs"
         name="chat_bubble_outline"
         size="17px"
-        class="text-weight-bold q-mr-xs"
       />
       <div v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </div>
     </template>
 
-    <template v-slot:grid-counter-extra="props">
+    <template #grid-counter-extra="props">
       <q-btn
         v-if="props.row.file"
-        flat
-        dense
         @click.stop="openURL(props.row.file.source)"
-        target="_blank"
         color="blue-gray-6"
-        size="sm"
         icon="o_text_snippet"
+        size="sm"
+        target="_blank"
         text-color="blue-gray-6"
+        dense
+        flat
       />
       <q-btn
         v-if="props.row.url"
-        flat
-        dense
         @click.stop="openURL(props.row.url)"
-        target="_blank"
         color="blue-gray-6"
-        size="sm"
         icon="link"
+        size="sm"
+        target="_blank"
         text-color="blue-gray-6"
+        dense
+        flat
       />
     </template>
   </DataTable>
@@ -121,40 +121,42 @@
 <script>
 import { openURL, useMeta } from "quasar";
 import {
-  filter as rFilter,
   flatten,
+  groupBy,
   has,
   isEmpty,
-  groupBy,
+  keys,
   map,
   mapObjIndexed,
   partition,
-  keys,
+  filter as rFilter,
   values,
 } from "ramda";
 import { defineComponent, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
 import { requests } from "@/api";
 import { DataTable, DetailPopover, TagPill, TasklistList } from "@/components";
-import { formatDate, getColumns, getDefaults } from "@/utils";
 import { taskListsSchema, tasksSchema } from "@/schemas";
-import { useAPI, usePagination, useEditing, useStores } from "@/use";
+import { useAPI, useEditing, usePagination, useStores } from "@/use";
+import { formatDate, getColumns, getDefaults } from "@/utils";
+
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
 export default defineComponent({
   name: "TaskList",
-  props: {
-    embedded: {
-      type: Boolean,
-      default: false,
-    },
-  },
   components: {
     DetailPopover,
     DataTable,
     TagPill,
     TasklistList,
+  },
+  props: {
+    embedded: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ["onReloadTaskLists"],
   setup(props, context) {

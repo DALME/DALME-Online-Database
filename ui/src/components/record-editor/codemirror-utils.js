@@ -1,25 +1,25 @@
-import { EditorState, Compartment, StateEffect } from "@codemirror/state";
+import { closeBrackets, completionKeymap } from "@codemirror/autocomplete";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
+import { xml } from "@codemirror/lang-xml";
 import {
-  EditorView,
-  keymap,
-  placeholder,
-  drawSelection,
-  highlightActiveLine,
-  dropCursor,
-  highlightActiveLineGutter,
-} from "@codemirror/view";
-import {
-  indentUnit,
-  defaultHighlightStyle,
-  syntaxHighlighting,
   bracketMatching,
+  defaultHighlightStyle,
   foldGutter,
+  indentUnit,
+  syntaxHighlighting,
 } from "@codemirror/language";
 import { lintGutter } from "@codemirror/lint";
-import { indentWithTab, defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { searchKeymap } from "@codemirror/search";
-import { closeBrackets, completionKeymap } from "@codemirror/autocomplete";
-import { xml } from "@codemirror/lang-xml";
+import { Compartment, EditorState, StateEffect } from "@codemirror/state";
+import {
+  EditorView,
+  drawSelection,
+  dropCursor,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  keymap,
+  placeholder,
+} from "@codemirror/view";
 
 export const baseExtensions = [
   xml(),

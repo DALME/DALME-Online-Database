@@ -1,10 +1,10 @@
 <template>
   <q-item
-    clickable
+    :class="`${inline ? 'external-link-inline' : 'external-link'}`"
+    :href="url"
     tag="a"
     target="_blank"
-    :href="url"
-    :class="`${inline ? 'external-link-inline' : 'external-link'}`"
+    clickable
     dense
   >
     <q-item-section v-if="icon" avatar>
@@ -24,19 +24,31 @@ import { defineComponent } from "vue";
 export default defineComponent({
   name: "ExternalLink",
   props: {
-    title: String,
-    caption: String,
+    title: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    caption: {
+      type: String,
+      required: false,
+      default: null,
+    },
     url: {
       type: String,
       default: "#",
     },
-    icon: String,
+    icon: {
+      type: String,
+      required: false,
+      default: null,
+    },
     inline: Boolean,
   },
 });
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
 .external-link {
   padding: 2px;
   border-radius: 3px;

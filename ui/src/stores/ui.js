@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
 import { EventBus, debounce } from "quasar";
+import { computed, ref } from "vue";
 
 export const useUiStore = defineStore(
   "ui",

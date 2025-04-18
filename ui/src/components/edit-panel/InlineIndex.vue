@@ -1,27 +1,27 @@
 <template>
   <div
     v-if="inlineIndexShow"
-    class="container q-py-sm"
+    @click.stop="handleFocus"
     :class="{
       focussed: isFocus,
       pulse: mouseoverSubmit && focus === 'inline',
     }"
-    @click.stop="handleFocus"
+    class="container q-py-sm"
   >
     <div class="q-pa-md q-gutter-sm row">
       <q-btn
         @click.stop="transport.undo"
-        color="white"
-        text-color="black"
-        label="Undo"
         class="q-ml-auto"
+        color="white"
+        label="Undo"
+        text-color="black"
       />
       <q-btn
         @click.stop="transport.redo"
-        color="white"
-        text-color="black"
-        label="Redo"
         :disable="disableRedo"
+        color="white"
+        label="Redo"
+        text-color="black"
       />
     </div>
     <q-list separator>
@@ -41,6 +41,7 @@
 
 <script>
 import { computed, defineComponent, watch } from "vue";
+
 import { useEditing, useStores, useTransport } from "@/use";
 
 export default defineComponent({

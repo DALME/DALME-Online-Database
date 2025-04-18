@@ -1,18 +1,18 @@
 <template>
   <q-input
-    autogrow
-    clearable
+    v-model="value"
+    @blur="handleBlur"
+    :error="errorMessage && meta.touched"
     debounce="500"
     type="textfield"
-    v-model="value"
-    :error="errorMessage && meta.touched"
-    @blur="handleBlur"
+    autogrow
+    clearable
   >
     <ToolTip v-if="description">
       {{ description }}
     </ToolTip>
 
-    <template v-slot:error>
+    <template #error>
       <div>{{ errorMessage }}</div>
     </template>
   </q-input>
@@ -20,10 +20,13 @@
 
 <script>
 import { useField } from "vee-validate";
-import { defineComponent, defineAsyncComponent } from "vue";
+import { defineAsyncComponent, defineComponent } from "vue";
 
 export default defineComponent({
   name: "TextField",
+  components: {
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     field: {
       type: String,
@@ -38,9 +41,7 @@ export default defineComponent({
       default: () => false,
     },
   },
-  components: {
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+
   setup(props) {
     const { errorMessage, handleBlur, meta, value } = useField(props.field, props.validation);
 

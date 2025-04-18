@@ -2,25 +2,25 @@
   <DataTable
     :columns="columns"
     :editable="editable"
-    :search="search"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
     :schema="schema"
+    :search="search"
     :title="title"
-    :updateRequest="updateRequest"
-    :visibleColumns="visibleColumns"
+    :update-request="updateRequest"
+    :visible-columns="visibleColumns"
   >
-    <template v-slot:render-cell-locale="props">
+    <template #render-cell-locale="props">
       <router-link
-        class="text-link"
         v-if="props.row.locale"
         :to="{ name: 'Locales', params: { id: props.row.locale.id } }"
+        class="text-link"
       >
         {{ props.row.locale.name }}
       </router-link>
@@ -31,11 +31,13 @@
 <script>
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
 import { DataTable } from "@/components";
-import { getColumns, getDefaults } from "@/utils";
 import { placeListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
+import { getColumns, getDefaults } from "@/utils";
+
 import { columnMap } from "./columns";
 
 export default defineComponent({

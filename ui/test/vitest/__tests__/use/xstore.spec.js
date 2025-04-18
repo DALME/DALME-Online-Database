@@ -1,7 +1,7 @@
 // Test the use/xstore module.
 import { createPinia, defineStore, setActivePinia } from "pinia";
-import { createMachine } from "xstate";
 import { beforeEach, describe, expect, it } from "vitest";
+import { createMachine } from "xstate";
 
 import { useStoreMachine } from "@/use";
 

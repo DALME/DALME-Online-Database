@@ -1,21 +1,21 @@
 <template>
   <q-chip
-    clickable="clickable"
-    dense
-    :square="inline"
+    @click="router.push({ name: 'User', params: { username: user.username } })"
     :class="`${inline ? 'inline' : ''} ${dark ? 'dark' : ''}`"
     :color="color"
-    @click="router.push({ name: 'User', params: { username: user.username } })"
+    :square="inline"
+    clickable="clickable"
+    dense
   >
     <template v-if="showAvatar">
       <q-avatar v-if="!nully(user.avatar)" :size="avatarSize">
         <img :src="user.avatar" fit="cover" ratio="1" />
       </q-avatar>
       <q-icon
-        class="avatar-icon no-padding text-grey-6"
         v-else
-        name="mdi-account-circle"
         :size="avatarIconSize"
+        class="avatar-icon no-padding text-grey-6"
+        name="mdi-account-circle"
       />
     </template>
     <div :class="`${inline ? '' : 'q-pr-xs'}`" :style="style">{{ user.fullName }}</div>
@@ -24,8 +24,9 @@
 
 <script>
 import { computed, defineComponent } from "vue";
-import { nully } from "@/utils";
 import { useRouter } from "vue-router";
+
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "UserPill",

@@ -2,25 +2,25 @@
   <div class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
       <q-table
-        :title="title"
-        :rows="rows"
         :columns="columns"
-        :no-data-label="noData"
         :filter="filter"
-        :pagination="pagination"
-        :title-class="{ 'text-h6': true }"
         :loading="loading"
+        :no-data-label="noData"
+        :pagination="pagination"
+        :rows="rows"
+        :title="title"
+        :title-class="{ 'text-h6': true }"
         row-key="id"
       >
-        <template v-slot:top-right>
-          <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-            <template v-slot:append>
+        <template #top-right>
+          <q-input v-model="filter" debounce="300" placeholder="Search" borderless dense>
+            <template #append>
               <q-icon name="search" />
             </template>
           </q-input>
         </template>
 
-        <template v-slot:body-cell-creators="props">
+        <template #body-cell-creators="props">
           <q-td :props="props">
             {{ formatCreators(props.value) }}
           </q-td>
@@ -32,8 +32,9 @@
 </template>
 
 <script>
-import { map, keys } from "ramda";
+import { keys, map } from "ramda";
 import { defineComponent, onMounted, ref } from "vue";
+
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components";
 import { libraryListSchema } from "@/schemas";
@@ -109,7 +110,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-table tbody td {
   white-space: normal;
 }

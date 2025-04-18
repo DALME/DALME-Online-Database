@@ -1,8 +1,9 @@
-import { defineConfig } from "vitest/config";
 import path from "path";
-import vue from "@vitejs/plugin-vue";
+
 import { quasar, transformAssetUrls } from "@quasar/vite-plugin";
+import vue from "@vitejs/plugin-vue";
 import jsconfigPaths from "vite-jsconfig-paths";
+import { defineConfig } from "vitest/config";
 
 // https://vitejs.dev/config/
 export default defineConfig({

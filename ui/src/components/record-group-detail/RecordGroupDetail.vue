@@ -3,13 +3,13 @@
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">
-          <div class="info-area row" v-if="!ui.globalLoading">
+          <div v-if="!ui.globalLoading" class="info-area row">
             <div class="column">
               <div class="row items-center text-h5">
                 <template v-if="!ui.globalLoading">
                   {{ recordGroup.name }}
                 </template>
-                <q-skeleton v-else width="350px" height="30px" type="rect" />
+                <q-skeleton v-else height="30px" type="rect" width="350px" />
               </div>
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!ui.globalLoading">
@@ -18,9 +18,9 @@
                     {{ formatDate(recordGroup.creationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
+                    :show-avatar="false"
                     :user="recordGroup.creationUser"
                     text-size="12px"
-                    :show-avatar="false"
                     inline
                   />
                   <span
@@ -28,13 +28,13 @@
                     {{ formatDate(recordGroup.modificationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
+                    :show-avatar="false"
                     :user="recordGroup.modificationUser"
                     text-size="12px"
-                    :show-avatar="false"
                     inline
                   />
                 </template>
-                <q-skeleton v-else width="500px" height="12px" type="rect" />
+                <q-skeleton v-else height="12px" type="rect" width="500px" />
               </div>
             </div>
           </div>
@@ -42,27 +42,27 @@
         <div class="row">
           <q-tabs
             v-model="view.tab"
-            dense
-            no-caps
-            inline-label
-            switch-indicator
+            active-class="active-tab"
             align="left"
             class="bg-white text-grey-8 tab-container"
-            active-class="active-tab"
+            dense
+            inline-label
+            no-caps
+            switch-indicator
           >
-            <q-tab name="info" icon="o_info" label="Info" />
+            <q-tab icon="o_info" label="Info" name="info" />
             <template v-if="!ui.globalLoading">
-              <q-tab name="comments" icon="o_forum" label="Discussion & Activity">
+              <q-tab icon="o_forum" label="Discussion & Activity" name="comments">
                 <q-badge
                   v-if="commentCount > 0"
+                  :label="commentCount"
+                  class="text-indigo-1 q-mx-xs"
                   color="indigo-5"
                   rounded
-                  class="text-indigo-1 q-mx-xs"
-                  :label="commentCount"
                 />
               </q-tab>
             </template>
-            <AdaptiveSpinner v-else type="bars" size="sm" class="q-ml-md" />
+            <AdaptiveSpinner v-else class="q-ml-md" size="sm" type="bars" />
           </q-tabs>
         </div>
       </div>
@@ -72,12 +72,12 @@
         <template v-if="!ui.globalLoading">
           <q-tab-panels
             v-model="view.tab"
-            animated
-            transition-prev="jump-up"
             transition-next="jump-up"
+            transition-prev="jump-up"
+            animated
             keep-alive
           >
-            <q-tab-panel name="info" class="q-pt-none q-px-none">
+            <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div class="row q-pt-md">
                 <div class="col q-pr-md">
                   <DetailCard icon="bookmark" title="Record" pad-container>
@@ -93,21 +93,21 @@
                       <div class="col-3 text-weight-medium text-right q-mr-lg">Owner</div>
                       <div class="col-8">
                         <router-link
-                          class="text-link"
                           :to="{
                             name: 'User',
                             params: { username: recordGroup.owner.username },
                           }"
+                          class="text-link"
                         >
                           {{ recordGroup.owner.fullName }}
                         </router-link>
                         <q-chip
                           v-if="recordGroup.isPrivate"
-                          dense
-                          size="10px"
-                          outline
-                          color="red-10"
                           class="q-ml-sm text-bold"
+                          color="red-10"
+                          size="10px"
+                          dense
+                          outline
                         >
                           PRIVATE
                         </q-chip>
@@ -127,11 +127,11 @@
                     </div>
                   </DetailCard>
                   <DetailCard
-                    icon="subject"
-                    title="Description"
-                    noData="No description assigned."
-                    pad-container
                     class="q-mt-md"
+                    icon="subject"
+                    no-data="No description assigned."
+                    title="Description"
+                    pad-container
                   >
                     <MarkdownEditor
                       v-if="recordGroup.description"
@@ -140,17 +140,17 @@
                   </DetailCard>
                   <DetailCard
                     v-if="!nully(recordGroup.children)"
+                    class="q-mt-md"
                     icon="account_tree"
                     title="Children"
-                    showFilter
-                    class="q-mt-md"
+                    show-filter
                   >
-                    <RecordChildren overview :children="recordGroup.children" />
+                    <RecordChildren :children="recordGroup.children" overview />
                   </DetailCard>
                 </div>
               </div>
             </q-tab-panel>
-            <q-tab-panel name="comments" class="q-pt-md q-px-lg">
+            <q-tab-panel class="q-pt-md q-px-lg" name="comments">
               <CommentBox @on-count-changed="updateCommentCount" />
             </q-tab-panel>
           </q-tab-panels>
@@ -159,12 +159,12 @@
       </div>
       <div v-if="!ui.globalLoading" class="col-3 q-pl-md q-pt-md">
         <DetailSidebar>
-          <template v-slot:extraElements>
-            <DetailElement label="Unique Id" clipboard :content="recordGroup.id" />
+          <template #extraElements>
+            <DetailElement :content="recordGroup.id" label="Unique Id" clipboard />
             <DetailElement label="Created">
-              <template v-slot:content>
+              <template #content>
                 <div>
-                  <UserPill :user="recordGroup.creationUser" text-size="13px" :bold="false" />
+                  <UserPill :bold="false" :user="recordGroup.creationUser" text-size="13px" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
                     {{ formatDate(recordGroup.creationTimestamp.value, "DATETIME_AT") }}
                   </div>
@@ -172,9 +172,9 @@
               </template>
             </DetailElement>
             <DetailElement label="Last modified">
-              <template v-slot:content>
+              <template #content>
                 <div>
-                  <UserPill :user="recordGroup.modificationUser" text-size="13px" :bold="false" />
+                  <UserPill :bold="false" :user="recordGroup.modificationUser" text-size="13px" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
                     {{ formatDate(recordGroup.modificationTimestamp.value, "DATETIME_AT") }}
                   </div>
@@ -192,20 +192,22 @@
 import { useMeta } from "quasar";
 import { defineComponent, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
-import { useAPI, useEditing, useStores } from "@/use";
-import RecordChildren from "./RecordChildren.vue";
-import { nully } from "@/utils";
 import {
   AdaptiveSpinner,
   CommentBox,
   DetailCard,
-  DetailSidebar,
   DetailElement,
+  DetailSidebar,
   MarkdownEditor,
   UserPill,
 } from "@/components";
 import { recordGroupSchema } from "@/schemas";
+import { useAPI, useEditing, useStores } from "@/use";
+import { nully } from "@/utils";
+
+import RecordChildren from "./RecordChildren.vue";
 
 export default defineComponent({
   name: "RecordGroupDetail",
@@ -282,7 +284,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .record-actions {
   border-bottom: 1px solid #d1d1d1;
   margin-top: auto;

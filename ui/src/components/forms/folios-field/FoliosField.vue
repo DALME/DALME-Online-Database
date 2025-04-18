@@ -1,30 +1,30 @@
 <template>
-  <div class="folios-field column q-my-sm" :class="{ separator: !showing }">
+  <div :class="{ separator: !showing }" class="folios-field column q-my-sm">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
-        {{ !showing && modelValue !== [empty()] ? `Folios (${modelValue.length})` : "Folios" }}
+        {{ !showing && !empty(modelValue) ? `Folios (${modelValue.length})` : "Folios" }}
       </div>
 
       <q-spinner v-if="loading" color="primary" size="xs" />
       <q-btn
         v-show="showing"
-        round
+        @click.stop="handleAddField"
         class="q-ml-sm"
         color="amber"
         icon="add"
         size="xs"
         text-color="black"
-        @click.stop="handleAddField"
+        round
       >
         <ToolTip> Add a folio </ToolTip>
       </q-btn>
 
       <q-btn
-        round
+        @click.stop="showing = !showing"
+        :icon="showing ? 'visibility_off' : 'visibility'"
         class="q-ml-sm"
         size="xs"
-        :icon="showing ? 'visibility_off' : 'visibility'"
-        @click.stop="showing = !showing"
+        round
       >
         <ToolTip>
           {{ showing ? "Hide folios" : "Show folios" }}
@@ -39,39 +39,39 @@
     <template v-if="showing">
       <template v-if="modelValue.length > 0">
         <template v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)" :key="field.key">
-          <div class="row q-mb-sm" v-show="showing">
+          <div v-show="showing" class="row q-mb-sm">
             <div class="justify-center q-py-md q-pr-md text-grey text-subtitle2">
               #{{ idx + 1 }}
             </div>
             <div class="col-5 q-pr-sm">
               <InputField
-                label="Folio"
                 v-model="data.folio"
                 :field="`folios[${idx}].folio`"
                 :validation="validators.folio"
+                label="Folio"
               />
             </div>
             <div class="q-pl-sm col-4">
               <SelectField
-                label="DAM ID"
                 v-model="data.damId"
                 :field="`folios[${idx}].damId`"
                 :filterable="true"
-                :getOptions="getImageOptions"
-                :optionsSchema="imageOptionsSchema"
+                :get-options="getImageOptions"
+                :options-schema="imageOptionsSchema"
                 :validation="validators.damId"
+                label="DAM ID"
               />
             </div>
             <div class="q-pl-sm col">
               <div class="row flex-center full-height">
                 <q-btn
-                  flat
-                  round
-                  push
-                  icon="search"
+                  @click.stop="() => handlePreview(data.damId)"
                   :color="!data.damId || !data.hasImage ? 'grey' : 'black'"
                   :disable="!data.damId || !data.hasImage"
-                  @click.stop="() => handlePreview(data.damId)"
+                  icon="search"
+                  flat
+                  push
+                  round
                 >
                   <ToolTip> Preview folio </ToolTip>
                 </q-btn>
@@ -80,40 +80,40 @@
 
             <div class="row items-center">
               <q-btn
+                @click.stop.prevent="handleDrag(idx)"
+                :disable="true"
                 class="q-ml-auto"
+                color="grey"
+                icon="swap_vert"
+                size="xs"
                 flat
                 round
                 unelevated
-                size="xs"
-                icon="swap_vert"
-                :disable="true"
-                color="grey"
-                @click.stop.prevent="handleDrag(idx)"
               />
               <q-btn
+                @click.stop="confirm = true"
                 class="q-ml-auto"
+                icon="clear"
+                size="xs"
                 flat
                 round
                 unelevated
-                size="xs"
-                icon="clear"
-                @click.stop="confirm = true"
               >
-                <q-dialog v-model="confirm" persistent class="z-max">
+                <q-dialog v-model="confirm" class="z-max" persistent>
                   <q-card>
                     <q-card-section class="row items-center">
-                      <q-avatar icon="warning" color="red" text-color="white" size="sm" />
+                      <q-avatar color="red" icon="warning" size="sm" text-color="white" />
                       <span class="q-ml-sm"> Are you sure you want to remove this folio? </span>
                     </q-card-section>
 
                     <q-card-actions align="right">
-                      <q-btn flat label="Cancel" color="primary" v-close-popup />
+                      <q-btn v-close-popup color="primary" label="Cancel" flat />
                       <q-btn
-                        flat
-                        label="Remove"
-                        color="red"
                         v-close-popup
                         @click.stop="handleRemoveField(idx)"
+                        color="red"
+                        label="Remove"
+                        flat
                       />
                     </q-card-actions>
                   </q-card>
@@ -134,10 +134,11 @@
 
 <script>
 import { createId as cuid } from "@paralleldrive/cuid2";
-import { filter as rFilter, isNil, reduce, zip } from "ramda";
-import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, defineAsyncComponent, onMounted, ref, unref } from "vue";
 import { useActor } from "@xstate/vue";
+import { isNil, filter as rFilter, reduce, zip } from "ramda";
+import { useFieldArray } from "vee-validate";
+import { computed, defineAsyncComponent, defineComponent, onMounted, ref, unref } from "vue";
+
 import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
 import { imageOptionsSchema } from "@/schemas";
@@ -147,6 +148,11 @@ import { empty } from "./normalize";
 
 export default defineComponent({
   name: "FoliosField",
+  components: {
+    InputField,
+    SelectField,
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     modelValue: {
       type: Array,
@@ -157,14 +163,12 @@ export default defineComponent({
       default: () => false,
     },
     validators: {
+      type: Object,
       required: true,
     },
   },
-  components: {
-    InputField,
-    SelectField,
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+  emits: ["update:modelValue"],
+
   setup(props, context) {
     const {
       editingIndex,
@@ -253,10 +257,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-.folios-field {
-  will-transform: auto;
-}
+<style lang="scss" scoped>
 .folios-field .q-field__after,
 .folios-field .q-field__append {
   padding-left: 0 !important;

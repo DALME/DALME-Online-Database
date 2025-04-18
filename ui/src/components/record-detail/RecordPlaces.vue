@@ -1,19 +1,19 @@
 <template>
   <q-table
-    flat
-    dense
-    :rows="places"
     :columns="columns"
-    :no-data-label="noData"
     :filter="filter"
+    :no-data-label="noData"
     :pagination="pagination"
+    :rows="places"
     :rows-per-page-options="[0]"
-    row-key="id"
     class="sticky-header"
+    row-key="id"
     table-colspan="3"
+    dense
+    flat
     wrap-cells
   >
-    <template v-slot:body-cell-name="props">
+    <template #body-cell-name="props">
       <q-td :props="props">
         <span v-html="props.value" />
       </q-td>
@@ -25,19 +25,21 @@
 
 <script>
 import { defineComponent, inject, ref } from "vue";
-import { getColumns } from "@/utils";
-import { columnMap } from "./placeColumns";
+
 import { MapWidget } from "@/components";
+import { getColumns } from "@/utils";
+
+import { columnMap } from "./placeColumns";
 
 export default defineComponent({
   name: "RecordPlaces",
+  components: { MapWidget },
   props: {
     places: {
       type: Object,
       required: true,
     },
   },
-  components: { MapWidget },
   setup() {
     const columns = ref(getColumns(columnMap));
     const filter = inject("cardFilter");
@@ -54,7 +56,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-table__top {
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   padding: 0;

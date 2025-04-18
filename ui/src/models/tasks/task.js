@@ -1,5 +1,6 @@
 import { Model } from "pinia-orm";
 import { DateCast } from "pinia-orm/casts";
+
 import { useAuthStore } from "@/stores/auth";
 
 export default class Task extends Model {

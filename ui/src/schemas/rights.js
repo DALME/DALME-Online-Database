@@ -1,5 +1,6 @@
 import * as yup from "yup";
-import { attachmentSchema, userAttributeSchema, timeStampSchema } from "@/schemas";
+
+import { attachmentSchema, timeStampSchema, userAttributeSchema } from "@/schemas";
 
 export const rightsSchema = yup
   .object()

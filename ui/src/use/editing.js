@@ -1,20 +1,21 @@
+import { useActor, useMachine, useSelector } from "@xstate/vue";
 import {
   any,
-  filter as rFilter,
   indexBy,
   isEmpty,
   isNil,
   keys,
-  map as rMap,
   omit,
   pipe,
   prop,
+  filter as rFilter,
+  map as rMap,
   values,
 } from "ramda";
 import { computed, inject, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { assign, sendTo, setup, spawnChild } from "xstate";
-import { useActor, useMachine, useSelector } from "@xstate/vue";
+
 import { default as notifier } from "@/notifier";
 
 const MAX_MODALS = 10;

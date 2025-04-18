@@ -1,5 +1,5 @@
 <template>
-  <q-menu class="cm-tag-menu" anchor="center middle" self="center middle">
+  <q-menu anchor="center middle" class="cm-tag-menu" self="center middle">
     <q-card class="q-pa-sm">
       <div>
         <div class="flex no-wrap">
@@ -8,17 +8,17 @@
               <CustomIcon :icon="icon" class="q-mr-sm" />
               <div v-html="`${elData.label}`"></div>
             </div>
-            <div class="cm-tag-description" v-html="elData.description"></div>
+            <div v-html="elData.description" class="cm-tag-description"></div>
           </div>
           <div v-if="action == 'edit'" class="cm-tag-remove column items-center q-ml-md">
             <q-btn
-              flat
-              dense
               v-close-popup
-              color="primary"
-              size="md"
-              icon="mdi-tag-remove"
               @click="deleteTag"
+              color="primary"
+              icon="mdi-tag-remove"
+              size="md"
+              dense
+              flat
             />
           </div>
         </div>
@@ -27,32 +27,32 @@
             <div v-if="attr.editable">
               <template v-if="['string', 'textarea'].includes(attr.kind)">
                 <q-input
-                  dense
-                  :bottom-slots="!nully(attr.description)"
                   v-model="attr.currentValue"
-                  :label="attr.label"
                   :autogrow="attr.kind === 'textarea'"
-                  :type="attr.kind === 'string' ? 'text' : 'textarea'"
+                  :bottom-slots="!nully(attr.description)"
                   :clearable="!attr.required"
+                  :label="attr.label"
+                  :type="attr.kind === 'string' ? 'text' : 'textarea'"
+                  dense
                 >
-                  <template v-slot:hint v-if="!nully(attr.description)">
+                  <template #hint v-if="!nully(attr.description)">
                     <span v-html="attr.description"></span>
                   </template>
                 </q-input>
               </template>
               <template v-if="['choice', 'multichoice'].includes(attr.kind)">
                 <q-select
-                  dense
-                  options-dense
-                  map-options
-                  :bottom-slots="!nully(attr.description)"
                   v-model="attr.currentValue"
-                  :options="attr.options"
-                  :multiple="attr.kind === 'multichoice'"
-                  :label="attr.label"
+                  :bottom-slots="!nully(attr.description)"
                   :clearable="!attr.required"
+                  :label="attr.label"
+                  :multiple="attr.kind === 'multichoice'"
+                  :options="attr.options"
+                  dense
+                  map-options
+                  options-dense
                 >
-                  <template v-slot:hint v-if="!nully(attr.description)">
+                  <template #hint v-if="!nully(attr.description)">
                     <span v-html="attr.description"></span>
                   </template>
                 </q-select>
@@ -63,11 +63,11 @@
         </div>
         <q-btn
           v-if="action === 'create'"
-          flat
-          size="xs"
-          label="Insert"
-          class="editor-tb-button"
           @click="insertTag"
+          class="editor-tb-button"
+          label="Insert"
+          size="xs"
+          flat
         />
       </div>
     </q-card>
@@ -75,15 +75,18 @@
 </template>
 
 <script>
+import { groupBy, prop, filter as rFilter } from "ramda";
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
-import { nully } from "@/utils";
-import { useSettingsStore } from "@/stores/settings";
+
 import { CustomIcon } from "@/components";
-import { filter as rFilter, groupBy, prop } from "ramda";
+import { useSettingsStore } from "@/stores/settings";
+import { nully } from "@/utils";
 
 export default defineComponent({
   name: "TeiTagMenu",
-  emits: ["update", "insert"],
+  components: {
+    CustomIcon,
+  },
   props: {
     tagData: {
       type: Object,
@@ -93,19 +96,24 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    attributes: Object,
-    label: String,
-    description: String,
-    from: Number,
-    to: Number,
+    attributes: {
+      type: Object,
+      required: true,
+    },
+    from: {
+      type: Number,
+      required: true,
+    },
+    to: {
+      type: Number,
+      required: true,
+    },
     action: {
       type: String,
       default: "edit",
     },
   },
-  components: {
-    CustomIcon,
-  },
+  emits: ["update", "insert"],
   setup(props, ctx) {
     const settings = useSettingsStore();
     const isCompound = props.elData.compound;

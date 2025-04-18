@@ -1,14 +1,14 @@
 <template>
   <template v-if="compact">
-    <q-icon :name="icon" :style="iconStyle" :color="color">
+    <q-icon :color="color" :name="icon" :style="iconStyle">
       <ToolTip v-if="iconOnly">{{ attachment.filename }}</ToolTip>
     </q-icon>
     <ExternalLink
       v-if="!iconOnly"
-      :url="attachment.source"
       :title="attachment.filename"
-      inline
+      :url="attachment.source"
       class="q-ml-xs"
+      inline
     />
   </template>
   <template v-else>
@@ -23,16 +23,16 @@
       </q-item>
       <q-card-section>
         <q-img :src="attachment.source">
-          <template v-slot:loading>
+          <template #loading>
             <q-spinner />
           </template>
-          <template v-slot:error>
+          <template #error>
             <div class="absolute-full flex flex-center bg-negative text-white">
               Couldn't load attachment
             </div>
           </template>
           <div class="absolute-bottom-right text-subtitle1 text-center">
-            <a :href="attachment.source" target="_blank" class="q-pa-sm text-white">
+            <a :href="attachment.source" class="q-pa-sm text-white" target="_blank">
               {{ attachment.filename }}
             </a>
           </div>
@@ -44,14 +44,24 @@
 </template>
 
 <script>
-import { computed, defineComponent, defineAsyncComponent, inject } from "vue";
-import { useConstants } from "@/use";
+import { computed, defineAsyncComponent, defineComponent, inject } from "vue";
+
 import { AdaptiveSpinner, ExternalLink } from "@/components";
+import { useConstants } from "@/use";
 
 export default defineComponent({
   name: "AttachmentWidget",
+  components: {
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+    AdaptiveSpinner,
+    ExternalLink,
+  },
   props: {
-    file: Object,
+    file: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     iconOnly: {
       type: Boolean,
       default: false,
@@ -73,11 +83,7 @@ export default defineComponent({
       default: "currentColor",
     },
   },
-  components: {
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-    AdaptiveSpinner,
-    ExternalLink,
-  },
+
   setup(props) {
     const attachment = props.file ? props.file : inject("attachment");
     const { attachmentIcons } = useConstants();

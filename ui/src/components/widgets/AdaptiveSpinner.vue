@@ -1,79 +1,78 @@
 <template>
   <div
+    v-if="showing"
     ref="container"
     :class="`spinner-container ${position} ${adaptive ? 'adaptive' : ''}`"
     :style="style"
-    v-if="showing"
   >
     <q-spinner-facebook
       v-if="type === 'facebook'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
     <q-spinner-audio
       v-else-if="type === 'audio'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
     <q-spinner-bars
       v-else-if="type === 'bars'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
     <q-spinner-comment
       v-else-if="type === 'comment'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
     <q-spinner-cube
       v-else-if="type === 'cube'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
     <q-spinner-hourglass
       v-else-if="type === 'hourglass'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
-    <q-spinner-ios v-else-if="type === 'ios'" :size="cSize" :thickness="thickness" :color="color" />
+    <q-spinner-ios v-else-if="type === 'ios'" :color="color" :size="cSize" :thickness="thickness" />
     <q-spinner-orbit
       v-else-if="type === 'orbit'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
     <q-spinner-oval
       v-else-if="type === 'oval'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
-    <q-spinner-pie v-else-if="type === 'pie'" :size="cSize" :thickness="thickness" :color="color" />
+    <q-spinner-pie v-else-if="type === 'pie'" :color="color" :size="cSize" :thickness="thickness" />
     <q-spinner-puff
       v-else-if="type === 'puff'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
     <q-spinner-rings
       v-else-if="type === 'rings'"
+      :color="color"
       :size="cSize"
       :thickness="thickness"
-      :color="color"
     />
-    <q-spinner-dots v-else :size="cSize" :thickness="thickness" :color="color" />
+    <q-spinner-dots v-else :color="color" :size="cSize" :thickness="thickness" />
   </div>
 </template>
 
 <script>
-import { computed } from "vue";
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 
 export default defineComponent({
   name: "AdaptiveSpinner",
@@ -94,7 +93,11 @@ export default defineComponent({
       type: String,
       default: "relative",
     },
-    size: String,
+    size: {
+      type: String,
+      required: false,
+      default: null,
+    },
     color: {
       type: String,
       default: "currentColor",
@@ -119,8 +122,16 @@ export default defineComponent({
       type: [Number, String],
       default: 0,
     },
-    containerHeight: [Number, String],
-    containerWidth: [Number, String],
+    containerHeight: {
+      type: [Number, String],
+      required: false,
+      default: null,
+    },
+    containerWidth: {
+      type: [Number, String],
+      required: false,
+      default: null,
+    },
   },
   setup(props) {
     const cSize = ref(props.size || "2rem");
@@ -149,7 +160,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .spinner-container {
   display: flex;
   align-content: center;

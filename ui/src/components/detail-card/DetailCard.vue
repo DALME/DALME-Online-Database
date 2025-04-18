@@ -1,55 +1,55 @@
 <template>
-  <q-card flat bordered class="detail-card">
-    <q-item dense class="q-pb-none q-px-sm bg-grey-2 text-grey-7">
-      <q-item-section v-if="icon" side class="q-pr-sm">
+  <q-card class="detail-card" bordered flat>
+    <q-item class="q-pb-none q-px-sm bg-grey-2 text-grey-7" dense>
+      <q-item-section v-if="icon" class="q-pr-sm" side>
         <q-icon :name="icon" color="grey-6" size="xs" />
       </q-item-section>
       <q-item-section>
         <q-item-label class="text-subtitle2">
           {{ title }}
-          <q-badge v-if="badgeValue" rounded color="purple-4" align="middle" label="badgeValue" />
+          <q-badge v-if="badgeValue" align="middle" color="purple-4" label="badgeValue" rounded />
         </q-item-label>
       </q-item-section>
       <template v-if="showFilter">
         <q-input
-          dense
-          standout="bg-indigo-6"
-          hide-bottom-space
           v-model="cardFilter"
-          debounce="300"
+          autocapitalize="off"
           autocomplete="off"
           autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          placeholder="Filter"
           class="card-title-search"
           color="indigo-9"
+          debounce="300"
+          placeholder="Filter"
+          spellcheck="false"
+          standout="bg-indigo-6"
+          dense
+          hide-bottom-space
         >
-          <template v-slot:append>
-            <q-icon v-if="cardFilter === ''" name="search" color="blue-grey-5" size="14px" />
+          <template #append>
+            <q-icon v-if="cardFilter === ''" color="blue-grey-5" name="search" size="14px" />
             <q-icon
               v-else
-              name="highlight_off"
+              @click="cardFilter = ''"
               class="cursor-pointer"
               color="blue-grey-5"
+              name="highlight_off"
               size="14px"
-              @click="cardFilter = ''"
             />
           </template>
         </q-input>
       </template>
       <EditButtons
         v-if="editable"
-        :linkable="data.link"
-        cancellable
-        :main-icon="editIcon"
-        :main-color="editColour"
-        :show-main="!saving"
-        :show-cancel="markdown && editOn && editor.hasChanged"
-        :show-spinner="saving"
-        @navigate="router.push(linkTarget)"
         @action="editOn = !editOn"
         @cancel="editor?.onCancel"
+        @navigate="router.push(linkTarget)"
+        :linkable="data.link"
+        :main-color="editColour"
+        :main-icon="editIcon"
+        :show-cancel="markdown && editOn && editor.hasChanged"
+        :show-main="!saving"
+        :show-spinner="saving"
+        cancellable
       />
     </q-item>
     <q-separator class="bg-grey-4" />
@@ -58,19 +58,19 @@
         <template v-for="field in fields" :key="field">
           <ValueDisplay
             :ref="(el) => register(field, el)"
+            @value-changed="valueChanged"
             :data="data[field]"
             :field="field"
-            @value-changed="valueChanged"
           />
         </template>
       </template>
       <template v-else-if="markdown">
         <MarkdownEditor
           ref="md-editor"
+          @on-save-text="valueChanged"
+          :placeholder="data.placeholder"
           :text="data.value"
           in-card
-          @onSaveText="valueChanged"
-          :placeholder="data.placeholder"
         />
       </template>
       <slot v-else>
@@ -82,10 +82,12 @@
 
 <script>
 import { computed, defineComponent, provide, ref, useTemplateRef } from "vue";
-import ValueDisplay from "./ValueDisplay.vue";
+
 import { MarkdownEditor } from "@/components";
 import { isObject } from "@/utils";
+
 import EditButtons from "./EditButtons.vue";
+import ValueDisplay from "./ValueDisplay.vue";
 
 export default defineComponent({
   name: "DetailCard",
@@ -94,9 +96,12 @@ export default defineComponent({
     MarkdownEditor,
     ValueDisplay,
   },
-  emits: ["valueChanged"],
   props: {
-    icon: String,
+    icon: {
+      type: String,
+      required: false,
+      default: "mdiInformationBox",
+    },
     title: {
       type: String,
       required: true,
@@ -105,7 +110,11 @@ export default defineComponent({
       type: String,
       default: "There is no data to show.",
     },
-    badgeValue: Number,
+    badgeValue: {
+      type: Number,
+      required: false,
+      default: null,
+    },
     showFilter: {
       type: Boolean,
       default: false,
@@ -118,15 +127,30 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    fields: Array,
-    data: Object,
-    register: Function,
-    fieldName: String,
+    fields: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+    data: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    register: {
+      type: Function,
+      required: true,
+    },
+    fieldName: {
+      type: String,
+      required: true,
+    },
     markdown: {
       type: Boolean,
       default: false,
     },
   },
+  emits: ["valueChanged"],
 
   setup(props, context) {
     const cardFilter = ref("");
@@ -178,7 +202,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .detail-card {
   border-color: rgb(209, 209, 209);
 }

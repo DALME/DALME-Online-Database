@@ -1,21 +1,21 @@
 <template>
   <div class="map-container">
     <ol-map ref="map" class="map-box">
-      <ol-view :center="centre" :zoom="zoom" :projection="projection" />
+      <ol-view :center="centre" :projection="projection" :zoom="zoom" />
       <ol-tile-layer>
         <ol-source-xyz
-          :url="baseTiles.url"
           :attributions="baseTiles.attributions"
           :max-zoom="baseTiles.maxZoom"
+          :url="baseTiles.url"
         />
       </ol-tile-layer>
       <ol-tile-layer>
         <ol-source-xyz
           v-if="showLabels"
-          :url="labelTiles.url"
           :attributions="labelTiles.attributions"
           :max-zoom="labelTiles.maxZoom"
-          :zDirection="labelTiles.zDirection"
+          :url="labelTiles.url"
+          :z-direction="labelTiles.zDirection"
         />
       </ol-tile-layer>
       <ol-vector-layer declutter="true">
@@ -30,10 +30,10 @@
                 </ol-style-circle>
                 <ol-style-text
                   v-if="pt.label"
-                  :text="pt.label"
                   :offset-y="20"
-                  font="700 14px 'Noto Sans', sans-serif"
+                  :text="pt.label"
                   declutter-mode="obstacle"
+                  font="700 14px 'Noto Sans', sans-serif"
                 />
               </ol-style>
             </ol-feature>
@@ -45,8 +45,8 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeMount, onMounted, ref, useTemplateRef } from "vue";
 import proj4 from "proj4";
+import { defineComponent, onBeforeMount, onMounted, ref, useTemplateRef } from "vue";
 
 export default defineComponent({
   name: "MapWidget",

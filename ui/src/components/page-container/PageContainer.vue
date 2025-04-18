@@ -12,7 +12,7 @@
 import { keys } from "ramda";
 import { computed, defineComponent } from "vue";
 
-import { PageModal, FormModal } from "@/components";
+import { FormModal, PageModal } from "@/components";
 import { useEditing } from "@/use";
 
 const X_ORIGIN = window.innerWidth / 3;

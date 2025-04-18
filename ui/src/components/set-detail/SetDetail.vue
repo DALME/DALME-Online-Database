@@ -27,19 +27,19 @@
             <div class="col-8">{{ set.name }}</div>
           </div>
 
-          <div class="row q-my-xs" v-if="set.setType">
+          <div v-if="set.setType" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Type</div>
             <div class="col-8">{{ set.setType.name }}</div>
           </div>
 
-          <div class="row q-my-xs" v-if="!isNil(set.isPublic)">
+          <div v-if="!isNil(set.isPublic)" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Public</div>
             <div class="col-8">
               <q-icon :name="set.isPublic ? 'done' : 'close'" size="xs" />
             </div>
           </div>
 
-          <div class="row q-my-xs" v-if="!isNil(set.hasLanding)">
+          <div v-if="!isNil(set.hasLanding)" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Has landing</div>
             <div class="col-8">
               <q-icon :name="set.hasLanding ? 'done' : 'close'" size="xs" />
@@ -51,7 +51,7 @@
             <div class="col-8">{{ set.endpoint }}</div>
           </div>
 
-          <div class="row q-my-xs" v-if="set.owner">
+          <div v-if="set.owner" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Owner</div>
             <div class="col-8">
               <router-link
@@ -65,43 +65,43 @@
             </div>
           </div>
 
-          <div class="row q-my-xs" v-if="set.permissions">
+          <div v-if="set.permissions" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Permissions</div>
             <div class="col-8">{{ set.permissions.name }}</div>
           </div>
 
-          <div class="row q-my-xs" v-if="!isNil(set.description)">
+          <div v-if="!isNil(set.description)" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Description</div>
             <div class="col-8">{{ set.description }}</div>
           </div>
 
-          <div class="row q-my-xs" v-if="!isNil(set.statTitle)">
+          <div v-if="!isNil(set.statTitle)" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Stat Title</div>
             <div class="col-8">{{ set.statTitle }}</div>
           </div>
 
-          <div class="row q-my-xs" v-if="!isNil(set.statText)">
+          <div v-if="!isNil(set.statText)" class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">Stat Text</div>
             <div class="col-8">{{ set.statText }}</div>
           </div>
         </q-card-section>
       </q-card>
 
-      <q-card class="q-ma-md q-pa-md" v-if="isWorkset">
-        <div class="row q-my-xs" v-if="!isNil(set.worksetProgress)">
+      <q-card v-if="isWorkset" class="q-ma-md q-pa-md">
+        <div v-if="!isNil(set.worksetProgress)" class="row q-my-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">Progress</div>
           <div class="col-8">
-            <q-linear-progress size="20px" :value="set.worksetProgress" color="teal">
+            <q-linear-progress :value="set.worksetProgress" color="teal" size="20px">
               <div class="absolute-full flex flex-center">
-                <q-badge color="white" text-color="teal" :label="`${set.worksetProgress * 100}%`" />
+                <q-badge :label="`${set.worksetProgress * 100}%`" color="white" text-color="teal" />
               </div>
             </q-linear-progress>
           </div>
         </div>
       </q-card>
 
-      <q-card class="q-ma-md" v-if="hasMembers">
-        <SetMembers :memberCount="set.memberCount" :publicMemberCount="set.publicMemberCount" />
+      <q-card v-if="hasMembers" class="q-ma-md">
+        <SetMembers :member-count="set.memberCount" :public-member-count="set.publicMemberCount" />
       </q-card>
     </q-tab-panel>
   </div>
@@ -109,14 +109,16 @@
 </template>
 
 <script>
-import { isNil } from "ramda";
 import { useMeta } from "quasar";
+import { isNil } from "ramda";
+import { computed, defineComponent, onMounted, provide, ref } from "vue";
 import { useRoute } from "vue-router";
-import { computed, defineComponent, provide, onMounted, ref } from "vue";
+
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components";
 import { setDetailSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
+
 import SetMembers from "./SetMembers.vue";
 
 export default defineComponent({

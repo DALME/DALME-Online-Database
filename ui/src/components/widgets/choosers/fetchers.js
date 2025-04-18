@@ -1,8 +1,8 @@
-import { fetcher } from "@/boot/axios";
-import { default as userRequests } from "@/api/users.js";
 import { default as ticketRequests } from "@/api/tickets.js";
-import { userListSchema } from "@/schemas/users.js";
+import { default as userRequests } from "@/api/users.js";
+import { fetcher } from "@/boot/axios";
 import { ticketListSchema } from "@/schemas/tickets.js";
+import { userListSchema } from "@/schemas/users.js";
 import { nully } from "@/utils/utilities.js";
 
 export const filterItemClass = "text-grey-8";

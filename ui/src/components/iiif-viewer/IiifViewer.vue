@@ -5,22 +5,22 @@
       :class="`viewer-toolbar ${tbVertAlt ? 'toolbar-v' : 'toolbar-h'}`"
       :style="navPosition"
     >
-      <q-btn :disabled="view.currentPageRef === 0" icon="first_page" @click="changePage('first')" />
+      <q-btn @click="changePage('first')" :disabled="view.currentPageRef === 0" icon="first_page" />
       <q-btn
+        @click="changePage('prev')"
         :disabled="view.currentPageRef === 0"
         icon="navigate_before"
-        @click="changePage('prev')"
       />
       <div class="viewer-current-page">{{ currentPageData.name }}</div>
       <q-btn
+        @click="changePage('next')"
         :disabled="view.currentPageRef === pageCount - 1"
         icon="navigate_next"
-        @click="changePage('next')"
       />
       <q-btn
+        @click="changePage('last')"
         :disabled="view.currentPageRef === pageCount - 1"
         icon="last_page"
-        @click="changePage('last')"
       />
     </div>
     <div
@@ -28,53 +28,54 @@
       :style="zoomPosition"
     >
       <q-btn
-        icon="zoom_in"
         @click="zoom('in')"
-        class="zoom-btn"
         :disabled="currentPageData.viewerZoom >= maxZoomLevel"
+        class="zoom-btn"
+        icon="zoom_in"
       />
       <q-btn
-        icon="zoom_out"
         @click="zoom('out')"
-        class="zoom-btn"
         :disabled="currentPageData.viewerZoom <= minZoomLevel"
+        class="zoom-btn"
+        icon="zoom_out"
       />
-      <q-btn icon="aspect_ratio" @click="zoom('full')" />
-      <q-btn icon="expand" @click="zoom('fitV')" />
+      <q-btn @click="zoom('full')" icon="aspect_ratio" />
+      <q-btn @click="zoom('fitV')" icon="expand" />
       <q-btn @click="zoom('fitH')">
-        <q-icon name="expand" class="rotate-90" />
+        <q-icon class="rotate-90" name="expand" />
       </q-btn>
     </div>
-    <div class="viewer-toolbar toolbar-h" :style="toolPosition">
+    <div :style="toolPosition" class="viewer-toolbar toolbar-h">
       <q-btn
-        :icon="view.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'"
         @click="changeSplitView"
+        :icon="view.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'"
       />
       <q-btn
         v-if="pageCount > 1"
-        icon="o_auto_stories"
-        :class="view.pageDrawerMini ? '' : 'crossed-out'"
         @click="changeDrawerMini"
+        :class="view.pageDrawerMini ? '' : 'crossed-out'"
+        icon="o_auto_stories"
       />
     </div>
   </div>
 </template>
 
 <script>
+import OpenSeadragon from "openseadragon";
 import { isEmpty } from "ramda";
 import {
   computed,
   defineComponent,
   inject,
   markRaw,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   ref,
   watch,
-  nextTick,
 } from "vue";
+
 import { useStores } from "@/use";
-import OpenSeadragon from "openseadragon";
 
 export default defineComponent({
   name: "IiifViewer",

@@ -1,4 +1,5 @@
 import * as yup from "yup";
+
 import { transcriptionsFieldSchema } from "@/schemas";
 
 export const pageFieldSchema = yup.object().shape({

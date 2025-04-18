@@ -1,33 +1,33 @@
 <template>
   <div class="mde-toolbar">
     <q-resize-observer @resize="setWidth" debounce="1000" />
-    <q-btn icon="mdi-format-header-pound" @click="$emit('insertEnclosure', ['### ', ''])">
+    <q-btn @click="$emit('insertEnclosure', ['### ', ''])" icon="mdi-format-header-pound">
       <ToolTip>Add heading</ToolTip>
     </q-btn>
-    <q-btn icon="mdi-format-bold" @click="$emit('insertEnclosure', ['**', '**'])">
+    <q-btn @click="$emit('insertEnclosure', ['**', '**'])" icon="mdi-format-bold">
       <ToolTip>Add bold text</ToolTip>
     </q-btn>
-    <q-btn icon="mdi-format-italic" @click="$emit('insertEnclosure', ['*', '*'])">
+    <q-btn @click="$emit('insertEnclosure', ['*', '*'])" icon="mdi-format-italic">
       <ToolTip>Add italic text</ToolTip>
     </q-btn>
-    <q-btn icon="mdi-format-strikethrough" @click="$emit('insertEnclosure', ['~~', '~~'])">
+    <q-btn @click="$emit('insertEnclosure', ['~~', '~~'])" icon="mdi-format-strikethrough">
       <ToolTip>Add strike-through text</ToolTip>
     </q-btn>
-    <q-separator vertical spaced />
-    <q-btn v-if="width >= 300" icon="mdi-format-quote-close" @click="$emit('insertPrefix', '> ')">
+    <q-separator spaced vertical />
+    <q-btn v-if="width >= 300" @click="$emit('insertPrefix', '> ')" icon="mdi-format-quote-close">
       <ToolTip>Insert a quote</ToolTip>
     </q-btn>
     <q-btn v-if="width >= 300" icon="mdi-code-braces">
       <ToolTip>Insert code</ToolTip>
-      <q-menu cover class="popup-menu" :class="dark ? 'dark' : ''">
+      <q-menu :class="dark ? 'dark' : ''" class="popup-menu" cover>
         <q-list>
           <q-item
-            dense
             v-for="(option, idx) in codeOptions"
             :key="idx"
-            clickable
             v-close-popup
             @click="$emit('insertEnclosure', ['\`\`\`' + option.value + '\\n', '\\n\`\`\`'])"
+            clickable
+            dense
           >
             <q-item-section>
               <span v-text="option.label" />
@@ -36,65 +36,65 @@
         </q-list>
       </q-menu>
     </q-btn>
-    <q-btn v-if="width >= 300" icon="mdi-link" @click="$emit('insertEnclosure', ['[', '](url)'])">
+    <q-btn v-if="width >= 300" @click="$emit('insertEnclosure', ['[', '](url)'])" icon="mdi-link">
       <ToolTip>Insert a link</ToolTip>
     </q-btn>
     <q-btn
       v-if="width >= 300"
-      icon="mdi-note"
       @click="$emit('insertEnclosure', [':::\n', '\n:::'])"
+      icon="mdi-note"
     >
       <ToolTip>Insert a note</ToolTip>
     </q-btn>
-    <q-separator v-if="width >= 300" vertical spaced />
-    <q-btn v-if="width >= 395" icon="mdi-format-list-bulleted" @click="$emit('insertPrefix', '- ')">
+    <q-separator v-if="width >= 300" spaced vertical />
+    <q-btn v-if="width >= 395" @click="$emit('insertPrefix', '- ')" icon="mdi-format-list-bulleted">
       <ToolTip>Add a bulleted list</ToolTip>
     </q-btn>
     <q-btn
       v-if="width >= 395"
-      icon="mdi-format-list-numbered"
       @click="$emit('insertPrefix', 'numbered')"
+      icon="mdi-format-list-numbered"
     >
       <ToolTip>Add a numbered list</ToolTip>
     </q-btn>
     <q-btn
       v-if="width >= 395"
-      icon="mdi-format-list-checks"
       @click="$emit('insertPrefix', '- [ ] ')"
+      icon="mdi-format-list-checks"
     >
       <ToolTip>Add a task list</ToolTip>
     </q-btn>
-    <q-separator v-if="width >= 395" vertical spaced />
+    <q-separator v-if="width >= 395" spaced vertical />
     <GeneralChooser
       v-if="width >= 420"
+      @item-chosen="onUserSelected"
       :dark="dark"
       :toggle="false"
-      type="users"
       icon="mdi-account-multiple-plus"
       return-field="username"
       tooltip="Mention another user"
-      @item-chosen="onUserSelected"
+      type="users"
     />
     <GeneralChooser
       v-if="width >= 420"
+      @item-chosen="onTicketSelected"
       :dark="dark"
       :toggle="false"
-      type="tickets"
       icon="mdi-bug"
       return-field="number"
       tooltip="Reference a ticket"
-      @item-chosen="onTicketSelected"
+      type="tickets"
     />
 
     <q-btn v-if="width < 420" icon="mdi-dots-vertical">
-      <q-menu cover class="popup-menu" :class="dark ? 'dark' : ''">
+      <q-menu :class="dark ? 'dark' : ''" class="popup-menu" cover>
         <q-list>
           <q-item
             v-if="width < 300"
-            dense
-            clickable
             v-close-popup
             @click="$emit('insertPrefix', '> ')"
+            clickable
+            dense
           >
             <q-item-section avatar>
               <q-icon name="mdi-format-quote-close" />
@@ -102,20 +102,20 @@
             <q-item-section>Insert a quote</q-item-section>
           </q-item>
 
-          <q-item clickable dense v-if="width < 300">
+          <q-item v-if="width < 300" clickable dense>
             <q-item-section avatar>
               <q-icon name="mdi-code-braces" />
             </q-item-section>
             <q-item-section>Insert code</q-item-section>
-            <q-menu cover class="popup-menu" :class="dark ? 'dark' : ''">
+            <q-menu :class="dark ? 'dark' : ''" class="popup-menu" cover>
               <q-list>
                 <q-item
-                  dense
                   v-for="(option, idx) in codeOptions"
                   :key="idx"
-                  clickable
                   v-close-popup
                   @click="$emit('insertEnclosure', ['\`\`\`' + option.value + '\\n', '\\n\`\`\`'])"
+                  clickable
+                  dense
                 >
                   <q-item-section>
                     <span v-text="option.label" />
@@ -127,10 +127,10 @@
 
           <q-item
             v-if="width < 300"
-            dense
-            clickable
             v-close-popup
             @click="$emit('insertEnclosure', ['[', '](url)'])"
+            clickable
+            dense
           >
             <q-item-section avatar>
               <q-icon name="mdi-link" />
@@ -140,10 +140,10 @@
 
           <q-item
             v-if="width < 300"
-            dense
-            clickable
             v-close-popup
             @click="$emit('insertEnclosure', [':::\n', '\n:::'])"
+            clickable
+            dense
           >
             <q-item-section avatar>
               <q-icon name="mdi-note" />
@@ -151,14 +151,14 @@
             <q-item-section>Insert a note</q-item-section>
           </q-item>
 
-          <q-separator spaced v-if="width < 300" />
+          <q-separator v-if="width < 300" spaced />
 
           <q-item
             v-if="width < 395"
-            dense
-            clickable
             v-close-popup
             @click="$emit('insertPrefix', '- ')"
+            clickable
+            dense
           >
             <q-item-section avatar>
               <q-icon name="mdi-format-list-bulleted" />
@@ -168,10 +168,10 @@
 
           <q-item
             v-if="width < 395"
-            dense
-            clickable
             v-close-popup
             @click="$emit('insertPrefix', 'numbered')"
+            clickable
+            dense
           >
             <q-item-section avatar>
               <q-icon name="mdi-format-list-numbered" />
@@ -181,10 +181,10 @@
 
           <q-item
             v-if="width < 395"
-            dense
-            clickable
             v-close-popup
             @click="$emit('insertPrefix', '- [ ] ')"
+            clickable
+            dense
           >
             <q-item-section avatar>
               <q-icon name="mdi-format-list-checks" />
@@ -192,28 +192,28 @@
             <q-item-section>Add a task list</q-item-section>
           </q-item>
 
-          <q-separator spaced v-if="width < 395" />
+          <q-separator v-if="width < 395" spaced />
 
           <GeneralChooser
             v-if="width < 420"
-            item
-            :dark="dark"
-            type="users"
-            icon="mdi-account-multiple-plus"
-            return-field="username"
-            label="Mention another user"
             @item-chosen="onUserSelected"
+            :dark="dark"
+            icon="mdi-account-multiple-plus"
+            label="Mention another user"
+            return-field="username"
+            type="users"
+            item
           />
 
           <GeneralChooser
             v-if="width < 420"
-            item
-            :dark="dark"
-            type="tickets"
-            icon="mdi-bug"
-            return-field="number"
-            label="Reference a ticket"
             @item-chosen="onTicketSelected"
+            :dark="dark"
+            icon="mdi-bug"
+            label="Reference a ticket"
+            return-field="number"
+            type="tickets"
+            item
           />
         </q-list>
       </q-menu>
@@ -223,20 +223,21 @@
 
 <script>
 import { defineComponent, inject, ref } from "vue";
+
 import { GeneralChooser, ToolTip } from "@/components/widgets";
 
 export default defineComponent({
   name: "MDEToolbar",
+  components: {
+    GeneralChooser,
+    ToolTip,
+  },
   props: {
     dark: {
       type: Boolean,
       required: false,
       default: false,
     },
-  },
-  components: {
-    GeneralChooser,
-    ToolTip,
   },
   emits: ["insertEnclosure", "insertPrefix"],
   setup() {
@@ -267,7 +268,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .md-editor-container .mde-toolbar {
   display: flex;
   flex-grow: 1;

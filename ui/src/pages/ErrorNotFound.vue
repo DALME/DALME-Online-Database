@@ -8,11 +8,11 @@
       <q-btn
         class="q-mt-xl"
         color="white"
-        text-color="blue"
-        unelevated
-        to="/"
         label="Go Home"
+        text-color="blue"
+        to="/"
         no-caps
+        unelevated
       />
     </div>
   </div>

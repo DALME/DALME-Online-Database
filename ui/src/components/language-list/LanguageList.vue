@@ -1,26 +1,26 @@
 <template>
   <DataTable
     :columns="columns"
-    :search="search"
-    :filterList="filterList"
+    :filter-list="filterList"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onChangeFilters="onChangeFilters"
-    :onClearFilters="onClearFilters"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-filters="onChangeFilters"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-clear-filters="onClearFilters"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
+    :search="search"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
   >
-    <template v-slot:render-cell-type="props">
+    <template #render-cell-type="props">
       <span v-text="props.row.isDialect ? 'Dialect' : 'Language'"></span>
     </template>
 
-    <template v-slot:render-cell-parent="props">
+    <template #render-cell-parent="props">
       <template v-if="props.row.parent">
         {{ props.row.parent.name }}
       </template>
@@ -31,11 +31,13 @@
 <script>
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
 import { DataTable } from "@/components";
-import { getColumns, getDefaults } from "@/utils";
 import { languageListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
+import { getColumns, getDefaults } from "@/utils";
+
 import { columnMap } from "./columns";
 import { filterList } from "./filters";
 

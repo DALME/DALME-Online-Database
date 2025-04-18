@@ -3,10 +3,10 @@ import { markRaw } from "vue";
 import { requests } from "@/api";
 import { AttributesField, InputField } from "@/components/forms";
 import {
-  attributeValidators,
   archiveEditSchema,
   archiveFieldValidation,
-  sourceSubmitSchemas,
+  attributeValidators,
+  recordSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = ["defaultRights", "email", "locale", "streetAddress", "url"];
@@ -50,5 +50,5 @@ export default {
   edit: archiveEditSchema,
   form: archiveFormSchema,
   requests: archiveRequests,
-  submit: sourceSubmitSchemas,
+  submit: recordSubmitSchemas,
 };

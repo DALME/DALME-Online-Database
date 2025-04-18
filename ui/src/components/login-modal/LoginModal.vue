@@ -1,11 +1,11 @@
 <template>
   <q-dialog
-    v-model="auth.unauthorized"
-    persistent
-    transition-show="scale"
-    transition-hide="scale"
-    class="frosted-background login-dialog"
     v-if="pageBackdropLoaded"
+    v-model="auth.unauthorized"
+    class="frosted-background login-dialog"
+    transition-hide="scale"
+    transition-show="scale"
+    persistent
   >
     <q-card class="login-modal">
       <q-card-section class="login-card-header">
@@ -20,66 +20,66 @@
           </div>
           <q-form @submit="onSubmit" class="q-gutter-sm">
             <q-input
-              placeholder="Username"
               v-model="username"
-              dense
-              outlined
-              color="indigo-6"
-              bg-color="white"
-              hide-bottom-space
+              :rules="usernameRules"
+              autocapitalize="off"
               autocomplete="off"
               autocorrect="off"
-              autocapitalize="off"
+              bg-color="white"
+              color="indigo-6"
+              placeholder="Username"
               spellcheck="false"
+              dense
+              hide-bottom-space
               lazy-rules
-              :rules="usernameRules"
+              outlined
             />
 
             <q-input
               v-model="password"
-              placeholder="Password"
-              dense
-              outlined
-              color="indigo-6"
-              bg-color="white"
-              lazy-rules
-              hide-bottom-space
+              :rules="passwordRules"
+              :type="isPassword ? 'password' : 'text'"
+              autocapitalize="off"
               autocomplete="off"
               autocorrect="off"
-              autocapitalize="off"
+              bg-color="white"
+              color="indigo-6"
+              placeholder="Password"
               spellcheck="false"
-              :type="isPassword ? 'password' : 'text'"
-              :rules="passwordRules"
+              dense
+              hide-bottom-space
+              lazy-rules
+              outlined
             >
-              <template v-slot:append>
+              <template #append>
                 <q-icon
-                  class="cursor-pointer"
-                  :name="isPassword ? 'visibility_off' : 'visibility'"
                   @click.stop="isPassword = !isPassword"
+                  :name="isPassword ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
                 />
               </template>
             </q-input>
 
             <div class="row justify-center q-mt-sm q-pt-md">
               <q-btn
-                unelevated
-                no-caps
-                label="Log in"
-                type="submit"
-                class="login-modal-button"
-                color="indigo-6"
-                padding="sm 5rem"
-                preventClose="true"
                 :disable="disabled"
                 :loading="submitting"
+                class="login-modal-button"
+                color="indigo-6"
+                label="Log in"
+                padding="sm 5rem"
+                prevent-close="true"
+                type="submit"
+                no-caps
+                unelevated
               >
-                <template v-slot:loading>
+                <template #loading>
                   <q-spinner-facebook />
                 </template>
               </q-btn>
             </div>
             <div class="row justify-center text-indigo-6 login-modal-link">
-              <a href="" class="text-link">Recover password</a>
+              <a class="text-link" href="">Recover password</a>
               <span v-if="auth.reauthenticate" class="text-grey-7 q-mx-sm">|</span>
               <a v-if="auth.reauthenticate" @click="logout" class="text-link cursor-pointer">
                 Log out
@@ -89,12 +89,12 @@
         </template>
         <AdaptiveSpinner
           v-else
-          type="facebook"
-          color="indigo-3"
-          size="100px"
-          class="q-ma-auto"
           :container-height="240"
           :container-width="250"
+          class="q-ma-auto"
+          color="indigo-3"
+          size="100px"
+          type="facebook"
         />
       </q-card-section>
     </q-card>
@@ -104,10 +104,11 @@
 <script>
 import { any, isEmpty } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
-import { requests } from "@/api";
-import { useAPI, useEventHandling, useStores } from "@/use";
 import { useRoute } from "vue-router";
+
+import { requests } from "@/api";
 import { AdaptiveSpinner } from "@/components";
+import { useAPI, useEventHandling, useStores } from "@/use";
 
 export default defineComponent({
   name: "LoginModal",
@@ -176,7 +177,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .login-modal {
   min-width: 400px;
   box-shadow: 0px 0px 20px 3px #212f3a8c;

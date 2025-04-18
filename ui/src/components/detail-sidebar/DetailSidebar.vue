@@ -9,17 +9,27 @@
 
 <script>
 import { defineComponent } from "vue";
+
 import { copyToClipboard } from "@/utils";
+
 import DetailElement from "./DetailElement.vue";
 
 export default defineComponent({
   name: "DetailSidebar",
-  props: {
-    fields: Array,
-    data: Object,
-  },
   components: {
     DetailElement,
+  },
+  props: {
+    fields: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+    data: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   setup() {
     return { copyToClipboard };
@@ -27,7 +37,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .detail-sidebar-item {
   padding-bottom: 12px;
   margin-bottom: 12px;

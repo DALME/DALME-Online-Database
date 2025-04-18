@@ -1,16 +1,16 @@
 <template>
-  <q-card flat :bordered="!inCard" :class="containerClasses">
+  <q-card :bordered="!inCard" :class="containerClasses" flat>
     <Transition enter-active-class="animated slideInDown">
       <div v-if="isEditable" class="md-editor-header">
-        <q-tabs v-model="mdTab" dense indicator-color="transparent" no-caps>
-          <q-tab name="write" label="Write" />
-          <q-tab name="preview" label="Preview" :disable="!mdText" />
+        <q-tabs v-model="mdTab" indicator-color="transparent" dense no-caps>
+          <q-tab label="Write" name="write" />
+          <q-tab :disable="!mdText" label="Preview" name="preview" />
         </q-tabs>
 
         <MDEToolbar
-          :dark="dark"
           @insert-enclosure="insertEnclosure"
           @insert-prefix="insertPrefix"
+          :dark="dark"
         />
       </div>
     </Transition>
@@ -18,28 +18,28 @@
     <q-tab-panels
       v-if="isEditable"
       v-model="mdTab"
-      keep-alive
-      animated
-      transition-prev="jump-up"
       transition-next="jump-up"
+      transition-prev="jump-up"
+      animated
+      keep-alive
     >
-      <q-tab-panel name="write" class="q-pa-md">
+      <q-tab-panel class="q-pa-md" name="write">
         <q-input
-          type="textarea"
           ref="input"
           v-model="mdText"
-          outlined
-          dense
           autocapitalize="off"
           autocomplete="off"
           autocorrect="off"
+          type="textarea"
+          dense
+          outlined
         />
       </q-tab-panel>
-      <q-tab-panel name="preview" class="q-pa-md">
+      <q-tab-panel class="q-pa-md" name="preview">
         <q-markdown
           :class="dark ? 'dark' : ''"
-          :src="mdText"
           :extend="extendMarkdown"
+          :src="mdText"
           style="min-height: 124px"
           task-lists-enable
         />
@@ -48,37 +48,37 @@
 
     <q-markdown
       v-else
-      class="md-editor-readonly"
-      :src="mdText ? mdText : pHolder"
       :extend="extendMarkdown"
+      :src="mdText ? mdText : placeholder"
+      class="md-editor-readonly"
       task-lists-enable
     />
 
     <Transition enter-active-class="animated slideInUp">
       <div v-if="isEditable" class="md-editor-footer">
         <q-icon
-          size="sm"
-          name="mdi-language-markdown"
           @click="openMarkdown"
           class="cursor-pointer q-mr-sm"
+          name="mdi-language-markdown"
+          size="sm"
         />
         <div v-if="help" class="text-caption">{{ help }}</div>
         <q-space />
         <q-btn
           v-if="!inCard"
-          dense
-          class="md-button cancel text-roboto q-mr-sm"
-          :disable="!hasChanged"
-          label="cancel"
           @click="onCancel"
+          :disable="!hasChanged"
+          class="md-button cancel text-roboto q-mr-sm"
+          label="cancel"
+          dense
         />
         <q-btn
           v-if="!inCard"
-          dense
-          class="md-button submit text-roboto"
-          :disable="!hasChanged"
-          :label="buttonLabel"
           @click="onSubmit"
+          :disable="!hasChanged"
+          :label="submitLabel"
+          class="md-button submit text-roboto"
+          dense
         />
       </div>
     </Transition>
@@ -88,10 +88,14 @@
 <script>
 import { openURL } from "quasar";
 import { computed, defineComponent, inject, provide, ref, watch } from "vue";
+
 import MDEToolbar from "./MDEToolbar.vue";
 
 export default defineComponent({
   name: "MarkdownEditor",
+  components: {
+    MDEToolbar,
+  },
   props: {
     dark: {
       type: Boolean,
@@ -109,24 +113,31 @@ export default defineComponent({
       type: String,
       default: "",
     },
-    placeholder: String,
-    help: String,
-    submitLabel: String,
+    placeholder: {
+      type: String,
+      required: false,
+      default: "Enter text here...",
+    },
+    help: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    submitLabel: {
+      type: String,
+      required: false,
+      default: "Save",
+    },
     inCard: {
       type: Boolean,
       default: false,
     },
   },
-  components: {
-    MDEToolbar,
-  },
   emits: ["onSaveText"],
   setup(props, context) {
     const input = ref(null);
     const textareaEl = computed(() => input.value.getNativeElement());
-    const buttonLabel = props.submitLabel || "Save";
     const mdText = ref(props.text);
-    const pHolder = props.placeholder || "Enter text here...";
     const mdTab = ref("write");
     const hasChanged = computed(() => mdText.value !== props.text);
     const isEditable = props.inCard ? inject("editOn", false) : props.editable;
@@ -248,7 +259,6 @@ export default defineComponent({
     }
 
     return {
-      buttonLabel,
       hasChanged,
       extendMarkdown,
       insertEnclosure,
@@ -261,7 +271,6 @@ export default defineComponent({
       openMarkdown,
       onUserSelected,
       onTicketSelected,
-      pHolder,
       resetEditor,
       textareaEl,
       containerClasses,
@@ -272,7 +281,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .md-editor-container {
   --base-colour: var(--light-bg-base-colour);
   --bg-colour: var(--light-bg-raised-colour);

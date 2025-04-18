@@ -1,8 +1,8 @@
 <template>
-  <q-card flat bordered class="detail-card full-width">
-    <q-item dense class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5">
-      <q-item-section side class="q-pr-sm">
-        <q-icon name="settings" color="indigo-5" size="xs" />
+  <q-card class="detail-card full-width" bordered flat>
+    <q-item class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5" dense>
+      <q-item-section class="q-pr-sm" side>
+        <q-icon color="indigo-5" name="settings" size="xs" />
       </q-item-section>
       <q-item-section>
         <q-item-label class="text-subtitle2">Preferences</q-item-label>
@@ -12,29 +12,29 @@
     <q-card-section class="q-pa-none">
       <q-tabs
         v-model="tab"
-        dense
-        class="text-grey"
         active-color="primary"
-        indicator-color="primary"
         align="left"
-        no-caps
+        class="text-grey"
+        indicator-color="primary"
+        dense
         narrow-indicator
+        no-caps
       >
-        <q-tab name="ui" label="User Interface" />
-        <q-tab name="editor" label="Source Editor" />
+        <q-tab label="User Interface" name="ui" />
+        <q-tab label="Source Editor" name="editor" />
       </q-tabs>
       <q-separator />
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="ui">
           <q-list>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="tooltipsOn"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -44,14 +44,14 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="sidebarCollapsed"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -67,8 +67,8 @@
           <q-list>
             <q-item>
               <q-item-section avatar>
-                <q-select dense v-model="theme" :options="themeList">
-                  <template v-slot:option="scope">
+                <q-select v-model="theme" :options="themeList" dense>
+                  <template #option="scope">
                     <q-item dense v-bind="scope.itemProps">
                       <q-item-section>
                         <q-item-label>{{ scope.opt.label }}</q-item-label>
@@ -89,10 +89,10 @@
               <q-item-section avatar>
                 <q-input
                   v-model.number="fontSize"
-                  type="number"
-                  filled
                   style="width: 80px"
                   suffix="px"
+                  type="number"
+                  filled
                 />
               </q-item-section>
               <q-item-section>
@@ -102,14 +102,14 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="highlightWord"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -120,14 +120,14 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="showGuides"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -135,14 +135,14 @@
                 <q-item-label caption>??</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="showGutter"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -152,14 +152,14 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="showInvisibles"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -169,14 +169,14 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="showLineNumbers"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -187,14 +187,14 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item tag="label" v-ripple>
+            <q-item v-ripple tag="label">
               <q-item-section avatar>
                 <q-toggle
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
                   v-model="softWrap"
+                  checked-icon="visibility"
+                  color="green"
                   size="lg"
+                  unchecked-icon="visibility_off"
                 />
               </q-item-section>
               <q-item-section>
@@ -213,6 +213,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+
 import { useStores } from "@/use";
 
 const themeList = [

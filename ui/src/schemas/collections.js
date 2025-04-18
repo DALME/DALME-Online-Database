@@ -3,8 +3,8 @@ import * as yup from "yup";
 import {
   attributeSchema,
   attributesFieldSchema,
-  userAttributeSchema,
   groupAttributeSchema,
+  userAttributeSchema,
 } from "@/schemas";
 
 export const collectionAttributeSchema = yup.object().shape({

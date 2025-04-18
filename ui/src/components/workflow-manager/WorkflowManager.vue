@@ -1,14 +1,14 @@
 <template>
   <div class="column">
     <q-btn-dropdown
+      :class="`workflow-button bg-grey-2`"
+      :icon="icon"
+      :label="data.status.text"
+      :text-color="colours.text"
+      size="sm"
       dense
       outline
       split
-      size="sm"
-      :icon="icon"
-      :text-color="colours.text"
-      :class="`workflow-button bg-grey-2`"
-      :label="data.status.text"
     >
       <q-card class="workflow-card">
         <q-card-section horizontal>
@@ -19,8 +19,8 @@
                 <q-badge
                   class="status-badge"
                   color="orange-1"
-                  text-color="orange-9"
                   label="assessment"
+                  text-color="orange-9"
                 />
                 <span>.</span>
               </div>
@@ -29,8 +29,8 @@
                 <q-badge
                   class="status-badge"
                   color="green-1"
-                  text-color="green-10"
                   label="completed"
+                  text-color="green-10"
                 />
                 <span>.</span>
               </div>
@@ -44,8 +44,8 @@
                   <q-badge
                     class="status-badge"
                     color="deep-purple-1"
-                    text-color="deep-purple-8"
                     label="parsing"
+                    text-color="deep-purple-8"
                   />
                   <span>.</span>
                 </div>
@@ -53,19 +53,19 @@
                   <div v-if="currentStageDone">
                     <span>The record is awaiting </span>
                     <q-badge
+                      :label="nextStage"
                       class="status-badge"
                       color="deep-purple-1"
                       text-color="deep-purple-8"
-                      :label="nextStage"
                     />
                     <span>.</span>
                   </div>
                   <div v-else>
                     <q-badge
+                      :label="currentStage"
                       class="status-badge plus-text"
                       color="blue-1"
                       text-color="blue-9"
-                      :label="currentStage"
                     />
                     <span>is in progress.</span>
                   </div>
@@ -76,53 +76,53 @@
                 <q-badge
                   class="status-badge plus-text"
                   color="red-1"
-                  text-color="red-10"
                   label="help flag"
+                  text-color="red-10"
                 />
                 <span>requesting assistance is currently set on this record.</span>
               </div>
             </div>
           </q-card-section>
           <q-card-section>
-            <q-list dense separator class="status-menu text-grey-9">
+            <q-list class="status-menu text-grey-9" dense separator>
               <q-item
                 v-if="stageMenu.show"
-                clickable
                 v-close-popup
-                :disable="stageMenu.disabled"
                 @click="stageMenu.handler"
+                :disable="stageMenu.disabled"
+                clickable
               >
                 <q-item-section avatar>
-                  <q-icon :name="stageMenu.icon" size="xs" color="grey-6" />
+                  <q-icon :name="stageMenu.icon" color="grey-6" size="xs" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>{{ stageMenu.label }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item clickable v-close-popup @click="toggleHelp">
+              <q-item v-close-popup @click="toggleHelp" clickable>
                 <q-item-section avatar>
-                  <q-icon :name="helpFlagMenu.icon" size="xs" color="grey-6" />
+                  <q-icon :name="helpFlagMenu.icon" color="grey-6" size="xs" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>{{ helpFlagMenu.label }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item v-if="assessmentMenu.show" clickable v-close-popup @click="toggleAssessment">
+              <q-item v-if="assessmentMenu.show" v-close-popup @click="toggleAssessment" clickable>
                 <q-item-section avatar>
-                  <q-icon :name="assessmentMenu.icon" size="xs" color="grey-6" />
+                  <q-icon :name="assessmentMenu.icon" color="grey-6" size="xs" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>{{ assessmentMenu.label }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item
-                clickable
                 v-close-popup
-                :disable="publicationMenu.disabled"
                 @click="togglePublic"
+                :disable="publicationMenu.disabled"
+                clickable
               >
                 <q-item-section avatar>
-                  <q-icon :name="publicationMenu.icon" size="xs" color="grey-6" />
+                  <q-icon :name="publicationMenu.icon" color="grey-6" size="xs" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>{{ publicationMenu.label }}</q-item-label>
@@ -144,6 +144,7 @@
 
 <script>
 import { computed, defineComponent } from "vue";
+
 import { useConstants } from "@/use";
 
 export default defineComponent({
@@ -260,7 +261,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .workflow-button > button {
   padding-right: 10px;
 }

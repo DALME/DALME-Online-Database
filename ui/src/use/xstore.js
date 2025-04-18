@@ -1,7 +1,7 @@
 // Allow xstate machines to be embedded as data in stores.
+import { useStorage } from "@vueuse/core";
 import { markRaw, shallowRef } from "vue";
 import { createActor } from "xstate";
-import { useStorage } from "@vueuse/core";
 
 const inspect =
   process.env.NODE_ENV === "development" && process.env.VITE_INSPECT_ACTORS === "true"

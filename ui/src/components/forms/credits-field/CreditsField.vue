@@ -1,30 +1,30 @@
 <template>
-  <div class="credits-field column q-my-sm" :class="{ separator: !showing }">
+  <div :class="{ separator: !showing }" class="credits-field column q-my-sm">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
-        {{ !showing && modelValue !== [empty()] ? `Credits (${modelValue.length})` : "Credits" }}
+        {{ !showing && !empty(modelValue) ? `Credits (${modelValue.length})` : "Credits" }}
       </div>
 
       <q-spinner v-if="loading" color="primary" size="xs" />
       <q-btn
         v-show="showing"
-        round
+        @click.stop="handleAddField"
         class="q-ml-sm"
         color="amber"
         icon="add"
         size="xs"
         text-color="black"
-        @click.stop="handleAddField"
+        round
       >
         <ToolTip> Add a credit </ToolTip>
       </q-btn>
 
       <q-btn
-        round
+        @click.stop="showing = !showing"
+        :icon="showing ? 'visibility_off' : 'visibility'"
         class="q-ml-sm"
         size="xs"
-        :icon="showing ? 'visibility_off' : 'visibility'"
-        @click.stop="showing = !showing"
+        round
       >
         <ToolTip>
           {{ showing ? "Hide credits" : "Show credits" }}
@@ -39,50 +39,50 @@
     <template v-if="showing">
       <template v-if="modelValue.length > 0">
         <template v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)" :key="field.key">
-          <div class="row q-mb-sm" v-show="showing">
+          <div v-show="showing" class="row q-mb-sm">
             <div class="col-6 q-pr-sm">
               <SelectField
-                label="Agent"
-                :field="`credits[${idx}].agent`"
-                :filterable="true"
-                :getOptions="getAgentOptions"
-                :optionsSchema="agentOptionsSchema"
-                :validation="validators.agent"
                 v-model="data.agent"
                 @clear="() => handleClearAgent(idx)"
+                :field="`credits[${idx}].agent`"
+                :filterable="true"
+                :get-options="getAgentOptions"
+                :options-schema="agentOptionsSchema"
+                :validation="validators.agent"
+                label="Agent"
               />
             </div>
             <div class="q-pl-sm col-4">
               <SelectField
-                :field="`credits[${idx}].role`"
-                :disable="!data.agent"
-                :label="data.agent ? 'Role' : 'Choose an agent'"
-                :filterable="false"
-                :getOptions="getRoleOptions(idx)"
-                :optionsSchema="creditRoleOptionsSchema"
-                :validation="validators.role"
                 v-model="data.role"
+                :disable="!data.agent"
+                :field="`credits[${idx}].role`"
+                :filterable="false"
+                :get-options="getRoleOptions(idx)"
+                :label="data.agent ? 'Role' : 'Choose an agent'"
+                :options-schema="creditRoleOptionsSchema"
+                :validation="validators.role"
               />
             </div>
             <div class="q-pl-sm col">
               <div class="row flex-center full-height">
                 <q-btn
-                  flat
-                  round
-                  icon="notes"
                   :color="!(data.agent && data.role) ? 'grey' : 'black'"
                   :disable="!(data.agent && data.role)"
+                  icon="notes"
+                  flat
+                  round
                 >
                   <q-popup-edit
-                    buttons
-                    fit
+                    v-model="data.note"
+                    @hide="noteValidation"
+                    :validate="noteValidation"
                     anchor="bottom right"
                     class="z-max column"
-                    v-model="data.note"
-                    :validate="noteValidation"
-                    @hide="noteValidation"
+                    buttons
+                    fit
                   >
-                    <template v-slot="scope">
+                    <template #default="scope">
                       <div class="column">
                         <div class="column">
                           <code class="text-caption text-grey" style="font-size: 0.75rem">
@@ -97,14 +97,14 @@
                           </span>
                         </div>
                         <q-input
-                          counter
-                          dense
-                          autofocus
-                          type="textarea"
-                          :error="noteError"
-                          :error-message="noteErrorMessage"
                           v-model="scope.value"
                           @keyup.enter.stop
+                          :error="noteError"
+                          :error-message="noteErrorMessage"
+                          type="textarea"
+                          autofocus
+                          counter
+                          dense
                         />
                       </div>
                     </template>
@@ -117,13 +117,13 @@
 
             <div class="row items-center">
               <q-btn
+                @click.stop="handleRemoveField(idx)"
                 class="q-ml-auto"
+                icon="clear"
+                size="xs"
                 flat
                 round
                 unelevated
-                size="xs"
-                icon="clear"
-                @click.stop="handleRemoveField(idx)"
               >
               </q-btn>
             </div>
@@ -140,9 +140,10 @@
 </template>
 
 <script>
-import { filter as rFilter, isEmpty, isNil, map as rMap, keys, reduce, zip } from "ramda";
+import { isEmpty, isNil, keys, filter as rFilter, map as rMap, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, defineAsyncComponent, inject, ref, unref } from "vue";
+import { computed, defineAsyncComponent, defineComponent, inject, ref, unref } from "vue";
+
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
 import { agentOptionsSchema, creditRoleOptionsSchema } from "@/schemas";
@@ -151,6 +152,10 @@ import { empty } from "./normalize";
 
 export default defineComponent({
   name: "CreditsField",
+  components: {
+    SelectField,
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     modelValue: {
       type: Array,
@@ -165,10 +170,8 @@ export default defineComponent({
       required: true,
     },
   },
-  components: {
-    SelectField,
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+  emits: ["update:modelValue"],
+
   setup(props, context) {
     const { fields, replace } = useFieldArray("credits");
 
@@ -287,7 +290,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .credits-field .q-field__after,
 .credits-field .q-field__append {
   padding-left: 0 !important;

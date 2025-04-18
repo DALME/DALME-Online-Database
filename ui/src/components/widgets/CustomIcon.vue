@@ -1,12 +1,12 @@
 <template>
   <template v-if="merge">
     <div :class="`icon-merge ${classes}`">
-      <q-icon :size="`${size + 4}px`" :name="mergeIcons[0]" />
-      <q-icon :size="`${size - 2}px`" :name="mergeIcons[1]" />
+      <q-icon :name="mergeIcons[0]" :size="`${size + 4}px`" />
+      <q-icon :name="mergeIcons[1]" :size="`${size - 2}px`" />
     </div>
   </template>
   <template v-else>
-    <q-icon :size="`${size}px`" :name="icon" :class="classes" />
+    <q-icon :class="classes" :name="icon" :size="`${size}px`" />
   </template>
 </template>
 
@@ -42,7 +42,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .icon-merge {
   display: flex;
   align-items: center;

@@ -1,23 +1,23 @@
 <template>
   <div
     v-if="!nully(pageList)"
-    class="container q-py-sm"
+    @click.stop="handleFocus"
     :class="{
       focussed: isFocus,
       pulse: mouseoverSubmit && focus === 'inline',
     }"
-    @click.stop="handleFocus"
+    class="container q-py-sm"
   >
     <div class="index-header">
       <div class="index-title">FOLIOS</div>
     </div>
     <q-list separator>
       <q-item
-        :clickable="page.ref !== view.currentPageRef"
         v-for="page in pageList"
         :key="page.id"
-        class="column q-px-sm"
         @click.stop="eventBus.emit('changePage', page.ref)"
+        :clickable="page.ref !== view.currentPageRef"
+        class="column q-px-sm"
       >
         <div>
           <code>{{ page.name }}</code>
@@ -30,6 +30,7 @@
 <script>
 import { filter as rFilter } from "ramda";
 import { computed, defineComponent, watch } from "vue";
+
 import { useEditing, useEventHandling, useStores, useTransport } from "@/use";
 import { nully } from "@/utils";
 

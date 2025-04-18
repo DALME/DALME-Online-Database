@@ -1,24 +1,24 @@
 <template>
   <q-select
-    multiple
-    clearable
-    use-chips
-    input-debounce="350"
-    popup-content-class="selectfield"
     v-model="value"
-    :error="errorMessage && meta.touched"
-    :options="options"
-    :option-label="(option) => option.label"
-    :popup-content-style="{ zIndex: '9999 !important' }"
-    :use-input="filterable"
     @blur="handleBlur"
     @filter="handleOptions"
+    :error="errorMessage && meta.touched"
+    :option-label="(option) => option.label"
+    :options="options"
+    :popup-content-style="{ zIndex: '9999 !important' }"
+    :use-input="filterable"
+    input-debounce="350"
+    popup-content-class="selectfield"
+    clearable
+    multiple
+    use-chips
   >
     <ToolTip v-if="description">
       {{ description }}
     </ToolTip>
 
-    <template v-slot:option="scope">
+    <template #option="scope">
       <q-item v-bind="scope.itemProps">
         <q-item-section>
           <q-item-label class="text-weight-medium">
@@ -29,25 +29,28 @@
       </q-item>
     </template>
 
-    <template v-slot:no-option>
+    <template #no-option>
       <q-item>
         <q-item-section class="text-grey"> No choices </q-item-section>
       </q-item>
     </template>
 
-    <template v-slot:error>
+    <template #error>
       <div>{{ errorMessage }}</div>
     </template>
   </q-select>
 </template>
 
 <script>
-import { useField } from "vee-validate";
 import { isNil } from "ramda";
-import { defineComponent, defineAsyncComponent, ref } from "vue";
+import { useField } from "vee-validate";
+import { defineAsyncComponent, defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "MultipleSelectField",
+  components: {
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     field: {
       type: String,
@@ -74,9 +77,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: {
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+
   setup(props) {
     const options = ref(null);
 
@@ -123,7 +124,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-menu.selectfield {
   width: min-content;
 }

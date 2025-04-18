@@ -1,43 +1,43 @@
 <template>
   <q-table
-    flat
-    :dense="overview"
-    :rows="children"
     :columns="columns"
-    :visible-columns="visibleColumns"
-    :no-data-label="noData"
+    :dense="overview"
     :filter="filter"
+    :no-data-label="noData"
     :pagination="pagination"
+    :rows="children"
     :rows-per-page-options="[0]"
-    row-key="id"
+    :visible-columns="visibleColumns"
     class="sticky-header"
+    row-key="id"
     table-colspan="3"
+    flat
     wrap-cells
   >
-    <template v-slot:body-cell-name="props">
+    <template #body-cell-name="props">
       <q-td :props="props">
         <router-link
-          class="text-link"
           :to="{
             name: 'Record',
             params: { id: props.row.id },
           }"
+          class="text-link"
         >
           {{ props.value }}
         </router-link>
       </q-td>
     </template>
 
-    <template v-slot:body-cell-type="props">
+    <template #body-cell-type="props">
       <q-td :props="props" class="text-no-wrap">
         {{ props.value }}
         <q-chip
           v-if="props.row.hasInventory"
-          dense
-          size="10px"
-          outline
-          color="green-9"
           class="text-bold"
+          color="green-9"
+          size="10px"
+          dense
+          outline
         >
           LIST
         </q-chip>

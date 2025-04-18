@@ -3,10 +3,10 @@ import * as yup from "yup";
 
 import {
   attachmentSchema,
-  taskListSchema,
-  userAttributeSchema,
   collectionAttributeSchema,
+  taskListSchema,
   timeStampSchema,
+  userAttributeSchema,
 } from "@/schemas";
 
 // Field-level validation rules/schemas.

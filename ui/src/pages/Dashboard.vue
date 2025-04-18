@@ -16,6 +16,7 @@
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
+
 import { DashChartWidget, PageContainer } from "@/components";
 
 export default defineComponent({
@@ -36,7 +37,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .dash-container {
   margin-top: 10px;
 }

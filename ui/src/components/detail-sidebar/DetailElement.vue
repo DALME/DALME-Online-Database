@@ -2,15 +2,15 @@
   <div class="detail-sidebar-item">
     <q-btn
       v-if="editable"
+      :label="data?.label || label"
+      :ripple="false"
       class="item-header"
       icon-right="mdi-cog-outline"
-      :label="data?.label || label"
       dense
-      no-caps
       flat
-      :ripple="false"
+      no-caps
     >
-      <q-menu anchor="bottom right" self="top right" class="detail-sidebar-item-menu">
+      <q-menu anchor="bottom right" class="detail-sidebar-item-menu" self="top right">
         <slot name="edit-menu" />
         <q-list dense>
           <q-item>
@@ -26,7 +26,7 @@
     </div>
     <div class="flex text-13 items-center">
       <slot name="content" />
-      <span v-if="data?.clipboard" class="cursor-pointer" @click="copyToClipboard(value)">
+      <span v-if="data?.clipboard" @click="copyToClipboard(value)" class="cursor-pointer">
         {{ value }}
       </span>
       <span v-else>{{ value }}</span>
@@ -35,16 +35,27 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeMount, ref } from "vue";
-import { copyToClipboard } from "@/utils";
 import { map as rMap } from "ramda";
+import { defineComponent, onBeforeMount, ref } from "vue";
+
+import { copyToClipboard } from "@/utils";
 
 export default defineComponent({
   name: "DetailElement",
   props: {
-    data: Object,
-    field: String,
-    label: String,
+    data: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    field: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
   },
   setup(props) {
     const value = ref(null);
@@ -76,7 +87,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .detail-sidebar-item {
   padding-bottom: 12px;
   margin-bottom: 12px;

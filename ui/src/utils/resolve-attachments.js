@@ -1,6 +1,7 @@
 import { isNil, map } from "ramda";
-import { fetcher } from "@/boot/axios";
+
 import { requests } from "@/api";
+import { fetcher } from "@/boot/axios";
 import { attachmentSchema } from "@/schemas";
 
 export const resolveAttachments = async (records, targetField = "file") => {

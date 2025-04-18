@@ -3,7 +3,9 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
+// eslint-disable-next-line import/no-unresolved
 import { fileURLToPath } from "node:url";
+
 import { configure } from "quasar/wrappers";
 
 const getDevCSP = () => {

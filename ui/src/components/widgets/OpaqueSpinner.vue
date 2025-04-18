@@ -1,6 +1,6 @@
 <template>
-  <q-inner-loading class="inner" :showing="showing">
-    <q-spinner color="primary" size="3em" :thickness="6" />
+  <q-inner-loading :showing="showing" class="inner">
+    <q-spinner :thickness="6" color="primary" size="3em" />
   </q-inner-loading>
 </template>
 

@@ -1,12 +1,13 @@
 import { defineStore } from "pinia";
-import { computed, defineAsyncComponent, ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
 import { useRepo } from "pinia-orm";
-import { Task, TaskList } from "@/models";
-import { API as apiInterface, requests } from "@/api";
-import { tasksSchema, taskListsSchema } from "@/schemas";
 import { Dialog } from "quasar";
+import { computed, defineAsyncComponent, ref } from "vue";
 import { useRouter } from "vue-router";
+
+import { API as apiInterface, requests } from "@/api";
+import { Task, TaskList } from "@/models";
+import { taskListsSchema, tasksSchema } from "@/schemas";
+import { useAuthStore } from "@/stores/auth";
 
 export const useTaskStore = defineStore("tasks", () => {
   // stores and repositories

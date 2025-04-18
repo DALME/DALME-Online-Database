@@ -1,41 +1,41 @@
 <template>
-  <q-layout view="lhh lpr lff" container :style="`height: ${compositeHeight + 2}px`">
+  <q-layout :style="`height: ${compositeHeight + 2}px`" view="lhh lpr lff" container>
     <q-drawer
       v-model="drawer"
-      side="left"
       :mini="view.pageDrawerMini"
-      class="page-selector-drawer q-mini-drawer-hide"
-      :width="parseInt(141)"
       :mini-width="parseInt(0)"
+      :width="parseInt(141)"
+      class="page-selector-drawer q-mini-drawer-hide"
+      side="left"
     >
-      <div v-if="pageChooser" class="page-container" :style="`height: ${compositeHeight}px`">
+      <div v-if="pageChooser" :style="`height: ${compositeHeight}px`" class="page-container">
         <q-table
-          grid
-          hide-bottom
-          card-container-class="q-pa-none"
-          :rows="view.pages"
           :columns="columns"
+          :pagination="pagination"
+          :rows="view.pages"
+          card-container-class="q-pa-none"
+          class="sticky-header q-mini-drawer-hide"
           no-data-label="No folios found."
           row-key="id"
-          class="sticky-header q-mini-drawer-hide"
-          :pagination="pagination"
+          grid
+          hide-bottom
         >
-          <template v-slot:item="props">
+          <template #item="props">
             <q-card
-              bordered
+              @click="changePage(props.row.ref)"
               :class="
                 props.row.ref === view.currentPageRef
                   ? 'grid-card text-weight-medium current-page'
                   : 'grid-card text-weight-medium cursor-pointer'
               "
-              @click="changePage(props.row.ref)"
+              bordered
             >
               <q-img
-                no-native-menu
-                width="108px"
-                height="135px"
-                fit="cover"
                 :src="props.row.thumbnailUrl"
+                fit="cover"
+                height="135px"
+                width="108px"
+                no-native-menu
               />
               <q-card-section class="q-px-sm q-py-xs text-detail">
                 Folio {{ props.row.name }}
@@ -50,38 +50,38 @@
       <q-page :class="!view.pageDrawerMini ? 'q-pl-sm q-pr-none' : 'q-pa-none'">
         <q-splitter
           v-model="view.editorSplitter"
-          unit="px"
-          :horizontal="view.splitterHorizontal"
-          separator-class="splitter-separator"
-          :limits="view.splitterLimits"
-          emit-immediately
           :class="orientationClass"
+          :horizontal="view.splitterHorizontal"
+          :limits="view.splitterLimits"
+          separator-class="splitter-separator"
+          unit="px"
+          emit-immediately
         >
-          <template v-slot:before>
+          <template #before>
             <IiifViewer
-              @changePage="changePage"
-              @toggleSplitter="toggleSplitter"
-              @toggleDrawer="toggleMini"
+              @change-page="changePage"
+              @toggle-drawer="toggleMini"
+              @toggle-splitter="toggleSplitter"
             />
           </template>
 
-          <template v-slot:separator>
+          <template #separator>
             <q-btn
-              unelevated
-              size="xs"
+              :class="{ 'drag-button-h': view.splitterHorizontal }"
+              class="splitter-separator-button strong-focus"
               icon="drag_indicator"
               icon-right="drag_indicator"
-              class="splitter-separator-button strong-focus"
-              :class="{ 'drag-button-h': view.splitterHorizontal }"
+              size="xs"
+              unelevated
             />
           </template>
 
-          <template v-slot:after>
+          <template #after>
             <div v-if="editOn" class="editor-box">
               <TeiEditor v-if="editorStore.ready" ref="editor" />
-              <AdaptiveSpinner type="bars" position="absolute" v-else class="q-ma-auto" />
+              <AdaptiveSpinner v-else class="q-ma-auto" position="absolute" type="bars" />
             </div>
-            <div v-else class="render-panel" :style="`height: ${compositeHeight}px`">
+            <div v-else :style="`height: ${compositeHeight}px`" class="render-panel">
               <TeiRenderer :text="currentPageData.tei" />
             </div>
           </template>
@@ -94,10 +94,12 @@
 <script>
 import { useQuasar } from "quasar";
 import { computed, defineComponent, inject, onMounted, provide, ref } from "vue";
-import { useEventHandling, useStores } from "@/use";
+
 import { AdaptiveSpinner, CustomDialog, IiifViewer, TeiRenderer } from "@/components";
-import TeiEditor from "./TeiEditor.vue";
+import { useEventHandling, useStores } from "@/use";
 import { nully } from "@/utils";
+
+import TeiEditor from "./TeiEditor.vue";
 
 export default defineComponent({
   name: "RecordEditor",

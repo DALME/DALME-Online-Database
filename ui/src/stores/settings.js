@@ -1,6 +1,7 @@
 // Define the settings store
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
+
 import { API as apiInterface, requests } from "@/api";
 import notifier from "@/notifier";
 import { preferenceListSchema } from "@/schemas";

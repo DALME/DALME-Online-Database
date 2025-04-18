@@ -1,26 +1,26 @@
 <template>
   <q-btn-dropdown
+    content-class="popup-menu filtered dark info-list"
     label="Lists"
-    size="12px"
     menu-anchor="bottom left"
     menu-self="top left"
-    content-class="popup-menu filtered dark info-list"
+    size="12px"
   >
     <q-list separator>
-      <q-item dense class="header">
+      <q-item class="header" dense>
         <q-item-section>Task lists</q-item-section>
         <q-item-section side>
-          <q-btn flat dense size="xs" icon="close" @click.stop="taskStore.clearListFilters" />
+          <q-btn @click.stop="taskStore.clearListFilters" icon="close" size="xs" dense flat />
         </q-item-section>
       </q-item>
 
       <template v-for="(list, group, idx) in lists" :key="idx">
         <q-item
-          dense
-          clickable
-          :group="group"
-          :active="taskStore.activeGroups.has(group)"
           @click.stop="taskStore.setFilterList(group, true)"
+          :active="taskStore.activeGroups.has(group)"
+          :group="group"
+          clickable
+          dense
         >
           <q-item-section avatar>
             <q-icon name="mdi-account-group-outline" size="xs" />
@@ -31,50 +31,50 @@
         </q-item>
 
         <q-item
-          v-for="(taskList, idx) in list"
-          :key="idx"
-          dense
-          clickable
-          class="inset-item"
-          :group="group"
-          :list="taskList.name"
+          v-for="(taskList, idx2) in list"
+          :key="idx2"
+          @click.stop="taskStore.setFilterList(`${group}-${taskList.name}`)"
           :active="
             taskStore.activeGroups.has(group) ||
             taskStore.activeLists.has(`${group}-${taskList.name}`)
           "
-          @click.stop="taskStore.setFilterList(`${group}-${taskList.name}`)"
+          :group="group"
+          :list="taskList.name"
+          class="inset-item"
+          clickable
+          dense
         >
           <q-item-section>
             {{ taskList.name }}
           </q-item-section>
           <q-item-section class="badges">
             <q-badge
-              rounded
-              outline
-              :label="taskList.taskCount"
               :color="taskList.taskCount > 0 ? 'light-green-8' : 'blue-grey-8'"
+              :label="taskList.taskCount"
+              outline
+              rounded
             />
           </q-item-section>
-          <q-item-section side class="actions">
-            <q-btn v-if="isAdmin" flat dense size="sm" icon="mdi-pencil-outline">
-              <ToolTip anchor="center left" self="center right" :offset="[10, 10]">
+          <q-item-section class="actions" side>
+            <q-btn v-if="isAdmin" icon="mdi-pencil-outline" size="sm" dense flat>
+              <ToolTip :offset="[10, 10]" anchor="center left" self="center right">
                 Edit task list
               </ToolTip>
             </q-btn>
 
             <q-btn
               v-if="isAdmin"
-              flat
-              dense
-              size="sm"
-              icon="mdi-delete-forever-outline"
               :disable="taskList.taskCount > 0"
+              icon="mdi-delete-forever-outline"
+              size="sm"
+              dense
+              flat
             >
               <ToolTip
                 v-if="taskList.taskCount === 0"
+                :offset="[10, 10]"
                 anchor="center left"
                 self="center right"
-                :offset="[10, 10]"
               >
                 Delete task list
               </ToolTip>
@@ -83,7 +83,7 @@
         </q-item>
       </template>
 
-      <q-item v-if="isAdmin" clickable v-close-popup dense>
+      <q-item v-if="isAdmin" v-close-popup clickable dense>
         <q-item-section avatar>
           <q-icon name="mdi-playlist-plus" size="xs" />
         </q-item-section>
@@ -95,20 +95,21 @@
 
 <script>
 import { defineComponent } from "vue";
+
 import { ToolTip } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { useTaskStore } from "@/stores/tasks";
 
 export default defineComponent({
   name: "TasklistList",
+  components: {
+    ToolTip,
+  },
   props: {
     lists: {
       type: Object,
       required: true,
     },
-  },
-  components: {
-    ToolTip,
   },
   emits: ["onReload"],
   setup() {

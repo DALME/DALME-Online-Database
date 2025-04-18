@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
 import { isEmpty, mergeDeepLeft } from "ramda";
-import { nully } from "@/utils";
+import { computed, ref } from "vue";
+
 import { useUiStore } from "@/stores/ui";
+import { nully } from "@/utils";
 
 class ViewState {
   constructor(state) {

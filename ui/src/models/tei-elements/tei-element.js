@@ -1,4 +1,5 @@
 import { Model } from "pinia-orm";
+
 import TeiTag from "./tei-tag";
 
 export default class TeiElement extends Model {

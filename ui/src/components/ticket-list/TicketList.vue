@@ -1,37 +1,37 @@
 <template>
   <DataTable
-    grid
     :columns="columns"
     :embedded="embedded"
-    :search="search"
-    :filterList="filterList"
+    :filter-list="filterList"
     :loading="loading"
-    :noData="noData"
-    :onChangeSearch="onChangeSearch"
-    :onChangePage="onChangePage"
-    :onChangeRowsPerPage="onChangeRowsPerPage"
-    :onChangeFilters="onChangeFilters"
-    :onClearFilters="onClearFilters"
-    :onRequest="onRequest"
+    :no-data="noData"
+    :on-change-filters="onChangeFilters"
+    :on-change-page="onChangePage"
+    :on-change-rows-per-page="onChangeRowsPerPage"
+    :on-change-search="onChangeSearch"
+    :on-clear-filters="onClearFilters"
+    :on-request="onRequest"
     :pagination="pagination"
     :rows="rows"
-    :sortList="sortList"
+    :search="search"
+    :sort-list="sortList"
     :title="title"
-    :visibleColumns="visibleColumns"
+    :visible-columns="visibleColumns"
+    grid
   >
-    <template v-slot:grid-avatar="props">
+    <template #grid-avatar="props">
       <q-icon
-        :name="props.row.status ? 'check_circle_outline' : 'error_outline'"
         :color="props.row.status ? 'purple-8' : 'green-8'"
+        :name="props.row.status ? 'check_circle_outline' : 'error_outline'"
         size="22px"
       />
     </template>
 
-    <template v-slot:grid-main="props">
+    <template #grid-main="props">
       <DetailPopover
-        linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Ticket', params: { id: props.row.number } }"
-        :linkText="props.row.subject"
+        :link-target="{ name: 'Ticket', params: { id: props.row.number } }"
+        :link-text="props.row.subject"
+        link-class="text-h7 title-link"
       >
         <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
           {{ props.row.creationUser.username }}
@@ -50,13 +50,13 @@
         :key="idx"
         :name="tag.tag"
         :type="tag.tag"
-        size="xs"
-        module="ticket"
         class="q-ml-sm"
+        module="ticket"
+        size="xs"
       />
     </template>
 
-    <template v-slot:grid-detail="props">
+    <template #grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
         <span
           v-text="
@@ -66,52 +66,52 @@
             )} by `
           "
         />
-        <DetailPopover showAvatar :userData="props.row.creationUser" />
+        <DetailPopover :user-data="props.row.creationUser" show-avatar />
         <template v-if="props.row.status && props.row.closingUser">
           <span v-text="`, closed on ${formatDate(props.row.closingDate, 'DATETIME_AT')} by `" />
-          <DetailPopover :userData="props.row.closingUser" />
+          <DetailPopover :user-data="props.row.closingUser" />
         </template>
       </div>
     </template>
 
-    <template v-slot:grid-counter="props">
+    <template #grid-counter="props">
       <q-icon
-        name="chat_bubble_outline"
-        size="17px"
         v-if="props.row.commentCount"
         class="text-weight-bold q-mr-xs"
+        name="chat_bubble_outline"
+        size="17px"
       />
       <div v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </div>
     </template>
 
-    <template v-slot:grid-counter-extra="props">
+    <template #grid-counter-extra="props">
       <q-btn
         v-if="props.row.file"
-        flat
-        dense
         @click.stop="openURL(props.row.file.source)"
-        target="_blank"
         color="blue-gray-6"
-        size="sm"
         icon="o_text_snippet"
+        size="sm"
+        target="_blank"
         text-color="blue-gray-6"
+        dense
+        flat
       />
       <q-btn
         v-if="props.row.url"
-        flat
-        dense
         @click.stop="openURL(props.row.url)"
-        target="_blank"
         color="blue-gray-6"
-        size="sm"
         icon="link"
+        size="sm"
+        target="_blank"
         text-color="blue-gray-6"
+        dense
+        flat
       />
     </template>
 
-    <template v-slot:render-cell-tags="props">
+    <template #render-cell-tags="props">
       <TagPill
         v-for="(tag, idx) in cleanTags(props.row.tags)"
         :key="idx"
@@ -121,79 +121,81 @@
       />
     </template>
 
-    <template v-slot:render-cell-status="props">
+    <template #render-cell-status="props">
       <q-icon
-        :name="props.row.status ? 'error_outline' : 'check_circle_outline'"
         :color="props.row.status ? 'green-8' : 'purple-8'"
+        :name="props.row.status ? 'error_outline' : 'check_circle_outline'"
         size="16px"
       />
     </template>
 
-    <template v-slot:render-cell-subject="props">
+    <template #render-cell-subject="props">
       <router-link
-        class="text-subtitle2 text-link"
         :to="{ name: 'Ticket', params: { id: props.row.number } }"
+        class="text-subtitle2 text-link"
       >
         {{ props.row.subject }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-file="props">
+    <template #render-cell-file="props">
       <q-btn
         v-if="props.row.file"
-        flat
         @click.stop="openURL(props.row.file.source)"
-        target="_blank"
         color="blue-gray-6"
-        size="sm"
         icon="o_text_snippet"
+        size="sm"
+        target="_blank"
         text-color="blue-gray-6"
+        flat
       />
     </template>
 
-    <template v-slot:render-cell-commentCount="props">
+    <template #render-cell-commentCount="props">
       <q-icon
-        name="chat_bubble_outline"
-        size="17px"
         v-if="props.row.commentCount"
         class="text-weight-bold q-mr-xs"
+        name="chat_bubble_outline"
+        size="17px"
       />
       <span v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </span>
     </template>
 
-    <template v-slot:render-cell-creationUser="props">
-      <DetailPopover showAvatar :userData="props.row.creationUser" />
+    <template #render-cell-creationUser="props">
+      <DetailPopover :user-data="props.row.creationUser" show-avatar />
     </template>
   </DataTable>
 </template>
 
 <script>
-import { useMeta, openURL } from "quasar";
-import { useRoute } from "vue-router";
+import { openURL, useMeta } from "quasar";
 import { filter as rFilter } from "ramda";
 import { defineComponent, provide, ref } from "vue";
+import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
 import { DataTable, DetailPopover, TagPill } from "@/components";
-import { formatDate, getColumns, getDefaults } from "@/utils";
 import { ticketListSchema } from "@/schemas";
 import { useAPI, useConstants, useEditing, usePagination, useStores } from "@/use";
+import { formatDate, getColumns, getDefaults } from "@/utils";
+
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
 export default defineComponent({
   name: "TicketList",
+  components: {
+    DetailPopover,
+    DataTable,
+    TagPill,
+  },
   props: {
     embedded: {
       type: Boolean,
       default: false,
     },
-  },
-  components: {
-    DetailPopover,
-    DataTable,
-    TagPill,
   },
   setup(props, context) {
     if (!props.embedded) useMeta({ title: "Issue Tickets" });

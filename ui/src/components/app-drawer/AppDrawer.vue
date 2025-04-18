@@ -1,14 +1,14 @@
 <template>
   <div
-    class="fullscreen frosted-background custom-drawer app-drawer"
     :class="appDrawerOpen ? '' : 'hide-modal'"
+    class="fullscreen frosted-background custom-drawer app-drawer"
   >
     <div class="q-dialog__backdrop fixed-full" tabindex="-1" />
-    <q-drawer overlay v-model="appDrawerOpen" side="left" :width="320">
-      <q-list padding class="drawer-menu-list full-height col q-pb-none">
-        <q-item dense class="no-shrink">
+    <q-drawer v-model="appDrawerOpen" :width="320" side="left" overlay>
+      <q-list class="drawer-menu-list full-height col q-pb-none" padding>
+        <q-item class="no-shrink" dense>
           <q-item-section avatar>
-            <IDALogo size="60px" fill="#83adcb" stroke-color="#fff" stroke-width="0px" />
+            <IDALogo fill="#83adcb" size="60px" stroke-color="#fff" stroke-width="0px" />
           </q-item-section>
           <q-item-section>
             <q-item-label class="text-weight-bold">IDA DB</q-item-label>
@@ -16,11 +16,11 @@
           </q-item-section>
           <q-item-section side>
             <q-btn
-              flat
+              @click="appDrawerOpen = !appDrawerOpen"
               class="drawer-close-button"
               icon="mdi-close"
               size="10px"
-              @click="appDrawerOpen = !appDrawerOpen"
+              flat
             >
               <ToolTip>Close app drawer.</ToolTip>
             </q-btn>
@@ -28,35 +28,35 @@
         </q-item>
         <EditPanel />
         <CollectionsManager
-          user-collections
-          in-drawer
-          :scrollHeight="minScrollHeight"
-          width="319"
           :default-opened="true"
+          :scroll-height="minScrollHeight"
           label="Your collections"
+          width="319"
+          in-drawer
+          user-collections
         />
         <div class="app-drawer-nav">
           <template v-for="(route, idx) in appRoutes" :key="idx">
             <q-expansion-item
               :label="route.name"
-              header-class="drawer_expansion_header"
               expand-icon="mdi-plus-box-outline"
               expanded-icon="mdi-minus-box-outline"
               group="app-drawer"
+              header-class="drawer_expansion_header"
             >
               <q-item
                 v-for="(child, i) in route.children"
-                dense
-                clickable
-                v-close-popup
                 :key="i"
-                :to="{ name: child.children ? child.children[0].name : child.name }"
+                v-close-popup
                 :active="
                   child.children
                     ? ui.currentSubsection === child.children[0].name
                     : ui.currentSubsection === child.name
                 "
+                :to="{ name: child.children ? child.children[0].name : child.name }"
                 class="q-my-xs"
+                clickable
+                dense
               >
                 <q-item-section class="col-auto q-mr-xs">
                   <q-icon :name="child.meta.icon" size="xs" />
@@ -75,9 +75,10 @@
 
 <script>
 import { computed, defineComponent } from "vue";
-import { useStores } from "@/use";
-import { navRoutes } from "@/router";
+
 import { CollectionsManager, EditPanel, IDALogo, ToolTip } from "@/components";
+import { navRoutes } from "@/router";
+import { useStores } from "@/use";
 
 export default defineComponent({
   name: "AppDrawer",
@@ -102,7 +103,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .custom-drawer.app-drawer .q-drawer {
   border-top-right-radius: 18px;
   border-bottom-right-radius: 18px;

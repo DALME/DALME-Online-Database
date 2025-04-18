@@ -1,5 +1,5 @@
 <template>
-  <div class="agents-field column q-my-sm" :class="{ separator: !showing }">
+  <div :class="{ separator: !showing }" class="agents-field column q-my-sm">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
         {{
@@ -10,23 +10,23 @@
       <q-spinner v-if="loading" color="primary" size="xs" />
       <q-btn
         v-show="showing"
-        round
+        @click.stop="handleAddField"
         class="q-ml-sm"
         color="amber"
         icon="add"
         size="xs"
         text-color="black"
-        @click.stop="handleAddField"
+        round
       >
         <ToolTip> Add a named person </ToolTip>
       </q-btn>
 
       <q-btn
-        round
+        @click.stop="showing = !showing"
+        :icon="showing ? 'visibility_off' : 'visibility'"
         class="q-ml-sm"
         size="xs"
-        :icon="showing ? 'visibility_off' : 'visibility'"
-        @click.stop="showing = !showing"
+        round
       >
         <ToolTip>
           {{ showing ? "Hide named persons" : "Show named persons" }}
@@ -41,41 +41,41 @@
     <template v-if="showing">
       <template v-if="modelValue.length > 0">
         <template v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)" :key="field.key">
-          <div class="row q-mb-sm" v-show="showing">
+          <div v-show="showing" class="row q-mb-sm">
             <div class="col-6 q-pr-sm">
               <SelectField
-                label="Agent"
-                :field="`agents[${idx}].agent`"
-                :filterable="true"
-                :getOptions="getAgentOptions"
-                :optionsSchema="agentOptionsSchema"
-                :validation="validators.agent"
                 v-model="data.agent"
                 @clear="() => handleClearAgent(idx)"
+                :field="`agents[${idx}].agent`"
+                :filterable="true"
+                :get-options="getAgentOptions"
+                :options-schema="agentOptionsSchema"
+                :validation="validators.agent"
+                label="Agent"
               />
             </div>
             <div class="q-pl-sm col">
               <SelectField
-                :field="`agents[${idx}].legalPersona`"
-                :disable="!data.agent"
-                :label="data.agent ? 'Legal Persona' : 'Choose an agent'"
-                :filterable="false"
-                :getOptions="getLegalPersonaOptions"
-                :optionsSchema="legalPersonaOptionsSchema"
-                :validation="validators.legalPersona"
                 v-model="data.legalPersona"
+                :disable="!data.agent"
+                :field="`agents[${idx}].legalPersona`"
+                :filterable="false"
+                :get-options="getLegalPersonaOptions"
+                :label="data.agent ? 'Legal Persona' : 'Choose an agent'"
+                :options-schema="legalPersonaOptionsSchema"
+                :validation="validators.legalPersona"
               />
             </div>
 
             <div class="row items-center">
               <q-btn
+                @click.stop="handleRemoveField(idx)"
                 class="q-ml-auto"
+                icon="clear"
+                size="xs"
                 flat
                 round
                 unelevated
-                size="xs"
-                icon="clear"
-                @click.stop="handleRemoveField(idx)"
               >
               </q-btn>
             </div>
@@ -92,9 +92,10 @@
 </template>
 
 <script>
-import { filter as rFilter, isNil, reduce, zip } from "ramda";
+import { isNil, filter as rFilter, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, defineAsyncComponent, ref, unref } from "vue";
+import { computed, defineAsyncComponent, defineComponent, ref, unref } from "vue";
+
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
 import { agentOptionsSchema, legalPersonaOptionsSchema } from "@/schemas";
@@ -103,6 +104,10 @@ import { empty } from "./normalize";
 
 export default defineComponent({
   name: "AgentsField",
+  components: {
+    SelectField,
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     modelValue: {
       type: Array,
@@ -117,10 +122,8 @@ export default defineComponent({
       required: true,
     },
   },
-  components: {
-    SelectField,
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+  emits: ["update:modelValue"],
+
   setup(props, context) {
     const { fields, replace } = useFieldArray("agents");
 
@@ -186,7 +189,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .agents-field {
   will-change: auto;
   // will-transform: auto;

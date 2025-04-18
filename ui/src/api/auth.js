@@ -1,4 +1,4 @@
-import { authUrl, CSRFUrl } from "./config";
+import { CSRFUrl, authUrl } from "./config";
 
 const auth = {
   authorize(params) {

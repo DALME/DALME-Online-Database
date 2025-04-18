@@ -4,36 +4,36 @@
     <div v-if="editable" class="date-chooser-input-container q-ml-lg">
       <q-select
         v-model="day"
-        :options="dayOptions"
-        label="Day"
         @update:model-value="onChange"
-        options-dense
-        dense
-        borderless
+        :options="dayOptions"
         class="date-chooser-day"
+        label="Day"
+        borderless
+        dense
+        options-dense
       />
       <q-select
         v-model="month"
-        :options="monthOptions"
-        label="Month"
         @update:model-value="onChange"
+        :options="monthOptions"
+        class="date-chooser-month"
+        label="Month"
+        borderless
+        dense
         map-options
         options-dense
-        dense
-        borderless
-        class="date-chooser-month"
       />
       <q-input
         v-model="year"
-        label="Year"
         @update:model-value="onChange"
-        dense
-        borderless
         class="date-chooser-year"
+        label="Year"
+        borderless
+        dense
       />
-      <q-btn v-if="date" icon="event" size="sm" dense flat class="q-mx-sm">
+      <q-btn v-if="date" class="q-mx-sm" icon="event" size="sm" dense flat>
         <q-popup-proxy cover>
-          <q-date v-model="date" minimal mask="YYYY-MM-DD" @update:model-value="onChange" />
+          <q-date v-model="date" @update:model-value="onChange" mask="YYYY-MM-DD" minimal />
         </q-popup-proxy>
       </q-btn>
     </div>
@@ -41,8 +41,9 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref, onBeforeMount, watch } from "vue";
 import { range } from "ramda";
+import { computed, defineComponent, onBeforeMount, ref, watch } from "vue";
+
 import { formatDate } from "@/utils";
 
 export default defineComponent({

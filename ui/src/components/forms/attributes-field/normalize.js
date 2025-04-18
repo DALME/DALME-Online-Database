@@ -1,4 +1,4 @@
-import { filter as rFilter, isNil, pipe, reduce } from "ramda";
+import { isNil, pipe, filter as rFilter, reduce } from "ramda";
 import * as yup from "yup";
 
 import { attributeValidators } from "@/schemas";

@@ -3,21 +3,21 @@
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">
-          <div class="info-area row" v-if="!loading">
+          <div v-if="!loading" class="info-area row">
             <div class="column">
               <div class="row items-center text-h5">
                 <template v-if="!loading">
                   {{ policy.name }}
                   <TagPill
-                    :name="policy.rightsStatus.name"
                     :colour="statusColours.colour"
-                    :textColour="statusColours.text"
-                    size="sm"
-                    module="standalone"
+                    :name="policy.rightsStatus.name"
+                    :text-colour="statusColours.text"
                     class="q-ml-md q-mt-xs"
+                    module="standalone"
+                    size="sm"
                   />
                 </template>
-                <q-skeleton v-else width="350px" height="30px" type="rect" />
+                <q-skeleton v-else height="30px" type="rect" width="350px" />
               </div>
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!loading">
@@ -25,9 +25,9 @@
                     >Created on {{ formatDate(policy.creationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
+                    :show-avatar="false"
                     :user="policy.creationUser"
                     text-size="12px"
-                    :show-avatar="false"
                     inline
                   />
                   <span
@@ -35,13 +35,13 @@
                     {{ formatDate(policy.modificationTimestamp.value, "DATETIME_AT") }} by
                   </span>
                   <UserPill
+                    :show-avatar="false"
                     :user="policy.modificationUser"
                     text-size="12px"
-                    :show-avatar="false"
                     inline
                   />
                 </template>
-                <q-skeleton v-else width="500px" height="12px" type="rect" />
+                <q-skeleton v-else height="12px" type="rect" width="500px" />
               </div>
             </div>
           </div>
@@ -49,27 +49,27 @@
         <div class="row">
           <q-tabs
             v-model="view.tab"
-            dense
-            no-caps
-            inline-label
-            switch-indicator
+            active-class="active-tab"
             align="left"
             class="bg-white text-grey-8 tab-container"
-            active-class="active-tab"
+            dense
+            inline-label
+            no-caps
+            switch-indicator
           >
-            <q-tab name="info" icon="o_info" label="Info" />
+            <q-tab icon="o_info" label="Info" name="info" />
             <template v-if="!loading">
-              <q-tab name="comments" icon="o_forum" label="Discussion">
+              <q-tab icon="o_forum" label="Discussion" name="comments">
                 <q-badge
                   v-if="commentCount > 0"
+                  :label="commentCount"
+                  class="text-indigo-1 q-mx-xs"
                   color="indigo-5"
                   rounded
-                  class="text-indigo-1 q-mx-xs"
-                  :label="commentCount"
                 />
               </q-tab>
             </template>
-            <AdaptiveSpinner v-else type="bars" size="sm" class="q-ml-md" />
+            <AdaptiveSpinner v-else class="q-ml-md" size="sm" type="bars" />
           </q-tabs>
         </div>
       </div>
@@ -79,12 +79,12 @@
         <template v-if="!loading">
           <q-tab-panels
             v-model="view.tab"
-            animated
-            transition-prev="jump-up"
             transition-next="jump-up"
+            transition-prev="jump-up"
+            animated
             keep-alive
           >
-            <q-tab-panel name="info" class="q-pt-none q-px-none">
+            <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div v-if="policy" class="row q-pt-md">
                 <div class="col">
                   <DetailCard icon="bookmark" title="Record" pad-container>
@@ -119,25 +119,25 @@
                   </DetailCard>
                   <DetailCard
                     v-if="policy.attachments"
+                    class="q-mt-md"
                     icon="preview"
                     title="Attachment preview"
-                    class="q-mt-md"
                     pad-container
                   >
                     <div class="row q-mt-xs">
                       <embed
+                        class="embeddedDocPdf"
+                        height="700px"
                         src="/media/dalme/attachments/2020/12/
 AD_Savoie_-_Autorisation_de_publication.pdf"
                         type="application/pdf"
-                        class="embeddedDocPdf"
-                        height="700px"
                       />
                     </div>
                   </DetailCard>
                 </div>
               </div>
             </q-tab-panel>
-            <q-tab-panel name="comments" class="q-pt-md q-px-lg">
+            <q-tab-panel class="q-pt-md q-px-lg" name="comments">
               <CommentBox @on-count-changed="updateCommentCount" />
             </q-tab-panel>
           </q-tab-panels>
@@ -146,20 +146,20 @@ AD_Savoie_-_Autorisation_de_publication.pdf"
       </div>
       <div v-if="!loading" class="col-3 q-pl-md q-pt-md">
         <DetailSidebar>
-          <template v-slot:extraElements>
+          <template #extraElements>
             <DetailElement label="Attachment">
-              <template v-slot:content>
+              <template #content>
                 <template v-if="policy.attachments">
                   <AttachmentWidget :file="policy.attachments" color="indigo-6" compact />
                 </template>
-                <div class="text-13" v-else>None yet</div>
+                <div v-else class="text-13">None yet</div>
               </template>
             </DetailElement>
-            <DetailElement label="Unique Id" clipboard :content="policy.id" />
+            <DetailElement :content="policy.id" label="Unique Id" clipboard />
             <DetailElement label="Created">
-              <template v-slot:content>
+              <template #content>
                 <div>
-                  <UserPill :user="policy.creationUser" text-size="13px" :bold="false" />
+                  <UserPill :bold="false" :user="policy.creationUser" text-size="13px" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
                     {{ formatDate(policy.creationTimestamp.value, "DATETIME_AT") }}
                   </div>
@@ -167,9 +167,9 @@ AD_Savoie_-_Autorisation_de_publication.pdf"
               </template>
             </DetailElement>
             <DetailElement label="Last modified">
-              <template v-slot:content>
+              <template #content>
                 <div>
-                  <UserPill :user="policy.modificationUser" text-size="13px" :bold="false" />
+                  <UserPill :bold="false" :user="policy.modificationUser" text-size="13px" />
                   <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
                     {{ formatDate(policy.modificationTimestamp.value, "DATETIME_AT") }}
                   </div>
@@ -185,22 +185,23 @@ AD_Savoie_-_Autorisation_de_publication.pdf"
 
 <script>
 import { useMeta } from "quasar";
-import { computed, defineComponent, ref, readonly, provide, watch } from "vue";
+import { computed, defineComponent, provide, readonly, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+
 import { requests } from "@/api";
-import { useAPI, useStores, useConstants } from "@/use";
-import { rightsSchema } from "@/schemas";
 import {
   AdaptiveSpinner,
   AttachmentWidget,
   BooleanValue,
   CommentBox,
   DetailCard,
-  DetailSidebar,
   DetailElement,
+  DetailSidebar,
   TagPill,
   UserPill,
 } from "@/components";
+import { rightsSchema } from "@/schemas";
+import { useAPI, useConstants, useStores } from "@/use";
 
 export default defineComponent({
   name: "RightsDetail",
@@ -276,7 +277,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .embeddedDocPdf {
   width: 100%;
 }

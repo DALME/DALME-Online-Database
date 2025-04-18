@@ -1,9 +1,9 @@
 <template>
-  <q-item clickable v-close-popup dense :class="cls" @click="$emit('itemChosen', item)">
+  <q-item v-close-popup @click="$emit('itemChosen', item)" :class="cls" clickable dense>
     <q-item-section side>
       <q-icon
-        :name="ticketIcon(item.status)"
         :color="item.status == 0 ? 'light-green-6' : 'deep-purple-4'"
+        :name="ticketIcon(item.status)"
         size="16px"
       />
     </q-item-section>

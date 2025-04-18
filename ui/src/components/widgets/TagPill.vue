@@ -1,16 +1,17 @@
 <template>
-  <q-icon v-if="mini" :name="miniIcon" :color="tagColours.text" :size="size" />
+  <q-icon v-if="mini" :color="tagColours.text" :name="miniIcon" :size="size" />
   <q-badge
     v-else
-    :color="outline ? 'transparent' : tagColours.colour"
-    :text-color="tagColours.text"
     :class="`tag-${size}`"
+    :color="outline ? 'transparent' : tagColours.colour"
     :label="name"
+    :text-color="tagColours.text"
   />
 </template>
 
 <script>
 import { computed, defineComponent } from "vue";
+
 import { useConstants } from "@/use";
 
 export default defineComponent({
@@ -19,10 +20,12 @@ export default defineComponent({
     colour: {
       type: String,
       required: false,
+      default: null,
     },
     name: {
       type: [String, Number],
       required: false,
+      default: null,
     },
     mini: {
       type: Boolean,
@@ -41,18 +44,22 @@ export default defineComponent({
     textColour: {
       type: String,
       required: false,
+      default: null,
     },
     type: {
       type: String,
       required: false,
+      default: null,
     },
     wfStage: {
       type: Number,
       required: false,
+      default: null,
     },
     wfStatus: {
       type: Number,
       required: false,
+      default: null,
     },
     outline: {
       type: Boolean,
@@ -110,7 +117,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .tag-sm {
   border: 1px solid;
   text-transform: uppercase;

@@ -1,4 +1,5 @@
 import { Model } from "pinia-orm";
+
 import TeiElement from "./tei-element";
 import TeiSetMember from "./tei-set-member";
 

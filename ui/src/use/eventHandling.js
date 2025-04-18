@@ -1,5 +1,6 @@
 import { Notify } from "quasar";
 import { inject, provide } from "vue";
+
 import notifier from "@/notifier";
 import { useUiStore } from "@/stores/ui";
 

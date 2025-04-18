@@ -1,20 +1,20 @@
 <template>
   <q-expansion-item
-    label="Editing tools"
     class="edit-panel-item"
-    header-class="drawer_expansion_header"
     expand-icon="mdi-plus-box-outline"
     expanded-icon="mdi-minus-box-outline"
+    header-class="drawer_expansion_header"
+    label="Editing tools"
     default-opened
   >
     <q-item dense>
       <EditSubmit />
       <q-btn
-        icon="edit_note"
+        @click="eventBus.emit('toggleEditor')"
         :class="{ 'edit-on': editOn }"
         :disable="!showEditBtn"
+        icon="edit_note"
         square
-        @click="eventBus.emit('toggleEditor')"
       />
       <EditUpdate />
       <EditCreate />
@@ -72,12 +72,14 @@
 
 <script>
 import { computed, defineComponent } from "vue";
+
 import { useEditing, useEventHandling, useStores } from "@/use";
+
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
 import { default as EditUpdate } from "./EditUpdate.vue";
-import { default as PageIndex } from "./PageIndex.vue";
 import { default as InlineIndex } from "./InlineIndex.vue";
+import { default as PageIndex } from "./PageIndex.vue";
 import { default as WindowIndex } from "./WindowIndex.vue";
 
 export default defineComponent({

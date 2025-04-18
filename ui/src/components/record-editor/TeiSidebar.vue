@@ -1,46 +1,46 @@
 <template>
   <transition name="collapse">
-    <div v-if="view.showTagMenu" class="col tag-menu" :style="`height: ${editorHeight + 1}px`">
+    <div v-if="view.showTagMenu" :style="`height: ${editorHeight + 1}px`" class="col tag-menu">
       <q-input
-        dense
-        borderless
-        hide-bottom-space
         v-model="elementFilter"
-        debounce="300"
+        autocapitalize="off"
         autocomplete="off"
         autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        placeholder="Search tags"
         class="tag-search-box"
+        debounce="300"
+        placeholder="Search tags"
+        spellcheck="false"
+        borderless
+        dense
+        hide-bottom-space
       >
-        <template v-slot:append>
+        <template #append>
           <q-icon
             v-if="elementFilter"
-            name="close"
-            class="cursor-pointer"
-            size="12px"
-            color="blue-grey-5"
             @click="elementFilter = ''"
+            class="cursor-pointer"
+            color="blue-grey-5"
+            name="close"
+            size="12px"
           />
         </template>
       </q-input>
       <q-list dense separator>
         <template v-for="(el, idx) in teiElements" :key="idx">
           <q-btn-dropdown
+            :label="el.label"
+            align="left"
+            content-class="tag-menu-popup outlined-item menu-shadow"
+            auto-close
             flat
             no-caps
-            auto-close
             split
-            align="left"
-            :label="el.label"
-            content-class="tag-menu-popup outlined-item menu-shadow"
           >
             <q-list dense separator>
               <q-item>
                 <q-item-section>
                   <q-item-label class="text-detail text-grey-7 q-py-sm">
-                    <q-icon name="o_info" size="14px" color="grey-6" class="q-mr-xs" />
+                    <q-icon class="q-mr-xs" color="grey-6" name="o_info" size="14px" />
                     <span v-html="el.description" />
                   </q-item-label>
                 </q-item-section>
@@ -65,6 +65,7 @@
 
 <script>
 import { computed, defineComponent, inject, ref } from "vue";
+
 import { useStores } from "@/use";
 
 export default defineComponent({

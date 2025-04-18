@@ -1,60 +1,65 @@
 <template>
-  <q-menu anchor="top right" self="top left" :class="dark ? 'dark' : ''">
-    <q-list bordered separator class="text-grey-9 choser-menu">
-      <q-item v-if="!asItem && label" dense class="q-pr-sm">
+  <q-menu :class="dark ? 'dark' : ''" anchor="top right" self="top left">
+    <q-list class="text-grey-9 choser-menu" bordered separator>
+      <q-item v-if="!asItem && label" class="q-pr-sm" dense>
         <q-item-section class="text-weight-bold">{{ label }}</q-item-section>
         <q-item-section avatar>
-          <q-btn flat dense size="xs" color="grey-6" icon="close" @click="$emit('clearFilters')" />
+          <q-btn @click="$emit('clearFilters')" color="grey-6" icon="close" size="xs" dense flat />
         </q-item-section>
       </q-item>
 
       <q-item
         v-if="searchable"
-        dense
         :class="`${asItem ? 'chooser-filter-st' : 'chooser-filter'} ${
           loading || nully(itemData) ? 'standalone' : ''
         }`"
+        dense
       >
         <q-input
-          :dark="dark"
-          borderless
-          square
-          dense
-          hide-bottom-space
           v-model="search"
-          debounce="300"
+          :dark="dark"
+          autocapitalize="off"
           autocomplete="off"
           autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          placeholder="Type to search"
           class="chooser-filter-box"
+          debounce="300"
+          placeholder="Type to search"
+          spellcheck="false"
+          borderless
+          dense
+          hide-bottom-space
+          square
         >
-          <template v-slot:append>
+          <template #append>
             <q-icon
               v-if="search && !loading"
-              name="mdi-close"
-              class="cursor-pointer"
               @click="search = ''"
+              class="cursor-pointer"
+              name="mdi-close"
             />
             <AdaptiveSpinner
               v-if="loading"
-              type="bars"
-              size="20px"
               :adaptive="false"
-              color="indigo-3"
               class="q-mr-sm"
+              color="indigo-3"
+              size="20px"
+              type="bars"
             />
           </template>
         </q-input>
       </q-item>
 
       <template v-if="showSelected && !nully(selected)">
-        <component :is="itemComponent" :item="selected" :dark="dark" itemClass="chooser-selected" />
+        <component
+          :is="itemComponent"
+          :dark="dark"
+          :item="selected"
+          item-class="chooser-selected"
+        />
       </template>
-      <q-list separator class="chooser-items-container">
+      <q-list class="chooser-items-container" separator>
         <template v-for="(item, idx) in itemData" :key="idx">
-          <component :is="itemComponent" :item="item" :dark="dark" @item-chosen="selectItem" />
+          <component :is="itemComponent" @item-chosen="selectItem" :dark="dark" :item="item" />
         </template>
       </q-list>
     </q-list>
@@ -64,13 +69,20 @@
 <script>
 import { filter as rFilter } from "ramda";
 import { computed, defineComponent, onBeforeMount, ref, watch } from "vue";
+
 import { AdaptiveSpinner } from "@/components";
-import ItemUser from "./ItemUser.vue";
-import ItemTicket from "./ItemTicket.vue";
 import { nully } from "@/utils";
+
+import ItemTicket from "./ItemTicket.vue";
+import ItemUser from "./ItemUser.vue";
 
 export default defineComponent({
   name: "ChooserMenu",
+  components: {
+    AdaptiveSpinner,
+    ItemUser,
+    ItemTicket,
+  },
   props: {
     asItem: {
       type: Boolean,
@@ -84,7 +96,11 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    label: String,
+    label: {
+      type: String,
+      required: false,
+      default: null,
+    },
     returnField: {
       type: String,
       default: "id",
@@ -105,11 +121,6 @@ export default defineComponent({
       type: Function,
       required: true,
     },
-  },
-  components: {
-    AdaptiveSpinner,
-    ItemUser,
-    ItemTicket,
   },
   emits: ["itemChosen", "clearFilters"],
   setup(props, context) {
@@ -171,7 +182,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .choser-menu {
   min-width: 250px;
 }

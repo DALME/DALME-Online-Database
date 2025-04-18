@@ -1,16 +1,16 @@
 <template>
   <q-table
+    v-model:pagination="pagination"
+    @request="onRequest"
     :columns="columns"
     :filter="filter"
     :loading="loading"
     :no-data-label="noData"
     :rows="rows"
-    @request="onRequest"
-    v-model:pagination="pagination"
-    row-key="id"
     class="sticky-header"
+    row-key="id"
   >
-    <template v-slot:top>
+    <template #top>
       <q-item-section avatar>
         <q-avatar>
           <q-icon name="people" />
@@ -20,14 +20,14 @@
         Set Members ({{ memberCount }}, {{ publicMemberCount }} public)
       </q-item-label>
       <q-space />
-      <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-        <template v-slot:append>
+      <q-input v-model="filter" debounce="300" placeholder="Search" borderless dense>
+        <template #append>
           <q-icon name="search" />
         </template>
       </q-input>
     </template>
 
-    <template v-slot:body-cell-name="props">
+    <template #body-cell-name="props">
       <q-td :props="props">
         <router-link
           :to="{
@@ -40,7 +40,7 @@
       </q-td>
     </template>
 
-    <template v-slot:body-cell-isPublic="props">
+    <template #body-cell-isPublic="props">
       <q-td :props="props">
         <div class="col-8">
           <q-icon :name="props.value ? 'done' : 'close'" />
@@ -48,12 +48,13 @@
       </q-td>
     </template>
   </q-table>
-  <AdaptiveSpinner type="facebook" :showing="loading" thickness="3" />
+  <AdaptiveSpinner :showing="loading" thickness="3" type="facebook" />
 </template>
 
 <script>
 import { keys, map } from "ramda";
 import { defineComponent, inject, ref } from "vue";
+
 import { requests } from "@/api";
 import { AdaptiveSpinner } from "@/components";
 import { setMembersSchema } from "@/schemas";
@@ -67,6 +68,9 @@ const columnMap = {
 
 export default defineComponent({
   name: "SetMembers",
+  components: {
+    AdaptiveSpinner,
+  },
   props: {
     memberCount: {
       type: Number,
@@ -76,9 +80,6 @@ export default defineComponent({
       type: Number,
       required: true,
     },
-  },
-  components: {
-    AdaptiveSpinner,
   },
   setup() {
     const { apiInterface } = useAPI();
@@ -132,7 +133,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-table__top {
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   padding-top: 8px;

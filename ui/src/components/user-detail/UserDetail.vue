@@ -2,10 +2,10 @@
   <div v-if="!loading && user">
     <div class="row q-pa-md">
       <div class="col-12 col-md-9 q-pr-md">
-        <q-card flat bordered class="detail-card">
-          <q-item dense class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5">
-            <q-item-section side class="q-pr-sm">
-              <q-icon name="person" color="indigo-5" size="xs" />
+        <q-card class="detail-card" bordered flat>
+          <q-item class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5" dense>
+            <q-item-section class="q-pr-sm" side>
+              <q-icon color="indigo-5" name="person" size="xs" />
             </q-item-section>
             <q-item-section>
               <q-item-label class="text-subtitle2">
@@ -61,26 +61,26 @@
 
             <div class="row q-mt-xs">
               <div class="col-3 text-weight-medium text-right q-mr-lg">Groups</div>
-              <div class="col-8" v-html="formatGroups(user.groups)"></div>
+              <div v-html="formatGroups(user.groups)" class="col-8"></div>
             </div>
           </q-card-section>
         </q-card>
       </div>
       <div class="col-12 col-md-3">
-        <q-card flat bordered class="detail-card full-height bg-grey-2">
+        <q-card class="detail-card full-height bg-grey-2" bordered flat>
           <q-card-section class="justify-center content-center q-pa-none full-height">
             <q-img
               v-if="user.avatar"
               :src="user.avatar"
-              fit="cover"
               class="q-mx-auto q-my-auto full-height avatar-image"
+              fit="cover"
             />
             <q-icon
               v-else
-              name="no_accounts"
-              color="grey-4"
-              size="15rem"
               class="column q-mx-auto q-my-auto full-height"
+              color="grey-4"
+              name="no_accounts"
+              size="15rem"
             />
           </q-card-section>
         </q-card>
@@ -98,11 +98,13 @@ import { useMeta } from "quasar";
 import { map } from "ramda";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+
 import { requests } from "@/api";
 import { BooleanValue, OpaqueSpinner } from "@/components";
 import { userSchema } from "@/schemas";
+import { useAuthStore } from "@/stores/auth";
 import { useAPI } from "@/use";
+
 import UserPreferences from "./UserPreferences.vue";
 
 const getAttributeLabel = (attribute) => {

@@ -1,67 +1,69 @@
 <template>
-  <q-card v-if="!loading" :class="`chart-card q-pa-none ${orientation}`" flat dense bordered>
+  <q-card v-if="!loading" :class="`chart-card q-pa-none ${orientation}`" bordered dense flat>
     <q-card-section class="q-pa-xs">
       <div class="text-subtitle2 text-center q-pa-sm">
         {{ title }}
       </div>
     </q-card-section>
     <q-separator class="full-width" />
-    <q-card-section class="chart-container" ref="chart-container">
-      <Bar v-if="chartType === 'bar'" :options="options" :data="dataset" :style="styles" />
+    <q-card-section ref="chart-container" class="chart-container">
+      <Bar v-if="chartType === 'bar'" :data="dataset" :options="options" :style="styles" />
       <Doughnut
         v-if="chartType === 'doughnut'"
-        :options="options"
         :data="dataset"
+        :options="options"
         :style="styles"
       />
       <Line
         v-if="chartType === 'line'"
         id="dash-chart-container"
-        :options="options"
         :data="dataset"
+        :options="options"
         :style="styles"
       />
       <Pie
         v-if="chartType === 'pie'"
         id="dash-chart-container"
-        :options="options"
         :data="dataset"
+        :options="options"
         :style="styles"
       />
-      <PolarArea v-if="chartType === 'polar'" :options="options" :data="dataset" :style="styles" />
-      <Radar v-if="chartType === 'radar'" :options="options" :data="dataset" :style="styles" />
-      <Bubble v-if="chartType === 'bubble'" :options="options" :data="dataset" :style="styles" />
-      <Scatter v-if="chartType === 'scatter'" :options="options" :data="dataset" :style="styles" />
+      <PolarArea v-if="chartType === 'polar'" :data="dataset" :options="options" :style="styles" />
+      <Radar v-if="chartType === 'radar'" :data="dataset" :options="options" :style="styles" />
+      <Bubble v-if="chartType === 'bubble'" :data="dataset" :options="options" :style="styles" />
+      <Scatter v-if="chartType === 'scatter'" :data="dataset" :options="options" :style="styles" />
     </q-card-section>
     <q-card-actions class="chart-actions">
-      <q-btn flat round color="red" icon="favorite" />
-      <q-btn flat round color="teal" icon="bookmark" />
-      <q-btn flat round color="primary" icon="share" />
+      <q-btn color="red" icon="favorite" flat round />
+      <q-btn color="teal" icon="bookmark" flat round />
+      <q-btn color="primary" icon="share" flat round />
     </q-card-actions>
   </q-card>
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, ref } from "vue";
-import { Bar, Doughnut, Line, Pie, PolarArea, Radar, Bubble, Scatter } from "vue-chartjs";
 import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
+  ArcElement,
   BarElement,
   CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LineElement,
   LinearScale,
   PointElement,
-  ArcElement,
-  LineElement,
   RadialLinearScale,
-  Filler,
+  Title,
+  Tooltip,
 } from "chart.js";
-import { useAPI, useStores } from "@/use";
 import { format } from "quasar";
+import { computed, defineComponent, onMounted, ref } from "vue";
+import { Bar, Bubble, Doughnut, Line, Pie, PolarArea, Radar, Scatter } from "vue-chartjs";
+
 import { requests } from "@/api";
-import { samples, sampleOptions } from "./sample-data.js";
+import { useAPI, useStores } from "@/use";
+
+import { sampleOptions, samples } from "./sample-data.js";
 import * as widgets from "./widgets";
 
 ChartJS.register(
@@ -80,12 +82,6 @@ ChartJS.register(
 
 export default defineComponent({
   name: "DashChartWidget",
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-  },
   components: {
     Bar,
     Doughnut,
@@ -96,6 +92,12 @@ export default defineComponent({
     Radar,
     Bubble,
     Scatter,
+  },
+  props: {
+    name: {
+      type: String,
+      required: true,
+    },
   },
   setup(props) {
     const { capitalize } = format;
@@ -167,7 +169,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .chart-card {
   display: flex;
   flex-direction: column;

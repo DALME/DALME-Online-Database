@@ -7,8 +7,8 @@ import {
   bibliographyEditSchema,
   bibliographyFieldValidation,
   bibliographyTypeOptionsSchema,
+  recordSubmitSchemas,
   setOptionsSchema,
-  sourceSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = ["defaultRights", "isPrivate", "owner", "parent", "zoteroKey"];
@@ -79,5 +79,5 @@ export default {
   edit: bibliographyEditSchema,
   form: bibliographyFormSchema,
   requests: bibliographyRequests,
-  submit: sourceSubmitSchemas,
+  submit: recordSubmitSchemas,
 };

@@ -1,24 +1,23 @@
 module.exports = {
   root: true,
-
   parserOptions: {
     ecmaVersion: 2022, // Allows for the parsing of modern ECMAScript features
   },
-
   env: {
     node: true,
     browser: true,
+    es2022: true,
     "vue/setup-compiler-macros": true,
   },
-
   extends: [
     "eslint:recommended",
-    "plugin:vue/vue3-essential", // Priority A: Essential (Error Prevention)
+    // "plugin:vue/vue3-essential", // Priority A: Essential (Error Prevention)
+    "plugin:vue-scoped-css/vue3-recommended",
+    "plugin:import/recommended",
+    "plugin:vue/vue3-recommended",
     "prettier",
   ],
-
-  plugins: ["vue", "prettier", "unused-imports"],
-
+  plugins: ["import", "unused-imports", "prettier", "vue"],
   globals: {
     ga: "readonly", // Google Analytics
     cordova: "readonly",
@@ -31,13 +30,35 @@ module.exports = {
     Capacitor: "readonly",
     chrome: "readonly",
   },
-
   rules: {
-    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-    "prefer-promise-reject-errors": "off",
+    "import/no-unresolved": "error",
+    "import/namespace": ["error", {allowComputed: true}],
+    "import/order": [
+      "error",
+      {
+        groups: [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "object",
+          "unknown",
+          "type",
+        ],
+        "newlines-between": "always",
+        alphabetize: {
+          order: "asc",
+          caseInsensitive: true,
+        },
+      },
+    ],
     "linebreak-style": ["error", "unix"],
-    "no-unused-vars": "off",
     "max-len": ["error", { code: 100, ignoreUrls: true }],
+    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+    "no-unused-vars": "off",
+    "prefer-promise-reject-errors": "off",
     "prettier/prettier": [
       "error",
       {
@@ -48,8 +69,18 @@ module.exports = {
         printWidth: 100,
       },
     ],
-    quotes: ["error", "double", { "avoidEscape": true }],
+    quotes: ["error", "double", { avoidEscape: true }],
     semi: ["error", "always"],
+    "sort-imports": [
+      "error",
+      {
+        ignoreCase: false,
+        ignoreDeclarationSort: true,
+        ignoreMemberSort: false,
+        memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
+        allowSeparatedGroups: true,
+      },
+    ],
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
       "warn",
@@ -60,6 +91,45 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
+    "vue-scoped-css/no-unused-selector": "off",
+    "vue/attributes-order": ["error", {
+      order: [
+        "DEFINITION",
+        "LIST_RENDERING",
+        "CONDITIONALS",
+        "RENDER_MODIFIERS",
+        "GLOBAL",
+        "UNIQUE",
+        "TWO_WAY_BINDING",
+        "OTHER_DIRECTIVES",
+        "EVENTS",
+        "CONTENT",
+        "ATTR_DYNAMIC",
+        "ATTR_STATIC",
+        "ATTR_SHORTHAND_BOOL",
+      ],
+      alphabetical: true,
+    }],
+    "vue/require-default-prop": "error",
     "vue/no-multiple-template-root": "off",
+    "vue/no-v-html": "off",
+  },
+  settings: {
+    "import/resolver": {
+      alias: {
+        map: [
+          ["@", "./src"],
+          ["layouts", "./src/layouts"],
+          ["pages", "./src/pages"],
+          ["components", "./src/components"],
+          ["assets", "./src/assets"],
+          ["boot", "./src/boot"],
+          ["models", "./src/models"],
+          ["stores", "./src/stores"],
+          ["api", "./src/api"],
+          ["src", "./src"],
+        ],
+      },
+    },
   },
 };

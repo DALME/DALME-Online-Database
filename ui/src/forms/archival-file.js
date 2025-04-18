@@ -4,11 +4,9 @@ import { fetcher, requests } from "@/api";
 import { AttributesField, InputField, SelectField } from "@/components/forms";
 import {
   attributeValidators,
-  archivalFileEditSchema,
-  archivalFileFieldValidation,
-  setOptionsSchema,
   recordOptionsSchema,
   recordSubmitSchemas,
+  setOptionsSchema,
 } from "@/schemas";
 
 const resourceAttributes = [
@@ -32,14 +30,12 @@ const archivalFileFormSchema = {
     component: markRaw(InputField),
     label: "Name *",
     description: "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
-    validation: archivalFileFieldValidation.name,
   },
   shortName: {
     field: "shortName",
     component: markRaw(InputField),
     label: "Short name *",
     description: "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
-    validation: archivalFileFieldValidation.shortName,
   },
   parent: {
     field: "parent",
@@ -53,7 +49,6 @@ const archivalFileFormSchema = {
         response.json(),
       ),
     optionsSchema: recordOptionsSchema,
-    validation: archivalFileFieldValidation.parent,
   },
   primaryDataset: {
     field: "primaryDataset",
@@ -62,7 +57,6 @@ const archivalFileFormSchema = {
     description: "Dataset used to assign permissions.",
     getOptions: () => fetcher(requests.sets.getSetsByType(3)).then((response) => response.json()),
     optionsSchema: setOptionsSchema,
-    validation: archivalFileFieldValidation.primaryDataset,
   },
   attributes: {
     field: "attributes",
@@ -71,7 +65,6 @@ const archivalFileFormSchema = {
     allowed: resourceAttributes,
     required: requiredAttributes,
     validators: attributeValidators,
-    validation: archivalFileFieldValidation.attributes,
   },
 };
 
@@ -83,7 +76,6 @@ const archivalFileRequests = {
 };
 
 export default {
-  edit: archivalFileEditSchema,
   form: archivalFileFormSchema,
   requests: archivalFileRequests,
   submit: recordSubmitSchemas,

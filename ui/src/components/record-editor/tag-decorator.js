@@ -1,7 +1,9 @@
-import { h, render } from "vue";
+import { ensureSyntaxTree, matchBrackets, syntaxTree } from "@codemirror/language";
 import { Decoration, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
-import { matchBrackets, ensureSyntaxTree, syntaxTree } from "@codemirror/language";
+import { h, render } from "vue";
+
 import { useEditorStore } from "@/stores/editor";
+
 import TeiTagMenu from "./TeiTagMenu.vue";
 
 const tagPattern = /<(\/)?([a-z]+)([^>]+?)?(\/)?>/gi;

@@ -1,9 +1,9 @@
 <template>
   <q-uploader
-    style="max-width: 300px"
-    label="Upload attachment"
-    :url="url"
     @rejected="handleRejected"
+    :url="url"
+    label="Upload attachment"
+    style="max-width: 300px"
   />
 </template>
 

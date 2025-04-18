@@ -1,12 +1,13 @@
+import { storeToRefs } from "pinia";
 import { EventBus } from "quasar";
 import { inject, provide } from "vue";
-import { storeToRefs } from "pinia";
+
 import { useAuthStore } from "@/stores/auth";
+import { useEditorStore } from "@/stores/editor";
+import { useSettingsStore } from "@/stores/settings";
+import { useTaskStore } from "@/stores/tasks";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
-import { useSettingsStore } from "@/stores/settings";
-import { useEditorStore } from "@/stores/editor";
-import { useTaskStore } from "@/stores/tasks";
 
 const StoresSymbol = Symbol();
 

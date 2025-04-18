@@ -1,5 +1,6 @@
 import * as yup from "yup";
-import { timeStampSchema, groupSchema } from "@/schemas";
+
+import { groupSchema, timeStampSchema } from "@/schemas";
 
 export const userSchema = yup.object().shape({
   id: yup.number().required(),

@@ -1,15 +1,15 @@
 <template>
   <q-btn
+    @click.stop="handleSubmit"
+    @mouseleave="mouseoverSubmit = false"
+    @mouseover="mouseoverSubmit = true"
+    :color="valid ? (mouseoverSubmit ? 'red-10' : 'light-green-8') : 'none'"
+    :disable="!valid"
+    :text-color="valid ? (mouseoverSubmit ? 'red-2' : 'light-green-2') : 'none'"
     icon="save"
     size="11px"
-    :disable="!valid"
-    :color="valid ? (mouseoverSubmit ? 'red-10' : 'light-green-8') : 'none'"
-    :text-color="valid ? (mouseoverSubmit ? 'red-2' : 'light-green-2') : 'none'"
-    @click.stop="handleSubmit"
-    @mouseover="mouseoverSubmit = true"
-    @mouseleave="mouseoverSubmit = false"
   >
-    <template v-slot:loading>
+    <template #loading>
       <q-spinner-facebook />
     </template>
   </q-btn>
@@ -18,6 +18,7 @@
 <script>
 // import { isNil } from "ramda";
 import { defineComponent, ref } from "vue";
+
 import { useEditing } from "@/use";
 
 export default defineComponent({

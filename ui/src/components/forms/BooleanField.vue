@@ -1,19 +1,19 @@
 <template>
   <q-select
-    clearable
-    input-debounce="350"
-    label="True or False"
     v-model="value"
+    @blur="handleBlur"
     :error="errorMessage && meta.touched"
     :options="options"
     :popup-content-style="{ zIndex: '9999 !important' }"
-    @blur="handleBlur"
+    input-debounce="350"
+    label="True or False"
+    clearable
   >
     <ToolTip v-if="description">
       {{ description }}
     </ToolTip>
 
-    <template v-slot:error>
+    <template #error>
       <div>{{ errorMessage }}</div>
     </template>
   </q-select>
@@ -21,11 +21,15 @@
 
 <script>
 import { useField } from "vee-validate";
-import { defineComponent, defineAsyncComponent } from "vue";
+import { defineAsyncComponent, defineComponent } from "vue";
+
 import { booleanOptions } from "@/forms/constants";
 
 export default defineComponent({
   name: "BooleanField",
+  components: {
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     field: {
       type: String,
@@ -40,9 +44,7 @@ export default defineComponent({
       default: () => false,
     },
   },
-  components: {
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+
   setup(props) {
     const options = booleanOptions;
 

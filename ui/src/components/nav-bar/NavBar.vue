@@ -2,10 +2,10 @@
   <q-header class="no-shadow">
     <div class="main-toolbar row flex-center q-px-lg q-py-xs">
       <q-btn
-        icon="mdi-menu"
-        class="tb-button q-mr-md"
-        :class="{ 'edit-on': ongoingEdit }"
         @click="appDrawerOpen = !appDrawerOpen"
+        :class="{ 'edit-on': ongoingEdit }"
+        class="tb-button q-mr-md"
+        icon="mdi-menu"
       >
         <ToolTip>Open App menu.</ToolTip>
       </q-btn>
@@ -14,9 +14,9 @@
 
       <q-breadcrumbs
         v-if="ui.windowWidth > 790"
-        separator-color="bc-colour"
-        gutter="xs"
         class="menu-breadcrumb q-ml-md q-mr-auto"
+        gutter="xs"
+        separator-color="bc-colour"
       >
         <template v-for="(route, idx) in breadcrumbs" :key="idx">
           <q-breadcrumbs-el
@@ -35,34 +35,34 @@
       </div>
 
       <q-btn
+        class="tb-button q-mx-md tb-search-button"
         icon="mdi-magnify"
         icon-right="mdi-tab-search"
         label="Search..."
         no-caps
-        class="tb-button q-mx-md tb-search-button"
       >
         <ToolTip>Search IDA.</ToolTip>
       </q-btn>
 
-      <q-separator vertical dark class="q-mr-md" />
+      <q-separator class="q-mr-md" dark vertical />
 
       <template v-for="(route, idx) in topRoutes" :key="idx">
         <q-btn-group
           v-if="route.path == 'tickets'"
-          class="tb-button q-mr-sm"
           :class="ui.currentSection === route.children[0].name ? 'disabled' : ''"
+          class="tb-button q-mr-sm"
         >
           <q-btn
-            :to="{ name: route.children[0].name }"
-            :icon="route.meta.icon"
             :disable="ui.currentSection === route.children[0].name"
+            :icon="route.meta.icon"
+            :to="{ name: route.children[0].name }"
           >
             <ToolTip>{{ route.label }}</ToolTip>
           </q-btn>
           <q-btn
-            icon="mdi-plus"
-            class="btn-dropdown-like"
             :disable="ui.currentSection === route.children[0].name"
+            class="btn-dropdown-like"
+            icon="mdi-plus"
           >
             <ToolTip>Create new issue ticket.</ToolTip>
           </q-btn>
@@ -71,20 +71,20 @@
         <q-btn-dropdown
           v-else-if="route.dropdown == true"
           :icon="route.meta.icon"
+          :menu-offset="[0, 5]"
           class="tb-button q-mr-sm"
+          content-class="popup-menu dark"
           menu-anchor="bottom right"
           menu-self="top right"
-          :menu-offset="[0, 5]"
-          content-class="popup-menu dark"
         >
           <q-list>
             <template v-for="(child, i) in route.children" :key="i">
               <q-item
-                :to="{ name: child.name ? child.name : child.children[0].name }"
-                dense
-                clickable
                 v-close-popup
                 :disable="ui.currentSubsection === child.meta.navPath[1]"
+                :to="{ name: child.name ? child.name : child.children[0].name }"
+                clickable
+                dense
               >
                 <q-item-section class="col-auto q-mr-xs">
                   <q-icon :name="child.meta.icon" size="xs" />
@@ -100,24 +100,24 @@
 
         <q-btn
           v-else
-          :to="{ name: route.name ? route.name : route.children[0].name }"
-          :icon="route.meta.icon"
-          class="tb-button q-mr-sm"
           :disable="
             route.name
               ? ui.currentSection === route.name
               : ui.currentSection === route.children[0].name
           "
+          :icon="route.meta.icon"
+          :to="{ name: route.name ? route.name : route.children[0].name }"
+          class="tb-button q-mr-sm"
         >
           <ToolTip>{{ route.label }}</ToolTip>
         </q-btn>
       </template>
 
-      <q-btn dense round class="q-pr-none" @click="userDrawerOpen = !userDrawerOpen">
+      <q-btn @click="userDrawerOpen = !userDrawerOpen" class="q-pr-none" dense round>
         <q-avatar v-if="!nully(auth.user.avatar)" size="34px">
           <q-img :src="auth.user.avatar" fit="cover" ratio="1" />
         </q-avatar>
-        <q-icon v-else name="mdi-account-circle" size="lg" color="blue-grey-5" />
+        <q-icon v-else color="blue-grey-5" name="mdi-account-circle" size="lg" />
       </q-btn>
     </div>
 
@@ -126,8 +126,11 @@
         <q-btn
           v-for="(route, idx) in menuRoutes"
           :key="idx"
-          no-wrap
-          class="text-grey-9 menu-button"
+          :active="
+            route.name
+              ? ui.currentSection === route.name
+              : ui.currentSection === route.children[0].name
+          "
           :class="
             route.name
               ? ui.currentSection === route.name
@@ -138,11 +141,8 @@
                 : ''
           "
           :to="{ name: route.name ? route.name : route.children[0].name }"
-          :active="
-            route.name
-              ? ui.currentSection === route.name
-              : ui.currentSection === route.children[0].name
-          "
+          class="text-grey-9 menu-button"
+          no-wrap
         >
           <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
           <span :data-content="route.name" class="q-pl-sm text-menu">
@@ -153,37 +153,37 @@
         <q-space />
 
         <q-btn
-          size="12px"
-          :text-color="preferences.tooltipsOn.value ? 'green-7' : 'grey-7'"
+          @click="preferences.tooltipsOn.value = !preferences.tooltipsOn.value"
+          :class="{ 'bg-green-1': preferences.tooltipsOn.value }"
           :icon="
             preferences.tooltipsOn.value
               ? 'mdi-tooltip-remove-outline'
               : 'mdi-tooltip-check-outline'
           "
+          :text-color="preferences.tooltipsOn.value ? 'green-7' : 'grey-7'"
           class="mc-button"
-          :class="{ 'bg-green-1': preferences.tooltipsOn.value }"
-          @click="preferences.tooltipsOn.value = !preferences.tooltipsOn.value"
+          size="12px"
         >
           <ToolTip>Tooltips</ToolTip>
         </q-btn>
         <q-btn
-          size="13px"
-          :text-color="isFullscreen ? 'indigo-7' : 'grey-7'"
-          :icon="isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
-          class="mc-button"
-          :class="{ 'bg-indigo-1': isFullscreen }"
           @click="toggleFullscreen"
+          :class="{ 'bg-indigo-1': isFullscreen }"
+          :icon="isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+          :text-color="isFullscreen ? 'indigo-7' : 'grey-7'"
+          class="mc-button"
+          size="13px"
         >
           <ToolTip>Full screen</ToolTip>
         </q-btn>
         <q-btn
           v-if="showInfoAreaToggle"
-          size="13px"
-          :text-color="showInfoArea ? 'grey-7' : 'indigo-7'"
-          :icon="showInfoArea ? 'mdi-arrow-collapse-vertical' : 'mdi-arrow-expand-vertical'"
-          class="mc-button"
-          :class="{ 'bg-indigo-1': !showInfoArea }"
           @click="showInfoArea = !showInfoArea"
+          :class="{ 'bg-indigo-1': !showInfoArea }"
+          :icon="showInfoArea ? 'mdi-arrow-collapse-vertical' : 'mdi-arrow-expand-vertical'"
+          :text-color="showInfoArea ? 'grey-7' : 'indigo-7'"
+          class="mc-button"
+          size="13px"
         >
           <ToolTip>Shrink info area to maximize editing space.</ToolTip>
         </q-btn>
@@ -196,11 +196,12 @@
 import { openURL, useQuasar } from "quasar";
 import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, provide, ref, watch } from "vue";
-import { navRoutes } from "@/router";
+import { useRoute } from "vue-router";
+
 import { ToolTip } from "@/components";
+import { navRoutes } from "@/router";
 import { useStores } from "@/use";
 import { nully } from "@/utils";
-import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "NavBar",
@@ -286,7 +287,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .main-toolbar {
   background-color: #2f333c;
   background-image: linear-gradient(180deg, #072034 10%, #1b1b1b);

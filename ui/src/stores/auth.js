@@ -1,4 +1,5 @@
 // Define the auth store machine interface.
+import { useSelector } from "@xstate/vue";
 import { encode as base64encode } from "base64-arraybuffer";
 import * as changeKeys from "change-case/keys";
 import cryptoRandomString from "crypto-random-string";
@@ -7,7 +8,6 @@ import { Notify } from "quasar";
 import { has, isNil, isNotNil } from "ramda";
 import { computed, ref, watch } from "vue";
 import { assign, fromCallback, fromPromise, setup } from "xstate";
-import { useSelector } from "@xstate/vue";
 import * as yup from "yup";
 
 import { API as apiInterface, requests } from "@/api";

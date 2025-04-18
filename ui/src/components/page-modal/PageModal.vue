@@ -1,23 +1,24 @@
 <template>
   <BaseModal :cuid="cuid" :x-pos="xPos" :y-pos="yPos">
-    <template v-slot:content>
+    <template #content>
       <q-img v-if="url" :src="url">
-        <template v-slot:error>
+        <template #error>
           <div class="absolute-full flex flex-center bg-negative text-white">
             Couldn't load preview...
           </div>
         </template>
       </q-img>
-      <AdaptiveSpinner type="facebook" v-else thickness="3" class="q-ma-auto" />
+      <AdaptiveSpinner v-else class="q-ma-auto" thickness="3" type="facebook" />
     </template>
   </BaseModal>
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from "vue";
 import { useSelector } from "@xstate/vue";
+import { defineComponent, onMounted, ref } from "vue";
+
 import { requests } from "@/api";
-import { BaseModal, AdaptiveSpinner } from "@/components";
+import { AdaptiveSpinner, BaseModal } from "@/components";
 import { useAPI, useEditing } from "@/use";
 
 export default defineComponent({

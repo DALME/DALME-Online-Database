@@ -1,5 +1,5 @@
 <template>
-  <div class="attributes-field column q-my-sm" :class="{ separator: !showing }">
+  <div :class="{ separator: !showing }" class="attributes-field column q-my-sm">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
         {{ !showing && !empty(modelValue) ? `Attributes (${modelValue.length})` : "Attributes" }}
@@ -7,25 +7,25 @@
 
       <q-spinner v-if="loading" color="primary" size="xs" />
       <q-btn
-        round
+        v-show="showing"
+        @click.stop="handleAddField"
+        :disable="modelValue.length === allowed.length"
         class="q-ml-sm"
         color="amber"
         icon="add"
         size="xs"
         text-color="black"
-        v-show="showing"
-        :disable="modelValue.length === allowed.length"
-        @click.stop="handleAddField"
+        round
       >
         <ToolTip> Add an attribute </ToolTip>
       </q-btn>
 
       <q-btn
-        round
+        @click.stop="showing = !showing"
+        :icon="showing ? 'visibility_off' : 'visibility'"
         class="q-ml-sm"
         size="xs"
-        :icon="showing ? 'visibility_off' : 'visibility'"
-        @click.stop="showing = !showing"
+        round
       >
         <ToolTip>
           {{ showing ? "Hide attributes" : "Show attributes" }}
@@ -43,16 +43,15 @@
           v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
           :key="`${idx}-${field.key}`"
         >
-          <div class="row q-mb-sm" v-show="showing">
+          <div v-show="showing" class="row q-mb-sm">
             <div class="col-6 q-pr-sm">
               <q-select
-                map-options
-                label="Attribute"
-                class="attribute-select"
+                @clear="() => handleClearAttribute(idx)"
+                @filter="handleOptions"
+                @update:model-value="(option) => handleUpdateAttribute(option, idx)"
                 :clearable="!isRequiredAttribute(data.attribute)"
                 :disable="isRequiredAttribute(data.attribute)"
                 :model-value="data.attribute"
-                :options="options"
                 :option-label="
                   (option) =>
                     option
@@ -62,11 +61,12 @@
                       : null
                 "
                 :option-value="(option) => option"
+                :options="options"
                 :popup-content-style="{ zIndex: '9999 !important' }"
                 :use-input="true"
-                @clear="() => handleClearAttribute(idx)"
-                @filter="handleOptions"
-                @update:modelValue="(option) => handleUpdateAttribute(option, idx)"
+                class="attribute-select"
+                label="Attribute"
+                map-options
               >
                 <ToolTip v-if="data.attribute && data.attribute.description">
                   {{ data.attribute.description }}
@@ -76,7 +76,7 @@
 
             <div class="q-pl-sm col">
               <template v-if="!data.attribute">
-                <q-input disable label="Choose an attribute" />
+                <q-input label="Choose an attribute" disable />
               </template>
               <template v-else>
                 <template v-if="data.attribute.dataType === 'Boolean'">
@@ -124,20 +124,20 @@
                     v-if="!getOptionsData(data.attribute.shortName).multiple"
                     v-model="data.value"
                     :field="`attributes[${idx}].value`"
-                    :label="data.attribute.dataType"
                     :filterable="getOptionsData(data.attribute.shortName).filterable"
-                    :getOptions="wrapRequest(getOptionsData(data.attribute.shortName).request)"
-                    :optionsSchema="getOptionsData(data.attribute.shortName).schema"
+                    :get-options="wrapRequest(getOptionsData(data.attribute.shortName).request)"
+                    :label="data.attribute.dataType"
+                    :options-schema="getOptionsData(data.attribute.shortName).schema"
                     :validation="validators[data.attribute.shortName]"
                   />
                   <MultipleSelectField
                     v-else
                     v-model="data.value"
                     :field="`attributes[${idx}].value`"
-                    :label="data.attribute.dataType"
                     :filterable="getOptionsData(data.attribute.shortName).filterable"
-                    :getOptions="wrapRequest(getOptionsData(data.attribute.shortName).request)"
-                    :optionsSchema="getOptionsData(data.attribute.shortName).schema"
+                    :get-options="wrapRequest(getOptionsData(data.attribute.shortName).request)"
+                    :label="data.attribute.dataType"
+                    :options-schema="getOptionsData(data.attribute.shortName).schema"
                     :validation="validators[data.attribute.shortName]"
                   />
                 </template>
@@ -154,15 +154,15 @@
 
             <div v-if="!required || modelValue.length > 1" class="row items-center">
               <q-btn
+                @click.stop="handleRemoveField(idx)"
+                :disable="isRequiredAttribute(data.attribute)"
+                :text-color="isRequiredAttribute(data.attribute) ? 'grey' : 'black'"
                 class="q-ml-auto"
+                icon="clear"
+                size="xs"
                 flat
                 round
                 unelevated
-                size="xs"
-                icon="clear"
-                :text-color="isRequiredAttribute(data.attribute) ? 'grey' : 'black'"
-                :disable="isRequiredAttribute(data.attribute)"
-                @click.stop="handleRemoveField(idx)"
               >
                 <ToolTip v-if="isRequiredAttribute(data.attribute)">
                   Can't delete a required attribute
@@ -184,7 +184,7 @@
 <script>
 import { isNil, filter as rFilter, map as rMap, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, defineAsyncComponent, onMounted, ref, unref } from "vue";
+import { computed, defineAsyncComponent, defineComponent, onMounted, ref, unref } from "vue";
 import { string as yString } from "yup";
 
 import { fetcher, requests } from "@/api";
@@ -206,6 +206,17 @@ import { empty } from "./normalize";
 
 export default defineComponent({
   name: "AttributesField",
+  components: {
+    BooleanField,
+    DateField,
+    DecimalField,
+    InputField,
+    MultipleSelectField,
+    NumberField,
+    SelectField,
+    TextField,
+    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
+  },
   props: {
     modelValue: {
       type: Array,
@@ -224,20 +235,12 @@ export default defineComponent({
       default: () => [],
     },
     validators: {
+      type: Object,
       required: true,
     },
   },
-  components: {
-    BooleanField,
-    DateField,
-    DecimalField,
-    InputField,
-    MultipleSelectField,
-    NumberField,
-    SelectField,
-    TextField,
-    ToolTip: defineAsyncComponent(() => import("@/components/widgets/ToolTip.vue")),
-  },
+  emits: ["update:modelValue"],
+
   setup(props, context) {
     const { apiInterface } = useAPI();
     const { fields, push, replace, remove } = useFieldArray("attributes");
@@ -380,7 +383,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .attributes-field {
   will-change: auto;
   //will-transform: auto;

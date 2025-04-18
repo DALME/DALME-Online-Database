@@ -1,35 +1,35 @@
 <template>
   <q-btn-dropdown
-    unelevated
-    no-caps
-    label="Task Lists"
-    size="12px"
-    menu-anchor="bottom left"
-    menu-self="top left"
     class="bg-indigo-1 text-indigo-9 table-toolbar-button"
     content-class="menu-shadow"
+    label="Task Lists"
+    menu-anchor="bottom left"
+    menu-self="top left"
+    size="12px"
+    no-caps
+    unelevated
   >
-    <q-list bordered separator class="text-grey-9 task-list-menu">
-      <q-item dense class="q-pr-sm">
+    <q-list class="text-grey-9 task-list-menu" bordered separator>
+      <q-item class="q-pr-sm" dense>
         <q-item-section class="text-weight-bold">Task lists</q-item-section>
         <q-item-section avatar>
-          <q-btn flat dense size="xs" color="grey-6" icon="close" @click="clearActiveFilters" />
+          <q-btn @click="clearActiveFilters" color="grey-6" icon="close" size="xs" dense flat />
         </q-item-section>
       </q-item>
 
       <template v-for="(list, group, idx) in taskLists" :key="idx">
         <q-item
-          dense
-          clickable
-          :group="group"
+          @click.stop="filter"
           :class="
             activeFilters && activeFilters.has(group)
               ? 'text-weight-bold bg-indigo-1 text-indigo-5'
               : 'text-weight-600 text-grey-7'
           "
-          @click.stop="filter"
+          :group="group"
+          clickable
+          dense
         >
-          <q-item-section side class="q-pr-xs">
+          <q-item-section class="q-pr-xs" side>
             <q-icon name="o_group" size="xs" />
           </q-item-section>
           <q-item-section class="text-13">
@@ -38,16 +38,16 @@
         </q-item>
 
         <q-item
-          dense
-          clickable
-          v-for="(taskList, idx) in list"
-          :key="idx"
+          v-for="(taskList, idx2) in list"
+          :key="idx2"
+          @click.stop="filter"
+          :active="activeFilters && activeFilters.has(`${group}_${taskList.name}`)"
           :group="group"
           :list="taskList.name"
-          :active="activeFilters && activeFilters.has(`${group}_${taskList.name}`)"
-          class="q-pr-sm"
           active-class="text-weight-bold bg-indigo-1 text-indigo-5"
-          @click.stop="filter"
+          class="q-pr-sm"
+          clickable
+          dense
         >
           <q-item-section class="inset-item">
             {{ taskList.name }}
@@ -56,42 +56,42 @@
           <q-item-section class="col-grow">
             <div class="row q-ml-sm">
               <q-badge
-                rounded
-                color="indigo-2"
-                class="text-detail text-weight-600 text-indigo-5 q-mx-sm q-my-xs"
                 :label="taskList.taskCount"
+                class="text-detail text-weight-600 text-indigo-5 q-mx-sm q-my-xs"
+                color="indigo-2"
+                rounded
               />
               <q-btn
                 v-if="isAdmin"
-                flat
-                dense
-                size="sm"
+                @click.stop="handleEdit(taskList)"
+                class="q-ml-auto q-mr-xs strong-focus outlined-item"
                 color="grey-6"
                 icon="o_edit"
-                class="q-ml-auto q-mr-xs strong-focus outlined-item"
-                @click.stop="handleEdit(taskList)"
+                size="sm"
+                dense
+                flat
               >
-                <ToolTip anchor="center left" self="center right" :offset="[10, 10]">
+                <ToolTip :offset="[10, 10]" anchor="center left" self="center right">
                   Edit task list
                 </ToolTip>
               </q-btn>
 
               <q-btn
                 v-if="isAdmin"
-                flat
-                dense
-                size="sm"
-                :color="taskList.taskCount > 0 ? 'grey-4' : 'grey-6'"
-                icon="o_delete"
-                class="strong-focus outlined-item"
-                :disable="taskList.taskCount > 0"
                 @click.stop="handleDelete(taskList)"
+                :color="taskList.taskCount > 0 ? 'grey-4' : 'grey-6'"
+                :disable="taskList.taskCount > 0"
+                class="strong-focus outlined-item"
+                icon="o_delete"
+                size="sm"
+                dense
+                flat
               >
                 <ToolTip
                   v-if="taskList.taskCount === 0"
+                  :offset="[10, 10]"
                   anchor="center left"
                   self="center right"
-                  :offset="[10, 10]"
                 >
                   Delete task list
                 </ToolTip>
@@ -103,13 +103,13 @@
 
       <q-item
         v-if="isAdmin"
-        clickable
         v-close-popup
-        dense
-        class="text-grey-8"
         @click.stop="handleCreate"
+        class="text-grey-8"
+        clickable
+        dense
       >
-        <q-item-section side class="q-pr-xs">
+        <q-item-section class="q-pr-xs" side>
           <q-icon name="o_playlist_add" size="xs" />
         </q-item-section>
         <q-item-section class="text-weight-600">New Task List</q-item-section>
@@ -120,14 +120,15 @@
 
 <script>
 import { createId as cuid } from "@paralleldrive/cuid2";
+import { useActor } from "@xstate/vue";
 import { isNil } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 import { useRouter } from "vue-router";
-import { useActor } from "@xstate/vue";
+
 import { requests } from "@/api";
+import { ToolTip } from "@/components";
 import forms from "@/forms";
 import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
-import { ToolTip } from "@/components";
 
 export default defineComponent({
   name: "TasklistList",
@@ -256,7 +257,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .task-list-menu {
   min-width: 300px;
 }

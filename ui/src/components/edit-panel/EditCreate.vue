@@ -1,90 +1,90 @@
 <template>
-  <q-fab ref="cFab" icon="data_saver_on" direction="down" square>
+  <q-fab ref="cFab" direction="down" icon="data_saver_on" square>
     <q-fab
-      padding="0.5rem"
+      :hide-label="false"
+      color="orange"
+      direction="left"
       icon="bookmark"
       label="Record"
-      external-label
       label-position="right"
+      padding="0.5rem"
       text-color="black"
-      direction="left"
-      color="orange"
-      :hide-label="false"
+      external-label
     >
       <q-fab-action
-        :onClick="() => handleClick('archive')"
+        :on-click="() => handleClick('archive')"
         color="amber"
-        text-color="black"
         icon="villa"
+        text-color="black"
         push
       >
-        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip :offset="[0, 35]" anchor="bottom middle" self="bottom middle">
           Create Archive
         </ToolTip>
       </q-fab-action>
 
       <q-fab-action
-        :onClick="() => handleClick('archivalFile')"
+        :on-click="() => handleClick('archivalFile')"
         color="amber"
-        text-color="black"
         icon="inventory"
+        text-color="black"
         push
       >
-        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip :offset="[0, 35]" anchor="bottom middle" self="bottom middle">
           Create Archival File
         </ToolTip>
       </q-fab-action>
 
       <q-fab-action
-        :onClick="() => handleClick('bibliography')"
+        :on-click="() => handleClick('bibliography')"
         color="amber"
-        text-color="black"
         icon="library_books"
+        text-color="black"
         push
       >
-        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip :offset="[0, 35]" anchor="bottom middle" self="bottom middle">
           Create Bibliography
         </ToolTip>
       </q-fab-action>
 
       <q-fab-action
-        :onClick="() => handleClick('record')"
+        :on-click="() => handleClick('record')"
         color="amber"
-        text-color="black"
         icon="format_list_numbered"
+        text-color="black"
         push
       >
-        <ToolTip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <ToolTip :offset="[0, 35]" anchor="bottom middle" self="bottom middle">
           Create Record
         </ToolTip>
       </q-fab-action>
     </q-fab>
 
     <q-fab
-      padding="0.5rem"
-      icon="collections_bookmark"
-      text-color="black"
-      direction="left"
       color="orange"
+      direction="left"
+      icon="collections_bookmark"
+      padding="0.5rem"
+      text-color="black"
     >
       <q-fab-action
         :onclick="() => handleClick('corpus')"
         color="amber"
-        text-color="black"
         icon="local_library"
+        text-color="black"
         push
       >
-        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]"> Create Corpus </ToolTip>
+        <ToolTip :offset="[0, 35]" anchor="top middle" self="top middle"> Create Corpus </ToolTip>
       </q-fab-action>
 
       <q-fab-action
         :onclick="() => handleClick('collection')"
         color="amber"
-        text-color="black"
         icon="apps"
+        text-color="black"
         push
       >
-        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]">
+        <ToolTip :offset="[0, 35]" anchor="top middle" self="top middle">
           Create Collection
         </ToolTip>
       </q-fab-action>
@@ -92,42 +92,42 @@
       <q-fab-action
         :onclick="() => handleClick('dataset')"
         color="amber"
-        text-color="black"
         icon="schema"
+        text-color="black"
         push
       >
-        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]"> Create Dataset </ToolTip>
+        <ToolTip :offset="[0, 35]" anchor="top middle" self="top middle"> Create Dataset </ToolTip>
       </q-fab-action>
 
       <q-fab-action
         :onclick="() => handleClick('workset')"
         color="amber"
-        text-color="black"
         icon="work"
+        text-color="black"
         push
       >
-        <ToolTip anchor="top middle" self="top middle" :offset="[0, 35]"> Create Workset </ToolTip>
+        <ToolTip :offset="[0, 35]" anchor="top middle" self="top middle"> Create Workset </ToolTip>
       </q-fab-action>
     </q-fab>
 
     <q-fab-action
       :onclick="() => handleClick('task')"
       color="amber"
-      text-color="black"
       icon="assignment"
+      text-color="black"
       push
     >
-      <ToolTip anchor="center left" self="center right" :offset="[10, 10]"> Create Task </ToolTip>
+      <ToolTip :offset="[10, 10]" anchor="center left" self="center right"> Create Task </ToolTip>
     </q-fab-action>
 
     <q-fab-action
       :onclick="() => handleClick('ticket')"
       color="amber"
-      text-color="black"
       icon="task"
+      text-color="black"
       push
     >
-      <ToolTip anchor="center left" self="center right" :offset="[10, 10]"> Create Ticket </ToolTip>
+      <ToolTip :offset="[10, 10]" anchor="center left" self="center right"> Create Ticket </ToolTip>
     </q-fab-action>
   </q-fab>
 </template>
@@ -135,8 +135,9 @@
 <script>
 import { createId as cuid } from "@paralleldrive/cuid2";
 import { defineComponent, ref } from "vue";
-import { useEditing } from "@/use";
+
 import { ToolTip } from "@/components";
+import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "EditCreate",

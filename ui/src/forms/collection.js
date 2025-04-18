@@ -5,9 +5,9 @@ import { AttributesField, InputField, SelectField, TextField } from "@/component
 import { permissionOptions } from "@/forms/constants";
 import {
   attributeValidators,
-  optionsSchema,
   collectionEditSchema,
   collectionFieldValidation,
+  optionsSchema,
   setSubmitSchemas,
 } from "@/schemas";
 

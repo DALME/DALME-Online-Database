@@ -3,28 +3,28 @@
     <div class="column q-pt-xs">
       <q-tabs
         v-model="currentPageData.editorTab"
-        dense
-        shrink
-        class="text-grey md-editor-tabs"
-        active-color="light-blue-10"
+        @update:model-value="onTabSwitch"
         active-bg-color="white"
-        indicator-color="transparent"
+        active-color="light-blue-10"
         align="left"
+        class="text-grey md-editor-tabs"
+        content-class="q-px-sm"
+        indicator-color="transparent"
+        dense
         narrow-indicator
         no-caps
-        content-class="q-px-sm"
-        @update:model-value="onTabSwitch"
+        shrink
       >
-        <q-tab name="preview" label="Preview" :disable="disabled" />
-        <q-tab name="edit" label="Edit" class="editor-tab-edit" />
+        <q-tab :disable="disabled" label="Preview" name="preview" />
+        <q-tab class="editor-tab-edit" label="Edit" name="edit" />
       </q-tabs>
     </div>
     <!--q-btn @click="parse" label="parse" /-->
     <div class="column">
       <transition
-        appear
         enter-active-class="animated slideInRight"
         leave-active-class="animated slideOutRight"
+        appear
       >
         <ToolBar v-show="currentPageData.editorTab === 'edit'" />
       </transition>
@@ -33,57 +33,59 @@
   <q-separator />
   <q-tab-panels
     v-model="currentPageData.editorTab"
-    keep-alive
-    animated
-    transition-prev="jump-up"
-    transition-next="jump-up"
-    class="editor-panel text-body2"
     :style="`height: ${editorHeight}px;`"
+    class="editor-panel text-body2"
+    transition-next="jump-up"
+    transition-prev="jump-up"
+    animated
+    keep-alive
   >
-    <q-tab-panel name="edit" class="row q-pa-none">
+    <q-tab-panel class="row q-pa-none" name="edit">
       <div class="col editor-container-col">
-        <div class="v-codemirror editor-container" ref="container"></div>
+        <div ref="container" class="v-codemirror editor-container"></div>
       </div>
       <TeiSidebar />
       <ContextMenu />
     </q-tab-panel>
-    <q-tab-panel name="preview" class="render-panel" :style="`height: ${editorHeight}px`">
+    <q-tab-panel :style="`height: ${editorHeight}px`" class="render-panel" name="preview">
       <TeiRenderer />
     </q-tab-panel>
   </q-tab-panels>
 </template>
 
 <script>
+import { autocompletion } from "@codemirror/autocomplete";
+import { highlightSelectionMatches } from "@codemirror/search";
+import { EditorState } from "@codemirror/state";
+import { EditorView, lineNumbers, tooltips } from "@codemirror/view";
 import { isEmpty, isNil } from "ramda";
 import {
   computed,
   defineComponent,
+  getCurrentInstance,
   inject,
   nextTick,
-  getCurrentInstance,
   onBeforeUnmount,
   onMounted,
   provide,
   shallowRef,
   watch,
 } from "vue";
-import { useEventHandling, useStores } from "@/use";
+
 import { TeiRenderer } from "@/components";
+import { useEventHandling, useStores } from "@/use";
+
 import {
   createEditorState,
   createEditorView,
   destroyEditorView,
   getEditorTools,
 } from "./codemirror-utils.js";
-import { EditorState } from "@codemirror/state";
-import { EditorView, lineNumbers, tooltips } from "@codemirror/view";
-import { highlightSelectionMatches } from "@codemirror/search";
-import { autocompletion } from "@codemirror/autocomplete";
-import TeiSidebar from "./TeiSidebar.vue";
 import ContextMenu from "./ContextMenu.vue";
-import ToolBar from "./ToolBar.vue";
 import { tagDecoratorPlugin } from "./tag-decorator.js";
+import TeiSidebar from "./TeiSidebar.vue";
 import * as themes from "./themes.js";
+import ToolBar from "./ToolBar.vue";
 import { getCompletions } from "./transcription-tools.js";
 
 export default defineComponent({

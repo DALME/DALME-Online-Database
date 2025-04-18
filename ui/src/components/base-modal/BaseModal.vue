@@ -1,21 +1,21 @@
 <template>
   <teleport to="body">
     <div
-      :class="`${containerClasses} ${zClass}`"
-      ref="el"
-      :style="`touch-action:none;${dragging}`"
       v-show="visible"
-      @click.stop="handleFocus"
+      ref="el"
       v-ripple:blue-1
+      @click.stop="handleFocus"
+      :class="`${containerClasses} ${zClass}`"
+      :style="`touch-action:none;${dragging}`"
     >
-      <q-card borderless class="modal-card">
+      <q-card class="modal-card" borderless>
         <q-card-section :class="`header ${zClass}`">
           <div class="title">{{ modalTitle }}</div>
           <div class="header-button-group">
-            <q-btn icon="o_visibility_off" @click.stop="handleMinimize">
+            <q-btn @click.stop="handleMinimize" icon="o_visibility_off">
               <ToolTip> Minimize </ToolTip>
             </q-btn>
-            <q-btn icon="close" @click.stop="confirm">
+            <q-btn @click.stop="confirm" icon="close">
               <ToolTip> Close </ToolTip>
             </q-btn>
           </div>
@@ -33,15 +33,19 @@
 </template>
 
 <script>
-import { format, useQuasar } from "quasar";
-import { computed, defineComponent, ref } from "vue";
 import { useDraggable, useStorage } from "@vueuse/core";
 import { useActor, useSelector } from "@xstate/vue";
-import { useEditing } from "@/use";
+import { format, useQuasar } from "quasar";
+import { computed, defineComponent, ref } from "vue";
+
 import { CustomDialog, ToolTip } from "@/components";
+import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "BaseModal",
+  components: {
+    ToolTip,
+  },
   props: {
     cuid: {
       type: String,
@@ -55,9 +59,6 @@ export default defineComponent({
       type: Number,
       required: true,
     },
-  },
-  components: {
-    ToolTip,
   },
   setup(props) {
     const $q = useQuasar();
@@ -149,7 +150,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .modal-container {
   min-width: 45rem;
   max-width: 50rem;

@@ -6,13 +6,13 @@
       <div class="text-h2" style="opacity: 0.4">Something went wrong...</div>
 
       <q-btn
+        :to="{ name: 'Home' }"
         class="q-mt-xl"
         color="white"
-        text-color="blue"
-        unelevated
-        :to="{ name: 'Home' }"
         label="Go Home"
+        text-color="blue"
         no-caps
+        unelevated
       />
     </div>
   </div>
