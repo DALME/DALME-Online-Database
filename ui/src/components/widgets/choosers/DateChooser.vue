@@ -1,37 +1,44 @@
 <template>
   <div class="date-chooser-wrapper">
     <div v-if="!editable" class="date-chooser-text">{{ text }}</div>
-    <div v-if="editable" class="date-chooser-input-container q-ml-lg">
+    <div v-if="editable" class="date-chooser-input-container">
       <q-select
         v-model="day"
         @update:model-value="onChange"
         :options="dayOptions"
-        class="date-chooser-day"
-        label="Day"
-        borderless
+        class="date-chooser-field day"
+        clearable
         dense
         options-dense
-      />
+        outlined
+      >
+        <template #selected v-if="!day"><div class="select-placeholder">Day</div></template>
+      </q-select>
+
       <q-select
         v-model="month"
         @update:model-value="onChange"
         :options="monthOptions"
-        class="date-chooser-month"
-        label="Month"
-        borderless
+        class="date-chooser-field month"
+        clearable
         dense
         map-options
         options-dense
-      />
+        outlined
+      >
+        <template #selected v-if="!month"><div class="select-placeholder">Month</div></template>
+      </q-select>
+
       <q-input
         v-model="year"
         @update:model-value="onChange"
-        class="date-chooser-year"
-        label="Year"
-        borderless
+        class="date-chooser-field year"
+        placeholder="Year"
         dense
+        outlined
       />
-      <q-btn v-if="date" class="q-mx-sm" icon="event" size="sm" dense flat>
+
+      <q-btn v-if="date" class="calendar-button" icon="event" dense flat>
         <q-popup-proxy cover>
           <q-date v-model="date" @update:model-value="onChange" mask="YYYY-MM-DD" minimal />
         </q-popup-proxy>
@@ -84,8 +91,8 @@ export default defineComponent({
 
     const text = computed(() => {
       if (date.value) {
-        const dateObj = new Date(date.value, { zone: "Europe/Paris" });
-        return formatDate(dateObj, "DATE_MED_WITH_WEEKDAY");
+        const dateObj = new Date(date.value);
+        return formatDate(dateObj, "DATE_MED_WITH_WEEKDAY", "Europe/Paris");
       } else {
         return "TEXT";
       }
