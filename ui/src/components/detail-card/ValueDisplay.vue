@@ -6,6 +6,7 @@
       :label="data.label"
       :placeholder="data.description ? data.description : null"
       :readonly="!editOn"
+      class="base-field"
       color="indigo-8"
       autogrow
     >
@@ -34,6 +35,7 @@
       :options="options"
       :readonly="!editOn"
       :use-chips="multiple"
+      class="base-field"
       color="indigo-8"
       input-debounce="0"
       emit-value
@@ -73,13 +75,19 @@
         />
       </template>
     </q-select>
-    <q-field v-if="data.dataType === 'BOOL'" :borderless="!editOn" :readonly="!editOn">
+    <q-field
+      v-if="data.dataType === 'BOOL'"
+      :borderless="!editOn"
+      :readonly="!editOn"
+      class="bool-field"
+    >
       <q-checkbox
         v-model="value"
         :disable="!editOn"
         :label="data.label"
         checked-icon="task_alt"
         unchecked-icon="highlight_off"
+        dense
         left-label
       />
       <template #append>
@@ -98,7 +106,10 @@
         />
       </template>
     </q-field>
-    <div v-if="data.dataType === 'DATE'" class="field-date-container">
+    <div
+      v-if="data.dataType === 'DATE'"
+      :class="editOn ? 'field-date-container active' : 'field-date-container'"
+    >
       <div class="field-date-wrapper">
         <div class="field-date-label q-field__label">
           <div>{{ data.label }}</div>

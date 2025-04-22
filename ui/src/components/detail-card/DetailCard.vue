@@ -53,7 +53,7 @@
       />
     </q-item>
     <q-separator class="bg-grey-4" />
-    <q-card-section :class="padContainer ? 'q-pa-md' : 'q-pa-none'">
+    <q-card-section :class="bodyClasses">
       <template v-if="fields && data">
         <template v-for="field in fields" :key="field">
           <ValueDisplay
@@ -164,6 +164,11 @@ export default defineComponent({
     const editOn = ref(false);
     const saving = ref(false);
     const isNew = ref(props.data?.value === null && props.data?.show === true);
+    const bodyClasses = computed(() => {
+      if (props.padContainer) return "q-pa-md";
+      if (props.padContainerList) return "q-px-md q-pb-md q-pt-xs";
+      return "q-pa-none";
+    });
 
     const editIcon = computed(() =>
       editOn.value
@@ -203,6 +208,7 @@ export default defineComponent({
       editor,
       saving,
       valueChanged,
+      bodyClasses,
     };
   },
 });
