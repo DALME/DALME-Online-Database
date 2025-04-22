@@ -123,6 +123,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    padContainerList: {
+      type: Boolean,
+      default: false,
+    },
     editable: {
       type: Boolean,
       default: false,
@@ -139,11 +143,13 @@ export default defineComponent({
     },
     register: {
       type: Function,
-      required: true,
+      required: false,
+      default: null,
     },
     fieldName: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     markdown: {
       type: Boolean,

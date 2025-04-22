@@ -98,15 +98,15 @@ export default defineComponent({
     },
     attributes: {
       type: Object,
-      required: true,
+      default: null,
     },
     from: {
       type: Number,
-      required: true,
+      default: null,
     },
     to: {
       type: Number,
-      required: true,
+      default: null,
     },
     action: {
       type: String,

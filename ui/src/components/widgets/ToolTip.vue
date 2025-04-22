@@ -27,7 +27,8 @@ export default defineComponent({
     },
     text: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   setup() {

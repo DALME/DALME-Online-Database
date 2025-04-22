@@ -77,7 +77,7 @@ export default defineComponent({
     },
     label: {
       type: String,
-      required: true,
+      default: null,
     },
     tooltip: {
       type: String,

@@ -76,6 +76,14 @@ export default defineComponent({
       type: String,
       default: "Collections",
     },
+    width: {
+      type: String,
+      required: true,
+    },
+    scrollHeight: {
+      type: Number,
+      required: true,
+    },
   },
   setup(props, context) {
     const { auth } = useStores();

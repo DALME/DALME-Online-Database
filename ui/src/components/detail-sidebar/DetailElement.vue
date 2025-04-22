@@ -50,11 +50,13 @@ export default defineComponent({
     },
     field: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     label: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   setup(props) {
