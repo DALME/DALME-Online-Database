@@ -582,10 +582,6 @@ tei-category {
 tei-cell {
   display: table-cell;
   padding: 1em 1.5em 1em 1em;
-  /*
-tei-border-left: 2px solid @border-color;
-tei-border-top:2px solid @border-color;
-tei-*/
   border: 1px dotted #aaaaaa;
   width: 100%;
 }
@@ -1368,22 +1364,6 @@ tei-particDesc {
 tei-pause {
   /* Empty Rule Set*/
 }
-tei-pb {
-  /*
-  display: block;
-  width: 100%;
-  text-align: right;
-  color: gray;
-  margin: 2em 0 2em 0;
-  font-size: 11pt;
-  */
-}
-/*
-tei-pb:before {
-tei-	content: "[page:\a0" attr(n) "]";
-}
-tei-*/
-
 tei-per {
   /* don't know, check back */
 }
@@ -1511,7 +1491,6 @@ tei-lb + tei-quotation {
   margin-top: -15px;
 }
 
-tei-*/
 /* r */
 tei-app tei-rdg {
   /*perhaps choice */
@@ -1891,11 +1870,6 @@ tei-table[rend~=hdiv] table tr:not(:last-of-type) {
 
 tei-teiHeader {
   display: block;
-  /*
-tei-border-radius: 15px;
-tei-border: 1px solid black;
-tei-background:white;
-tei-*/
   margin-top: 2em;
   margin-bottom: 2em;
 }
