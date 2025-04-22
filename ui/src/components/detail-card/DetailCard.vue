@@ -209,40 +209,43 @@ export default defineComponent({
 .card-title-search {
   width: 30%;
 }
-.card-title-search .q-field__control {
+:deep(.card-title-search .q-field__control) {
   font-size: 12px;
   height: 23px;
   border: 1px solid rgb(209, 209, 209);
   border-radius: 4px;
   padding: 0px 5px 0px 10px;
 }
-.card-title-search .q-field__native,
-.card-title-search .q-field__marginal {
+:deep(.q-item__label) {
+  font-size: 13px;
+}
+:deep(.card-title-search .q-field__native),
+:deep(.card-title-search .q-field__marginal) {
   height: 21px;
   padding: 6px 10px;
   color: #777;
 }
-.card-title-search .q-field__inner {
+:deep(.card-title-search .q-field__inner) {
   align-self: center;
 }
-.q-field--standard.q-field--readonly .q-field__control:before,
-.q-field--readonly .q-field__control:before {
+:deep(.q-field--standard.q-field--readonly .q-field__control:before),
+:deep(.q-field--readonly .q-field__control:before) {
   border-bottom: 1px dotted rgba(0, 0, 0, 0.24);
 }
-.value-display .q-field__append {
+:deep(.value-display .q-field__append) {
   height: auto;
 }
-.value-display .q-field--labeled .q-field__native {
+:deep(.value-display .q-field--labeled .q-field__native) {
   padding-bottom: 0;
 }
-.value-display .q-chip {
+:deep(.value-display .q-chip) {
   font-size: 12px;
   padding: 0.5em 0.9em;
   height: 1.7em;
   background: transparent;
   border: 1px solid #303f9f;
 }
-.value-display .q-chip--dense .q-chip__icon--remove {
+:deep(.value-display .q-chip--dense .q-chip__icon--remove) {
   margin-left: 0.3em;
   margin-right: -0.5em;
 }

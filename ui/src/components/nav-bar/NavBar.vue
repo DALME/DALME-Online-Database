@@ -308,38 +308,38 @@ export default defineComponent({
 .main-toolbar .tb-button:before {
   box-shadow: none;
 }
-.main-toolbar .tb-button .q-icon {
+:deep(.main-toolbar .tb-button .q-icon) {
   font-size: 20px;
 }
-.main-toolbar .tb-button.q-btn-group {
+:deep(.main-toolbar .tb-button.q-btn-group) {
   padding: 0;
 }
-.main-toolbar .tb-button:hover:not(.q-btn-group, .disabled),
-.main-toolbar .tb-button.q-btn-group:not(.disabled) .q-btn:hover {
+:deep(.main-toolbar .tb-button:hover:not(.q-btn-group, .disabled)),
+:deep(.main-toolbar .tb-button.q-btn-group:not(.disabled) .q-btn:hover) {
   border-color: rgb(87, 115, 144);
   color: rgb(132, 159, 195);
   background-color: #1d3446;
 }
-.main-toolbar .tb-button.q-btn-group:hover:not(.disabled) {
+:deep(.main-toolbar .tb-button.q-btn-group:hover:not(.disabled)) {
   border-color: rgb(87, 115, 144);
 }
-.main-toolbar .tb-button.q-btn-group.disabled,
-.main-toolbar .tb-button.disabled:not(.q-btn-group) {
+:deep(.main-toolbar .tb-button.q-btn-group.disabled),
+:deep(.main-toolbar .tb-button.disabled:not(.q-btn-group)) {
   box-shadow:
     inset -1px -1px 0px 1px rgb(87 111 128 / 15%),
     inset 1px 1px 0px 1px black;
   opacity: 1 !important;
   background: #13293a;
 }
-.main-toolbar .tb-button .q-focus-helper {
+:deep(.main-toolbar .tb-button .q-focus-helper) {
   opacity: 0 !important;
 }
 .main-toolbar .tb-button.q-btn-group,
 .main-toolbar .tb-button.q-btn-dropdown {
   width: auto;
 }
-.main-toolbar .tb-button.q-btn-group .q-btn-dropdown__arrow,
-.main-toolbar .tb-button.q-btn-dropdown .q-btn-dropdown__arrow {
+:deep(.main-toolbar .tb-button.q-btn-group .q-btn-dropdown__arrow),
+:deep(.main-toolbar .tb-button.q-btn-dropdown .q-btn-dropdown__arrow) {
   margin-left: 2px;
   width: 12px;
 }
@@ -348,15 +348,19 @@ export default defineComponent({
   height: 30px;
   font-size: 11px;
 }
-.main-toolbar
-  .tb-button.q-btn-dropdown--split
-  .q-btn-dropdown__arrow-container:not(.q-btn--outline) {
+:deep(
+  .main-toolbar
+    .tb-button.q-btn-dropdown--split
+    .q-btn-dropdown__arrow-container:not(.q-btn--outline)
+) {
   border-left: none;
   padding-left: 4px;
 }
-.main-toolbar
-  .tb-button.q-btn-dropdown--split
-  .q-btn-dropdown__arrow-container:not(.q-btn--outline):before {
+:deep(
+  .main-toolbar
+    .tb-button.q-btn-dropdown--split
+    .q-btn-dropdown__arrow-container:not(.q-btn--outline):before
+) {
   height: 20px;
   border-left: 1px solid #334354;
   margin-top: 5px;
@@ -371,20 +375,20 @@ export default defineComponent({
   z-index: 1;
 }
 .tb-search-button {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
   width: 20% !important;
   align-items: baseline;
 }
-.tb-search-button span.block {
+:deep(.tb-search-button span.block) {
   font-size: 14px;
   margin-right: 10px;
 }
-.tb-search-button .q-btn__content {
+:deep(.tb-search-button .q-btn__content) {
   width: 100%;
   flex-wrap: nowrap;
 }
-.tb-search-button .q-btn__content .q-icon.on-right {
+:deep(.tb-search-button .q-btn__content .q-icon.on-right) {
   margin-left: auto;
   padding-left: 10px;
   border-left: 1px solid rgb(51, 67, 84);
@@ -476,9 +480,6 @@ export default defineComponent({
 }
 .q-header {
   background-color: white;
-}
-.user-menu {
-  min-width: 200px;
 }
 .mc-button {
   border: 1px solid rgb(209, 209, 209);

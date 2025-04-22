@@ -104,32 +104,32 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.popover-container {
+:deep(.popover-container) {
   --bg-colour: var(--light-bg-base-colour);
   --border-colour: var(--ligth-border-base-colour);
   --main-colour: var(--light-default-text-colour);
   --secondary-colour: var(--light-secondary-text-colour);
 }
-.popover-container.dark {
+:deep(.popover-container.dark) {
   --bg-colour: var(--dark-bg-base-colour);
   --border-colour: var(--dark-border-base-colour);
   --main-colour: var(--dark-default-text-colour);
   --secondary-colour: var(--dark-secondary-text-colour);
 }
-.popover-container {
+:deep(.popover-container) {
   padding: 8px;
   box-shadow: none !important;
   background: none !important;
 }
-.popover-container .q-card {
+:deep(.popover-container .q-card) {
   background: var(--bg-colour);
   border-color: var(--border-colour);
   box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.2);
 }
-.popover-container .q-item {
+:deep(.popover-container .q-item) {
   color: var(--main-colour);
 }
-.popover-container .q-item .q-item__label--caption {
+:deep(.popover-container .q-item .q-item__label--caption) {
   color: var(--secondary-colour);
 }
 .popover-link,

@@ -208,11 +208,11 @@ export default defineComponent({
 .chooser-filter-box {
   width: 100%;
 }
-.chooser-filter-box input.q-field__native {
+:deep(.chooser-filter-box input.q-field__native) {
   padding-left: 17px;
   padding-right: 17px;
 }
-.chooser-filter-box .q-field__append.q-field__marginal {
+:deep(.chooser-filter-box .q-field__append.q-field__marginal) {
   padding-right: 8px;
 }
 .chooser-selected {
@@ -225,15 +225,15 @@ export default defineComponent({
   color: var(--dark-menu-text-colour);
   border-color: var(--dark-border-base-colour);
 }
-.q-menu.dark .q-list--bordered,
-.q-menu.dark .q-card--bordered {
+:deep(.q-menu.dark .q-list--bordered),
+:deep(.q-menu.dark .q-card--bordered) {
   border-color: var(--dark-border-base-colour);
 }
 .q-menu.dark .chooser-filter,
 .q-menu.dark .chooser-filter-st {
   background-color: var(--dark-bg-base-colour);
 }
-.q-menu.dark .q-item__label--caption {
+:deep(.q-menu.dark .q-item__label--caption) {
   color: var(--dark-secondary-text-colour);
 }
 </style>

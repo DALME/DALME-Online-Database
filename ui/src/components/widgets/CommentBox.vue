@@ -372,30 +372,30 @@ export default defineComponent({
   padding-bottom: 0;
   min-height: 58px;
 }
-.comment-box .q-item__section--avatar {
+:deep(.comment-box .q-item__section--avatar) {
   padding-right: 18px;
 }
-.comment-box .q-item__section--side:not(.q-item__section--avatar) {
+:deep(.comment-box .q-item__section--side:not(.q-item__section--avatar)) {
   padding-left: 18px;
 }
-.event-box .q-avatar .q-avatar__content,
-.event-box .avatar-icon,
-.comment-box .q-avatar:not(.closing-dot) .q-avatar__content {
+:deep(.event-box .q-avatar .q-avatar__content),
+:deep(.event-box .avatar-icon),
+:deep(.comment-box .q-avatar:not(.closing-dot) .q-avatar__content) {
   background-color: var(--bg-colour);
   border: 2px solid var(--green-box);
 }
-.event-box.op-post .q-avatar .q-avatar__content,
-.event-box.op-post .avatar-icon,
-.comment-box.op-post .q-avatar:not(.closing-dot) .q-avatar__content {
+:deep(.event-box.op-post .q-avatar .q-avatar__content),
+:deep(.event-box.op-post .avatar-icon),
+:deep(.comment-box.op-post .q-avatar:not(.closing-dot) .q-avatar__content) {
   border: 2px solid var(--blue-box);
 }
-.comment-box .q-avatar:not(.closing-dot) .q-icon {
+:deep(.comment-box .q-avatar:not(.closing-dot) .q-icon) {
   color: var(--secondary-colour);
 }
-.comment-box.op-post .q-avatar__content .q-icon {
+:deep(.comment-box.op-post .q-avatar__content .q-icon) {
   color: var(--blue-box) !important;
 }
-.comment-box .q-avatar__content .q-icon {
+:deep(.comment-box .q-avatar__content .q-icon) {
   color: var(--green-box) !important;
 }
 .comment-thread-divider {
@@ -422,14 +422,14 @@ export default defineComponent({
   background: var(--blue-box) !important;
   color: var(--blue-text) !important;
 }
-.comment-box .q-avatar.closing-dot {
+:deep(.comment-box .q-avatar.closing-dot) {
   width: 32px;
   height: 32px;
   position: relative;
   background: #558b2f;
   right: 5px;
 }
-.comment-box.op-post .q-avatar.closing-dot {
+:deep(.comment-box.op-post .q-avatar.closing-dot) {
   left: 5px;
 }
 .comment-thread-divider + .comment-box {

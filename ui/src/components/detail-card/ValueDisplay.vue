@@ -301,12 +301,38 @@ export default defineComponent({
 .value-display label {
   flex-grow: 1;
 }
+:deep(.q-field.base-field .q-field__control .q-field__append) {
+  margin-top: 22px;
+}
 .field-date-container {
   display: flex;
   flex-direction: row;
   width: 100%;
   border-bottom: 1px dotted rgba(0, 0, 0, 0.24);
-  height: 56px;
+  height: 57px;
+}
+:deep(.q-field textarea.q-field__native) {
+  align-content: center;
+}
+.field-date-container::after {
+  content: "";
+  pointer-events: none;
+  height: 2px;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  transform-origin: center bottom;
+  transform: scale3d(0, 1, 1);
+  background: rgb(48, 63, 159);
+  transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-self: end;
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  margin-bottom: -1px;
+}
+.field-date-container.active::after {
+  transform: scale3d(1, 1, 1);
 }
 .field-date-wrapper {
   display: flex;
@@ -315,6 +341,9 @@ export default defineComponent({
 .field-date-buttons {
   display: flex;
   margin-left: auto;
+  height: auto;
+  align-items: center;
+  margin-top: 22px;
 }
 .field-date-label {
   transform: scale(0.75);
@@ -326,5 +355,21 @@ export default defineComponent({
 }
 .date-chooser-wrapper {
   height: 32px;
+}
+.bool-field .q-checkbox {
+  height: 32px;
+  align-self: anchor-center;
+}
+:deep(.bool-field .q-field__control),
+:deep(.bool-field .q-field__native) {
+  min-height: 32px;
+  height: 42px;
+}
+:deep(.bool-field .q-checkbox__label) {
+  color: rgba(0, 0, 0, 0.75);
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 400;
+  letter-spacing: 0.00937em;
 }
 </style>

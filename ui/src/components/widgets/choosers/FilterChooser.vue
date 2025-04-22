@@ -394,11 +394,11 @@ export default defineComponent({
 .chooser-filter-box {
   width: 100%;
 }
-.chooser-filter-box input.q-field__native {
+:deep(.chooser-filter-box input.q-field__native) {
   padding-left: 17px;
   padding-right: 17px;
 }
-.chooser-filter-box .q-field__append.q-field__marginal {
+:deep(.chooser-filter-box .q-field__append.q-field__marginal) {
   padding-right: 8px;
 }
 .chooser-items-container {

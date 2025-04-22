@@ -152,8 +152,8 @@ export default {
   width: 300px;
   position: relative;
   align-self: center;
-  font-size: 40px;
-  font-weight: 200;
+  font-size: 30px;
+  font-weight: 300;
   color: white;
   text-transform: capitalize;
   text-shadow: -15px 2px 14px black;
@@ -170,6 +170,9 @@ export default {
   padding: 20px 40px !important;
   font-size: 16px;
   font-weight: 300;
+}
+:deep(.dialogue-body b) {
+  font-weight: 500;
 }
 .dialogue-button {
   font-size: 14px;

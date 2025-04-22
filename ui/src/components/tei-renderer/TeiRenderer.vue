@@ -286,15 +286,14 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-@import "./tei.css";
+<style lang="css" scoped>
 .transcription {
   position: relative;
   width: 100%;
   padding: 30px;
   display: flex;
 }
-.tei-tooltip {
+:deep(.tei-tooltip) {
   background: #333;
   color: white;
   font-weight: bold;
@@ -303,10 +302,10 @@ export default defineComponent({
   border-radius: 4px;
   display: none;
 }
-.tei-tooltip[data-show] {
+:deep(.tei-tooltip[data-show]) {
   display: block;
 }
-.tei-tooltip-arrow::after {
+:deep(.tei-tooltip-arrow::after) {
   content: "";
   position: absolute;
   border-width: 8px;
@@ -316,22 +315,22 @@ export default defineComponent({
   border-bottom-color: transparent;
   border-left-color: transparent;
 }
-.tei-tooltip-arrow[data-popper-placement^="top"]::after {
+:deep(.tei-tooltip-arrow[data-popper-placement^="top"]::after) {
   left: calc(50% - 8px);
   border-top-color: #333;
   top: 100%;
 }
-.tei-tooltip-arrow[data-popper-placement^="left"]::after {
+:deep(.tei-tooltip-arrow[data-popper-placement^="left"]::after) {
   top: calc(50% - 8px);
   border-left-color: #333;
   left: 100%;
 }
-.tei-tooltip-arrow[data-popper-placement^="right"]::after {
+:deep(.tei-tooltip-arrow[data-popper-placement^="right"]::after) {
   top: calc(50% - 8px);
   border-right-color: #333;
   right: 100%;
 }
-.tei-tooltip-arrow[data-popper-placement^="bottom"]::after {
+:deep(.tei-tooltip-arrow[data-popper-placement^="bottom"]::after) {
   left: calc(50% - 8px);
   bottom: 100%;
   border-bottom-color: #333;

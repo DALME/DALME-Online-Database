@@ -511,26 +511,26 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.basic-list .q-table__bottom {
+:deep(.basic-list .q-table__bottom) {
   min-height: 35px;
   padding: 0;
   background: #fafafa;
   border-top: none;
 }
-.basic-list .q-table__bottom--nodata {
+:deep(.basic-list .q-table__bottom--nodata) {
   padding-left: 12px;
 }
-.basic-list th {
+:deep(.basic-list th) {
   padding: 0;
   border-right: 1px dotted rgb(209, 209, 209);
 }
-.basic-list table {
+:deep(.basic-list table) {
   border-bottom: none;
 }
-.basic-list thead > tr > th:last-of-type {
+:deep(.basic-list thead > tr > th:last-of-type) {
   border-right: none;
 }
-.basic-list.q-table--grid .q-table__middle {
+:deep(.basic-list.q-table--grid .q-table__middle) {
   min-height: 0;
   margin-bottom: 0;
 }

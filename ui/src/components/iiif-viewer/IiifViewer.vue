@@ -211,6 +211,7 @@ export default defineComponent({
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   transition: height 0.2s ease-in-out;
+  cursor: grab;
 }
 .q-splitter--vertical #viewer-container {
   border-right: none;
@@ -283,6 +284,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: default;
 }
 .viewer-toolbar.toolbar-h .viewer-current-page {
   border-right: 1px solid #717171;

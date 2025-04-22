@@ -140,7 +140,7 @@ export default defineComponent({
   background: white;
   border: 1px solid rgb(209, 209, 209);
 }
-.page-input input {
+:deep(.page-input input) {
   padding: 0;
   font-weight: 500;
   user-select: auto;
@@ -149,12 +149,12 @@ export default defineComponent({
   -moz-appearance: textfield;
   color: #616161;
 }
-.page-input input::-webkit-outer-spin-button,
-.page-input input::-webkit-inner-spin-button {
+:deep(.page-input input::-webkit-outer-spin-button),
+:deep(.page-input input::-webkit-inner-spin-button) {
   -webkit-appearance: none;
   margin: 0;
 }
-.page-input .q-field__control {
+:deep(.page-input .q-field__control) {
   height: 28px;
   background-color: #fff;
   border-right: 1px solid rgb(209, 209, 209);

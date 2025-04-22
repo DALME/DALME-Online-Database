@@ -484,6 +484,11 @@ pre {
     padding: 0 !important;
 }
 
+/* visual fix for buttons with no-toggle class */
+.no-toggle>span.q-btn__content>.q-icon:nth-of-type(2) {
+    display: none;
+}
+
 @import "box-arrows.scss";
 @import "popup-menu.scss";
 @import "drawer-menu-list.scss";

@@ -118,9 +118,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.no-toggle > span.q-btn__content > .q-icon:nth-of-type(2) {
-  display: none;
-}
-</style>

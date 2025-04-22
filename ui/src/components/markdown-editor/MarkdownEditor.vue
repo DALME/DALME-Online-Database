@@ -344,33 +344,42 @@ export default defineComponent({
   background: var(--base-colour);
   cursor: default !important;
 }
-.md-editor-container .q-tabs .q-tab.q-tab--active .q-focus-helper {
+:deep(.q-tab .q-tab__label) {
+  font-size: 12px;
+}
+:deep(.md-editor-container .q-tabs .q-tab.q-tab--active .q-focus-helper) {
   opacity: 0;
 }
 .md-editor-container .q-tab-panels {
   background: var(--base-colour);
 }
-.md-editor-container .q-tab-panels .q-field--outlined .q-field__control:before {
+.md-editor-container .q-tab-panel {
+  min-height: 144px;
+}
+.md-editor-container .write-panel {
+  padding: 0 !important;
+}
+:deep(.write-panel .q-field--outlined .q-field__control:before) {
   border: none;
 }
-.md-editor-container .q-tab-panels .q-field--outlined .q-field__control:after {
+:deep(.write-panel .q-field--outlined .q-field__control:after) {
   border: none;
 }
-.md-editor-container .q-field.q-textarea .q-field__control {
-  border-radius: 0;
+:deep(.write-panel .q-field--outlined .q-field__control) {
   padding: 0;
+}
+:deep(.write-panel .q-field.q-textarea .q-field__control) {
   background: var(--textbox-bg);
 }
-.md-editor-container .q-field.q-textarea .q-field__native {
+:deep(.write-panel .q-field.q-textarea .q-field__native) {
   color: var(--textbox-text);
-  padding: 0;
-  min-height: 120px;
+  padding: 16px;
 }
 .md-editor-container .md-editor-footer {
   display: flex;
   background: var(--bg-colour);
   color: var(--text-detail);
-  padding: 0 8px;
+  padding: 0 0 0 8px;
   align-items: center;
   border-top: 1px solid var(--border-colour);
   height: 31px;
@@ -381,17 +390,16 @@ export default defineComponent({
   line-height: 31px;
 }
 .md-editor-container .md-button {
-  font-weight: 600;
-  font-size: 11px;
+  font-weight: 500;
+  font-size: 12px;
   padding: 0 22px;
+  height: 100%;
+  border-radius: 0;
+  border-left: 1px dotted var(--border-colour);
+  text-transform: capitalize;
 }
 .md-editor-container .md-button.submit {
-  background: var(--green-button);
   color: var(--green-button-text);
-}
-.md-editor-container .md-button.cancel {
-  background: var(--red-button);
-  color: var(--red-button-text);
 }
 .md-editor-container .md-button.disabled {
   opacity: 0.2 !important;

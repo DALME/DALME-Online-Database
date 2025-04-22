@@ -404,7 +404,7 @@ button.table-toolbar-button {
   min-height: 2em;
   padding: 4px 5px 4px 10px;
 }
-button.table-toolbar-button.btn-icon {
+:deep(button.table-toolbar-button.btn-icon) {
   padding-right: 10px;
 }
 .table-toolbar-button {
@@ -413,17 +413,17 @@ button.table-toolbar-button.btn-icon {
   border-right: 1px solid rgb(209, 209, 209);
   border-radius: 0;
 }
-.table-toolbar-searchbox .q-field__control,
-.table-toolbar-searchbox .q-field__marginal {
+:deep(.table-toolbar-searchbox .q-field__control),
+:deep(.table-toolbar-searchbox .q-field__marginal) {
   font-size: 13px;
   height: 28px;
   padding: 0px 5px 0px 10px;
   border-radius: 4px;
 }
-.table-toolbar-searchbox .q-field__native {
+:deep(.table-toolbar-searchbox .q-field__native) {
   font-weight: 500;
 }
-.table-toolbar-searchbox .q-field__inner {
+:deep(.table-toolbar-searchbox .q-field__inner) {
   align-self: center;
 }
 </style>

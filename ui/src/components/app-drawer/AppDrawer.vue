@@ -104,17 +104,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.custom-drawer.app-drawer .q-drawer {
-  border-top-right-radius: 18px;
-  border-bottom-right-radius: 18px;
-}
-.custom-drawer.app-drawer .scroll-area {
-  margin: 0;
-  border: none;
-}
-.custom-drawer.app-drawer .q-expansion-item:last-of-type .q-item:last-of-type {
-  margin-bottom: 12px;
-}
 .text-off-blue {
   color: #6a90b2;
 }
