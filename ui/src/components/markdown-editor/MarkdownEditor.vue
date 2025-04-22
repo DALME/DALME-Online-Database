@@ -15,15 +15,8 @@
       </div>
     </Transition>
 
-    <q-tab-panels
-      v-if="isEditable"
-      v-model="mdTab"
-      transition-next="jump-up"
-      transition-prev="jump-up"
-      animated
-      keep-alive
-    >
-      <q-tab-panel class="q-pa-md" name="write">
+    <q-tab-panels v-if="isEditable" v-model="mdTab" animated keep-alive>
+      <q-tab-panel class="write-panel" name="write">
         <q-input
           ref="input"
           v-model="mdText"
@@ -35,12 +28,11 @@
           outlined
         />
       </q-tab-panel>
-      <q-tab-panel class="q-pa-md" name="preview">
+      <q-tab-panel name="preview">
         <q-markdown
           :class="dark ? 'dark' : ''"
           :extend="extendMarkdown"
           :src="mdText"
-          style="min-height: 124px"
           task-lists-enable
         />
       </q-tab-panel>
@@ -68,7 +60,7 @@
           v-if="!inCard"
           @click="onCancel"
           :disable="!hasChanged"
-          class="md-button cancel text-roboto q-mr-sm"
+          class="md-button cancel text-roboto"
           label="cancel"
           dense
         />

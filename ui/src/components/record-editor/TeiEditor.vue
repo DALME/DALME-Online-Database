@@ -35,8 +35,6 @@
     v-model="currentPageData.editorTab"
     :style="`height: ${editorHeight}px;`"
     class="editor-panel text-body2"
-    transition-next="jump-up"
-    transition-prev="jump-up"
     animated
     keep-alive
   >

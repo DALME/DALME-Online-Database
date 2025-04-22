@@ -77,13 +77,7 @@
     <div class="row q-pt-sm">
       <div class="col-9 q-pr-md">
         <template v-if="!loading">
-          <q-tab-panels
-            v-model="view.tab"
-            transition-next="jump-up"
-            transition-prev="jump-up"
-            animated
-            keep-alive
-          >
+          <q-tab-panels v-model="view.tab" animated keep-alive>
             <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div v-if="policy" class="row q-pt-md">
                 <div class="col">

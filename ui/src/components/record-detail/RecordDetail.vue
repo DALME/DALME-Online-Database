@@ -138,13 +138,7 @@
     <div class="row q-pt-sm content-container-row">
       <div class="col content-container">
         <template v-if="!ui.globalLoading">
-          <q-tab-panels
-            v-model="view.tab"
-            transition-next="jump-up"
-            transition-prev="jump-up"
-            animated
-            keep-alive
-          >
+          <q-tab-panels v-model="view.tab" animated keep-alive>
             <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div class="col-9 q-pr-lg q-pt-md">
                 <template v-if="ui.windowWidth > 1100">
