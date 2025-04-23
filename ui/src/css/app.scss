@@ -489,6 +489,22 @@ pre {
     display: none;
 }
 
+/* special overrides that have to be global */
+.value-select-popup .q-item__label {
+    max-width: calc(50vw);
+    display: flex;
+}
+
+.value-select-popup .q-item__label span {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cm-tag-menu {
+    max-width: 300px !important;
+}
+
 @import "box-arrows.scss";
 @import "popup-menu.scss";
 @import "drawer-menu-list.scss";
