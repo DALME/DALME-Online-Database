@@ -63,8 +63,8 @@ import {
   getCurrentInstance,
   inject,
   nextTick,
-  onBeforeUnmount,
   onMounted,
+  onUnmounted,
   provide,
   shallowRef,
   watch,
@@ -100,10 +100,8 @@ export default defineComponent({
     const { editorHeight, editorWidth } = inject("editorDimensions");
     const disabled = computed(() => isEmpty(currentPageData.value.tei));
     const currentInstance = getCurrentInstance();
+    const { editorState, editorView, editorTools } = inject("editorControl");
     const container = shallowRef();
-    const editorState = shallowRef();
-    const editorView = shallowRef();
-    const editorTools = shallowRef();
 
     const currentTheme = computed(() =>
       preferences.value.theme.value ? themes[preferences.value.theme.value] : themes["oneDark"],
@@ -174,12 +172,24 @@ export default defineComponent({
       "font-size": `${preferences.value.fontSize.value}px`,
     }));
 
+    const updateEditorRendering = () => {
+      console.log("updating editor rendering", editorView.value.updateState);
+      editorView.value.requestMeasure();
+    };
+
+    const destroyEditor = () => {
+      destroyEditorView(editorView.value);
+    };
+
     const onTabSwitch = (value) => {
+      console.log("switch tab to:", value);
       if (value === "preview") {
-        currentPageData.value.tei = editorTools.value.getDoc();
+        if (!isNil(editorView.value)) {
+          currentPageData.value.tei = editorTools.value.getDoc();
+          destroyEditorView(editorView.value);
+        }
       } else {
-        editorTools.value.setDoc(currentPageData.value.tei);
-        // editorView.value.requestMeasure();
+        nextTick(loadEditor);
       }
     };
 
@@ -298,78 +308,91 @@ export default defineComponent({
     //   }
     // };
 
-    watch([editorHeight, editorWidth], async () => {
-      await nextTick();
-      if (!isNil(editorView)) {
-        editorView.value.requestMeasure();
-      }
-    });
-
-    onMounted(() => {
-      editorState.value = createEditorState({
-        doc: currentPageData.value.tei,
-        onUpdate: onEditorUpdate,
-        onChange: onEditorChange,
-        onFocus: onEditorFocus,
-        onBlur: onEditorBlur,
-      });
-
+    const loadEditor = () => {
       editorView.value = createEditorView({
         state: editorState.value,
         parent: container.value,
       });
 
       editorTools.value = getEditorTools(editorView.value);
+      editorTools.value.reExtensions(extensions.value || []);
+      editorTools.value.setStyle(style.value);
       editorTools.value.focus();
+    };
 
-      watch(
-        () => currentPageData.value.tei,
-        (newValue) => {
-          if (newValue !== editorTools.value.getDoc()) {
-            editorTools.value.setDoc(newValue);
-          }
-        },
-      );
-
-      watch(
-        () => extensions.value,
-        (extensions) => {
-          editorTools.value.reExtensions(extensions || []);
-        },
-        { immediate: true },
-      );
-
-      watch(
-        () => disabled.value,
-        (disabled) => editorTools.value.toggleDisabled(disabled),
-        { immediate: true },
-      );
-
-      watch(
-        () => style.value,
-        (style) => editorTools.value.setStyle(style),
-        { immediate: true },
-      );
-
-      const destroyEditor = () => {
-        destroyEditorView(editorView.value);
-      };
-
-      const updateEditorRendering = () => {
-        editorView.value.requestMeasure();
-      };
-
-      eventBus.on("updateEditorRendering", updateEditorRendering);
-      eventBus.on("destroyEditor", destroyEditor);
+    onMounted(() => {
+      console.log("TEIEDITOR mounted", currentPageData.value.editorTab);
+      if (isNil(editorState.value)) {
+        editorState.value = createEditorState({
+          doc: currentPageData.value.tei,
+          onUpdate: onEditorUpdate,
+          onChange: onEditorChange,
+          onFocus: onEditorFocus,
+          onBlur: onEditorBlur,
+        });
+      }
+      if (currentPageData.value.editorTab === "edit") {
+        nextTick(loadEditor);
+      }
     });
 
-    onBeforeUnmount(() => {
+    onUnmounted(() => {
+      console.log("unmounted TEIEDITOR");
       if (editorView.value) {
         destroyEditorView(editorView.value);
       }
     });
 
     provide("insertTag", insertTag);
+
+    eventBus.on("updateEditorRendering", updateEditorRendering);
+    eventBus.on("destroyEditor", destroyEditor);
+
+    watch([editorHeight, editorWidth], async () => {
+      await nextTick();
+      if (!isNil(editorView.value)) {
+        editorView.value.requestMeasure();
+      }
+    });
+
+    watch(
+      () => currentPageData.value.tei,
+      (newValue) => {
+        if (!isNil(editorView.value) && newValue !== editorTools.value.getDoc()) {
+          editorTools.value.setDoc(newValue);
+        }
+      },
+    );
+
+    watch(
+      () => extensions.value,
+      (extensions) => {
+        if (!isNil(editorView.value)) {
+          editorTools.value.reExtensions(extensions || []);
+        }
+      },
+      { immediate: true },
+    );
+
+    watch(
+      () => disabled.value,
+      (disabled) => {
+        if (!isNil(editorView.value)) {
+          editorTools.value.toggleDisabled(disabled);
+        }
+      },
+      { immediate: true },
+    );
+
+    watch(
+      () => style.value,
+      (style) => {
+        if (!isNil(editorView.value)) {
+          editorTools.value.setStyle(style);
+        }
+      },
+      { immediate: true },
+    );
 
     // const test = () => {
     //   console.log("test");

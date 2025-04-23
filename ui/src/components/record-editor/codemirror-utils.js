@@ -59,8 +59,14 @@ export const createEditorState = ({ doc, onUpdate, onChange, onFocus, onBlur }) 
   });
 };
 
-export const createEditorView = (config) => new EditorView({ ...config });
-export const destroyEditorView = (view) => view.destroy();
+export const createEditorView = (config) => {
+  console.log("creating editor view");
+  return new EditorView({ ...config });
+};
+export const destroyEditorView = (view) => {
+  console.log("destroying editor view");
+  view.destroy();
+};
 
 // https://codemirror.net/examples/config/
 // https://github.com/uiwjs/react-codemirror/blob/22cc81971a/src/useCodeMirror.ts#L144

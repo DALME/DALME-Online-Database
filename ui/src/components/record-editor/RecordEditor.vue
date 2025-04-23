@@ -49,7 +49,7 @@
     <q-page-container>
       <q-page :class="!view.pageDrawerMini ? 'q-pl-sm q-pr-none' : 'q-pa-none'">
         <q-splitter
-          v-model="view.editorSplitter"
+          v-model="views.editorSplitter"
           :class="orientationClass"
           :horizontal="view.splitterHorizontal"
           :limits="view.splitterLimits"
@@ -93,7 +93,8 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { computed, defineComponent, inject, onMounted, provide, ref } from "vue";
+import { isNil } from "ramda";
+import { computed, defineComponent, inject, onMounted, provide, ref, shallowRef } from "vue";
 
 import { AdaptiveSpinner, CustomDialog, IiifViewer, TeiRenderer } from "@/components";
 import { useEventHandling, useStores } from "@/use";
@@ -126,28 +127,9 @@ export default defineComponent({
     const columns = inject("pageColumns");
     const pages = view.pages;
     const pagination = ref({ rowsPerPage: 0 });
-
-    // const getPages = () => {
-    //   pages.forEach((page, idx) => {
-    //     page.ref = idx;
-    //     page.editorTab = "preview";
-    //     page.dbTei = page.transcription?.transcription;
-    //     page.tei = page.transcription?.transcription;
-    //     page.viewerZoom = 0;
-    //   });
-    //   return pages;
-    // };
-
-    // views.mergeValues(views, {
-    //   pages: getPages(),
-    //   currentPageRef: 0,
-    //   pageDrawerMini: true,
-    //   showTagMenu: false,
-    //   splitterHorizontal: true,
-    //   editorSplitter: 0,
-    //   lastSplitter: 0,
-    //   editOn: false,
-    // });
+    const editorState = shallowRef();
+    const editorView = shallowRef();
+    const editorTools = shallowRef();
 
     const drawer = ref(pageCount.value > 1);
     const pageChooser = computed(() => pageCount.value > 1);
@@ -164,22 +146,22 @@ export default defineComponent({
       return Math.round(contentHeight.value - infoAreaHeight.value - tabs);
     });
 
-    if (!view.value.editorSplitter) {
-      view.value.editorSplitter = Math.round(compositeHeight.value / 2);
+    if (!views.editorSplitter) {
+      views.editorSplitter = Math.round(contentWidth.value / 2);
     }
 
     const editorHeight = computed(() => {
       const toolbar = 40;
       const splitter = 7;
       return view.value.splitterHorizontal
-        ? Math.round(compositeHeight.value - view.value.editorSplitter - toolbar - splitter)
+        ? Math.round(compositeHeight.value - views.editorSplitter - toolbar - splitter)
         : compositeHeight.value - toolbar;
     });
 
     const editorWidth = computed(() =>
       view.value.splitterHorizontal
         ? Math.round(contentWidth.value)
-        : Math.round(contentWidth.value - view.value.editorSplitter),
+        : Math.round(contentWidth.value - views.editorSplitter),
     );
 
     const viewerHeight = computed(() =>
@@ -191,7 +173,7 @@ export default defineComponent({
     const viewerWidth = computed(() =>
       view.value.splitterHorizontal
         ? contentWidth.value - pageDrawerWidth.value
-        : view.value.editorSplitter,
+        : views.editorSplitter,
     );
 
     const separatorHeight = computed(() =>
@@ -208,7 +190,7 @@ export default defineComponent({
 
     const currentSplitterPercentage = computed(() => {
       let total = view.value.splitterHorizontal ? compositeHeight.value : contentWidth.value;
-      return Math.round((view.value.editorSplitter * 100) / total);
+      return Math.round((views.editorSplitter * 100) / total);
     });
 
     const nextSplitterPixels = computed(() => {
@@ -224,15 +206,15 @@ export default defineComponent({
           : Math.round(compositeHeight.value / 2);
       view.value.lastSplitter = currentSplitterPercentage.value;
       view.value.splitterHorizontal = !view.value.splitterHorizontal;
-      view.value.editorSplitter = targetSplit;
+      views.editorSplitter = targetSplit;
     };
 
     const toggleMini = () => {
       view.value.pageDrawerMini = !view.value.pageDrawerMini;
       if (!view.value.splitterHorizontal) {
-        view.value.editorSplitter = view.value.pageDrawerMini
-          ? view.value.editorSplitter + 141
-          : view.value.editorSplitter - 141;
+        views.editorSplitter = view.value.pageDrawerMini
+          ? views.editorSplitter + 141
+          : views.editorSplitter - 141;
       }
     };
 
@@ -246,7 +228,7 @@ export default defineComponent({
             closeIcon: false,
             message:
               "There is unsaved data in the current record. Do you wish to save your changes?",
-            icon: "exit_to_app",
+            icon: "mdi-alert-outline",
             okayButtonLabel: "Save",
           },
         }).onOk(() => {
@@ -266,6 +248,9 @@ export default defineComponent({
       if (para === "last") targetPage = pages.length - 1;
       if (para === "prev") targetPage = view.value.currentPageRef - 1;
       if (para === "next") targetPage = view.value.currentPageRef + 1;
+      if (!isNil(editorState.value)) {
+        currentPageData.value.tei = editorTools.value.getDoc();
+      }
       view.value.currentPageRef = targetPage;
     };
 
@@ -274,9 +259,12 @@ export default defineComponent({
 
     provide("editorDimensions", { editorHeight, editorWidth });
     provide("viewerDimensions", { viewerHeight, viewerWidth });
+    provide("editorControl", { editorState, editorView, editorTools });
 
-    onMounted(async () => {
+    onMounted(() => {
+      console.log("mounted editor");
       if (!editorStore.ready) {
+        console.log("editor store not ready:", editorStore.ready);
         editorStore.initialize().then(() => {
           // TODO: temp workaround - this should be set by the UI
           editorStore.currentSetId = editorStore.sets()[0].id;
@@ -307,6 +295,7 @@ export default defineComponent({
       toggleMini,
       toggleSplitter,
       view,
+      views,
       orientationClass,
       editorStore,
     };

@@ -1,5 +1,5 @@
 <template>
-  <div v-show="!rendering" ref="rendered-tei" class="transcription" />
+  <div v-show="!rendering" ref="rendered-tei" />
   <AdaptiveSpinner v-show="rendering" color="grey-5" size="10%" type="hourglass" adaptive />
 </template>
 
@@ -35,6 +35,7 @@ export default defineComponent({
     const teiRenderer = new CETEI();
     const rendering = ref(false);
     const tooltipInstances = ref([]);
+    const noteBarOn = ref(true);
 
     teiRenderer.addBehaviors(idaTeiBehaviours);
 
@@ -75,9 +76,21 @@ export default defineComponent({
         hasRenvois.value = Boolean(html.querySelectorAll(teiSelectors.renvois).length);
         hasColumns.value = Boolean(html.querySelectorAll(teiSelectors.columns).length);
         hasLeaders.value = Boolean(html.querySelectorAll(teiSelectors.leaders).length);
-        applyFixes(html).then((result) => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("transcription");
+        wrapper.append(html);
+        if (hasMarginalNotes.value) {
+          const notebar = document.createElement("div");
+          notebar.classList.add("notebar");
+          const nc = document.createElement("div");
+          nc.classList.add("notes-container");
+          notebar.append(nc);
+          wrapper.append(notebar);
+        }
+        applyFixes(wrapper).then((result) => {
           teiContainer.value.innerHTML = "";
           teiContainer.value.append(result);
+          // teiContainer.value.replaceWith(result);
           nextTick().then(() => {
             applyTooltips();
             rendering.value = false;
@@ -97,15 +110,17 @@ export default defineComponent({
               if (target.length > 1 && target.startsWith("#")) {
                 target = target.substring(1);
               }
-              el.append(html.querySelector(`tei-note#${target}`));
+              el.append(html.querySelector(`tei-note#${CSS.escape(target)}`));
             }
           });
         }
         // set up marginal notes
         if (hasMarginalNotes.value) {
-          let notesContainer = html.querySelector(".notes_container");
+          const notesContainer = html.querySelector(".notes-container");
+          console.log("MARGINAL NOTES", html.querySelectorAll(teiSelectors.marginalNotes));
           html.querySelectorAll(teiSelectors.marginalNotes).forEach((el) => {
             el.style.top = `${Math.round(el.getBoundingClientRect().top)}px`;
+            console.log("notesContainer", notesContainer);
             notesContainer.append(el);
           });
           notesContainer.style.height = `${html.querySelector("tei-text").offsetHeight}px`;
@@ -173,7 +188,7 @@ export default defineComponent({
             if (noteId.length > 1 && noteId.startsWith("#")) {
               noteId = noteId.substring(1);
             }
-            let note = html.querySelector(`tei-note#${noteId}`);
+            let note = html.querySelector(`tei-note#${CSS.escape(noteId)}`);
             if (note.length) {
               el.setAttribute("title", note.innerHTML);
               el.setAttribute("data-toggle", "tooltip");
@@ -264,8 +279,8 @@ export default defineComponent({
     //     this.formatLeaders();
     //   }
     //   if (this.hasMarginalNotes) {
-    //     let prev_height = $('.notes_container').height();
-    //     $('.notes_container').height(e.height);
+    //     let prev_height = $('.notes-container').height();
+    //     $('.notes-container').height(e.height);
     //     $('tei-note[type=marginal]').each(function() {
     //       let new_top = (parseInt($(this).css('top'), 10) / prev_height) * e.height;
     //       $(this).css({ top: `${Math.round(new_top)}px`});
@@ -281,13 +296,14 @@ export default defineComponent({
 
     return {
       rendering,
+      noteBarOn,
     };
   },
 });
 </script>
 
 <style lang="css" scoped>
-.transcription {
+:deep(.transcription) {
   position: relative;
   width: 100%;
   padding: 30px;
