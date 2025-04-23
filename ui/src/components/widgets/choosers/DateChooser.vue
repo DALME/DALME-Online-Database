@@ -93,8 +93,13 @@ export default defineComponent({
       if (date.value) {
         const dateObj = new Date(date.value);
         return formatDate(dateObj, "DATE_MED_WITH_WEEKDAY", "Europe/Paris");
+      } else if (month.value && year.value) {
+        const mOpt = monthOptions.find((x) => x.value === month.value);
+        return `${mOpt.label}, ${year.value}`;
+      } else if (year.value) {
+        return year.value;
       } else {
-        return "TEXT";
+        return "Invalid or missing date.";
       }
     });
 
@@ -182,6 +187,9 @@ export default defineComponent({
   line-height: 1.25;
   font-weight: 400;
   letter-spacing: 0.00937em;
+}
+.date-chooser-text {
+  min-width: 80px;
 }
 :deep(.date-chooser-field .q-field__control),
 :deep(.date-chooser-field .q-field__native) {
