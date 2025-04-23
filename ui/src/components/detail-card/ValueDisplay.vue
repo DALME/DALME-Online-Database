@@ -38,6 +38,7 @@
       class="base-field"
       color="indigo-8"
       input-debounce="0"
+      popup-content-class="value-select-popup"
       emit-value
       hide-dropdown-icon
       map-options
@@ -310,7 +311,7 @@ export default defineComponent({
   align-items: baseline;
 }
 .value-display label {
-  flex-grow: 1;
+  width: 100%;
 }
 :deep(.q-field.base-field .q-field__control .q-field__append) {
   margin-top: 22px;
@@ -382,5 +383,8 @@ export default defineComponent({
   line-height: 1.25;
   font-weight: 400;
   letter-spacing: 0.00937em;
+}
+:deep(.q-select--with-input.q-field--readonly .q-field__native input) {
+  display: none;
 }
 </style>
