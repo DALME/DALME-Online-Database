@@ -52,6 +52,16 @@ export const useViewStore = defineStore(
       () => "pages" in view.value && view.value.pages.some((p) => p.dbTei !== p.tei),
     );
 
+    const editorSplitter = computed({
+      get() {
+        if (!isEmpty(view.value)) return view.value.editorSplitter;
+        return 0;
+      },
+      set(newValue) {
+        if (!isEmpty(view.value)) view.value.editorSplitter = newValue;
+      },
+    });
+
     // actions
     const $reset = () => {
       view.value = {};
@@ -107,6 +117,7 @@ export const useViewStore = defineStore(
       retrieveViewState,
       setViewState,
       hasChanges,
+      editorSplitter,
       $reset,
     };
   },
