@@ -1,0 +1,10 @@
+.analytics-row {
+  margin-top: 5px !important;
+  border-bottom: 1px solid var(--w-color-border-furniture);
+}
+.analytics-row:last-of-type {
+  border-bottom: none;
+}
+.analytics-header {
+  margin-bottom: 15px;
+}

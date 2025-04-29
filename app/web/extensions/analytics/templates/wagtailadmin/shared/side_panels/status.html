@@ -1,0 +1,47 @@
+{% load wagtailadmin_tags format_metric format_measure i18n %}
+
+<div class="w-divide-y w-divide-border-furniture w-py-6 w-pl-2 lg:w-pl-8">
+    {% if object.analytics %}
+        <div class="w-py-6 w-space-y-3">
+            <section class="w-flex w-space-x-3 analytics-header">
+                <svg class="icon icon-plausible w-w-4 w-h-4 w-text-text-label w-flex-shrink-0 w-mt-0.5" aria-hidden="true">
+                    <use href="#icon-plausible"></use>
+                </svg>
+                <div class="w-flex w-flex-1">
+                    <div class="w-flex w-flex-col w-flex-1 w-pr-5">
+                        <h3 class="w-label-1 !w-mt-0 w-mb-1">Analytics</h3>
+                    </div>
+                    <a class="w-text-14 w-text-text-link-default hover:w-text-text-link-hover w-no-underline w-transition" href="https://plausible.io/">
+                        Plausible.io
+                    </a>
+                </div>
+            </section>
+            {% for metric, measure in object.analytics.items %}
+            <div class="w-flex w-justify-between w-items-center w-w-full analytics-row">
+                <div class="w-ml-3 w-pr-4 w-label-3">{{ metric|format_metric }}</div>
+                <div class="w-mr-3 w-bg-transparent w-text-14 w-p-0 w-text-text-link-default hover:w-text-text-link-hover w-inline-flex w-justify-center w-transition">
+                    {{ measure|format_measure:metric }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% for template in status_templates %}
+        {% include template %}
+    {% endfor %}
+    {# Object type / First Published information #}
+    <div class="w-pt-5 w-space-y-1">
+        <div class="w-label-3">
+            <strong>{{ model_name }}</strong>
+
+            {% if model_description %}
+                ({{ model_description }})
+            {% endif %}
+        </div>
+        {% if object.first_published_at %}
+            <div class="w-help-text">
+                {% trans 'First published' %} {% human_readable_date object.first_published_at placement="bottom" %}
+            </div>
+        {% endif %}
+    </div>
+</div>

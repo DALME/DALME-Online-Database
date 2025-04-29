@@ -115,6 +115,7 @@ class Base(Configuration):
     PROJECT_TENANT_APPS = [
         'modelcluster',
         'web',
+        'web.extensions.analytics',
         'web.extensions.banners',
         'web.extensions.bibliography',
         'web.extensions.extras',
@@ -416,6 +417,12 @@ class Base(Configuration):
     URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
     URL_PORT = ':8000' if IS_DEV else ''
 
+    # analytics
+    PLAUSIBLE_API_URL = 'https://plausible.io/api/v2/query'  # plausible API
+    # list of metrics to retrieve and store locally
+    PLAUSIBLE_METRICS = ['visitors', 'visits', 'pageviews', 'bounce_rate', 'time_on_page']
+    PLAUSIBLE_UPDATE_INTERVAL = 1  # interval for updating analytics from plausible API - in days
+
     # List of settings values to make available in templates.
     INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'API_URL', 'DAM_URL', 'WAGTAILADMIN_BASE_URL']
 
@@ -664,6 +671,9 @@ class Development(Base, Configuration):
     ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID')
     ZOTERO_LIBRARY_ID_GP = os.environ.get('ZOTERO_LIBRARY_ID_GP')
 
+    # analytics
+    PLAUSIBLE_API_KEY = os.environ.get('PLAUSIBLE_API_KEY')
+
 
 class CI(Development, Configuration):
     """Continuous integration pipeline settings."""
@@ -867,6 +877,11 @@ class Production(Base, Configuration):
     @property
     def ZOTERO_LIBRARY_ID_GP(self):
         return os.environ['ZOTERO_LIBRARY_ID_GP']
+
+    # analytics
+    @property
+    def PLAUSIBLE_API_KEY(self):
+        return os.environ['PLAUSIBLE_API_KEY']
 
 
 class Staging(Production, Configuration):

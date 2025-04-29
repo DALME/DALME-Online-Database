@@ -8,13 +8,14 @@ from wagtail.admin.panels import FieldPanel
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from web.extensions.analytics.models import AnalyticsMixin
 from web.extensions.bibliography.models import CitableMixin
 from web.extensions.images.models import BaseImage
 from web.extensions.team.models import BylineMixin
 from web.models.base_page import BasePage
 
 
-class FeaturedPage(BasePage, CitableMixin, BylineMixin):
+class FeaturedPage(BasePage, CitableMixin, BylineMixin, AnalyticsMixin):
     front_page_image = models.ForeignKey(
         BaseImage,
         null=True,

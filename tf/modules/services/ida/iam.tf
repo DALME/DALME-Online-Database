@@ -6,6 +6,7 @@ locals {
     data.aws_secretsmanager_secret_version.oidc_rsa_key.arn,
     data.aws_secretsmanager_secret_version.opensearch_master_user.arn,
     data.aws_secretsmanager_secret_version.zotero.arn,
+    data.aws_secretsmanager_secret_version.plausible.arn,
     local.postgres_master_user_secret_arn,
     module.secret["ADMIN-USER"].arn,
     module.secret["DJANGO-SECRET-KEY"].arn,

@@ -85,6 +85,7 @@ locals {
   dam_secret      = "DAM"
   oidc_rsa_secret = "OIDC-RSA-PRIVATE-KEY"
   zotero_secret   = "ZOTERO"
+  plausible_secret= "PLAUSIBLE"
 }
 
 # Any secret marked 'UNMANAGED' means we don't generate it ourselves here so we
@@ -103,6 +104,10 @@ data "aws_secretsmanager_secret_version" "oidc_rsa_key" {
 
 data "aws_secretsmanager_secret_version" "zotero" {
   secret_id = "${local.secret_prefix}-${local.zotero_secret}--${var.unmanaged_suffix}"
+}
+
+data "aws_secretsmanager_secret_version" "plausible" {
+  secret_id = "${local.secret_prefix}-${local.plausible_secret}--${var.unmanaged_suffix}"
 }
 
 data "aws_secretsmanager_secret_version" "opensearch_master_user" {
