@@ -59,6 +59,13 @@
   font-size: 13px;
   margin-left: auto;
 }
+.feature-essay-container a {
+  display: block;
+  overflow: hidden;
+  line-clamp: 2;
+  max-width: 150px;
+  margin-bottom: 10px;
+}
 .title-essays {
   margin-bottom: 0.7rem;
 }
