@@ -252,6 +252,13 @@ TEI_ATTRIBUTE_OPTIONS = [
             {'value': '2720', 'label': 'Maltese cross'},
             {'value': '261A', 'label': 'Manicule pointing left'},
             {'value': '261B', 'label': 'Manicule pointing right'},
+            {'value': '2125', 'label': 'Ounce (Alchemical)'},
+            {'value': '1F773', 'label': 'Half ounce (Alchemical)'},
+            {'value': '1F772', 'label': 'Half dram (Alchemical)'},
+            {'value': '03F6', 'label': 'Reversed lunate Epsilon)'},
+            {'value': '01B7', 'label': 'Capital Ezh'},
+            {'value': '2114', 'label': 'Lb bar'},
+            {'value': '1D5D', 'label': 'Modifier Beta'},
             {
                 'value': '00BD',
                 'label': 'fraction - half',
