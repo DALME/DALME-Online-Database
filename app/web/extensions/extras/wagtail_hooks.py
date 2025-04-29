@@ -10,7 +10,7 @@ from django.utils.html import format_html
 def register_extra_icons(icons):
     return [
         *icons,
-        'web/icons/expandable-text.svg',
+        'icons/expandable-text.svg',
         'wagtailfontawesomesvg/solid/chart-area.svg',
         'wagtailfontawesomesvg/solid/file-pdf.svg',
         'wagtailfontawesomesvg/solid/table-cells.svg',
