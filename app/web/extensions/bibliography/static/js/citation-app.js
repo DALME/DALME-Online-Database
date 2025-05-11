@@ -6,15 +6,6 @@ const cite_app = new Vue({
   directives: {
     onClickaway: window.VueClickaway.directive,
   },
-  created() {
-    const Cite = require("citation-js");
-    this.styles = this.citationData[0];
-    this.config = Cite.plugins.config.get("@csl");
-    this.loadTemplates().then(() => {
-      this.citation = new Cite(this.citationData[1]);
-      setTimeout(() => this.template = "chicago_16", 100);
-    });
-  },
   data: function() {
 return {
     showCitePanel: false,
@@ -42,6 +33,15 @@ return {
         lang: this.lang
       });
     }
+  },
+  created() {
+    const Cite = require("citation-js");
+    this.styles = this.citationData[0];
+    this.config = Cite.plugins.config.get("@csl");
+    this.loadTemplates().then(() => {
+      this.citation = new Cite(this.citationData[1]);
+      setTimeout(() => this.template = "chicago_16", 100);
+    });
   },
   methods: {
     async loadTemplates() {
