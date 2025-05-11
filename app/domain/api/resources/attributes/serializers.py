@@ -10,7 +10,7 @@ from rest_framework.utils import html
 from django.db import models
 
 from domain.api.serializers import DynamicSerializer
-from domain.models import Attribute, AttributeType, ContentAttributes, ContentTypeExtended
+from domain.models import Attribute, AttributeType
 
 
 class AttributeTypeSerializer(DynamicSerializer):
@@ -27,6 +27,7 @@ class AttributeTypeSerializer(DynamicSerializer):
             'source',
             'options',
             'same_as',
+            'is_local',
         ]
 
 
@@ -118,6 +119,7 @@ class AttributeSerializer(DynamicSerializer, WritableNestedModelSerializer):
         model = Attribute
         fields = [
             'id',
+            'object_id',
             'name',
             'label',
             'description',
@@ -178,57 +180,3 @@ class AttributeSerializer(DynamicSerializer, WritableNestedModelSerializer):
         )
 
         return AttributeListSerializer(*args, **list_kwargs)
-
-
-class ContentTypeSerializer(DynamicSerializer):
-    """Serializer for content types."""
-
-    attribute_types = AttributeTypeSerializer(many=True, required=False)
-
-    class Meta:
-        model = ContentTypeExtended
-        fields = [
-            'id',
-            'name',
-            'description',
-            'is_abstract',
-            'attribute_types',
-            'parent',
-            'can_view',
-            'can_edit',
-            'can_delete',
-            'can_add',
-            'can_remove',
-        ]
-        field_sets = {
-            'attribute': [
-                'id',
-                'name',
-                'short_name',
-                'is_abstract',
-                'description',
-            ],
-        }
-        extra_kwargs = {
-            'name': {
-                'validators': [],
-            },
-        }
-
-
-class ContentAttributesSerializer(DynamicSerializer):
-    """Serializer for content attributes."""
-
-    content_type = ContentTypeSerializer(required=False)
-    attribute_type = AttributeTypeSerializer(required=False)
-
-    class Meta:
-        model = ContentAttributes
-        fields = [
-            'id',
-            'content_type',
-            'attribute_type',
-            'order',
-            'required',
-            'unique',
-        ]

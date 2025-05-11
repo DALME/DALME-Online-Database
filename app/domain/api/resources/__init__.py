@@ -7,12 +7,17 @@ from .attributes import (
     AttributeSerializer,
     AttributeTypes,
     AttributeTypeSerializer,
-    ContentTypes,
     WebAttributes,
     WebAttributeTypes,
 )
 from .collections import Collections, CollectionSerializer
 from .comments import Comments, CommentSerializer
+from .content_types import (
+    ContentAttributesSerializer,
+    ContentTypes,
+    ContentTypeSerializer,
+    ExtendedContentTypeSerializer,
+)
 from .countries import Countries, CountryReferenceSerializer
 from .datasets import Datasets
 from .groups import Groups, GroupSerializer
@@ -51,11 +56,14 @@ __all__ = [
     'Collections',
     'CommentSerializer',
     'Comments',
+    'ContentAttributesSerializer',
+    'ContentTypeSerializer',
     'ContentTypes',
     'Countries',
     'CountryReferenceSerializer',
     'Datasets',
     'ElementSets',
+    'ExtendedContentTypeSerializer',
     'GroupSerializer',
     'Groups',
     'ImageOptionsSerializer',

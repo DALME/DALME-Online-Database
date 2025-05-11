@@ -2,8 +2,6 @@
 
 from rest_framework import serializers
 
-from django.contrib.contenttypes.models import ContentType
-
 
 class DynamicSerializer(serializers.ModelSerializer):
     """A serializer that takes an additional `fields` or 'field_set' keyword argument to indicate which fields should be included."""
@@ -46,18 +44,6 @@ class DynamicSerializer(serializers.ModelSerializer):
         self.fields['model'] = serializers.ReadOnlyField(source='_meta.model.__name__')
 
 
-class BaseContentTypeSerializer(DynamicSerializer):
-    """Serializer for base Django content types."""
-
-    class Meta:
-        model = ContentType
-        fields = [
-            'id',
-            'app_label',
-            'model',
-        ]
-
-
 class PermissionsSerializer(serializers.Serializer):
     """Serializer for object level permissions."""
 
@@ -68,7 +54,6 @@ class PermissionsSerializer(serializers.Serializer):
     can_remove = serializers.BooleanField()
 
     class Meta:
-        model = ContentType
         fields = [
             'can_view',
             'can_edit',

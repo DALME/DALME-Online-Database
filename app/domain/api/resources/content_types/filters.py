@@ -1,4 +1,4 @@
-"""Define API filtering for attribute resources."""
+"""Define API filtering for content type resources."""
 
 from django_filters import rest_framework as filters
 

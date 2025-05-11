@@ -8,16 +8,14 @@ from stringcase import snakecase
 
 from django.db.models import Q
 
-from app.access_policies import BaseAccessPolicy, GeneralAccessPolicy, WebAccessPolicy
+from app.access_policies import BaseAccessPolicy, WebAccessPolicy
+from domain.api.resources.content_types.serializers import ContentAttributesSerializer
 from domain.api.viewsets import BaseViewSet
-from domain.models import Attribute, AttributeType, ContentAttributes, ContentTypeExtended
+from domain.models import Attribute, AttributeType, ContentAttributes
 
-from .filters import ContentTypeFilter
 from .serializers import (
     AttributeSerializer,
     AttributeTypeSerializer,
-    ContentAttributesSerializer,
-    ContentTypeSerializer,
 )
 
 
@@ -31,17 +29,6 @@ class AttributeTypesAccessPolicy(BaseAccessPolicy):
     """Access policies for attribute types."""
 
     id = 'attribute-types-policy'
-
-
-class ContentTypes(BaseViewSet):
-    """API endpoint for managing ContentTypes."""
-
-    permission_classes = [GeneralAccessPolicy]
-    oauth_permission_classes = [TokenHasReadWriteScope & GeneralAccessPolicy]
-
-    queryset = ContentTypeExtended.objects.all()
-    serializer_class = ContentTypeSerializer
-    filterset_class = ContentTypeFilter
 
 
 class AttributeTypes(BaseViewSet):
@@ -79,9 +66,15 @@ class AttributeTypes(BaseViewSet):
         if lookup_url_kwarg in self.kwargs:
             lookup_value = self.kwargs[lookup_url_kwarg]
             if not str(lookup_value).isdigit():
-                filter_kwargs = {'name': lookup_value}
+                # check if provided name is likely to be an internal name for a related field
+                # and add the name minus the '_id' or '_ids' suffix to the filter
+                if lookup_value.endswith(('_id', '_ids')):
+                    filter_args = Q(name=lookup_value) | Q(name='_'.join(lookup_value.split('_')[:-1]))
+                else:
+                    filter_args = Q(name=lookup_value)
+
                 queryset = AttributeType.objects.all()
-                obj = get_object_or_404(queryset, **filter_kwargs)
+                obj = get_object_or_404(queryset, filter_args)
                 self.check_object_permissions(self.request, obj)
                 return obj
         return super().get_object()
