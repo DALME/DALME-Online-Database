@@ -58,52 +58,82 @@ class CollectionMemberSerializer(serializers.ModelSerializer):
 class CollectionSerializer(DynamicSerializer):
     """Serializer for collections."""
 
-    id = serializers.ReadOnlyField()
-    attributes = AttributeSerializer(many=True, required=False)
-    owner = UserSerializer(field_set='attribute', required=False)
-    team_link = GroupSerializer(field_set='attribute', required=False)
     # members = CollectionMemberSerializer(many=True)
+    attributes = AttributeSerializer(many=True, required=False)
+    attribute_ids = serializers.PrimaryKeyRelatedField(source='attributes', required=False, read_only=True, many=True)
     creation_user = UserSerializer(field_set='attribute', required=False)
-    modification_user = UserSerializer(field_set='attribute', required=False)
+    creation_user_id = serializers.PrimaryKeyRelatedField(source='creation_user', required=False, read_only=True)
+    id = serializers.ReadOnlyField()
     is_private = serializers.BooleanField()
+    modification_user = UserSerializer(field_set='attribute', required=False)
+    modification_user_id = serializers.PrimaryKeyRelatedField(
+        source='modification_user', required=False, read_only=True
+    )
+    owner = UserSerializer(field_set='attribute', required=False)
+    owner_id = serializers.PrimaryKeyRelatedField(source='owner', required=False, read_only=True)
+    team_link = GroupSerializer(field_set='attribute', required=False)
+    team_link_id = serializers.PrimaryKeyRelatedField(source='team_link', required=False, read_only=True)
     tenant = TenantSerializer(required=True)
 
     class Meta:
         model = Collection
         fields = [
-            'id',
-            'tenant',
-            'name',
             'attributes',
-            'use_as_workset',
-            'is_corpus',
-            'is_published',
-            'is_private',
-            'owner',
-            'team_link',
-            'creation_timestamp',
-            'modification_timestamp',
-            'creation_user',
-            'modification_user',
-            # 'members',
-            'member_count',
+            'attribute_ids',
             'comment_count',
+            'creation_timestamp',
+            'creation_user',
+            'creation_user_id',
+            'id',
+            'is_corpus',
+            'is_private',
+            'is_published',
+            'member_count',
+            'modification_timestamp',
+            'modification_user',
+            'modification_user_id',
+            'name',
+            'owner',
+            'owner_id',
+            'team_link',
+            'team_link_id',
+            'tenant',
+            'use_as_workset',
+            # 'members',
         ]
         field_sets = {
             'option': [
                 'id',
-                'name',
-                'is_published',
                 'is_private',
+                'is_published',
+                'name',
             ],
             'attribute': [
                 'id',
-                'name',
-                'is_published',
                 'is_private',
-                'use_as_workset',
+                'is_published',
+                'member_count',
+                'name',
                 'owner',
                 'team_link',
+                'use_as_workset',
+            ],
+            'retrieve': [
+                'attribute_ids',
+                'comment_count',
+                'creation_timestamp',
+                'creation_user_id',
+                'id',
+                'is_corpus',
+                'is_private',
+                'is_published',
                 'member_count',
+                'modification_timestamp',
+                'modification_user_id',
+                'name',
+                'owner_id',
+                'team_link_id',
+                'tenant',
+                'use_as_workset',
             ],
         }

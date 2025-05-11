@@ -7,7 +7,6 @@ from domain.api.resources.attributes import AttributeSerializer
 from domain.api.resources.languages import LanguageReferenceSerializer
 from domain.api.resources.locales import LocaleReferenceSerializer
 from domain.api.resources.pages import PageSerializer
-from domain.api.resources.places import PlaceSerializer
 from domain.api.resources.users import UserSerializer
 from domain.api.resources.workflows import WorkflowSerializer
 from domain.api.serializers import DynamicSerializer, PermissionsSerializer
@@ -106,80 +105,96 @@ class RecordParentSerializer(serializers.BaseSerializer):
 class RecordSerializer(DynamicSerializer):
     """Serializer for records."""
 
-    attributes = AttributeSerializer(many=True, required=False)
-    workflow = WorkflowSerializer(required=False)
-    pages = PageSerializer(many=True, required=False)
-    page_info = PageSerializer(field_set='info', many=True, required=False)
-    owner = UserSerializer(field_set='attribute', required=False)
-    creation_user = UserSerializer(field_set='attribute', required=False)
-    modification_user = UserSerializer(field_set='attribute', required=False)
-    image_urls = serializers.SerializerMethodField(required=False)
-    collections = RecordAttributeCollectionSerializer(many=True, required=False)
-    parent = RecordParentSerializer(required=False)
     agents = AgentSerializer(many=True, required=False)
-    places = PlaceSerializer(many=True, required=False)
+    agent_ids = serializers.PrimaryKeyRelatedField(source='agents', required=False, read_only=True, many=True)
+    attributes = AttributeSerializer(many=True, required=False)
+    attribute_ids = serializers.PrimaryKeyRelatedField(source='attributes', required=False, read_only=True, many=True)
+    collections = RecordAttributeCollectionSerializer(many=True, required=False)
+    creation_user = UserSerializer(field_set='attribute', required=False)
+    creation_user_id = serializers.PrimaryKeyRelatedField(source='creation_user', required=False, read_only=True)
+    image_urls = serializers.SerializerMethodField(required=False)
+    modification_user = UserSerializer(field_set='attribute', required=False)
+    modification_user_id = serializers.PrimaryKeyRelatedField(
+        source='modification_user', required=False, read_only=True
+    )
+    owner = UserSerializer(field_set='attribute', required=False)
+    owner_id = serializers.PrimaryKeyRelatedField(source='owner', required=False, read_only=True)
+    page_info = PageSerializer(field_set='info', many=True, required=False)
+    pages = PageSerializer(many=True, required=False)
+    parent = RecordParentSerializer(required=False)
+    # places = PlaceSerializer(many=True, required=False)
+    place_ids = serializers.PrimaryKeyRelatedField(source='places', required=False, read_only=True, many=True)
+    workflow = WorkflowSerializer(required=False)
     # annotated fields
     description = serializers.ReadOnlyField(required=False)
-    record_type = RecordTypeSerializer(field_set='attribute')
-    locale = LocaleReferenceSerializer(many=True, required=False)
     language = LanguageReferenceSerializer(many=True, required=False)
+    locale = LocaleReferenceSerializer(many=True, required=False)
+    record_type = RecordTypeSerializer(field_set='attribute')
     # method fields
     credit_line = serializers.SerializerMethodField(required=False)
     credits = serializers.SerializerMethodField(required=False)
-    source = serializers.SerializerMethodField(required=False)
     date = serializers.SerializerMethodField(required=False)
     permissions = serializers.SerializerMethodField(required=False)
+    source = serializers.SerializerMethodField(required=False)
+    collection_ids = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = Record
         fields = [
-            'id',
-            'name',
-            'short_name',
-            'owner',
+            'agents',
+            'agent_ids',
             'attributes',
-            'no_folios',
-            'has_images',
-            'no_images',
-            'workflow',
-            'pages',
-            'page_info',
-            'is_private',
+            'attribute_ids',
+            'collections',
+            'collection_ids',
             'comment_count',
             'creation_timestamp',
             'creation_user',
-            'modification_timestamp',
-            'modification_user',
-            'has_transcriptions',
-            'no_transcriptions',
-            'image_urls',
-            'description',
-            'record_type',
-            'date',
-            'collections',
-            'locale',
-            'language',
+            'creation_user_id',
             'credit_line',
             'credits',
-            'source',
-            'agents',
-            'parent',
-            'places',
-            'permissions',
-        ]
-        default_exclude = [
+            'date',
+            'description',
             'has_images',
             'has_transcriptions',
-            'no_transcriptions',
+            'id',
             'image_urls',
-            'description',
-            'record_type',
-            'date',
-            'collections',
-            'locale',
+            'is_private',
             'language',
+            'locale',
+            'modification_timestamp',
+            'modification_user',
+            'modification_user_id',
+            'name',
+            'no_folios',
+            'no_images',
+            'no_transcriptions',
+            'owner',
+            'owner_id',
+            'page_info',
+            'pages',
+            'parent',
+            'permissions',
+            'places',
+            'place_ids',
+            'record_type',
+            'short_name',
+            'source',
+            'workflow',
+        ]
+        default_exclude = [
+            'collections',
             'credit_line',
             'credits',
+            'date',
+            'description',
+            'has_images',
+            'has_transcriptions',
+            'image_urls',
+            'language',
+            'locale',
+            'no_transcriptions',
+            'record_type',
             'source',
         ]
         field_sets = {
@@ -197,71 +212,73 @@ class RecordSerializer(DynamicSerializer):
                 'name',
             ],
             'list': [
-                'id',
-                'name',
-                'short_name',
-                'owner',
                 'attributes',
-                'no_folios',
-                'is_private',
+                'collections',
                 'comment_count',
                 'creation_timestamp',
                 'creation_user',
+                'date',
+                'id',
+                'is_private',
+                'language',
+                'locale',
                 'modification_timestamp',
                 'modification_user',
-                'date',
-                'collections',
-                'locale',
-                'language',
+                'name',
+                'no_folios',
+                'owner',
+                'short_name',
                 'source',
                 'workflow',
             ],
             'retrieve': [
-                'id',
-                'name',
-                'short_name',
-                'owner',
-                'attributes',
-                'no_folios',
-                'workflow',
-                'pages',
-                'is_private',
+                # 'agents',
+                'agent_ids',
+                'attribute_ids',
+                'collection_ids',
                 'comment_count',
                 'creation_timestamp',
-                'creation_user',
-                'modification_timestamp',
-                'modification_user',
-                'no_transcriptions',
-                'collections',
+                'creation_user_id',
                 'credit_line',
+                'id',
+                'is_private',
+                'modification_timestamp',
+                'modification_user_id',
+                'name',
+                'no_folios',
+                'no_transcriptions',
+                # 'owner',
+                'owner_id',
+                'pages',
                 'parent',
-                'agents',
-                'places',
                 'permissions',
+                'place_ids',
+                'short_name',
+                'workflow',
             ],
             'web': [
+                'collections',
+                'date',
+                'description',
+                'has_images',
+                'has_transcriptions',
                 'id',
                 'name',
-                'short_name',
-                #'parent',
-                #'parent_name',
                 'no_folios',
                 'no_images',
                 'no_transcriptions',
-                'collections',
-                'has_images',
-                'has_transcriptions',
-                'description',
                 'record_type',
-                'date',
+                'short_name',
+                #'parent_name',
+                #'parent',
             ],
             'web_detail': [
-                'locale',
-                'language',
+                'agents',
                 'credit_line',
                 'credits',
+                'language',
+                'locale',
                 'source',
-                'agents',
             ],
             'images': ['image_urls'],
         }
@@ -292,3 +309,6 @@ class RecordSerializer(DynamicSerializer):
             serializer = PermissionsSerializer(perms)
             return serializer.data
         return None
+
+    def get_collection_ids(self, obj):
+        return [x.collection_id for x in obj.collections.all()]

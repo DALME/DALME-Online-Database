@@ -6,7 +6,6 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
 from app.abstract import BASE_DATA_TYPES
-from domain.api.resources.groups import GroupSerializer
 from domain.api.serializers import DynamicSerializer
 from domain.models.preference import Preference
 
@@ -14,20 +13,20 @@ from domain.models.preference import Preference
 class PreferenceSerializer(serializers.ModelSerializer):
     """Serializes user preference data."""
 
-    name = serializers.CharField(max_length=55, source='key.name')
-    label = serializers.CharField(max_length=255, source='key.label')
-    description = serializers.CharField(source='key.description')
     data_type = serializers.ChoiceField(BASE_DATA_TYPES, source='key.data_type')
+    description = serializers.CharField(source='key.description')
     group = serializers.CharField(max_length=55, source='key.group')
+    label = serializers.CharField(max_length=255, source='key.label')
+    name = serializers.CharField(max_length=55, source='key.name')
 
     class Meta:
         model = Preference
         fields = [
-            'name',
-            'label',
-            'description',
             'data_type',
+            'description',
             'group',
+            'label',
+            'name',
             'value',
         ]
 
@@ -35,102 +34,50 @@ class PreferenceSerializer(serializers.ModelSerializer):
 class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     """Serializes user and profile data."""
 
-    groups = GroupSerializer(many=True, field_set='attribute', required=False)
     avatar = serializers.URLField(max_length=255, source='avatar_url', required=False)
+    group_ids = serializers.PrimaryKeyRelatedField(source='groups', required=False, read_only=True, many=True)
     preferences = PreferenceSerializer(many=True, required=False)
 
     class Meta:
         model = get_user_model()
         fields = [
-            'id',
-            'last_login',
-            'is_superuser',
-            'username',
-            'first_name',
-            'last_name',
-            'full_name',
-            'email',
-            'is_staff',
-            'is_active',
-            'date_joined',
-            'groups',
-            'password',
             'avatar',
+            'date_joined',
+            'email',
+            'first_name',
+            'full_name',
+            'group_ids',
+            'id',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'last_name',
+            'password',
             'preferences',
+            'username',
         ]
         field_sets = {
             'attribute': [
-                'id',
-                'username',
-                'full_name',
                 'avatar',
                 'email',
-            ],
-            'option': [
+                'full_name',
                 'id',
                 'username',
-                'full_name',
+            ],
+            'option': [
                 'avatar',
+                'full_name',
+                'id',
+                'username',
             ],
         }
         extra_kwargs = {
+            'password': {
+                'required': False,
+                'write_only': True,
+            },
             'username': {
                 'validators': [],
             },
-            'password': {
-                'write_only': True,
-                'required': False,
-            },
         }
-
-    # def to_internal_value(self, data):
-    #     """Transform incoming data."""
-    #     if type(data) is int:
-    #         user = get_user_model().objects.get(pk=data)
-    #         data = {'id': user.id, 'username': user.username}
-
-    #     if data.get('groups') is not None:
-    #         self.context['groups'] = data.pop('groups')
-
-    #     if data.get('profile') is not None:
-    #         self.context['profile'] = data.pop('profile')
-
-    #     return super().to_internal_value(data)
-
-    # def update(self, instance, validated_data):
-    #     """Update user record."""
-    #     if self.context.get('profile') is not None:
-    #         profile_data = self.context.get('profile')
-    #         profile = Profile.objects.get_or_create(user=instance)
-
-    #         if type(profile) is tuple:
-    #             profile = profile[0]
-
-    #         for attr, value in profile_data.items():
-    #             setattr(profile, attr, value)
-
-    #         profile.save()
-
-    #     if self.context.get('groups') is not None:
-    #         group_data = [i['id'] for i in self.context['groups']]
-    #         instance.groups.set(group_data)
-
-    #     return super().update(instance, validated_data)
-
-    # def create(self, validated_data):
-    #     """Create new user."""
-    #     profile_data = self.context.get('profile')
-    #     if 'username' in validated_data:
-    #         validated_data['username'] = validated_data['username'].lower()
-
-    #     user = get_user_model().objects.create_user(**validated_data)
-
-    #     Profile.objects.create(user=user, **profile_data)
-
-    #     if self.context.get('groups') is not None:
-    #         group_data = [i['id'] for i in self.context['groups']]
-    #         user.groups.set(group_data)
-
-    #     Agent.objects.create(standard_name=user.profile.full_name, type=1, user=user)
-
-    #     return user

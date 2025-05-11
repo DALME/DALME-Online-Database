@@ -4,11 +4,12 @@ from rest_framework import serializers
 
 from domain.api.resources.agents import AgentSerializer
 from domain.api.resources.attributes import AttributeSerializer
+from domain.api.resources.content_types import ContentTypeSerializer
 
 # from domain.api.resources.locales import LocaleReferenceSerializer
 from domain.api.resources.records import RecordSerializer
 from domain.api.resources.users import UserSerializer
-from domain.api.serializers import BaseContentTypeSerializer, DynamicSerializer
+from domain.api.serializers import DynamicSerializer
 from domain.models import RecordGroup
 
 
@@ -19,7 +20,7 @@ class RecordGroupSerializer(DynamicSerializer):
     children = RecordSerializer(field_set='attribute', many=True, required=False)
     owner = UserSerializer(field_set='attribute', required=False)
     parent = AgentSerializer(required=False)
-    parent_type = BaseContentTypeSerializer(required=False)
+    parent_type = ContentTypeSerializer(required=False)
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
     # annotated fields

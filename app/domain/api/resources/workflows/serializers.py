@@ -2,47 +2,47 @@
 
 from rest_framework import serializers
 
-from domain.api.resources.users import UserSerializer
 from domain.models import Workflow, WorkLog
 
 
 class WorklogSerializer(serializers.ModelSerializer):
     """Basic serializer for work logs."""
 
-    user = UserSerializer(field_set='attribute', required=False)
+    user_id = serializers.PrimaryKeyRelatedField(source='user', required=False, read_only=True)
 
     class Meta:
         model = WorkLog
         fields = [
-            'id',
             'event',
+            'id',
             'timestamp',
-            'user',
+            'user_id',
         ]
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
     """Basic serializer for workflow control."""
 
-    last_user = UserSerializer(field_set='attribute', required=False)
-    work_log = WorklogSerializer(many=True, read_only=True, required=False)
+    last_user_id = serializers.PrimaryKeyRelatedField(source='last_user', required=False, read_only=True)
+    # work_log = WorklogSerializer(many=True, read_only=True, required=False)
 
     class Meta:
         model = Workflow
         fields = [
             'help_flag',
+            'ingestion_done',
             'is_public',
             'last_modified',
-            'last_user',
-            'wf_status',
-            'stage',
-            'status',
-            'ingestion_done',
-            'transcription_done',
+            'last_user_id',
             'markup_done',
             'parsing_done',
+            'record',
             'review_done',
-            'work_log',
+            'stage',
+            'status',
+            'transcription_done',
+            'wf_status',
+            # 'work_log',
         ]
         extra_kwargs = {
             'last_user': {

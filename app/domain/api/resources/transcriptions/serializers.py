@@ -13,8 +13,9 @@ class TranscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transcription
         fields = [
-            'id',
-            'transcription',
             'author',
+            'id',
+            'page_id',
+            'transcription',
             'version',
         ]

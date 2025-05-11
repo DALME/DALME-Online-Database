@@ -14,27 +14,29 @@ class PlaceSerializer(DynamicSerializer):
     """Serializer for places."""
 
     attributes = AttributeSerializer(many=True, required=False)
-    location = LocationSerializer(field_set='attribute')
-    tags = TagSerializer(many=True, required=False)
     creation_user = UserSerializer(field_set='attribute', required=False)
+    location = LocationSerializer(field_set='attribute')
     modification_user = UserSerializer(field_set='attribute', required=False)
+    object_id = serializers.SerializerMethodField()
     record_attestation_count = serializers.SerializerMethodField()
+    tags = TagSerializer(many=True, required=False)
 
     class Meta:
         model = Place
         fields = [
-            'id',
-            'name',
+            'attestation_count',
             'attributes',
-            'location',
+            'comment_count',
             'creation_timestamp',
             'creation_user',
+            'id',
+            'location',
             'modification_timestamp',
             'modification_user',
-            'comment_count',
-            'tags',
-            'attestation_count',
+            'name',
+            'object_id',
             'record_attestation_count',
+            'tags',
         ]
         field_sets = {
             'option': [
@@ -52,4 +54,10 @@ class PlaceSerializer(DynamicSerializer):
         """Return count of attestations for current record."""
         if self.context.get('record'):
             return obj.get_attestations_for_record(self.context['record'])
+        return None
+
+    def get_object_id(self, _):
+        """Return id for current record."""
+        if self.context.get('record'):
+            return self.context['record'].id
         return None

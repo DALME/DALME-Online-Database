@@ -13,14 +13,15 @@ class PageSerializer(DynamicSerializer):
     class Meta:
         model = Page
         fields = [
-            'id',
-            'name',
-            'order',
             'dam_id',
             'has_image',
             'has_transcription',
-            'thumbnail_url',
+            'id',
             'manifest_url',
+            'name',
+            'order',
+            'record_id',
+            'thumbnail_url',
             'transcription',
         ]
         field_sets = {
