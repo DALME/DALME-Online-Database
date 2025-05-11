@@ -3,7 +3,6 @@
 from oauth2_provider.oauth2_validators import OAuth2Validator
 
 from app.context import get_current_tenant
-from domain.api.resources.groups import GroupSerializer
 
 
 class OAuth2Validator(OAuth2Validator):
@@ -18,11 +17,17 @@ class OAuth2Validator(OAuth2Validator):
         claims.update(
             {
                 'avatar': avatar,
+                'date_joined': request.user.date_joined.isoformat() if request.user.date_joined else None,
                 'email': request.user.email,
-                'username': request.user.username,
+                'first_name': request.user.first_name,
                 'full_name': request.user.full_name,
-                'is_admin': request.user.is_staff,
-                'groups': GroupSerializer(request.user.groups_scoped, many=True).data,
+                'groupIds': [g.id for g in request.user.groups_scoped],
+                'is_active': request.user.is_active,
+                'is_staff': request.user.is_staff,
+                'is_superuser': request.user.is_superuser,
+                'last_login': request.user.last_login.isoformat() if request.user.last_login else None,
+                'last_name': request.user.last_name,
+                'username': request.user.username,
                 'tenant': {
                     'id': tenant.pk,
                     'name': tenant.name,
