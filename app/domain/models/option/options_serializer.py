@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 class OptionsSerializer(serializers.Serializer):
     label = serializers.ReadOnlyField()
-    value = serializers.ReadOnlyField()
+    value = serializers.IntegerField()
     group = serializers.ReadOnlyField(required=False)
     detail = serializers.ReadOnlyField(required=False)
     icon = serializers.ReadOnlyField(required=False)
