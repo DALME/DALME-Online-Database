@@ -84,6 +84,7 @@ TO_LOCAL = [
     'has_pages',
     'help_flag',
     'member_count',
+    'parent',
 ]
 
 NEW_TYPES = [
