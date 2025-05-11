@@ -34,13 +34,13 @@ class AttributeType(TrackingMixin):
             ctype = ContentType.objects.get_for_model(content)
         except AttributeError:
             try:
-                ctype = ContentType.objects.get(model=content)
+                ctype = ContentType.objects.get(app_label='domain', model=content)
             except (ContentType.DoesNotExist, MultipleObjectsReturned):
                 try:
                     ctype = ContentType.objects.get(contenttypeextended__name=content)
                 except (ContentType.DoesNotExist, MultipleObjectsReturned):
                     return self.options
 
-        qs = self.attribute_type.contenttypes.filter(content_type=ctype.id)
+        qs = self.contenttypes.filter(content_type=ctype.id)
         override_options = qs.first().override_options if qs.exists() else None
         return override_options if override_options else self.options
