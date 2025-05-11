@@ -14,10 +14,10 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 class Transcription(UuidMixin, TrackingMixin):
     """Stores information about transcriptions."""
 
-    transcription = models.TextField(blank=True)
     author = models.CharField(max_length=255, default=get_current_username)
-    version = models.IntegerField(default=1)
     count_ignore = models.BooleanField(default=False)
+    transcription = models.TextField(blank=True)
+    version = models.IntegerField(default=1)
 
     def __str__(self):
         return str(self.id)
@@ -48,3 +48,8 @@ class Transcription(UuidMixin, TrackingMixin):
         if (tags == 1 and tree[0].tag in ['quote', 'gap', 'mute']) or tags == 0:
             return len(' '.join(t for t in tree.xpath('text()'))) != 0
         return True
+
+    @property
+    def page_id(self):
+        """Return the page id associated with the transcription (if any)."""
+        return self.pagenodes.first().page.id if self.pagenodes.exists() else None

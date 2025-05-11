@@ -48,11 +48,17 @@ class Page(UuidMixin, TrackingMixin, TagMixin):
         return thumbnail
 
     @property
+    def record_id(self):
+        """Return the record id associated with the page (if any)."""
+        return self.records.first().record.id if self.records.exists() else None
+
+    @property
     def transcription(self):
         """Return transcription page associated with the page (if any)."""
-        folio_model = apps.get_model(app_label='domain', model_name='pagenode')
-        folio = folio_model.objects.filter(page=self)
-        return folio.first().transcription if folio.exists() else None
+        # folio_model = apps.get_model(app_label='domain', model_name='pagenode')
+        # folio = folio_model.objects.filter(page=self)
+        # return folio.first().transcription if folio.exists() else None
+        return self.records.first().transcription if self.records.exists() else None
 
     @property
     def has_image(self):
