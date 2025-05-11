@@ -6,6 +6,10 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.contrib.contenttypes.models import ContentType
+
+from domain.models import ContentTypeExtended
+
 
 class BaseViewSet(viewsets.ModelViewSet):
     """Generic viewset. Should be subclassed for specific API endpoints."""
@@ -76,6 +80,21 @@ class BaseViewSet(viewsets.ModelViewSet):
                 serializer.save()
                 results.append(serializer.data)
             return Response({'data': results}, 200)
+        except Exception as e:  # noqa: BLE001
+            return Response({'error': str(e)}, 400)
+
+    @action(detail=False, methods=['get'])
+    def metadata(self, request, *args, **kwargs):  # noqa: ARG002
+        """Return resource content type metadata."""
+        # import serializers here to avoid circular imports
+        from domain.api.resources import ContentTypeSerializer, ExtendedContentTypeSerializer
+
+        try:
+            instance = self.get_queryset().first()
+            ct = ContentType.objects.get_for_model(instance)
+            cte = ContentTypeExtended.objects.filter(pk=ct.id)
+            serializer = ExtendedContentTypeSerializer(cte.first()) if cte.exists() else ContentTypeSerializer(ct)
+            return Response(serializer.data, 200)
         except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
 
