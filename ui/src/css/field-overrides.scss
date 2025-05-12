@@ -1,0 +1,18 @@
+.select-field.sidebar .q-field__label {
+    transform: translateY(-90%) scale(0.75);
+    font-weight: 700;
+}
+
+.select-field.sidebar .q-field--standard .q-field__control:before {
+    border-bottom-style: solid;
+    border-bottom-color: rgba(0, 0, 0, 0.12);
+}
+
+.select-field.sidebar .q-field .q-field__control .q-field__append {
+    margin-top: -7px;
+    align-items: flex-start;
+}
+
+.select-field.sidebar .q-select--multiple .q-field__native {
+    padding-bottom: 12px;
+}

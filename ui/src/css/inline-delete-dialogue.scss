@@ -1,0 +1,49 @@
+.inline-delete-dialogue {
+    display: flex;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.wrapper-box {
+    display: flex;
+    align-items: center;
+    padding: 5px 5px 5px 10px;
+    margin: 5px 5px 25px 5px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+}
+
+.wrapper-box::before {
+    content: "";
+    position: absolute;
+    border-width: 12px;
+    border-style: solid;
+    border-right-color: transparent;
+    border-top-color: #80808075;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    right: calc(50% - 12px);
+    bottom: 0;
+}
+
+.wrapper-box::after {
+    content: "";
+    position: absolute;
+    border-width: 12px;
+    border-style: solid;
+    border-right-color: transparent;
+    border-top-color: var(--light-bg-base-colour);
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    right: calc(50% - 12px);
+    bottom: 2px;
+}
+
+.inline-delete-dialogue .q-btn {
+    min-height: 0;
+    padding: 2px 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
