@@ -138,7 +138,7 @@ import { useRoute, useRouter } from "vue-router";
 import { requests } from "@/api";
 import { DataTable, DetailPopover, TagPill, TasklistList } from "@/components";
 import { taskListsSchema, tasksSchema } from "@/schemas";
-import { useAPI, useEditing, usePagination, useStores } from "@/use";
+import { useAPI, usePagination, useStores } from "@/use";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 
 import { columnMap } from "./columns";
@@ -166,7 +166,6 @@ export default defineComponent({
     const { auth } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
-    const { postSubmitRefreshWatcher } = useEditing();
     const columns = ref([]);
     const rows = ref([]);
     const filteredRows = ref([]);
@@ -244,8 +243,8 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       const request = props.embedded
-        ? requests.tasks.getUserTasks(auth.user.userId)
-        : requests.tasks.getTasks(query);
+        ? requests.tasks.getByUser(auth.user.id)
+        : requests.tasks.list(query);
       await fetchAPI(request);
       if (success.value)
         await tasksSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
@@ -262,7 +261,7 @@ export default defineComponent({
 
     const fetchTaskLists = async () => {
       const { success, data, fetchAPI } = apiInterface();
-      const request = requests.tasks.getTaskLists();
+      const request = requests.taskLists.list();
       fetchAPI(request).then(() => {
         if (success.value)
           taskListsSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
@@ -292,14 +291,13 @@ export default defineComponent({
     provide("activeFilters", activeFilters);
     provide("taskLists", taskLists);
 
-    postSubmitRefreshWatcher(fetchTaskLists);
     onMounted(async () => await fetchTaskLists());
 
     return {
       context,
       columns,
       filteredRows,
-      filterList: filterList(auth.user.userId),
+      filterList: filterList(auth.user.id),
       formatDate,
       fetchTaskLists,
       loading,

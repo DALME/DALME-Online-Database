@@ -61,7 +61,7 @@ export const useSettingsStore = defineStore(
 
     const updateServer = async (key, value) => {
       const { fetchAPI, success } = apiInterface();
-      await fetchAPI(requests.preferences.updatePreferences(key, value));
+      await fetchAPI(requests.preferences.update(key, value));
       if (!success.value) {
         notifier.settings.prefUpdateFailed();
       }
@@ -69,7 +69,7 @@ export const useSettingsStore = defineStore(
 
     const fetchPreferences = async () => {
       const { data, fetchAPI, success } = apiInterface();
-      await fetchAPI(requests.preferences.getPreferences());
+      await fetchAPI(requests.preferences.list());
       if (success.value) {
         preferenceListSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           preferenceData.value = value;

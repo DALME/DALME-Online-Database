@@ -68,7 +68,7 @@ export default defineComponent({
     };
 
     const fetchData = async (query) => {
-      const request = requests.places.getPlaces(query);
+      const request = requests.places.list(query);
       await fetchAPI(request);
       if (success.value)
         await placeListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {

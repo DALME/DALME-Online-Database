@@ -3,19 +3,19 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/images`;
 
 const images = {
-  getImageUrl(damId) {
+  getUrl(damId) {
     return {
       url: `${endpoint}/${damId}/?as=url`,
       method: "GET",
     };
   },
-  getImageOptions() {
+  getOptions() {
     return {
       url: `${endpoint}/?as=options`,
       method: "GET",
     };
   },
-  getImageInfo(iiif_id) {
+  getInfo(iiif_id) {
     return {
       url: `${iiif_id}/info.json`,
       method: "GET",

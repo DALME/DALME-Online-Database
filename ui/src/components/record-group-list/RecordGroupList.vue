@@ -166,7 +166,7 @@ export default defineComponent({
     };
 
     const fetchData = async (query) => {
-      const request = requests.recordGroups.getRecordGroups(query);
+      const request = requests.recordGroups.list(query);
       await fetchAPI(request);
       if (success.value)
         recordGroupListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {

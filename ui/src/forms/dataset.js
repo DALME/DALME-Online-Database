@@ -44,8 +44,7 @@ const datasetFormSchema = {
     component: markRaw(SelectField),
     label: "Dataset group *",
     description: "User group to be linked with this set.",
-    getOptions: () =>
-      fetcher(requests.groups.getDatasetGroups()).then((response) => response.json()),
+    getOptions: () => fetcher(requests.groups.getByDataset()).then((response) => response.json()),
     optionsSchema: groupOptionsSchema,
     validation: datasetFieldValidation.datasetUsergroup,
   },

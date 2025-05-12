@@ -179,7 +179,7 @@ export default defineComponent({
     const getStatusColours = (id) => rightsColoursById[id];
 
     const fetchData = async (query) => {
-      const request = requests.rights.getRights(query);
+      const request = requests.rights.list(query);
       await fetchAPI(request);
       if (success.value)
         await rightsListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
@@ -211,7 +211,7 @@ export default defineComponent({
 
     return {
       columns,
-      filterList: filterList(auth.user.userId),
+      filterList: filterList(auth.user.id),
       formatDate,
       getStatusIcon,
       getStatusColours,

@@ -52,7 +52,7 @@ export default defineComponent({
     const title = "Locales";
 
     const fetchData = async (query) => {
-      const request = requests.locales.getLocales(query);
+      const request = requests.locales.list(query);
       await fetchAPI(request);
       if (success.value)
         await localeListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {

@@ -213,7 +213,7 @@ export default defineComponent({
     const onAction = async () => {
       const { success, fetchAPI, status } = apiInterface();
       const action = ticket.value.status ? "markClosed" : "markOpen";
-      await fetchAPI(requests.tickets.setTicketState(id.value, action));
+      await fetchAPI(requests.tickets.setState(id.value, action));
       if (success.value && status.value === 200) {
         notifier.tickets.ticketStatusUpdated();
         await fetchData();
@@ -227,7 +227,7 @@ export default defineComponent({
     };
 
     const fetchData = async () => {
-      await fetchAPI(requests.tickets.getTicket(number.value));
+      await fetchAPI(requests.tickets.get(number.value));
       if (success.value)
         await ticketSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           action.value = value.status ? "reopen ticket" : "close ticket";
@@ -252,7 +252,7 @@ export default defineComponent({
       cleanTags,
       formatDate,
       number,
-      isAdmin: auth.user.isAdmin,
+      isAdmin: auth.user.isSuperuser,
       isEmpty,
       isNil,
       loading,

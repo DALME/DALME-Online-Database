@@ -81,7 +81,7 @@ export default defineComponent({
               const { success, data, fetchAPI } = apiInterface();
               const { attributes } = value;
               const shortNames = keys(attributes).join(",");
-              const request = requests.attributeTypes.getAttributeTypesByShortName(shortNames);
+              const request = requests.attributeTypes.getByShortName(shortNames);
               await fetchAPI(request);
               if (success.value)
                 await attributeTypesSchema

@@ -145,7 +145,7 @@ export default defineComponent({
     const formatGroups = (groups) => map((group) => group.name, groups).join("<br>");
 
     const fetchData = async () => {
-      await fetchAPI(requests.users.getUser(username));
+      await fetchAPI(requests.users.get(username));
       if (success.value)
         await userSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           user.value = value;

@@ -232,7 +232,7 @@ export default defineComponent({
     provide("id", readonly(id));
 
     const fetchData = async () => {
-      await fetchAPI(requests.rights.getPolicy(id.value));
+      await fetchAPI(requests.rights.get(id.value));
       if (success.value)
         await rightsSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           policy.value = value;

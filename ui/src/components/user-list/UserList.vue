@@ -147,7 +147,7 @@ export default defineComponent({
     const title = "Users";
 
     const fetchData = async (query) => {
-      const request = requests.users.getUsers(query);
+      const request = requests.users.list(query);
       await fetchAPI(request);
       if (success.value)
         await userListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {

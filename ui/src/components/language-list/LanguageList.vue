@@ -56,7 +56,7 @@ export default defineComponent({
     const title = "Languages";
 
     const fetchData = async (query) => {
-      const request = requests.languages.getLanguages(query);
+      const request = requests.languages.list(query);
       await fetchAPI(request);
       if (success.value)
         await languageListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {

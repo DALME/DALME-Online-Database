@@ -235,7 +235,7 @@ export default defineComponent({
     };
 
     const fetchData = async (query) => {
-      const request = requests.records.getRecords(query);
+      const request = requests.records.list(query);
       await fetchAPI(request);
       if (success.value)
         recordListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {

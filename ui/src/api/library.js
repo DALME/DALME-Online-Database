@@ -3,7 +3,7 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/library`;
 
 const library = {
-  getLibrary() {
+  list() {
     return {
       url: `${endpoint}/`,
       method: "GET",

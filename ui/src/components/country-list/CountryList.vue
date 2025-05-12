@@ -42,7 +42,7 @@ export default defineComponent({
     const title = "Countries";
 
     const fetchData = async (query) => {
-      const request = requests.countries.getCountries(query);
+      const request = requests.countries.list(query);
       await fetchAPI(request);
       if (success.value)
         await countryListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {

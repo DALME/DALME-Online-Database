@@ -50,7 +50,7 @@ export default defineComponent({
     const title = "Agents";
 
     const fetchData = async (query) => {
-      const request = requests.agents.getAgents(query);
+      const request = requests.agents.list(query);
       await fetchAPI(request);
       if (success.value)
         await agentListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {

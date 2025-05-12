@@ -3,16 +3,22 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/record-groups`;
 
 const recordGroups = {
-  getRecordGroup(id) {
+  get(id) {
     return {
       url: `${endpoint}/${id}/`,
       method: "GET",
     };
   },
-  getRecordGroups(query) {
+  list(query) {
     const url = query ? `${endpoint}/?${query}` : `${endpoint}/`;
     return {
       url: url,
+      method: "GET",
+    };
+  },
+  metadata() {
+    return {
+      url: `${endpoint}/metadata/`,
       method: "GET",
     };
   },

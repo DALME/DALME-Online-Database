@@ -3,16 +3,22 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/records`;
 
 const publications = {
-  getPublication(id) {
+  get(id) {
     return {
       url: `${endpoint}/${id}/`,
       method: "GET",
     };
   },
-  getPublications(query) {
+  list(query) {
     const url = query ? `${endpoint}/?${query}` : `${endpoint}/`;
     return {
       url: url,
+      method: "GET",
+    };
+  },
+  metadata() {
+    return {
+      url: `${endpoint}/metadata/`,
       method: "GET",
     };
   },

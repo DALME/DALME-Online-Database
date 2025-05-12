@@ -119,7 +119,7 @@ const recordFormSchema = {
 
 const recordType = { id: 13 }; // TODO: Magic number.
 const recordRequests = {
-  get: (id) => requests.records.getRecord(id),
+  get: (id) => requests.records.get(id),
   create: (data) => requests.records.createRecord({ type: recordType, ...data }),
   update: ({ id, ...data }) => requests.records.editRecord(id, { type: recordType, ...data }),
 };

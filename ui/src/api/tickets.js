@@ -5,26 +5,32 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/tickets`;
 
 const tickets = {
-  getTickets(query = false) {
+  list(query = false) {
     const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=0&offset=0`;
     return {
       url: url,
       method: "GET",
     };
   },
-  getTicket(id) {
+  get(id) {
     return {
       url: `${endpoint}/${id}/`,
       method: "GET",
     };
   },
-  getUserTickets(userId) {
+  getByUser(userId) {
     return {
       url: `${endpoint}/?creation_user=${userId}`,
       method: "GET",
     };
   },
-  setTicketState(id, action) {
+  metadata() {
+    return {
+      url: `${endpoint}/metadata/`,
+      method: "GET",
+    };
+  },
+  setState(id, action) {
     return {
       url: `${endpoint}/${id}/set_state/`,
       method: "PATCH",

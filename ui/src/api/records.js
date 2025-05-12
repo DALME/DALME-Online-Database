@@ -3,31 +3,43 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/records`;
 
 const records = {
-  getRecord(id) {
+  get(id) {
     return {
       url: `${endpoint}/${id}/`,
       method: "GET",
     };
   },
-  getRecords(query) {
+  list(query) {
     const url = query ? `${endpoint}/?${query}` : `${endpoint}/`;
     return {
       url: url,
       method: "GET",
     };
   },
-  createRecord(data) {
+  create(data) {
     return {
       url: `${endpoint}/`,
       method: "POST",
       data: data,
     };
   },
-  editRecord(id, payload, patch = false) {
+  update(id, payload, patch = true) {
     return {
       url: `${endpoint}/${id}/`,
       method: patch ? "PATCH" : "PUT",
       data: payload,
+    };
+  },
+  destroy(id) {
+    return {
+      url: `${endpoint}/${id}/`,
+      method: "DELETE",
+    };
+  },
+  metadata() {
+    return {
+      url: `${endpoint}/metadata/`,
+      method: "GET",
     };
   },
   addAttribute(id, type, value) {

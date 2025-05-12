@@ -30,7 +30,7 @@ const taskFormSchema = {
     component: markRaw(SelectField),
     label: "Task list *",
     description: "Designate the category the task is filed under.",
-    getOptions: () => fetcher(requests.tasks.getTaskLists()).then((response) => response.json()),
+    getOptions: () => fetcher(requests.taskLists.list()).then((response) => response.json()),
     validation: taskFieldValidation.taskList,
   },
   assignedTo: {
@@ -38,7 +38,7 @@ const taskFormSchema = {
     component: markRaw(SelectField),
     label: "Assigned to",
     description: "Who is responsible for the task.",
-    getOptions: () => fetcher(requests.users.getUsers()).then((response) => response.json()),
+    getOptions: () => fetcher(requests.users.list()).then((response) => response.json()),
     optionsSchema: usersAsOptionsSchema,
     validation: taskFieldValidation.assignedTo,
   },
@@ -57,9 +57,9 @@ const taskSubmitSchemas = {
 };
 
 const taskRequests = {
-  get: (id) => requests.tasks.getTask(id),
-  create: (data) => requests.tasks.createTask(data),
-  update: ({ id, ...data }) => requests.tasks.editTask(id, data),
+  get: (id) => requests.tasks.get(id),
+  create: (data) => requests.tasks.create(data),
+  update: ({ id, ...data }) => requests.tasks.update(id, data),
 };
 
 export default {

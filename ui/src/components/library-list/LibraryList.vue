@@ -84,7 +84,7 @@ export default defineComponent({
       ).join(", ");
 
     const fetchData = async () => {
-      const request = requests.library.getLibrary();
+      const request = requests.library.list();
       await fetchAPI(request);
       if (success.value)
         await libraryListSchema.validate(data.value, { stripUnknown: true }).then((value) => {

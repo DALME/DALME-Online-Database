@@ -166,7 +166,7 @@ export default defineComponent({
       submitting.value = true;
       const payload = { model, body: text, object: id.value };
       await commentPayloadSchema.validate(payload).then(async () => {
-        const request = requests.comments.addComment(payload);
+        const request = requests.comments.add(payload);
         await fetchAPI(request);
         if (status.value == 201) {
           await commentSchema.validate(data.value).then((value) => {
@@ -240,7 +240,7 @@ export default defineComponent({
     };
 
     const fetchData = async () => {
-      await fetchAPI(requests.comments.getComments(model, id.value));
+      await fetchAPI(requests.comments.list(model, id.value));
       if (success.value) {
         await commentsSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           if (nully(props.worklog)) {

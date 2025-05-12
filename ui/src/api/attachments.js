@@ -3,7 +3,7 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/attachments`;
 
 const attachments = {
-  getAttachment(uuid) {
+  get(uuid) {
     return {
       url: `${endpoint}/${uuid}/`,
       method: "GET",

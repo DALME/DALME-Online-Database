@@ -33,7 +33,7 @@ export const ticketFetcher = (filter) => {
     const query = nully(filter)
       ? "ordering=id&limit=10&offset=0"
       : `ordering=id&search=${filter}&limit=10&offset=0`;
-    fetcher(ticketRequests.getTickets(query)).then((response) => {
+    fetcher(ticketRequests.list(query)).then((response) => {
       if (response.status === 200) {
         ticketListSchema.validate(response.data.data, { stripUnknown: true }).then((value) => {
           resolve(value);
@@ -48,7 +48,7 @@ export const userFetcher = (filter) => {
     const query = nully(filter)
       ? "ordering=id&limit=10&offset=0"
       : `ordering=id&search=${filter}&limit=10&offset=0`;
-    fetcher(userRequests.getUsers(query)).then((response) => {
+    fetcher(userRequests.list(query)).then((response) => {
       if (response.status === 200) {
         userListSchema.validate(response.data.data, { stripUnknown: true }).then((value) => {
           resolve(value);

@@ -225,7 +225,7 @@ export default defineComponent({
 
     // TODO: Use fetchAPI and a schema here please.
     const getImageOptions = () =>
-      fetcher(requests.images.getImageOptions())
+      fetcher(requests.images.getOptions())
         .then((response) => response.json())
         .then((options) => filterImageOptions(options));
 

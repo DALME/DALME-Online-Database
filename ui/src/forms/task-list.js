@@ -23,7 +23,7 @@ const taskListFormSchema = {
     component: markRaw(SelectField),
     label: "Group *",
     description: "Which group is the task list filed under.",
-    getOptions: () => fetcher(requests.groups.getGroups()).then((response) => response.json()),
+    getOptions: () => fetcher(requests.groups.list()).then((response) => response.json()),
     optionsSchema: groupOptionsSchema,
     validation: taskListFieldValidation.group,
   },
@@ -35,7 +35,7 @@ const taskListSubmitSchemas = {
 };
 
 const taskListRequests = {
-  create: (data) => requests.tasks.createTaskList(data),
+  create: (data) => requests.taskLists.create(data),
   update: ({ id, ...data }) => requests.tasks.editTaskList(id, data),
 };
 

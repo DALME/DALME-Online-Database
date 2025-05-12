@@ -96,11 +96,11 @@ export default defineComponent({
 
     const request = computed(() => {
       if (props.userCollections) {
-        return requests.collections.getUserCollections(auth.user.userId, limit.value);
+        return requests.collections.getByUser(auth.user.id, limit.value);
       } else if (props.teamCollections) {
-        return requests.collections.getTeamCollections(auth.user.userId, limit.value);
+        return requests.collections.getByTeam(auth.user.id, limit.value);
       } else {
-        return requests.collections.getCollections();
+        return requests.collections.list();
       }
     });
 

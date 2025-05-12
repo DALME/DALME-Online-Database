@@ -52,7 +52,7 @@ export default defineComponent({
 
     const url = ref(null);
     const fetchPage = async () => {
-      await fetchAPI(requests.images.getImageUrl(metadata.value.damId));
+      await fetchAPI(requests.images.getUrl(metadata.value.damId));
       if (success.value) {
         url.value = data.value.url;
       }

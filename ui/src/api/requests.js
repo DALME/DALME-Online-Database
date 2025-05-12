@@ -19,6 +19,7 @@ import publications from "./publications";
 import recordGroups from "./record-groups";
 import records from "./records";
 import rights from "./rights";
+import taskLists from "./task-lists";
 import tasks from "./tasks";
 import teiElements from "./tei-elements";
 import tickets from "./tickets";
@@ -51,6 +52,7 @@ const requests = {
   records,
   transcriptions,
   tasks,
+  taskLists,
   tickets,
   users,
   workflow,

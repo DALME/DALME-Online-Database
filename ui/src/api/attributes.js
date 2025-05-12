@@ -3,7 +3,33 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/attributes`;
 
 const attributes = {
-  getAttributeOptions(target, model = null, filters = null, serialize = false) {
+  get(id) {
+    return {
+      url: `${endpoint}/${id}/`,
+      method: "GET",
+    };
+  },
+  create(data) {
+    return {
+      url: `${endpoint}/`,
+      method: "POST",
+      data: data,
+    };
+  },
+  update(id, payload, patch = true) {
+    return {
+      url: `${endpoint}/${id}/`,
+      method: patch ? "PATCH" : "PUT",
+      data: payload,
+    };
+  },
+  destroy(id) {
+    return {
+      url: `${endpoint}/${id}/`,
+      method: "DELETE",
+    };
+  },
+  getOptions(target, model = null, filters = null, serialize = false) {
     let url = `${endpoint}/${target}/options/`;
     if (model || filters || serialize) {
       const params = [];
@@ -18,7 +44,7 @@ const attributes = {
     };
   },
 
-  updateAttributeValue(target, value) {
+  updateValue(target, value) {
     return {
       url: `${endpoint}/${target}/`,
       method: "PATCH",

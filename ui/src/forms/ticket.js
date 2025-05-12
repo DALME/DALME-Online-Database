@@ -41,7 +41,7 @@ const ticketFormSchema = {
     component: markRaw(SelectField),
     label: "Assigned to",
     description: "Who is responsible for the ticket.",
-    getOptions: () => fetcher(requests.users.getUsers()).then((response) => response.json()),
+    getOptions: () => fetcher(requests.users.list()).then((response) => response.json()),
     optionsSchema: usersAsOptionsSchema,
     validation: ticketFieldValidation.assignedTo,
   },
@@ -59,7 +59,7 @@ const ticketFormSchema = {
 };
 
 const ticketRequests = {
-  get: (id) => requests.tickets.getTicket(id),
+  get: (id) => requests.tickets.get(id),
   create: (data) => requests.tickets.createTicket(data),
   update: ({ id, ...data }) => requests.tickets.editTicket(id, data),
 };

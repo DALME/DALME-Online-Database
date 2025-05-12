@@ -178,7 +178,7 @@ import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { DataTable, DetailPopover, TagPill } from "@/components";
 import { ticketListSchema } from "@/schemas";
-import { useAPI, useConstants, useEditing, usePagination, useStores } from "@/use";
+import { useAPI, useConstants, usePagination, useStores } from "@/use";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 
 import { columnMap } from "./columns";
@@ -204,7 +204,6 @@ export default defineComponent({
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { ticketTagColours } = useConstants();
-    const { postSubmitRefreshWatcher } = useEditing();
     const columns = ref([]);
     const rows = ref([]);
     const noData = props.embedded ? "No tickets created" : "No tickets found";
@@ -217,8 +216,8 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       const request = props.embedded
-        ? requests.tickets.getUserTickets(auth.user.userId)
-        : requests.tickets.getTickets(query);
+        ? requests.tickets.getByUser(auth.user.id)
+        : requests.tickets.list(query);
       await fetchAPI(request);
       if (success.value)
         await ticketListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
@@ -247,8 +246,6 @@ export default defineComponent({
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
     provide("activeFilters", activeFilters);
-
-    postSubmitRefreshWatcher(fetchData);
 
     return {
       context,

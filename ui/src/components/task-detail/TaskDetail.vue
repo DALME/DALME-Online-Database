@@ -125,7 +125,7 @@ import {
   OpaqueSpinner,
 } from "@/components";
 import { taskSchema } from "@/schemas";
-import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
+import { useAPI, useEventHandling, useStores } from "@/use";
 import { formatDate } from "@/utils";
 
 export default defineComponent({
@@ -144,7 +144,6 @@ export default defineComponent({
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
-    const { editingDetailRouteGuard } = useEditing();
     const model = "Task";
     const action = ref("");
     const attachment = ref(null);
@@ -166,7 +165,7 @@ export default defineComponent({
     const onAction = async () => {
       const { success, fetchAPI, status } = apiInterface();
       const action = task.value.completed ? "markUndone" : "markDone";
-      await fetchAPI(requests.tasks.setTaskState(id.value, action));
+      await fetchAPI(requests.tasks.setState(id.value, action));
       if (success.value && status.value === 201) {
         notifier.tasks.taskStatusUpdated();
         await fetchData();
@@ -176,7 +175,7 @@ export default defineComponent({
     };
 
     const fetchData = async () => {
-      await fetchAPI(requests.tasks.getTask(id.value));
+      await fetchAPI(requests.tasks.get(id.value));
       if (success.value)
         await taskSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           action.value = value.completed ? "reopen task" : "complete task";
@@ -186,7 +185,6 @@ export default defineComponent({
         });
     };
 
-    editingDetailRouteGuard();
     onMounted(async () => await fetchData());
     onBeforeRouteLeave(() => {
       ui.resetBreadcrumbTail();
@@ -198,7 +196,7 @@ export default defineComponent({
       buttonColours,
       capitalize,
       formatDate,
-      isAdmin: auth.user.isAdmin,
+      isAdmin: auth.user.isSuperuser,
       isEmpty,
       loading,
       onAction,

@@ -3,9 +3,15 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/transcriptions`;
 
 const transcriptions = {
-  getTranscription(id) {
+  get(id) {
     return {
       url: `${endpoint}/${id}/`,
+      method: "GET",
+    };
+  },
+  metadata() {
+    return {
+      url: `${endpoint}/metadata/`,
       method: "GET",
     };
   },
