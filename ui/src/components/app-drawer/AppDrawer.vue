@@ -26,7 +26,6 @@
             </q-btn>
           </q-item-section>
         </q-item>
-        <EditPanel />
         <CollectionsManager
           :default-opened="true"
           :scroll-height="minScrollHeight"
@@ -76,7 +75,7 @@
 <script>
 import { computed, defineComponent } from "vue";
 
-import { CollectionsManager, EditPanel, IDALogo, ToolTip } from "@/components";
+import { CollectionsManager, IDALogo, ToolTip } from "@/components";
 import { navRoutes } from "@/router";
 import { useStores } from "@/use";
 
@@ -84,7 +83,6 @@ export default defineComponent({
   name: "AppDrawer",
   components: {
     CollectionsManager,
-    EditPanel,
     IDALogo,
     ToolTip,
   },
