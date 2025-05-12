@@ -22,6 +22,7 @@
         class="date-chooser-field month"
         clearable
         dense
+        emit-value
         map-options
         options-dense
         outlined
@@ -34,6 +35,7 @@
         @update:model-value="onChange"
         class="date-chooser-field year"
         placeholder="Year"
+        clearable
         dense
         outlined
       />
@@ -82,10 +84,10 @@ export default defineComponent({
         }
       },
       set(newValue) {
-        const date = new Date(newValue);
-        day.value = date.day;
-        month.value = date.month;
-        year.value = date.year;
+        const newDate = new Date(newValue);
+        day.value = newDate.getDay();
+        month.value = newDate.getMonth();
+        year.value = newDate.getFullYear();
       },
     });
 
@@ -173,13 +175,14 @@ export default defineComponent({
   font-size: 13px;
 }
 .date-chooser-field.day {
-  min-width: 50px;
+  min-width: 80px;
 }
 .date-chooser-field.month {
-  min-width: 100px;
+  min-width: 135px;
 }
 .date-chooser-field.year {
   min-width: 60px;
+  max-width: 80px;
 }
 .select-placeholder {
   color: rgba(0, 0, 0, 0.6);
@@ -207,6 +210,9 @@ export default defineComponent({
 }
 :deep(.date-chooser-field .q-icon.q-field__focusable-action) {
   font-size: 14px;
+}
+:deep(.date-chooser-input-container .q-field__append) {
+  height: auto;
 }
 .calendar-button {
   font-size: 11px;
