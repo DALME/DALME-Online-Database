@@ -4,6 +4,7 @@ import { inject, provide } from "vue";
 
 import { useAuthStore } from "@/stores/auth";
 import { useEditorStore } from "@/stores/editor";
+import { useRecordStore } from "@/stores/records";
 import { useSettingsStore } from "@/stores/settings";
 import { useTaskStore } from "@/stores/tasks";
 import { useUiStore } from "@/stores/ui";
@@ -19,6 +20,7 @@ export const provideStores = () => {
   const settings = useSettingsStore();
   const editorStore = useEditorStore();
   const taskStore = useTaskStore();
+  const recordStore = useRecordStore();
 
   provide(StoresSymbol, {
     eventBus,
@@ -28,6 +30,7 @@ export const provideStores = () => {
     settings,
     editorStore,
     taskStore,
+    recordStore,
     ...storeToRefs(auth),
     ...storeToRefs(ui),
     ...storeToRefs(views),
@@ -43,6 +46,7 @@ export const provideStores = () => {
     settings,
     editorStore,
     taskStore,
+    recordStore,
     ...storeToRefs(auth),
     ...storeToRefs(ui),
     ...storeToRefs(views),
