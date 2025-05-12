@@ -212,7 +212,6 @@ export default defineComponent({
     const $q = useQuasar();
     const {
       auth,
-      globalLoading,
       isFullscreen,
       showInfoArea,
       ui,
@@ -263,7 +262,6 @@ export default defineComponent({
       auth,
       breadcrumbs,
       darkMode: $q.dark,
-      globalLoading,
       menuRoutes: navRoutes("menu"),
       topRoutes: navRoutes("top"),
       ui,

@@ -3,16 +3,16 @@
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">
-          <div v-if="!ui.globalLoading" class="info-area row">
+          <div v-if="!loading" class="info-area row">
             <div class="column">
               <div class="row items-center text-h5">
-                <template v-if="!ui.globalLoading">
+                <template v-if="!loading">
                   {{ recordGroup.name }}
                 </template>
                 <q-skeleton v-else height="30px" type="rect" width="350px" />
               </div>
               <div class="row detail-row-subheading text-grey-8">
-                <template v-if="!ui.globalLoading">
+                <template v-if="!loading">
                   <span
                     >Created on
                     {{ formatDate(recordGroup.creationTimestamp.value, "DATETIME_AT") }} by
@@ -51,7 +51,7 @@
             switch-indicator
           >
             <q-tab icon="o_info" label="Info" name="info" />
-            <template v-if="!ui.globalLoading">
+            <template v-if="!loading">
               <q-tab icon="o_forum" label="Discussion & Activity" name="comments">
                 <q-badge
                   v-if="commentCount > 0"
@@ -69,7 +69,7 @@
     </div>
     <div class="row q-pt-sm">
       <div class="col">
-        <template v-if="!ui.globalLoading">
+        <template v-if="!loading">
           <q-tab-panels v-model="view.tab" animated keep-alive>
             <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div class="row q-pt-md">
@@ -151,7 +151,7 @@
         </template>
         <AdaptiveSpinner v-else />
       </div>
-      <div v-if="!ui.globalLoading" class="col-3 q-pl-md q-pt-md">
+      <div v-if="!loading" class="col-3 q-pl-md q-pt-md">
         <DetailSidebar>
           <template #extraElements>
             <DetailElement :content="recordGroup.id" label="Unique Id" clipboard />
@@ -223,6 +223,7 @@ export default defineComponent({
     const recordGroup = ref({});
     const id = ref($route.params.id);
     const commentCount = ref(0);
+    const loading = ref(true);
 
     provide("model", "RecordGroup");
     provide("id", id);
@@ -232,14 +233,14 @@ export default defineComponent({
     }));
 
     const fetchData = async () => {
-      ui.globalLoading = true;
-      await fetchAPI(requests.recordGroups.getRecordGroup(id.value));
+      loading.value = true;
+      await fetchAPI(requests.recordGroups.get(id.value));
       if (success.value) {
         await recordGroupSchema.validate(data.value, { stripUnknown: false }).then((value) => {
           recordGroup.value = value;
           commentCount.value = value.commentCount;
           ui.breadcrumbTail.push(value.shortName);
-          ui.globalLoading = false;
+          loading.value = false;
         });
       }
     };
@@ -268,6 +269,7 @@ export default defineComponent({
       ui,
       isAdmin: auth.user.isSuperuser,
       nully,
+      loading,
     };
   },
 });

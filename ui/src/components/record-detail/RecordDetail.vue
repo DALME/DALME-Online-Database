@@ -3,10 +3,10 @@
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">
-          <div v-if="showInfoArea && !ui.globalLoading" class="info-area row">
+          <div v-if="showInfoArea && !loading" class="info-area row">
             <div class="column">
               <div class="row items-center text-h5">
-                <template v-if="!ui.globalLoading">
+                <template v-if="!loading">
                   {{ recordData.name.value }}
                   <TagPill
                     v-if="workflowData.isPublic"
@@ -21,7 +21,7 @@
                 <q-skeleton v-else height="30px" type="rect" width="350px" />
               </div>
               <div class="row detail-row-subheading text-grey-8">
-                <template v-if="!ui.globalLoading">
+                <template v-if="!loading">
                   <span>
                     Created on
                     {{ formatDate(recordData.creationTimestamp.value, "DATETIME_AT") }} by
@@ -61,7 +61,7 @@
             switch-indicator
           >
             <q-tab icon="o_info" label="Info" name="info" />
-            <template v-if="!ui.globalLoading">
+            <template v-if="!loading">
               <q-tab
                 v-if="pageData.length"
                 class="side-tab"
@@ -104,7 +104,7 @@
           </q-tabs>
         </div>
       </div>
-      <template v-if="!ui.globalLoading">
+      <template v-if="!loading">
         <div class="col-auto record-actions">
           <div class="row transition-all">
             <div class="row q-mr-sm">
@@ -137,7 +137,7 @@
     </div>
     <div class="row q-pt-sm content-container-row">
       <div class="col content-container">
-        <template v-if="!ui.globalLoading">
+        <template v-if="!loading">
           <q-tab-panels v-model="view.tab" animated keep-alive>
             <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div class="col-9 q-pr-lg q-pt-md">

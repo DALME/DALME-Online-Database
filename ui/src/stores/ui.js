@@ -15,7 +15,6 @@ export const useUiStore = defineStore(
     const currentSubsection = ref("");
     const breadcrumbTail = ref([]);
     const currentPageIcon = ref("");
-    const globalLoading = ref(false);
     const isFullscreen = ref(false);
     const showInfoArea = ref(true);
     const userDrawerOpen = ref(false);
@@ -57,7 +56,6 @@ export const useUiStore = defineStore(
       currentSubsection.value = "";
       breadcrumbTail.value = [];
       currentPageIcon.value = "";
-      globalLoading.value = false;
       isFullscreen.value = false;
       userDrawerOpen.value = false;
       appDrawerOpen.value = false;
@@ -107,7 +105,6 @@ export const useUiStore = defineStore(
       currentSubsection,
       breadcrumbTail,
       currentPageIcon,
-      globalLoading,
       isFullscreen,
       userDrawerOpen,
       appDrawerOpen,
