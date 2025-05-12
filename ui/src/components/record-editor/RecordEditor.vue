@@ -2,7 +2,7 @@
   <q-layout :style="`height: ${compositeHeight + 2}px`" view="lhh lpr lff" container>
     <q-drawer
       v-model="drawer"
-      :mini="view.pageDrawerMini"
+      :mini="recordStore.pageDrawerMini"
       :mini-width="parseInt(0)"
       :width="parseInt(141)"
       class="page-selector-drawer q-mini-drawer-hide"
@@ -12,7 +12,7 @@
         <q-table
           :columns="columns"
           :pagination="pagination"
-          :rows="view.pages"
+          :rows="recordStore.current.pages"
           card-container-class="q-pa-none"
           class="sticky-header q-mini-drawer-hide"
           no-data-label="No folios found."
@@ -24,7 +24,7 @@
             <q-card
               @click="changePage(props.row.ref)"
               :class="
-                props.row.ref === view.currentPageRef
+                props.row.ref === recordStore.currentPageIndex
                   ? 'grid-card text-weight-medium current-page'
                   : 'grid-card text-weight-medium cursor-pointer'
               "
@@ -47,12 +47,12 @@
     </q-drawer>
 
     <q-page-container>
-      <q-page :class="!view.pageDrawerMini ? 'q-pl-sm q-pr-none' : 'q-pa-none'">
+      <q-page :class="!recordStore.pageDrawerMini ? 'q-pl-sm q-pr-none' : 'q-pa-none'">
         <q-splitter
-          v-model="views.editorSplitter"
+          v-model="recordStore.editorSplitter"
           :class="orientationClass"
-          :horizontal="view.splitterHorizontal"
-          :limits="view.splitterLimits"
+          :horizontal="recordStore.splitterHorizontal"
+          :limits="recordStore.splitterLimits"
           separator-class="splitter-separator"
           unit="px"
           emit-immediately
@@ -67,7 +67,7 @@
 
           <template #separator>
             <q-btn
-              :class="{ 'drag-button-h': view.splitterHorizontal }"
+              :class="{ 'drag-button-h': recordStore.splitterHorizontal }"
               class="splitter-separator-button strong-focus"
               icon="drag_indicator"
               icon-right="drag_indicator"
@@ -77,12 +77,12 @@
           </template>
 
           <template #after>
-            <div v-if="editOn" class="editor-box">
+            <div v-if="recordStore.editOn" class="editor-box">
               <TeiEditor v-if="editorStore.ready" ref="editor" />
               <AdaptiveSpinner v-else class="q-ma-auto" position="absolute" type="bars" />
             </div>
             <div v-else :style="`height: ${compositeHeight}px`" class="render-panel">
-              <TeiRenderer :text="currentPageData.tei" />
+              <TeiRenderer :text="recordStore.editorContent" />
             </div>
           </template>
         </q-splitter>
@@ -112,33 +112,23 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
-    const {
-      currentPageData,
-      editOn,
-      contentHeight,
-      contentWidth,
-      pageCount,
-      views,
-      view,
-      showInfoArea,
-      editorStore,
-    } = useStores();
+    const { contentHeight, contentWidth, views, view, showInfoArea, editorStore, recordStore } =
+      useStores();
     const { eventBus } = useEventHandling();
     const columns = inject("pageColumns");
-    const pages = view.pages;
     const pagination = ref({ rowsPerPage: 0 });
     const editorState = shallowRef();
     const editorView = shallowRef();
     const editorTools = shallowRef();
-
-    const drawer = ref(pageCount.value > 1);
-    const pageChooser = computed(() => pageCount.value > 1);
+    const drawer = ref(recordStore.pageCount > 1);
+    const pageChooser = computed(() => recordStore.pageCount > 1);
     const editor = ref(null);
 
     const infoAreaHeight = computed(() => (showInfoArea.value ? 75 : 0));
-    const pageDrawerWidth = computed(() => (view.value.pageDrawerMini ? 0 : 141));
+    const pageDrawerWidth = computed(() => (recordStore.pageDrawerMini ? 0 : 141));
+
     const orientationClass = computed(() =>
-      view.value.splitterHorizontal ? "editor-horizontal" : "editor-vertical",
+      recordStore.splitterHorizontal ? "editor-horizontal" : "editor-vertical",
     );
 
     const compositeHeight = computed(() => {
@@ -146,80 +136,80 @@ export default defineComponent({
       return Math.round(contentHeight.value - infoAreaHeight.value - tabs);
     });
 
-    if (!views.editorSplitter) {
-      views.editorSplitter = Math.round(contentWidth.value / 2);
+    if (!recordStore.editorSplitter) {
+      recordStore.editorSplitter = Math.round(contentWidth.value / 2);
     }
 
     const editorHeight = computed(() => {
       const toolbar = 40;
       const splitter = 7;
-      return view.value.splitterHorizontal
-        ? Math.round(compositeHeight.value - views.editorSplitter - toolbar - splitter)
+      return recordStore.splitterHorizontal
+        ? Math.round(compositeHeight.value - recordStore.editorSplitter - toolbar - splitter)
         : compositeHeight.value - toolbar;
     });
 
     const editorWidth = computed(() =>
-      view.value.splitterHorizontal
+      recordStore.splitterHorizontal
         ? Math.round(contentWidth.value)
-        : Math.round(contentWidth.value - views.editorSplitter),
+        : Math.round(contentWidth.value - recordStore.editorSplitter),
     );
 
     const viewerHeight = computed(() =>
-      view.value.splitterHorizontal
+      recordStore.splitterHorizontal
         ? compositeHeight.value - editorHeight.value
         : compositeHeight.value,
     );
 
     const viewerWidth = computed(() =>
-      view.value.splitterHorizontal
+      recordStore.splitterHorizontal
         ? contentWidth.value - pageDrawerWidth.value
-        : views.editorSplitter,
+        : recordStore.editorSplitter,
     );
 
     const separatorHeight = computed(() =>
-      view.value.splitterHorizontal ? 4 : compositeHeight.value,
+      recordStore.splitterHorizontal ? 4 : compositeHeight.value,
     );
 
-    const separatorWidth = computed(() => (view.value.splitterHorizontal ? viewerWidth.value : 4));
+    const separatorWidth = computed(() => (recordStore.splitterHorizontal ? viewerWidth.value : 4));
 
     const splitterLimits = computed(() =>
-      view.value.splitterHorizontal
+      recordStore.splitterHorizontal
         ? [40, compositeHeight.value - 10]
         : [70, contentWidth.value - 10],
     );
 
     const currentSplitterPercentage = computed(() => {
-      let total = view.value.splitterHorizontal ? compositeHeight.value : contentWidth.value;
-      return Math.round((views.editorSplitter * 100) / total);
+      let total = recordStore.splitterHorizontal ? compositeHeight.value : contentWidth.value;
+      return Math.round((recordStore.editorSplitter * 100) / total);
     });
 
     const nextSplitterPixels = computed(() => {
-      let total = view.value.splitterHorizontal ? contentWidth.value : compositeHeight.value;
-      return view.value.lastSplitter ? Math.round((view.value.lastSplitter * total) / 100) : 0;
+      let total = recordStore.splitterHorizontal ? contentWidth.value : compositeHeight.value;
+      return recordStore.lastSplitter ? Math.round((recordStore.lastSplitter * total) / 100) : 0;
     });
 
     const toggleSplitter = () => {
       let targetSplit = nextSplitterPixels.value
         ? nextSplitterPixels.value
-        : view.value.splitterHorizontal
+        : recordStore.splitterHorizontal
           ? Math.round(contentWidth.value / 2)
           : Math.round(compositeHeight.value / 2);
-      view.value.lastSplitter = currentSplitterPercentage.value;
-      view.value.splitterHorizontal = !view.value.splitterHorizontal;
-      views.editorSplitter = targetSplit;
+      recordStore.lastSplitter = currentSplitterPercentage.value;
+      recordStore.splitterHorizontal = !recordStore.splitterHorizontal.value;
+      recordStore.editorSplitter = targetSplit;
     };
 
     const toggleMini = () => {
-      view.value.pageDrawerMini = !view.value.pageDrawerMini;
-      if (!view.value.splitterHorizontal) {
-        views.editorSplitter = view.value.pageDrawerMini
-          ? views.editorSplitter + 141
-          : views.editorSplitter - 141;
+      recordStore.pageDrawerMini = !recordStore.pageDrawerMini;
+      if (!recordStore.splitterHorizontal) {
+        recordStore.editorSplitter = recordStore.pageDrawerMini
+          ? recordStore.editorSplitter + 141
+          : recordStore.editorSplitter - 141;
       }
     };
 
     const toggleEditor = () => {
-      if (view.value.editOn && views.hasChanges) {
+      if (recordStore.editOn && views.hasChanges) {
         $q.dialog({
           component: CustomDialog,
           componentProps: {
@@ -234,10 +224,10 @@ export default defineComponent({
         }).onOk(() => {
           console.log("Save changes");
           eventBus.emit("destroyEditor");
-          view.value.editOn = !view.value.editOn;
+          recordStore.editOn = !recordStore.editOn;
         });
       } else {
-        view.value.editOn = !view.value.editOn;
+        recordStore.editOn = !recordStore.editOn;
       }
     };
 
@@ -245,13 +235,13 @@ export default defineComponent({
       let targetPage = null;
       if (Number.isInteger(para)) targetPage = para;
       if (para === "first") targetPage = 0;
-      if (para === "last") targetPage = pages.length - 1;
-      if (para === "prev") targetPage = view.value.currentPageRef - 1;
-      if (para === "next") targetPage = view.value.currentPageRef + 1;
+      if (para === "last") targetPage = recordStore.current.pages.length - 1;
+      if (para === "prev") targetPage = recordStore.currentPageId - 1;
+      if (para === "next") targetPage = recordStore.currentPageId + 1;
       if (!isNil(editorState.value)) {
-        currentPageData.value.tei = editorTools.value.getDoc();
+        recordStore.editorContent = editorTools.value.getDoc();
       }
-      view.value.currentPageRef = targetPage;
+      recordStore.currentPageId = recordStore.current.pages[targetPage];
     };
 
     eventBus.on("changePage", (page) => changePage(page));
@@ -275,8 +265,6 @@ export default defineComponent({
     return {
       nully,
       changePage,
-      currentPageData,
-      editOn,
       columns,
       drawer,
       editor,
@@ -286,7 +274,6 @@ export default defineComponent({
       editorHeight,
       editorWidth,
       pageChooser,
-      pages,
       pagination,
       separatorHeight,
       separatorWidth,
@@ -298,6 +285,7 @@ export default defineComponent({
       views,
       orientationClass,
       editorStore,
+      recordStore,
     };
   },
 });

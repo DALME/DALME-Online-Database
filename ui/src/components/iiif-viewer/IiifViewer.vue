@@ -1,61 +1,111 @@
 <template>
   <div id="viewer-container" :style="`height: ${viewerHeight}px; width: ${viewerWidth}px`">
     <div
-      v-if="pageCount > 1"
-      :class="`viewer-toolbar ${tbVertAlt ? 'toolbar-v' : 'toolbar-h'}`"
+      v-if="recordStore.pageCount > 1"
+      @mouseleave="expandNav = false"
+      @mouseover="expandNav = true"
+      :class="`hot-zone nav ${tbVertAlt ? 'toolbar-v' : 'toolbar-h'}`"
       :style="navPosition"
     >
-      <q-btn @click="changePage('first')" :disabled="view.currentPageRef === 0" icon="first_page" />
-      <q-btn
-        @click="changePage('prev')"
-        :disabled="view.currentPageRef === 0"
-        icon="navigate_before"
-      />
-      <div class="viewer-current-page">{{ currentPageData.name }}</div>
-      <q-btn
-        @click="changePage('next')"
-        :disabled="view.currentPageRef === pageCount - 1"
-        icon="navigate_next"
-      />
-      <q-btn
-        @click="changePage('last')"
-        :disabled="view.currentPageRef === pageCount - 1"
-        icon="last_page"
-      />
+      <div :class="`viewer-toolbar ${tbVertAlt ? 'toolbar-v' : 'toolbar-h'}`">
+        <div class="nav-arrows">
+          <transition
+            :enter-active-class="`animated ${tbVertAlt ? 'fadeInUp' : 'fadeInRight'} delay-1s`"
+            :leave-active-class="`animated ${tbVertAlt ? 'fadeOutDown' : 'fadeOutRight'}`"
+            appear
+          >
+            <div v-show="expandNav">
+              <q-btn
+                @click="changePage('first')"
+                :disabled="recordStore.currentPageIndex === 0"
+                class="start"
+                icon="first_page"
+              />
+              <q-btn
+                @click="changePage('prev')"
+                :disabled="recordStore.currentPageIndex === 0"
+                icon="navigate_before"
+              />
+            </div>
+          </transition>
+        </div>
+        <div class="viewer-current-page">{{ recordStore.currentPage.name }}</div>
+        <div class="nav-arrows">
+          <transition
+            :enter-active-class="`animated ${tbVertAlt ? 'fadeInDown' : 'fadeInLeft'}  delay-1s`"
+            :leave-active-class="`animated ${tbVertAlt ? 'fadeOutUp' : 'fadeOutLeft'}`"
+            appear
+          >
+            <div v-show="expandNav">
+              <q-btn
+                @click="changePage('next')"
+                :disabled="recordStore.currentPageIndex === recordStore.pageCount - 1"
+                icon="navigate_next"
+              />
+              <q-btn
+                @click="changePage('last')"
+                :disabled="recordStore.currentPageIndex === recordStore.pageCount - 1"
+                class="end"
+                icon="last_page"
+              />
+            </div>
+          </transition>
+        </div>
+      </div>
     </div>
     <div
-      :class="`viewer-toolbar tb-zoom ${tbHorAlt ? 'toolbar-h' : 'toolbar-v'}`"
-      :style="zoomPosition"
+      @mouseleave="expandTools = false"
+      @mouseover="expandTools = true"
+      :class="`hot-zone tools ${tbHorAlt ? 'zoombar-h' : 'zoombar-v'}`"
     >
       <q-btn
-        @click="zoom('in')"
-        :disabled="currentPageData.viewerZoom >= maxZoomLevel"
-        class="zoom-btn"
-        icon="zoom_in"
-      />
-      <q-btn
-        @click="zoom('out')"
-        :disabled="currentPageData.viewerZoom <= minZoomLevel"
-        class="zoom-btn"
-        icon="zoom_out"
-      />
-      <q-btn @click="zoom('full')" icon="aspect_ratio" />
-      <q-btn @click="zoom('fitV')" icon="expand" />
-      <q-btn @click="zoom('fitH')">
-        <q-icon class="rotate-90" name="expand" />
-      </q-btn>
-    </div>
-    <div :style="toolPosition" class="viewer-toolbar toolbar-h">
-      <q-btn
         @click="changeSplitView"
-        :icon="view.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'"
+        :icon="recordStore.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'"
+        class="pivot"
       />
-      <q-btn
-        v-if="pageCount > 1"
-        @click="changeDrawerMini"
-        :class="view.pageDrawerMini ? '' : 'crossed-out'"
-        icon="o_auto_stories"
-      />
+      <transition
+        :enter-active-class="`animated ${tbHorAlt ? 'fadeInLeft' : 'fadeInDown'} delay-1s`"
+        :leave-active-class="`animated ${tbHorAlt ? 'fadeOutLeft' : 'fadeOutUp'}`"
+        appear
+      >
+        <div
+          v-show="expandTools"
+          :class="`viewer-toolbar tb-zoom ${tbHorAlt ? 'toolbar-h' : 'toolbar-v'}`"
+          :style="zoomPosition"
+        >
+          <q-btn
+            @click="zoom('in')"
+            :class="`${tbHorAlt ? 'zoom-btn' : 'zoom-btn start'}`"
+            :disabled="recordStore.viewerZoom >= maxZoomLevel"
+            icon="zoom_in"
+          />
+          <q-btn
+            @click="zoom('out')"
+            :disabled="recordStore.viewerZoom <= minZoomLevel"
+            class="zoom-btn"
+            icon="zoom_out"
+          />
+          <q-btn @click="zoom('full')" icon="aspect_ratio" />
+          <q-btn @click="zoom('fitV')" icon="expand" />
+          <q-btn @click="zoom('fitH')" class="end">
+            <q-icon class="rotate-90" name="expand" />
+          </q-btn>
+        </div>
+      </transition>
+      <transition
+        enter-active-class="animated fadeInLeft delay-1s"
+        leave-active-class="animated fadeOutLeft"
+        appear
+      >
+        <div v-show="expandTools" :style="toolPosition" class="viewer-toolbar toolbar-h">
+          <q-btn
+            v-if="recordStore.pageCount > 1"
+            @click="changeDrawerMini"
+            :class="drawerButtonClasses"
+            icon="o_auto_stories"
+          />
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -83,37 +133,43 @@ export default defineComponent({
   setup(_, context) {
     var viewer = null;
     const { viewerHeight, viewerWidth } = inject("viewerDimensions");
-    const { currentPageData, pageCount, view } = useStores();
+    const { recordStore, view } = useStores();
+    const expandNav = ref(false);
+    const expandTools = ref(false);
 
-    const tbHorAlt = computed(() => view.value.splitterHorizontal && viewerHeight.value < 198);
-    const tbVertAlt = computed(() => !view.value.splitterHorizontal && viewerWidth.value < 240);
+    const tbHorAlt = computed(() => recordStore.splitterHorizontal && viewerHeight.value < 198);
+    const tbVertAlt = computed(() => !recordStore.splitterHorizontal && viewerWidth.value < 240);
     const navPosition = computed(() => {
       let top = tbVertAlt.value ? 199 : 5;
       let posHor = tbVertAlt.value ? "left" : "right";
       return `top: ${top}px; ${posHor}: 5px`;
     });
-    const toolPosition = computed(() => "top: 5px; left: 5px");
+    const toolPosition = computed(() => `top: -1px; left: ${tbHorAlt.value ? -153 : -33}px`);
     const zoomPosition = computed(() => {
-      let top = tbHorAlt.value ? 5 : 42;
-      let left = tbHorAlt.value ? (pageCount.value > 1 ? 71 : 41) : 5;
+      let top = tbHorAlt.value ? -1 : 29;
+      let left = tbHorAlt.value ? (recordStore.pageCount > 1 ? 29 : 0) : -31;
       return `top: ${top}px; left: ${left}px`;
+    });
+    const drawerButtonClasses = computed(() => {
+      const cls = ["border-left"];
+      tbHorAlt.value ? cls.push("border-right") : cls.push("end");
+      if (view.value.pageDrawerMini) cls.push("crossed-out");
+      return cls.join(" ");
     });
 
     const minZoomLevel = ref(0.5);
     const maxZoomLevel = ref(8);
-    const defaultZoomLevel = computed(() =>
-      currentPageData.value.viewerZoom ? currentPageData.value.viewerZoom : 1,
-    );
+    const defaultZoomLevel = computed(() => (recordStore.viewerZoom ? recordStore.viewerZoom : 1));
 
     const zoom = (type) => {
-      if (type === "full") console.log(currentPageData.value.ref - 1);
+      if (type === "full") console.log("FULL ZOOM");
       if (type === "out") {
-        let level = currentPageData.value.viewerZoom - 0.25;
+        let level = recordStore.viewerZoom - 0.25;
         if (level <= minZoomLevel.value) level = minZoomLevel.value;
         viewer.viewport.zoomTo(level);
       }
       if (type === "in") {
-        let level = currentPageData.value.viewerZoom + 0.25;
+        let level = recordStore.viewerZoom + 0.25;
         if (level >= maxZoomLevel.value) level = maxZoomLevel.value;
         viewer.viewport.zoomTo(level);
       }
@@ -134,8 +190,8 @@ export default defineComponent({
     };
 
     const loadPage = () => {
-      if (!isEmpty(currentPageData.value)) {
-        viewer.open(currentPageData.value.manifestUrl);
+      if (!isEmpty(recordStore.currentPage)) {
+        viewer.open(recordStore.currentPage.manifestUrl);
         viewer.viewport.zoomTo(defaultZoomLevel.value);
       }
     };
@@ -158,21 +214,21 @@ export default defineComponent({
           sequenceMode: false,
           crossOriginPolicy: "Anonymous",
           prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-          tileSources: [currentPageData.value.manifestUrl],
+          tileSources: [recordStore.currentPage.manifestUrl],
         }),
       );
-      if (currentPageData.value.viewerZoom) {
-        viewer.viewport.zoomTo(currentPageData.value.viewerZoom);
+      if (recordStore.viewerZoom) {
+        viewer.viewport.zoomTo(recordStore.viewerZoom);
       } else {
-        currentPageData.value.viewerZoom = viewer.viewport.getZoom(true);
+        recordStore.viewerZoom = viewer.viewport.getZoom(true);
       }
       viewer.addHandler("zoom", (evt) => {
-        currentPageData.value.viewerZoom = evt.zoom;
+        recordStore.viewerZoom = evt.zoom;
       });
     });
 
     watch(
-      () => view.value.currentPageRef,
+      () => recordStore.currentPageId,
       () => loadPage(),
     );
 
@@ -185,8 +241,7 @@ export default defineComponent({
       changePage,
       changeSplitView,
       changeDrawerMini,
-      currentPageData,
-      pageCount,
+      recordStore,
       minZoomLevel,
       maxZoomLevel,
       navPosition,
@@ -198,6 +253,9 @@ export default defineComponent({
       viewerWidth,
       view,
       zoom,
+      expandNav,
+      expandTools,
+      drawerButtonClasses,
     };
   },
 });
@@ -218,62 +276,13 @@ export default defineComponent({
   border-top-right-radius: 0;
   border-bottom-left-radius: 3px;
 }
-/* toolbar */
+/* toolbars general */
 .viewer-toolbar {
   display: flex;
-  position: absolute;
+  position: relative;
   z-index: 2;
-  background-color: rgba(0, 0, 0, 0.75);
   align-items: center;
   border-radius: 4px;
-}
-.viewer-toolbar.toolbar-h {
-  flex-direction: row;
-  height: 32px;
-  padding: 0 1px;
-}
-.viewer-toolbar.toolbar-v {
-  flex-direction: column;
-  width: 32px;
-  padding: 1px 0;
-}
-.viewer-toolbar button {
-  color: #d4d4d4;
-  font-size: 11px;
-  padding: 4px;
-  height: 30px;
-  width: 30px;
-  border-radius: 0;
-  border-right: 1px solid #717171;
-}
-.viewer-toolbar button::before {
-  box-shadow: none;
-}
-.viewer-toolbar.toolbar-v button {
-  border-right: none;
-  border-bottom: 1px solid #717171;
-}
-.viewer-toolbar.toolbar-v button:last-of-type {
-  border-bottom: none;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
-.viewer-toolbar.toolbar-v button:first-of-type {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-.viewer-toolbar.tb-zoom button.zoom-btn i {
-  font-size: 1.9em !important;
-  padding-top: 1px;
-}
-.viewer-toolbar.toolbar-h button:last-of-type {
-  border-right: none;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
-.viewer-toolbar.toolbar-h button:first-of-type {
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
 }
 .viewer-current-page {
   font-size: 0.85rem;
@@ -285,20 +294,42 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   cursor: default;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.25);
+  transition:
+    transform 0.3s ease-in-out,
+    border-radius 0.1s ease-in-out;
 }
-.viewer-toolbar.toolbar-h .viewer-current-page {
-  border-right: 1px solid #717171;
+.viewer-toolbar button,
+.pivot {
+  color: #d4d4d4;
+  font-size: 11px;
+  padding: 4px;
   height: 30px;
-  padding: 0 12px;
-}
-.viewer-toolbar.toolbar-v .viewer-current-page {
-  border-top: 1px solid #717171;
   width: 30px;
-  padding: 12px 0;
-  transform: rotate(180deg);
-  writing-mode: tb;
+  min-height: 30px;
+  min-width: 30px;
 }
-/* crossed-out icon */
+.border-left {
+  border-left: 1px solid #717171;
+}
+.border-right {
+  border-right: 1px solid #717171 !important;
+}
+.viewer-toolbar button:not(.pivot) {
+  border-right: 1px solid #717171;
+  border-radius: 0;
+}
+.viewer-toolbar button::before {
+  box-shadow: none;
+}
+.viewer-toolbar .q-btn {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+.viewer-toolbar.tb-zoom button.zoom-btn i {
+  font-size: 1.9em !important;
+  padding-top: 1px;
+}
 .crossed-out .q-btn__content::after {
   content: "";
   width: 2px;
@@ -306,5 +337,118 @@ export default defineComponent({
   background: #c3c3c3;
   transform: rotate(35deg);
   position: absolute;
+}
+.hot-zone {
+  position: absolute;
+  display: flex;
+  z-index: 99;
+}
+.pivot {
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.3s ease-in-out;
+}
+.hot-zone:hover .pivot {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+/* toolbars horizontal */
+.viewer-toolbar.toolbar-h {
+  flex-direction: row;
+  height: 32px;
+  padding: 0 1px;
+}
+.viewer-toolbar.toolbar-h .viewer-current-page {
+  transform: translateX(60px);
+}
+.viewer-toolbar.toolbar-h .nav-arrows {
+  width: 60px;
+}
+.viewer-toolbar.toolbar-h .start {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.viewer-toolbar.toolbar-h .end {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.viewer-toolbar.toolbar-h button:last-of-type {
+  border-right: none;
+}
+.viewer-toolbar.toolbar-h .viewer-current-page {
+  height: 30px;
+  padding: 0 12px;
+}
+.hot-zone.nav.toolbar-h {
+  height: 100px;
+  width: 200px;
+  justify-content: end;
+}
+.hot-zone.tools {
+  height: 200px;
+  width: 100px;
+  justify-content: start;
+  top: 5px;
+  left: 5px;
+}
+.hot-zone.tools.zoombar-h {
+  height: 80px;
+  width: 250px;
+}
+.hot-zone.nav.toolbar-h:hover .viewer-current-page {
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  border-right: 1px solid #717171;
+  border-left: 1px solid #717171;
+  transform: translateX(0);
+}
+
+/* vertical toolbars */
+.viewer-toolbar.toolbar-v {
+  flex-direction: column;
+  width: 32px;
+  padding: 1px 0;
+}
+.viewer-toolbar.toolbar-v button {
+  border-right: none;
+  border-bottom: 1px solid #717171;
+}
+.viewer-toolbar.toolbar-v .start {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+.viewer-toolbar.toolbar-v .end {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.viewer-toolbar.toolbar-v .zoom-btn.start {
+  border-radius: 0;
+  border-top: 1px solid #717171;
+}
+.viewer-toolbar.toolbar-v button:last-of-type {
+  border-bottom: none;
+}
+.viewer-toolbar.toolbar-v .viewer-current-page {
+  width: 30px;
+  padding: 12px 0;
+  transform: rotate(180deg);
+  writing-mode: tb;
+}
+.viewer-toolbar.toolbar-v .nav-arrows {
+  height: 60px;
+  width: 30px;
+}
+.hot-zone.nav.toolbar-v {
+  height: 200px;
+  width: 100px;
+  justify-content: start;
+}
+.hot-zone.nav.toolbar-v:hover .viewer-current-page {
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  border-top: 1px solid #717171;
+  border-bottom: 1px solid #717171;
 }
 </style>
