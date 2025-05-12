@@ -251,7 +251,7 @@ export default defineComponent({
       context,
       cleanTags,
       columns,
-      filterList: filterList(auth.user.userId),
+      filterList: filterList(auth.user.id),
       formatDate,
       loading,
       noData,

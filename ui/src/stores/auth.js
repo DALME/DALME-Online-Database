@@ -8,11 +8,10 @@ import { Notify } from "quasar";
 import { has, isNil, isNotNil } from "ramda";
 import { computed, ref, watch } from "vue";
 import { assign, fromCallback, fromPromise, setup } from "xstate";
-import * as yup from "yup";
 
 import { API as apiInterface, requests } from "@/api";
 import { router as $router } from "@/router";
-import { groupSchema, tenantSchema } from "@/schemas";
+import { userSchema } from "@/schemas";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
 import { useStoreMachine } from "@/use";
@@ -22,25 +21,12 @@ const CODE_CHALLENGE_METHOD = "S256";
 const CODE_VERIFIER_LENGTH = 128;
 const RESPONSE_TYPE = "code";
 
-const userInfoSchema = yup
-  .object()
-  .shape({
-    userId: yup.number().required(),
-    username: yup.string().required(),
-    fullName: yup.string().nullable(),
-    email: yup.string().email().required(),
-    avatar: yup.string().default(null).nullable(),
-    isAdmin: yup.boolean().required(),
-    groups: yup.array().of(groupSchema).default(null).nullable(),
-    tenant: tenantSchema,
-  })
-  .camelCase()
-  .transform((data) => {
-    return {
-      ...data,
-      userId: data.sub,
-    };
-  });
+const userInfoSchema = userSchema.camelCase().transform((data) => {
+  return {
+    ...data,
+    id: data.sub,
+  };
+});
 
 // To protect against vulnerabilities we don't keep the access token in the
 // machine context as it would then be persisted in localstorage. Instead we
@@ -125,7 +111,6 @@ const fetchTokens = fromPromise(
 const fetchUser = fromPromise(async () => {
   const { data, fetchAPI, success } = apiInterface();
   await fetchAPI(requests.auth.authUser());
-
   if (success.value) {
     await userInfoSchema.validate(data.value).then((value) => {
       data.value = value;

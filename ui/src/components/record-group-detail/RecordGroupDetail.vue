@@ -266,7 +266,7 @@ export default defineComponent({
       view,
       recordGroup,
       ui,
-      isAdmin: auth.user.isAdmin,
+      isAdmin: auth.user.isSuperuser,
       nully,
     };
   },

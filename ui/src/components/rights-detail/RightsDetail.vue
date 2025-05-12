@@ -260,7 +260,7 @@ export default defineComponent({
 
     return {
       policy,
-      isAdmin: auth.user.isAdmin,
+      isAdmin: auth.user.isSuperuser,
       loading,
       view,
       updateCommentCount,

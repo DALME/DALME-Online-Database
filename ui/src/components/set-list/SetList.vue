@@ -161,7 +161,7 @@ export default defineComponent({
       const setTypeConstant = setMap[setTypeAPI.value];
       // TODO: These set requests no longer exist.
       const request = props.embedded
-        ? requests.sets.getUserWorksets(auth.user.userId)
+        ? requests.sets.getUserWorksets(auth.user.id)
         : requests.sets.getSetsByType(setTypeConstant, query);
       const schema = setListSchema(setType.value);
       await fetchAPI(request);
@@ -233,7 +233,7 @@ export default defineComponent({
     return {
       context,
       columns,
-      filterList: filterList(auth.user.userId),
+      filterList: filterList(auth.user.id),
       formatDate,
       loading,
       noData,

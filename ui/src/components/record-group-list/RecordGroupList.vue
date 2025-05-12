@@ -211,7 +211,7 @@ export default defineComponent({
       columns,
       currentPageIcon,
       getLanguage,
-      filterList: filterList(auth.user.userId),
+      filterList: filterList(auth.user.id),
       loading,
       noData,
       onChangeSearch,

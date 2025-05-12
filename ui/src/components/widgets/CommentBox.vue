@@ -73,10 +73,10 @@
       <q-separator v-if="comments.length > 0" class="comment-thread-divider" />
     </q-card-section>
     <q-card-section
-      :class="`comment-thread ${dark ? 'dark' : ''} ${auth.user.userId == op ? 'op' : 'not-op'}`"
+      :class="`comment-thread ${dark ? 'dark' : ''} ${auth.user.id == op ? 'op' : 'not-op'}`"
     >
-      <q-item :class="auth.user.userId == op ? 'op-post' : ''" class="comment-box">
-        <q-item-section v-if="auth.user.userId == op" avatar>
+      <q-item :class="auth.user.id == op ? 'op-post' : ''" class="comment-box">
+        <q-item-section v-if="auth.user.id == op" avatar>
           <q-avatar size="40px">
             <q-img v-if="!nully(auth.user.avatar)" :src="auth.user.avatar" fit="cover" ratio="1" />
             <q-icon v-else name="mdi-account-circle" size="36px" />
@@ -88,13 +88,13 @@
             @on-save-text="onSubmit"
             :dark="dark"
             :help="helpLine"
-            :right="auth.user.userId != op"
+            :right="auth.user.id != op"
             placeholder="Leave a comment..."
             submit-label="Comment"
             editable
           />
         </q-item-section>
-        <q-item-section v-if="auth.user.userId != op" side>
+        <q-item-section v-if="auth.user.id != op" side>
           <q-avatar size="40px">
             <q-img v-if="!nully(auth.user.avatar)" :src="auth.user.avatar" fit="cover" ratio="1" />
             <q-icon v-else name="mdi-account-circle" size="36px" />

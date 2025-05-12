@@ -286,7 +286,7 @@ export default defineComponent({
       columns,
       currentPageIcon,
       getList,
-      filterList: filterList(auth.user.userId),
+      filterList: filterList(auth.user.id),
       loading,
       noData,
       onChangeSearch,
