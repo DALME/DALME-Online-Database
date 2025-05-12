@@ -86,7 +86,7 @@
 <script>
 import { useQuasar } from "quasar";
 import { isEmpty, isNil } from "ramda";
-import { computed, defineComponent, onBeforeMount, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 
 import { CustomDialog, TaskManager, ToolTip } from "@/components";
 import { useStores } from "@/use";
@@ -100,9 +100,10 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
-    const { auth, userDrawerOpen, windowHeight, taskStore } = useStores();
+    const { auth, userDrawerOpen, windowHeight } = useStores();
     const submitting = ref(false);
     const scrollHeight = computed(() => windowHeight.value - 181);
+    const loading = ref(false);
 
     const logout = () => {
       $q.dialog({
@@ -120,12 +121,6 @@ export default defineComponent({
       });
     };
 
-    onBeforeMount(() => {
-      if (!taskStore.ready || taskStore.isStale) {
-        taskStore.initialize();
-      }
-    });
-
     return {
       auth,
       isEmpty,
@@ -135,6 +130,7 @@ export default defineComponent({
       logout,
       nully,
       scrollHeight,
+      loading,
     };
   },
 });
