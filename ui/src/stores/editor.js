@@ -1,4 +1,4 @@
-// Define the settings store
+// Define the editor store
 import { defineStore } from "pinia";
 import { useRepo } from "pinia-orm";
 import { useCollect, usePluck } from "pinia-orm/helpers";
