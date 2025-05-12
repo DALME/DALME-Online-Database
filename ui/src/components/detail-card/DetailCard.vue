@@ -38,69 +38,25 @@
           </template>
         </q-input>
       </template>
-      <EditButtons
-        v-if="editable"
-        @action="editOn = !editOn"
-        @cancel="editor?.onCancel"
-        @navigate="router.push(linkTarget)"
-        :linkable="data.link"
-        :main-color="editColour"
-        :main-icon="editIcon"
-        :show-cancel="markdown && editOn && editor.hasChanged"
-        :show-main="!saving"
-        :show-spinner="saving"
-        cancellable
-      />
+      <slot name="card-buttons" />
     </q-item>
     <q-separator class="bg-grey-4" />
     <q-card-section :class="bodyClasses">
-      <template v-if="fields && data">
-        <template v-for="field in fields" :key="field">
-          <ValueDisplay
-            :ref="(el) => register(field, el)"
-            @value-changed="valueChanged"
-            :data="data[field]"
-            :field="field"
-          />
-        </template>
-      </template>
-      <template v-else-if="markdown">
-        <MarkdownEditor
-          ref="md-editor"
-          @on-save-text="valueChanged"
-          :placeholder="data.placeholder"
-          :text="data.value"
-          in-card
-        />
-      </template>
-      <slot v-else>
-        {{ noData }}
-      </slot>
+      <slot>{{ noData }}</slot>
     </q-card-section>
   </q-card>
 </template>
 
 <script>
-import { computed, defineComponent, provide, ref, useTemplateRef } from "vue";
-
-import { MarkdownEditor } from "@/components";
-import { isObject } from "@/utils";
-
-import EditButtons from "./EditButtons.vue";
-import ValueDisplay from "./ValueDisplay.vue";
+import { computed, defineComponent, provide, ref } from "vue";
 
 export default defineComponent({
   name: "DetailCard",
-  components: {
-    EditButtons,
-    MarkdownEditor,
-    ValueDisplay,
-  },
   props: {
     icon: {
       type: String,
       required: false,
-      default: "mdiInformationBox",
+      default: "mdi-information-box",
     },
     title: {
       type: String,
@@ -127,87 +83,19 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    editable: {
-      type: Boolean,
-      default: false,
-    },
-    fields: {
-      type: Array,
-      required: false,
-      default: null,
-    },
-    data: {
-      type: Object,
-      required: false,
-      default: null,
-    },
-    register: {
-      type: Function,
-      required: false,
-      default: null,
-    },
-    fieldName: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    markdown: {
-      type: Boolean,
-      default: false,
-    },
   },
-  emits: ["valueChanged"],
-
-  setup(props, context) {
+  setup(props) {
     const cardFilter = ref("");
-    const editor = useTemplateRef("md-editor");
-    const editOn = ref(false);
-    const saving = ref(false);
-    const isNew = ref(props.data?.value === null && props.data?.show === true);
     const bodyClasses = computed(() => {
       if (props.padContainer) return "q-pa-md";
       if (props.padContainerList) return "q-px-md q-pb-md q-pt-xs";
       return "q-pa-none";
     });
 
-    const editIcon = computed(() =>
-      editOn.value
-        ? editor.value.hasChanged
-          ? "mdi-content-save-outline"
-          : "mdi-close-circle-outline"
-        : "mdi-cog-outline",
-    );
-
-    const editColour = computed(() =>
-      editOn.value ? (editor.value.hasChanged ? "green-6" : "orange-6") : "grey-5",
-    );
-
-    const valueChanged = (value) => {
-      const baseAttr = {
-        name: props.fieldName,
-        update: !isNew.value,
-        source: props.data.source,
-        id: props.data.id,
-      };
-      if (isObject(value) && "name" in value) {
-        context.emit("valueChanged", value);
-      } else {
-        const valObj = isObject(value) ? value : { value: value, oldValue: props.data.value };
-        context.emit("valueChanged", Object.assign(valObj, baseAttr));
-      }
-    };
-
     provide("cardFilter", cardFilter);
-    provide("editOn", editOn);
 
     return {
       cardFilter,
-      editOn,
-      editIcon,
-      editColour,
-      editor,
-      saving,
-      valueChanged,
       bodyClasses,
     };
   },
@@ -239,26 +127,5 @@ export default defineComponent({
 }
 :deep(.card-title-search .q-field__inner) {
   align-self: center;
-}
-:deep(.q-field--standard.q-field--readonly .q-field__control:before),
-:deep(.q-field--readonly .q-field__control:before) {
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.24);
-}
-:deep(.value-display .q-field__append) {
-  height: auto;
-}
-:deep(.value-display .q-field--labeled .q-field__native) {
-  padding-bottom: 0;
-}
-:deep(.value-display .q-chip) {
-  font-size: 12px;
-  padding: 0.5em 0.9em;
-  height: 1.7em;
-  background: transparent;
-  border: 1px solid #303f9f;
-}
-:deep(.value-display .q-chip--dense .q-chip__icon--remove) {
-  margin-left: 0.3em;
-  margin-right: -0.5em;
 }
 </style>

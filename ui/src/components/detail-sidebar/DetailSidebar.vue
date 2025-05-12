@@ -1,7 +1,7 @@
 <template>
-  <template v-if="fields && data">
-    <template v-for="field in fields" :key="field">
-      <DetailElement :data="data[field]" :field="field" />
+  <template v-if="data">
+    <template v-for="item in data" :key="item.field">
+      <DetailElement :data="item" :field="item.field" />
     </template>
   </template>
   <slot name="extraElements" />
@@ -20,13 +20,8 @@ export default defineComponent({
     DetailElement,
   },
   props: {
-    fields: {
-      type: Array,
-      required: false,
-      default: null,
-    },
     data: {
-      type: Object,
+      type: Array,
       required: false,
       default: null,
     },
