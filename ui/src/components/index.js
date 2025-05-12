@@ -6,6 +6,7 @@ export { default as MarkdownEditor } from "./markdown-editor";
 export { default as TeiRenderer } from "./tei-renderer";
 export { default as IiifViewer } from "./iiif-viewer";
 export { default as DetailCard } from "./detail-card";
+export { default as AttributesCard } from "./attributes-card";
 export { DetailSidebar, DetailElement } from "./detail-sidebar";
 export { default as DataTable } from "./data-table";
 export { default as AgentList } from "./agent-list";
