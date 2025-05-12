@@ -198,7 +198,7 @@ import {
   UserPill,
 } from "@/components";
 import { recordGroupSchema } from "@/schemas";
-import { useAPI, useEditing, useStores } from "@/use";
+import { useAPI, useStores } from "@/use";
 import { nully } from "@/utils";
 
 import RecordChildren from "./RecordChildren.vue";
@@ -218,7 +218,6 @@ export default defineComponent({
   setup() {
     const $route = useRoute();
     const { apiInterface } = useAPI();
-    const { editingDetailRouteGuard, resource } = useEditing();
     const { auth, ui, view } = useStores();
     const { success, data, fetchAPI } = apiInterface();
     const recordGroup = ref({});
@@ -237,7 +236,6 @@ export default defineComponent({
       await fetchAPI(requests.recordGroups.getRecordGroup(id.value));
       if (success.value) {
         await recordGroupSchema.validate(data.value, { stripUnknown: false }).then((value) => {
-          resource.value = "recordGroup";
           recordGroup.value = value;
           commentCount.value = value.commentCount;
           ui.breadcrumbTail.push(value.shortName);
@@ -262,13 +260,10 @@ export default defineComponent({
       { immediate: true, flush: "post" },
     );
 
-    editingDetailRouteGuard();
-
     return {
       commentCount,
       updateCommentCount,
       view,
-      resource,
       recordGroup,
       ui,
       isAdmin: auth.user.isAdmin,

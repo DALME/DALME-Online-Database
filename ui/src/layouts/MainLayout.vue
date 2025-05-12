@@ -27,13 +27,7 @@ import { computed, defineComponent, onMounted, provide, ref, useTemplateRef, wat
 import { useRoute } from "vue-router";
 
 import { AppDrawer, LoginModal, NavBar, UserDrawer } from "@/components";
-import {
-  provideAPI,
-  provideEditing,
-  provideEventHandling,
-  provideStores,
-  provideTransport,
-} from "@/use";
+import { provideAPI, provideEventHandling, provideStores, provideTransport } from "@/use";
 
 export default defineComponent({
   name: "MainLayout",
@@ -63,7 +57,6 @@ export default defineComponent({
     };
 
     provideAPI();
-    provideEditing();
     provideTransport();
     provide("pageBackdropLoaded", pageBackdropLoaded);
 

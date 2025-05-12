@@ -119,16 +119,12 @@
 </template>
 
 <script>
-import { createId as cuid } from "@paralleldrive/cuid2";
-import { useActor } from "@xstate/vue";
-import { isNil } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { requests } from "@/api";
 import { ToolTip } from "@/components";
-import forms from "@/forms";
-import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
+import { useAPI, useEventHandling, useStores } from "@/use";
 
 export default defineComponent({
   name: "TasklistList",
@@ -138,12 +134,6 @@ export default defineComponent({
   emits: ["onReload"],
   setup(_, context) {
     const { apiInterface } = useAPI();
-    const {
-      editingIndex,
-      showEditing,
-      modals,
-      machine: { send },
-    } = useEditing();
     const { notifier } = useEventHandling();
     const { auth } = useStores();
     const $router = useRouter();
@@ -183,48 +173,9 @@ export default defineComponent({
       activeFilters.value = new Set(isFiltered.value.split(","));
     }
 
-    const handleCreate = () => {
-      send({
-        type: "SPAWN_FORM",
-        cuid: cuid(),
-        key: null,
-        kind: "taskList",
-        mode: "create",
-        initialData: {},
-      });
-      showEditing.value();
-    };
-
-    const handleEdit = async ({ id }) => {
-      const key = `form-taskList-${id}`;
-      const indexed = editingIndex.value[key];
-      if (!isNil(indexed)) {
-        const { send: actorSend } = useActor(modals.value[indexed.cuid].actor);
-        send({ type: "SET_FOCUS", value: indexed.cuid });
-        actorSend({ type: "SHOW" });
-      } else {
-        const { data, success, fetchAPI } = apiInterface();
-        const { edit: editSchema } = forms.taskList;
-        await fetchAPI(requests.tasks.getTaskList(id));
-        if (success.value) {
-          await editSchema.validate(data.value, { stripUnknown: true }).then((value) => {
-            send({
-              type: "SPAWN_FORM",
-              cuid: cuid(),
-              kind: "taskList",
-              mode: "update",
-              initialData: value,
-              key,
-            });
-            showEditing.value();
-          });
-        }
-      }
-    };
-
     const handleDelete = (taskList) => {
       const { success, fetchAPI } = apiInterface();
-      const request = requests.tasks.deleteTaskList(taskList.id);
+      const request = requests.taskLists.destroy(taskList.id);
       fetchAPI(request).then(() => {
         if (success.value) {
           notifier.tasks.taskListDeleted(taskList.name);
@@ -246,10 +197,8 @@ export default defineComponent({
       activeFilters,
       clearActiveFilters,
       filter,
-      handleCreate,
-      handleEdit,
       handleDelete,
-      isAdmin: auth.user.isAdmin,
+      isAdmin: auth.user.isSuperuser,
       taskLists,
       title,
     };
