@@ -10,14 +10,14 @@
       <q-item class="header" dense>
         <q-item-section>Task lists</q-item-section>
         <q-item-section side>
-          <q-btn @click.stop="taskStore.clearListFilters" icon="close" size="xs" dense flat />
+          <q-btn @click.stop="TaskLists.clearListFilters" icon="close" size="xs" dense flat />
         </q-item-section>
       </q-item>
 
       <template v-for="(list, group, idx) in lists" :key="idx">
         <q-item
-          @click.stop="taskStore.setFilterList(group, true)"
-          :active="taskStore.activeGroups.has(group)"
+          @click.stop="TaskLists.setFilterList(group, true)"
+          :active="TaskLists.activeGroups.has(group)"
           :group="group"
           clickable
           dense
@@ -33,10 +33,10 @@
         <q-item
           v-for="(taskList, idx2) in list"
           :key="idx2"
-          @click.stop="taskStore.setFilterList(`${group}-${taskList.name}`)"
+          @click.stop="TaskLists.setFilterList(`${group}-${taskList.name}`)"
           :active="
-            taskStore.activeGroups.has(group) ||
-            taskStore.activeLists.has(`${group}-${taskList.name}`)
+            TaskLists.activeGroups.has(group) ||
+            TaskLists.activeLists.has(`${group}-${taskList.name}`)
           "
           :group="group"
           :list="taskList.name"
@@ -97,8 +97,8 @@
 import { defineComponent } from "vue";
 
 import { ToolTip } from "@/components";
+import { TaskLists } from "@/models";
 import { useAuthStore } from "@/stores/auth";
-import { useTaskStore } from "@/stores/tasks";
 
 export default defineComponent({
   name: "TasklistList",
@@ -114,7 +114,6 @@ export default defineComponent({
   emits: ["onReload"],
   setup() {
     const auth = useAuthStore();
-    const taskStore = useTaskStore();
     const title = "Task Lists";
 
     // const filter = (e) => {
@@ -145,9 +144,9 @@ export default defineComponent({
     // };
 
     return {
-      isAdmin: auth.user.isAdmin,
+      isAdmin: auth.user.isSuperuser,
       title,
-      taskStore,
+      TaskLists,
     };
   },
 });

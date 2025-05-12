@@ -43,7 +43,7 @@
         />
       </div>
     </template>
-    <template v-if="loading">
+    <template v-else>
       <q-item dense>
         <q-item-section avatar>
           <q-skeleton height="18px" type="rect" width="18px" />
