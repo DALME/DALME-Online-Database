@@ -4,6 +4,15 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
-pinia.use(createORM());
-
+pinia.use(
+  createORM({
+    pinia: {
+      storeType: "setupStore",
+    },
+    model: {
+      withMeta: true,
+      hidden: [],
+    },
+  }),
+);
 export default pinia;
