@@ -1,2 +1,11 @@
+export { CustomModel, CustomRepository } from "./custom";
+export { Groups } from "./group";
+export { Users } from "./user";
+export { Attributes } from "./attribute";
+export { Agents } from "./agent";
+export { Collections } from "./collection";
+export { Places } from "./place";
+export { Tasks } from "./task";
+export { TaskLists } from "./task-list";
+export { Records, Pages, Workflows, Logs } from "./records";
 export { TeiElement, TeiTag, TeiSet, TeiSetMember } from "./tei-elements";
-export { Task, TaskList } from "./tasks";

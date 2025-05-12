@@ -140,7 +140,7 @@ import { useRouter } from "vue-router";
 
 import { requests } from "@/api";
 import { DateChooser } from "@/components";
-import { OptionListSchema } from "@/schemas";
+import { optionListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 import { nully } from "@/utils";
 
@@ -218,7 +218,7 @@ export default defineComponent({
           : requests.attributeTypes.getAttributeTypeOptions(snakeCase(props.field), true);
         fetchAPI(request).then(() => {
           if (success.value) {
-            OptionListSchema.validate(data.value, { stripUnknown: false }).then((validated) => {
+            optionListSchema.validate(data.value, { stripUnknown: false }).then((validated) => {
               resolve(validated);
             });
           }

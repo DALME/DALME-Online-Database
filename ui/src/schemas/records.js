@@ -5,11 +5,9 @@ import * as yup from "yup";
 import { agentsNormalizeInputSchema } from "@/components/forms/agents-field/normalize";
 import { foliosNormalizeInputSchema } from "@/components/forms/folios-field/normalize";
 import {
-  agentListSchema,
   agentsFieldSchema,
   attributeSchema,
   attributesFieldSchema,
-  collectionAttributeSchema,
   creditsFieldSchema,
   pageFieldSchema,
   pageSchema,
@@ -46,23 +44,45 @@ export const recordAttributeSchema = yup.object().shape({
 });
 
 export const recordDetailSchema = yup.object().shape({
-  agents: agentListSchema.default(null).nullable(),
-  attributes: yup.array().of(attributeSchema).required(),
-  collections: yup.array().of(collectionAttributeSchema).required(),
+  // agents: agentListSchema.default(null).nullable(),
+  agentIds: yup
+    .array()
+    .required()
+    .transform((value) => (isNil(value) ? [] : value)),
+  // attributes: yup.array().of(attributeSchema).required(),
+  attributeIds: yup
+    .array()
+    .default([])
+    .required()
+    .transform((value) => (isNil(value) ? [] : value)),
+  // collections: yup.array().of(collectionAttributeSchema).required(),
+  collectionIds: yup
+    .array()
+    .default([])
+    .required()
+    .transform((value) => (isNil(value) ? [] : value)),
   commentCount: yup.number().required(),
   creationTimestamp: timeStampSchema.required(),
-  creationUser: userAttributeSchema.required(),
+  // creationUser: userAttributeSchema.required(),
+  creationUserId: yup.number().required(),
   creditLine: yup.string().required(),
   id: yup.string().uuid().required(),
   isPrivate: yup.boolean().required(),
   modificationTimestamp: timeStampSchema.required(),
-  modificationUser: userAttributeSchema.required(),
+  // modificationUser: userAttributeSchema.required(),
+  modificationUserId: yup.number().required(),
   name: yup.string().required(),
   noFolios: yup.number().required(),
   noTranscriptions: yup.number().required(),
-  owner: userAttributeSchema.required(),
+  // owner: userAttributeSchema.required(),
+  ownerId: yup.number().required(),
   pages: yup.array().of(pageSchema).nullable(),
   places: placeListSchema.default(null).nullable(),
+  placeIds: yup
+    .array()
+    .default([])
+    .required()
+    .transform((value) => (isNil(value) ? [] : value)),
   shortName: yup.string().required(),
   parent: yup.lazy((value) =>
     "parent" in value ? recordGroupAttributeSchema : publicationAttributeSchema,

@@ -1,13 +1,7 @@
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-import {
-  attachmentSchema,
-  collectionAttributeSchema,
-  taskListSchema,
-  timeStampSchema,
-  userAttributeSchema,
-} from "@/schemas";
+import { attachmentSchema, collectionAttributeSchema, timeStampSchema } from "@/schemas";
 
 // Field-level validation rules/schemas.
 export const taskFieldValidation = {
@@ -44,10 +38,11 @@ export const taskSchema = yup
   .shape({
     id: yup.number().required(),
     title: yup.string().required(),
-    taskList: taskListSchema.shape({
-      taskCount: yup.number().default(null).nullable(),
-      taskIndex: yup.array().of(yup.number()).default(null).nullable(),
-    }),
+    // taskList: taskListSchema.shape({
+    //   taskCount: yup.number().default(null).nullable(),
+    //   taskIndex: yup.array().of(yup.number()).default(null).nullable(),
+    // }),
+    taskListId: yup.number().required(),
     description: yup.string().required(),
     dueDate: yup
       .date()
@@ -56,17 +51,24 @@ export const taskSchema = yup
       .nullable(),
     completed: yup.boolean().required(),
     completedDate: timeStampSchema.default(null).nullable(),
-    completedBy: userAttributeSchema.default(null).nullable(),
+    // completedBy: userAttributeSchema.default(null).nullable(),
+    completedById: yup.number().default(null).nullable(),
     overdue: yup.boolean().default(false).nullable(),
     files: yup.array().of(attachmentSchema).default(null).nullable(),
     resources: yup.array().of(collectionAttributeSchema).default(null).nullable(),
-    assignees: yup.array().of(userAttributeSchema).default(null).nullable(),
+    // assignees: yup.array().of(userAttributeSchema).default(null).nullable(),
+    assigneeIds: yup
+      .array()
+      .required()
+      .transform((value) => (isNil(value) ? [] : value)),
     url: yup.string().url().default(null).nullable(),
     commentCount: yup.number().default(0).nullable(),
     creationTimestamp: timeStampSchema.required(),
-    creationUser: userAttributeSchema.required(),
+    // creationUser: userAttributeSchema.required(),
+    creationUserId: yup.number().required(),
     modificationTimestamp: timeStampSchema.required(),
-    modificationUser: userAttributeSchema.required(),
+    // modificationUser: userAttributeSchema.required(),
+    modificationUserId: yup.number().required(),
   })
   .camelCase();
 

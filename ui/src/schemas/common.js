@@ -15,12 +15,6 @@ export const optionsSchema = yup.array().of(
   }),
 );
 
-export const baseContentTypeSchema = yup.object().shape({
-  id: yup.number().required(),
-  appLabel: yup.string().required(),
-  model: yup.string().required(),
-});
-
 export const timeStampSchema = yup.date().default(null).nullable();
 
 const singleDateSchema = yup.object().shape({

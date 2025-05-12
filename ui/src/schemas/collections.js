@@ -1,11 +1,7 @@
+import { isNil } from "ramda";
 import * as yup from "yup";
 
-import {
-  attributeSchema,
-  attributesFieldSchema,
-  groupAttributeSchema,
-  userAttributeSchema,
-} from "@/schemas";
+import { attributesFieldSchema } from "@/schemas";
 
 export const collectionAttributeSchema = yup.object().shape({
   id: yup.string().uuid().required(),
@@ -15,16 +11,24 @@ export const collectionAttributeSchema = yup.object().shape({
 export const collectionSchema = yup.object().shape({
   id: yup.string().uuid().required(),
   name: yup.string().required(),
-  attributes: yup.array().of(attributeSchema).default(null).nullable(),
+  // attributes: yup.array().of(attributeSchema).default(null).nullable(),
+  attributeIds: yup
+    .array()
+    .required()
+    .transform((value) => (isNil(value) ? [] : value)),
   useAsWorkset: yup.boolean().required(),
   isPublished: yup.boolean().required(),
   isPrivate: yup.boolean().required(),
-  owner: userAttributeSchema.default(null).nullable(),
-  teamLink: groupAttributeSchema.default(null).nullable(),
+  // owner: userAttributeSchema.default(null).nullable(),
+  ownerId: yup.number().required(),
+  // teamLink: groupAttributeSchema.default(null).nullable(),
+  teamLinkId: yup.number().default(null).nullable(),
   creationTimestamp: yup.string().required(),
   modificationTimestamp: yup.string().required(),
-  creationUser: userAttributeSchema.required(),
-  modificationUser: userAttributeSchema.required(),
+  // creationUser: userAttributeSchema.required(),
+  creationUserId: yup.number().required(),
+  // modificationUser: userAttributeSchema.required(),
+  modificationUserId: yup.number().required(),
   memberCount: yup.number().default(null).nullable(),
   commentCount: yup.number().default(null).nullable(),
 });

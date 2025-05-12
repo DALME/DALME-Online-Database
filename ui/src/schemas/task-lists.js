@@ -1,8 +1,6 @@
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-import { groupSchema, userAttributeSchema } from "@/schemas";
-
 // Full object schema.
 export const taskListSchema = yup
   .object()
@@ -11,14 +9,18 @@ export const taskListSchema = yup
     name: yup.string().required(),
     description: yup.string().nullable(),
     slug: yup.string().required(),
-    teamLink: groupSchema.required(),
-    owner: userAttributeSchema.required(),
+    // teamLink: groupSchema.required(),
+    // owner: userAttributeSchema.required(),
+    ownerId: yup.number().required(),
     taskCount: yup.number().required(),
     creationTimestamp: yup.string().required(),
-    creationUser: userAttributeSchema.required(),
+    // creationUser: userAttributeSchema.required(),
+    creationUserId: yup.number().required(),
     modificationTimestamp: yup.string().required(),
-    modificationUser: userAttributeSchema.required(),
+    // modificationUser: userAttributeSchema.required(),
+    modificationUserId: yup.number().required(),
     // taskIndex: yup.array().of(yup.number().required()).required(),
+    teamLinkId: yup.number().default(null).nullable(),
   })
   .camelCase();
 

@@ -138,47 +138,17 @@ export const attributeValidators = {
   zoteroKey: yup.string().nullable().required().label("Zotero key"),
 };
 
-export const attributeTypeSchema = yup
-  .object()
-  .shape({
-    id: yup.number().required(),
-    name: yup.string().required(),
-    shortName: yup
-      .string()
-      .required()
-      .transform((value) => camelCase(value)),
-    description: yup.string().nullable(),
-    optionsList: yup
-      .boolean()
-      .nullable()
-      .transform((value) => (value ? true : false)),
-    dataType: yup
-      .string()
-      .required()
-      .when(["shortName", "optionsList", "description"], (shortName, schema) => {
-        // Make sure certain fields come through as select fields.
-        const forceOptions = ["createdBy", "endpoint", "lastUser", "owner", "recordType", "sameAs"];
-        const optionsType = shortName[1] || forceOptions.includes(shortName[0]) ? "Options" : false;
+export const attributeTypeSchema = yup.object().shape({
+  dataType: yup.string().required(),
+  description: yup.string().nullable(),
+  id: yup.number().required(),
+  isLocal: yup.boolean().required(),
+  isRequired: yup.boolean().required(),
+  isUnique: yup.boolean().required(),
+  label: yup.string().required(),
+  name: yup.string().required(),
+  overrideDescription: yup.string().nullable().default(null),
+  overrideLabel: yup.string().nullable().default(null),
+});
 
-        // Booleans are a subset of INT so let's sort those out for clarity.
-        const booleanType = shortName[2].toLowerCase().includes("boolean") ? "Boolean" : false;
-
-        return schema.transform(
-          (value) =>
-            optionsType ||
-            booleanType ||
-            {
-              DATE: "Date",
-              FLOAT: "Floating Point",
-              INT: "Number",
-              STR: "String",
-              JSON: "Data",
-              "FK-INT": "Options",
-              "FK-UUID": "Options",
-            }[value],
-        );
-      }),
-  })
-  .camelCase();
-
-export const attributeTypesSchema = yup.array().of(attributeTypeSchema);
+export const attributeTypesListSchema = yup.array().of(attributeTypeSchema);

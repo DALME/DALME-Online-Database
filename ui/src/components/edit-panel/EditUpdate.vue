@@ -24,7 +24,7 @@ import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { normalizeAttributesInput } from "@/components/forms/attributes-field/normalize";
 import forms from "@/forms";
-import { attributeTypesSchema } from "@/schemas";
+import { attributeTypeSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
 
 export default defineComponent({
@@ -84,7 +84,7 @@ export default defineComponent({
               const request = requests.attributeTypes.getByShortName(shortNames);
               await fetchAPI(request);
               if (success.value)
-                await attributeTypesSchema
+                await attributeTypeSchema
                   .validate(data.value.data, { stripUnknown: true })
                   .then((attributeTypes) => {
                     const normalized = {

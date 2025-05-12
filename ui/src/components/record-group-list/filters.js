@@ -1,12 +1,8 @@
-import { requests } from "@/api";
+import { requestOptions } from "@/api";
 import { filterItemClass, filterItemClassSelected, optionFetcher, userFetcher } from "@/components";
-import { OptionListSchema } from "@/schemas";
+import { optionListSchema } from "@/schemas";
 
-const recordTypes = () =>
-  optionFetcher(
-    requests.attributeTypes.getAttributeTypeOptions("record_type", true),
-    OptionListSchema,
-  );
+const recordTypes = () => optionFetcher(requestOptions("record_type", true), optionListSchema);
 
 export const filterList = (userId) => ({
   preset: [

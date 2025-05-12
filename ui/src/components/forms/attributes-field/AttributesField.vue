@@ -198,7 +198,7 @@ import {
   SelectField,
   TextField,
 } from "@/components/forms";
-import { attributeTypesSchema } from "@/schemas";
+import { attributeTypeSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
 import { attributeFields } from "./attributes";
@@ -288,10 +288,10 @@ export default defineComponent({
     const handleOptions = async (val, update) => {
       if (isNil(options.value) || options.value.length !== optionCount.value) {
         const { success, data, fetchAPI } = apiInterface();
-        const request = requests.attributeTypes.getAttributeTypes();
+        const request = requests.attributeTypes.get();
         await fetchAPI(request);
         if (success.value)
-          await attributeTypesSchema.validate(data.value, { stripUnknown: true }).then((value) =>
+          await attributeTypeSchema.validate(data.value, { stripUnknown: true }).then((value) =>
             update(() => {
               options.value = Object.freeze(
                 value.filter(
@@ -333,12 +333,10 @@ export default defineComponent({
         if (props.required) {
           loading.value = true;
           const { success, data, fetchAPI } = apiInterface();
-          const request = requests.attributeTypes.getAttributeTypesByShortName(
-            props.required.join(),
-          );
+          const request = requests.attributeTypes.getByShortName(props.required.join());
           await fetchAPI(request);
           if (success.value)
-            await attributeTypesSchema
+            await attributeTypeSchema
               .validate(data.value.data, { stripUnknown: true })
               .then((value) => {
                 let newValue = unref(props.modelValue);

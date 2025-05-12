@@ -16,6 +16,8 @@ export const groupAttributeSchema = yup.object().shape({
   description: yup.string().required(),
 });
 
+export const groupListSchema = yup.array().of(groupAttributeSchema);
+
 export const groupOptionsSchema = yup.array().of(
   yup
     .object()

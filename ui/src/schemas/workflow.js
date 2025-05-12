@@ -1,12 +1,13 @@
 import * as yup from "yup";
 
-import { timeStampSchema, userAttributeSchema } from "@/schemas";
+import { timeStampSchema } from "@/schemas";
 
 export const logEventSchema = yup.object().shape({
   event: yup.string().required(),
   id: yup.number().required(),
   timestamp: timeStampSchema.required(),
-  user: userAttributeSchema.required(),
+  // user: userAttributeSchema.required(),
+  userId: yup.number().required(),
 });
 
 export const workflowSchema = yup.object().shape({
@@ -20,7 +21,8 @@ export const workflowSchema = yup.object().shape({
   reviewDone: yup.boolean().required(),
   parsingDone: yup.boolean().default(null).nullable(),
   lastModified: timeStampSchema.required(),
-  lastUser: userAttributeSchema.required(),
+  // lastUser: userAttributeSchema.required(),
+  lastUserId: yup.number().required(),
   status: yup.string().required(),
-  workLog: yup.array().of(logEventSchema).default(null).nullable(),
+  // workLog: yup.array().of(logEventSchema).default(null).nullable(),
 });

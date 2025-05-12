@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { OptionListSchema } from "@/schemas";
+import { optionListSchema } from "@/schemas";
 
 export const ElementTagAttributeSchema = yup.object().shape({
   label: yup.string().required(),
@@ -10,7 +10,7 @@ export const ElementTagAttributeSchema = yup.object().shape({
   required: yup.boolean().required(),
   editable: yup.boolean().required(),
   default: yup.string().nullable(),
-  options: OptionListSchema.nullable(),
+  options: optionListSchema.nullable(),
 });
 
 export const ElementTagAttributeListSchema = yup.array().of(ElementTagAttributeSchema);

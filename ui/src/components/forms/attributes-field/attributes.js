@@ -1,7 +1,7 @@
 import { keys, reduce } from "ramda";
 import * as yup from "yup";
 
-import { requests } from "@/api";
+import { requestOptions } from "@/api";
 import { attributeValidators } from "@/schemas";
 
 // TODO: Strip ununsed when we confirm they will never appear in a form.
@@ -55,7 +55,7 @@ export const attributeFields = reduce(
       options: optionFields.includes(attribute)
         ? /* eslint-disable */
           {
-            request: () => requests.attributeTypes.getAttributeTypeOptions(attribute, true),
+            request: () => requestOptions(attribute, true),
             schema: alternateSchema[attribute] || optionsSchema,
             multiple: multiple.includes(attribute),
           }
