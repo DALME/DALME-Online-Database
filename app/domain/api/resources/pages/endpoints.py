@@ -3,7 +3,7 @@
 import json
 import pathlib
 
-# from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -33,10 +33,7 @@ class Pages(BaseViewSet):
     """API endpoint for managing pages."""
 
     permission_classes = [PageAccessPolicy]
-    # TODO: commented out because it's preventing access to unregistered users
-    # from the public frontend this should probably be integrated with the
-    # overal permissions system, e.g. PageAccessPolicy
-    # oauth_permission_classes = [TokenHasReadWriteScope]
+    oauth_permission_classes = [TokenHasReadWriteScope & PageAccessPolicy]
 
     queryset = Page.objects.all()
     serializer_class = PageSerializer
