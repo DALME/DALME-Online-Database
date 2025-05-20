@@ -80,7 +80,7 @@ class AttributeTypes(BaseViewSet):
         return super().get_object()
 
     @action(detail=True, methods=['get'])
-    def opts(self, request, *args, **kwargs):  # noqa: ARG002
+    def options(self, request, *args, **kwargs):  # noqa: ARG002
         """Return options for single attribute type."""
         serialize = request.GET.get('serialize', False)
         model = request.GET.get('model', None)
@@ -106,7 +106,7 @@ class AttributeTypes(BaseViewSet):
         return Response({'error': 'No options could be retrieved.'}, 400)
 
     @action(detail=False, methods=['get'])
-    def options(self, request, *args, **kwargs):  # noqa: ARG002
+    def options_for_list(self, request, *args, **kwargs):  # noqa: ARG002
         """Return options for a list of attribute types."""
         if request.GET.get('names') is None:
             return Response({'error': 'No list of attributes was provided.'}, 400)
