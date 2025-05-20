@@ -497,18 +497,21 @@
           },
           renderFolio() {
             const that = this;
-            $.get(`/api/pages/${this.folioId}/get_rights/`, function (data) {
-              if (data.rights) {
-                that.showImage = data.rights.hasOwnProperty('showImage') ? data.rights.showImage : false;
-                that.showNotice = data.rights.displayNotice;
-                that.rightsNotice = data.rights.notice;
-                if (that.showImage && that.folioImageId) {
-                  that.renderImage();
-                } else {
-                  that.divaLoading = false;
-                }
-              }
-            }, 'json').then(() => that.setResizable());
+            fetch(`{% url 'api_endpoint:pages-list' %}${this.folioId}/get_rights/?format=json`)
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.rights) {
+                    that.showImage = data.rights.hasOwnProperty('showImage') ? data.rights.showImage : false;
+                    that.showNotice = data.rights.displayNotice;
+                    that.rightsNotice = data.rights.notice;
+                    if (that.showImage && that.folioImageId) {
+                      that.renderImage();
+                    } else {
+                      that.divaLoading = false;
+                    }
+                  }
+                  that.setResizable();
+                });
           },
           renderImage() {
             if (!window.folio) {
