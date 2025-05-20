@@ -13,8 +13,9 @@ class WorklogSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkLog
         fields = [
-            'event',
             'id',
+            'event',
+            'record',
             'timestamp',
             'user_id',
         ]
@@ -24,7 +25,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
     """Basic serializer for workflow control."""
 
     last_user_id = serializers.PrimaryKeyRelatedField(source='last_user', required=False, read_only=True)
-    # work_log = WorklogSerializer(many=True, read_only=True, required=False)
+    work_log = WorklogSerializer(many=True, read_only=True, required=False)
 
     class Meta:
         model = Workflow
@@ -42,7 +43,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             'status',
             'transcription_done',
             'wf_status',
-            # 'work_log',
+            'work_log',
         ]
         extra_kwargs = {
             'last_user': {
