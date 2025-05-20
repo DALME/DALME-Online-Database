@@ -11,13 +11,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.http import HttpResponseRedirect
 
 from app.access_policies import RecordAccessPolicy, WebAccessPolicy
 from domain.api.paginators import CustomPageNumberPagination
 from domain.api.viewsets import BaseViewSet
-from domain.models import PublicRegister, Record
+from domain.models import Permission, PublicRegister, Record
 
 from .filters import RecordFilter
 from .serializers import RecordSerializer
@@ -110,11 +110,16 @@ class Records(BaseViewSet):
         else:
             qs = Record.objects.all()
 
-        if self.request and hasattr(self.request, 'user'):
-            user = self.request.user
-            if not user.is_superuser:
-                q = Q(is_private=False) & ~Q(owner=user)
-                return qs.exclude(q)
+        if (
+            self.request
+            and hasattr(self.request, 'user')
+            and self.request.user.is_authenticated
+            and not self.request.user.is_superuser
+        ):
+            ip = Permission.objects.filter(object_id=str(OuterRef('pk')), is_default=True, can_view=True)
+            qs = qs.annotate(private=Exists(ip))
+            q = Q(private=False) & ~Q(owner=self.request.user)
+            return qs.exclude(q)
 
         return qs
 
