@@ -1,7 +1,13 @@
 [
   {
-    "action": ["retrieve", "options", "list"],
-    "principal": ["*"],
+    "action": [
+      "retrieve",
+      "options_for_list",
+      "list"
+    ],
+    "principal": [
+      "*"
+    ],
     "effect": "allow"
   }
 ]

@@ -3,7 +3,8 @@
     "action": [
       "list",
       "retrieve",
-      "has_permission"
+      "has_permission",
+      "metadata"
     ],
     "principal": [
       "authenticated"
@@ -28,11 +29,24 @@
       "create",
       "partial_update",
       "update",
-      "destroy"
+      "destroy",
+      "include_restricted_fields"
     ],
     "principal": [
       "group:Administrators"
     ],
     "effect": "allow"
+  },
+  {
+    "action": [
+      "include_restricted_fields"
+    ],
+    "principal": [
+      "authenticated"
+    ],
+    "effect": "allow",
+    "condition": [
+      "user_must_be:self"
+    ]
   }
 ]

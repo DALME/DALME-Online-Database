@@ -1,46 +1,96 @@
 [
   {
-    "action": ["list", "has_permission"],
-    "principal": ["authenticated"],
+    "action": [
+      "list",
+      "has_permission",
+      "metadata"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create"],
-    "principal": ["group:Users"],
+    "action": [
+      "create"
+    ],
+    "principal": [
+      "group:Users"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["retrieve", "members"],
-    "principal": ["authenticated"],
+    "action": [
+      "retrieve",
+      "members"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
-    "principal": ["group:Administrators"],
+    "action": [
+      "create",
+      "partial_update",
+      "update",
+      "destroy",
+      "workset_state",
+      "remove_members",
+      "add_members"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "update"],
-    "principal": ["authenticated"],
+    "action": [
+      "partial_update",
+      "update"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition_expression": ["(user_must_be:owner or has_perm:can_edit)"]
+    "condition_expression": [
+      "(user_must_be:owner or has_perm:can_edit)"
+    ]
   },
   {
-    "action": ["add_members"],
-    "principal": ["authenticated"],
+    "action": [
+      "add_members"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition_expression": ["(user_must_be:owner or has_perm:can_add)"]
+    "condition_expression": [
+      "(user_must_be:owner or has_perm:can_add)"
+    ]
   },
   {
-    "action": ["remove_members"],
-    "principal": ["authenticated"],
+    "action": [
+      "remove_members"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition_expression": ["(user_must_be:owner or has_perm:can_remove)"]
+    "condition_expression": [
+      "(user_must_be:owner or has_perm:can_remove)"
+    ]
   },
   {
-    "action": ["destroy"],
-    "principal": ["authenticated"],
+    "action": [
+      "destroy"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition_expression": ["(user_must_be:owner or has_perm:can_delete)"]
+    "condition_expression": [
+      "(user_must_be:owner or has_perm:can_delete)"
+    ]
   }
 ]

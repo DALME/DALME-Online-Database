@@ -1,29 +1,66 @@
 [
   {
-    "action": ["list", "retrieve", "has_permission"],
-    "principal": ["authenticated"],
+    "action": [
+      "list",
+      "retrieve",
+      "has_permission",
+      "metadata"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create"],
-    "principal": ["group:Users"],
+    "action": [
+      "create"
+    ],
+    "principal": [
+      "group:Users"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy", "change_state"],
-    "principal": ["group:Administrators"],
+    "action": [
+      "create",
+      "partial_update",
+      "update",
+      "destroy",
+      "change_state"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy", "change_state"],
-    "principal": ["authenticated"],
+    "action": [
+      "create",
+      "partial_update",
+      "update",
+      "destroy",
+      "change_state"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition": ["parent_as_proxy"]
+    "condition": [
+      "parent_as_proxy"
+    ]
   },
   {
-    "action": ["partial_update", "update", "change_state"],
-    "principal": ["authenticated"],
+    "action": [
+      "partial_update",
+      "update",
+      "change_state"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition": ["parent_as_proxy"]
+    "condition": [
+      "parent_as_proxy"
+    ]
   }
 ]

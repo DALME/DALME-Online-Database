@@ -1,7 +1,11 @@
 [
   {
-    "principal": ["authenticated"],
-    "action": ["<method:post>"],
+    "principal": [
+      "authenticated"
+    ],
+    "action": [
+      "<method:post>"
+    ],
     "effect": "allow"
   }
 ]

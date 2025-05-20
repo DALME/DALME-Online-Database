@@ -1,21 +1,16 @@
 [
     {
         "action": [
-            "list"
-        ],
-        "principal": [
-            "authenticated"
-        ],
-        "effect": "allow"
-    },
-    {
-        "action": [
+            "list",
             "update",
             "partial_update"
         ],
         "principal": [
             "authenticated"
         ],
-        "effect": "allow"
+        "effect": "allow",
+        "condition": [
+            "user_must_be:user"
+        ]
     }
 ]

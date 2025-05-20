@@ -2,10 +2,11 @@
   {
     "action": [
       "options",
-      "opts",
+      "options_for_list",
       "list",
       "retrieve",
-      "has_permission"
+      "has_permission",
+      "metadata"
     ],
     "principal": [
       "authenticated"

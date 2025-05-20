@@ -1,18 +1,40 @@
 [
   {
-    "action": ["list", "retrieve", "has_permission"],
-    "principal": ["authenticated"],
+    "action": [
+      "list",
+      "retrieve",
+      "has_permission",
+      "metadata"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy"],
-    "principal": ["group:Administrators"],
+    "action": [
+      "create",
+      "partial_update",
+      "update",
+      "destroy"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "update", "destroy"],
-    "principal": ["authenticated"],
+    "action": [
+      "partial_update",
+      "update",
+      "destroy"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition": ["user_must_be:creator"]
+    "condition": [
+      "user_must_be:creation_user"
+    ]
   }
 ]

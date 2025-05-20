@@ -3,7 +3,8 @@
         "action": [
             "retrieve",
             "options",
-            "list"
+            "list",
+            "metadata"
         ],
         "principal": [
             "*"

@@ -1,29 +1,62 @@
 [
   {
-    "action": ["*"],
-    "principal": ["group:Administrators"],
+    "action": [
+      "*"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["list", "retrieve", "get_set", "has_permission", "get_manifest"],
-    "principal": ["authenticated"],
+    "action": [
+      "list",
+      "retrieve",
+      "get_set",
+      "has_permission",
+      "get_manifest",
+      "metadata"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create"],
-    "principal": ["group:Users"],
+    "action": [
+      "create"
+    ],
+    "principal": [
+      "group:Users"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "change_description", "update", "bulk_edit"],
-    "principal": ["authenticated"],
+    "action": [
+      "partial_update",
+      "change_description",
+      "update",
+      "bulk_edit"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition_expression": ["(user_must_be:owner or has_perm:can_edit)"]
+    "condition_expression": [
+      "(user_must_be:owner or has_perm:can_edit)"
+    ]
   },
   {
-    "action": ["destroy", "bulk_remove"],
-    "principal": ["authenticated"],
+    "action": [
+      "destroy",
+      "bulk_remove"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition_expression": ["(user_must_be:owner or has_perm:can_delete)"]
+    "condition_expression": [
+      "(user_must_be:owner or has_perm:can_delete)"
+    ]
   }
 ]

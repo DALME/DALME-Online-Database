@@ -4,7 +4,8 @@
       "list",
       "retrieve",
       "has_permission",
-      "completions"
+      "completions",
+      "metadata"
     ],
     "principal": [
       "authenticated"

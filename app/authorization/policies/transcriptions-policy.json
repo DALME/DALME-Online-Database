@@ -1,23 +1,50 @@
 [
   {
-    "action": ["retrieve", "check_version"],
-    "principal": ["*"],
+    "action": [
+      "retrieve",
+      "check_version"
+    ],
+    "principal": [
+      "*"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["create", "list", "retrieve", "check_version"],
-    "principal": ["authenticated"],
+    "action": [
+      "create",
+      "list",
+      "retrieve",
+      "check_version",
+      "metadata"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "update", "destroy"],
-    "principal": ["group:Administrators"],
+    "action": [
+      "partial_update",
+      "update",
+      "destroy"
+    ],
+    "principal": [
+      "group:Administrators"
+    ],
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "update", "destroy"],
-    "principal": ["authenticated"],
+    "action": [
+      "partial_update",
+      "update",
+      "destroy"
+    ],
+    "principal": [
+      "authenticated"
+    ],
     "effect": "allow",
-    "condition": ["parent_as_proxy"]
+    "condition": [
+      "parent_as_proxy"
+    ]
   }
 ]

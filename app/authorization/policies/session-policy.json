@@ -1,6 +1,10 @@
 [
   {
-    "action": ["alter", "retrieve", "ping"],
+    "action": [
+      "alter",
+      "retrieve",
+      "ping"
+    ],
     "principal": "*",
     "effect": "allow"
   }
