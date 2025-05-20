@@ -18,20 +18,30 @@ class PreferenceAccessPolicy(BaseAccessPolicy):
     id = 'preferences-policy'
 
 
-class Preferences(viewsets.ViewSet):
+class Preferences(viewsets.ModelViewSet):
     """API endpoint for managing user preferences."""
 
+    queryset = Preference.objects.all()
+    serializer_class = PreferenceSerializer
     permission_classes = [PreferenceAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope & PreferenceAccessPolicy]
 
-    def get_object(self, pk=None):
+    def get_object(self):
         """Return the object of the view."""
+        pk = self.kwargs.get('pk')
+        if not pk:
+            return None
         try:
             key = PreferenceKey.objects.get(name=pk)
             return Preference.objects.get(user=self.request.user, key=key)
         except Exception as exc:
-            msg = 'No preferencematches the given query.'
+            msg = 'No preference matches the given query.'
             raise Http404(msg) from exc
+
+    def get_queryset(self):
+        """Return the queryset of the view filtered by user."""
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user)
 
     def list(self, request, format=None):  # noqa: A002, ARG002
         """Retrieve preferences for current user."""
@@ -44,7 +54,8 @@ class Preferences(viewsets.ViewSet):
         value = request.data.get('value')
         if not pk or value is None:
             return Response({'error': 'Request missing key or data.'}, 400)
-        obj = self.get_object(pk)
+        obj = self.get_object()
         obj.data = value
         obj.save()
-        return Response(200)
+        serializer = PreferenceSerializer(self.queryset.get(pk=obj.id))
+        return Response(serializer.data, 200)
