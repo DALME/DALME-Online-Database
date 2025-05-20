@@ -1,5 +1,7 @@
 """Mixin for tracking activity with user ids and timestamps."""
 
+import os
+
 from django_currentuser.middleware import get_current_user
 
 from django.conf import settings
@@ -31,6 +33,26 @@ class TrackingMixin(models.Model):
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        """Save record with tracking info."""
+        if os.environ.get('DATA_MIGRATION'):
+            if self._state.adding is True:
+                self.creation_timestamp = timezone.now() if not self.creation_timestamp else self.creation_timestamp
+                self.creation_user_id = 1 if not self.creation_user_id else self.creation_user_id
+            self.modification_timestamp = (
+                timezone.now() if not self.modification_timestamp else self.modification_timestamp
+            )
+            self.modification_user_id = 1 if not self.modification_user_id else self.modification_user_id
+
+        else:
+            if self._state.adding is True:
+                self.creation_timestamp = timezone.now()
+                self.creation_user = get_current_user()
+            self.modification_timestamp = timezone.now()
+            self.modification_user = get_current_user()
+
+        super().save(*args, **kwargs)
 
     def class_name(self):
         """Return specific model class name."""
