@@ -4,6 +4,7 @@ import json
 import pathlib
 
 from rest_access_policy import AccessPolicy, AccessPolicyException
+from rest_access_policy.access_policy import AccessEnforcement
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -59,7 +60,7 @@ class BaseAccessPolicy(AccessPolicy):
         """Return parent object. Should be overwritten by subclasses to provide resource-specific parents."""
         return (target, self)
 
-    def get_targets(self, view, arg=None):
+    def get_targets(self, view, arg=None):  # noqa: C901, PLR0912
         """Return target object(s)."""
         if len(self.targets) == 0:
             if isinstance(view, dict):
@@ -68,15 +69,29 @@ class BaseAccessPolicy(AccessPolicy):
             elif hasattr(view, 'object'):
                 self.targets = [view.object]
 
-            elif hasattr(view, 'get_object'):
-                try:
-                    self.targets = [view.get_object()]
-                except AssertionError:
-                    objects = []
-                    for t_id in list(view.request.data.keys()):
-                        view.kwargs['pk'] = t_id
-                        objects.append(view.get_object())
-                    self.targets = objects
+            elif hasattr(view, 'action') and view.action == 'list':
+                if hasattr(view, 'get_queryset'):
+                    self.targets = list(view.get_queryset())
+                elif hasattr(view, 'queryset'):
+                    self.targets = list(view.queryset)
+                else:
+                    self.targets = [{}]
+
+            elif hasattr(view, 'detail') and view.detail:
+                if hasattr(view, 'get_object'):
+                    try:
+                        target = view.get_object()
+                    except AssertionError:
+                        target = None
+
+                    if target is not None:
+                        self.targets = [target]
+                    else:
+                        objects = []
+                        for t_id in list(view.request.data.keys()):
+                            view.kwargs['pk'] = t_id
+                            objects.append(view.get_object())
+                        self.targets = objects
             else:
                 self.targets = [{}]
 
@@ -130,22 +145,24 @@ class BaseAccessPolicy(AccessPolicy):
             self.error = '"user_must_be" condition requires a parameter, none was supplied.'
             return False
 
-        if arg in ['owner', 'creator', 'self']:
-            for target in self.get_targets(view):
-                try:
-                    test = target.owner if arg == 'owner' else target.creation_user if arg == 'creator' else target
-                    if request.user != test:
-                        self.fail_target_string = target.get('name')
-                        return False
+        targets = self.get_targets(view)
 
-                except Exception as e:  # noqa: BLE001
-                    self.error = str(e)
+        if len(targets) == 0:
+            self.error = '"user_must_be" condition returned false because the view has no target objects.'
+            return False
+
+        for target in targets:
+            try:
+                test = getattr(target, arg) if arg != 'self' else target
+                if request.user != test:
+                    self.fail_target_string = target.get('name')
                     return False
 
-            return True
+            except Exception as e:  # noqa: BLE001
+                self.error = str(e)
+                return False
 
-        self.error = f'{arg} is not a valid argument for the "user_must_be" condition.'
-        return False
+        return True
 
     def has_perm(self, request, view, action, arg=None):  # noqa: ARG002
         """Test 'has_perm' condition."""
@@ -169,6 +186,18 @@ class BaseAccessPolicy(AccessPolicy):
                 return False
 
         return True
+
+    def include_restricted_fields(self, request, view):
+        """Test 'include_restricted_fields' condition."""
+        action = 'include_restricted_fields'
+        statements = self.get_policy_statements(request, view)
+
+        if len(statements) == 0:
+            return False
+
+        allowed = self._evaluate_statements(statements, request, view, action)
+        request.access_enforcement = AccessEnforcement(action=action, allowed=allowed)
+        return allowed
 
     def parent_as_proxy(self, request, view, action):  # noqa: ARG002
         """Test permissions using object's parent as proxy."""
