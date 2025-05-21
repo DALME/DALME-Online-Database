@@ -47,7 +47,8 @@ export default defineComponent({
     },
     id: {
       type: [Number, String],
-      required: true,
+      required: false,
+      default: null,
     },
     field: {
       type: String,
@@ -114,8 +115,12 @@ export default defineComponent({
     provide("editOn", editOn);
 
     onBeforeMount(() => {
-      record.value = props.repository.find(props.id);
-      value.value = record.value[dataField.value];
+      if (!props.creating) {
+        record.value = props.repository.find(props.id);
+        value.value = record.value[dataField.value];
+      } else {
+        value.value = "";
+      }
     });
 
     return {

@@ -24,6 +24,9 @@
       stack-label
       use-input
     >
+      <template #prepend v-if="nully(value)">
+        <div class="select-placeholder">{{ placeholder }}</div>
+      </template>
       <template v-if="repository.entity === 'user'" #option="scope">
         <q-item v-bind="scope.itemProps" dense>
           <q-item-section side>
@@ -126,6 +129,11 @@ export default defineComponent({
       required: false,
       default: null,
     },
+    placeholder: {
+      type: String,
+      required: false,
+      default: "No value selected...",
+    },
     link: {
       type: Object,
       required: false,
@@ -150,7 +158,6 @@ export default defineComponent({
     const router = useRouter();
 
     const cleanValue = (value) => {
-      console.log("cleanValue", value);
       if (Array.isArray(value)) return value.map((v) => (isObject(v) ? v.id : v));
       if (isObject(value)) return value.id;
       return value;
@@ -188,18 +195,12 @@ export default defineComponent({
     onBeforeMount(() => {
       loading.value = true;
       record.value = props.repository.find(props.id);
-      props.repository.options(optionsField.value).then((result) => {
+      const originator = isAttribute ? record.value.objectType : props.repository.entity;
+      props.repository.options(optionsField.value, originator).then((result) => {
         options.value = result;
         filteredOptions.value = options.value;
         value.value = cleanValue(record.value[dataField.value]);
         loading.value = false;
-        console.log(
-          `SELECT mounted ${fieldLabel.value}`,
-          value.value,
-          record.value,
-          dataField.value,
-          options.value,
-        );
       });
     });
 
@@ -239,6 +240,14 @@ export default defineComponent({
 .select-field label {
   width: 100%;
 }
+.select-placeholder {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.00937em;
+  text-decoration: inherit;
+  text-transform: inherit;
+  color: rgba(0, 0, 0, 0.87);
+}
 :deep(.q-field .q-field__control .q-field__append) {
   margin-top: 22px;
 }
@@ -265,9 +274,19 @@ export default defineComponent({
 :deep(.q-field__messages > div) {
   line-height: 1.3;
 }
+:deep(.q-field__prepend) {
+  position: absolute;
+  top: 30px;
+}
 // sidebar version
 // additional global overrides in src/css/field-overrides.scss
 .select-field.sidebar {
   margin-bottom: 12px;
+}
+.select-field.sidebar .select-placeholder {
+  font-size: 13px;
+}
+.select-field.sidebar :deep(.q-field__prepend) {
+  top: 22px;
 }
 </style>
