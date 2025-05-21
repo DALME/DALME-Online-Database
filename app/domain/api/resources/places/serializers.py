@@ -2,10 +2,7 @@
 
 from rest_framework import serializers
 
-from domain.api.resources.attributes import AttributeSerializer
-from domain.api.resources.locations import LocationSerializer
 from domain.api.resources.tags import TagSerializer
-from domain.api.resources.users import UserSerializer
 from domain.api.serializers import DynamicSerializer
 from domain.models import Place
 
@@ -13,10 +10,12 @@ from domain.models import Place
 class PlaceSerializer(DynamicSerializer):
     """Serializer for places."""
 
-    attributes = AttributeSerializer(many=True, required=False)
-    creation_user = UserSerializer(field_set='attribute', required=False)
-    location = LocationSerializer(field_set='attribute')
-    modification_user = UserSerializer(field_set='attribute', required=False)
+    attribute_ids = serializers.PrimaryKeyRelatedField(source='attributes', required=False, read_only=True, many=True)
+    creation_user_id = serializers.PrimaryKeyRelatedField(source='creation_user', required=False, read_only=True)
+    location_id = serializers.PrimaryKeyRelatedField(source='location', required=False, read_only=True)
+    modification_user_id = serializers.PrimaryKeyRelatedField(
+        source='modification_user', required=False, read_only=True
+    )
     object_id = serializers.SerializerMethodField()
     record_attestation_count = serializers.SerializerMethodField()
     tags = TagSerializer(many=True, required=False)
@@ -25,14 +24,14 @@ class PlaceSerializer(DynamicSerializer):
         model = Place
         fields = [
             'attestation_count',
-            'attributes',
+            'attribute_ids',
             'comment_count',
             'creation_timestamp',
-            'creation_user',
+            'creation_user_id',
             'id',
-            'location',
+            'location_id',
             'modification_timestamp',
-            'modification_user',
+            'modification_user_id',
             'name',
             'object_id',
             'record_attestation_count',
