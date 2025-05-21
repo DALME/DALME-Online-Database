@@ -2,7 +2,7 @@ import { useRepo } from "pinia-orm";
 import { DateCast } from "pinia-orm/casts";
 
 import { requests } from "@/api";
-import { CustomModel, CustomRepository, Users } from "@/models";
+import { CustomModel, CustomRepository, Locations, Users } from "@/models";
 import { placeListSchema, placeSchema } from "@/schemas";
 
 class Place extends CustomModel {
@@ -16,6 +16,7 @@ class Place extends CustomModel {
   static autoFields = {
     creationUserId: Users,
     modificationUserId: Users,
+    locationId: Locations,
   };
 
   static fields() {
@@ -26,14 +27,7 @@ class Place extends CustomModel {
       creationTimestamp: this.attr(null),
       creationUserId: this.attr(null),
       id: this.attr(null),
-      latitude: this.attr(null),
-      location: this.attr(null),
-      locationCountry: this.string(""),
-      locationDetails: this.string(""),
-      locationGeometry: this.string(""),
-      locationName: this.string(""),
-      locationRegion: this.string(""),
-      longitude: this.attr(null),
+      locationId: this.attr(null),
       modificationTimestamp: this.attr(null),
       modificationUserId: this.attr(null),
       name: this.string(""),
@@ -42,6 +36,7 @@ class Place extends CustomModel {
       // related
       creationUser: this.belongsTo(Users, "creationUserId"),
       modificationUser: this.belongsTo(Users, "modificationUserId"),
+      location: this.belongsTo(Locations, "locationId"),
     };
   }
 

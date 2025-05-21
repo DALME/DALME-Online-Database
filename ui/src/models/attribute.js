@@ -22,6 +22,7 @@ class Attribute extends CustomModel {
       label: this.string(""),
       name: this.string(""),
       objectId: this.attr(null),
+      objectType: this.string(""),
       value: this.attr(null),
     };
   }
