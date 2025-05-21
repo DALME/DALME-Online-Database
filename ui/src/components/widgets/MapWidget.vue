@@ -25,7 +25,7 @@
               <ol-geom-point :coordinates="pt.coordinates" />
               <ol-style>
                 <ol-style-circle :radius="radius">
-                  <ol-style-fill :color="fill" />
+                  <ol-style-fill :color="fill[pt.type]" />
                   <ol-style-stroke :color="stroke" :width="strokeWidth" />
                 </ol-style-circle>
                 <ol-style-text
@@ -51,7 +51,7 @@ import { defineComponent, onBeforeMount, onMounted, ref, useTemplateRef } from "
 export default defineComponent({
   name: "MapWidget",
   props: {
-    places: {
+    targets: {
       type: Object,
       required: true,
     },
@@ -61,7 +61,10 @@ export default defineComponent({
     const projection = "EPSG:3857";
     const radius = ref(7);
     const strokeWidth = ref(2);
-    const fill = ref("#ff0000");
+    const fill = ref({
+      place: "#ff0000",
+      location: "#0000ff",
+    });
     const stroke = ref("#ffffff");
     const zoom = ref(8);
     const centre = ref([0, 0]);
@@ -93,14 +96,23 @@ export default defineComponent({
     };
 
     onBeforeMount(() => {
-      for (const place of props.places) {
-        if ("latitude" in place && "longitude" in place) {
+      for (const target of props.targets) {
+        if (target.entity === "place" && target.location?.locationType === "Locale") {
+          const locale = target.location.attributes.find((a) => a.name === "locale");
           points.value.push({
+            type: "place",
             label:
-              place.name === place.locationName
-                ? place.name
-                : `${place.name} (${place.locationName})`,
-            coordinates: convertCoordinates(place.longitude, place.latitude),
+              target.name === locale.value.name
+                ? target.name
+                : `${target.name} (${locale.value.name})`,
+            coordinates: convertCoordinates(locale.value.longitude, locale.value.latitude),
+          });
+        } else if (target.entity === "attribute") {
+          points.value.push({
+            type: "locale",
+            // eslint-disable-next-line max-len
+            label: `${target.value.name} (${target.value.administrativeRegion}, ${target.value.country.name})`,
+            coordinates: convertCoordinates(target.value.longitude, target.value.latitude),
           });
         }
       }
