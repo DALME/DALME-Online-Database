@@ -11,6 +11,7 @@ class Log extends CustomModel {
 
   static fields() {
     return {
+      record: this.attr(null),
       event: this.string(""),
       id: this.number(null),
       timestamp: this.attr(null),

@@ -8,6 +8,7 @@ import { Logs } from "./log";
 class Workflow extends CustomModel {
   static entity = "workflow";
   static primaryKey = "record";
+
   static autoFields = {
     lastUserId: Users,
   };
@@ -27,7 +28,7 @@ class Workflow extends CustomModel {
       status: this.string(""),
       transcriptionDone: this.boolean(false),
       wfStatus: this.number(0),
-      workLog: this.hasMany(Logs, "workflow"),
+      workLog: this.hasMany(Logs, "record"),
       // related
       lastUser: this.belongsTo(Users, "lastUserId"),
     };
