@@ -330,8 +330,10 @@ class Base(Configuration):
     ]
 
     OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.Application'
-    OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', 3600)  # 1 hour
-    OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get('OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', 3600 * 24 * 14)  # 14 days
+    OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', '3600')  # 1 hour
+    OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get(
+        'OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', str(3600 * 24 * 14)
+    )  # 14 days
 
     @property
     def OAUTH_CLIENT_ID(self):
@@ -565,7 +567,7 @@ class Development(Base, Configuration):
             'USER': os.environ['POSTGRES_USER'],
             'PASSWORD': os.environ['POSTGRES_PASSWORD'],
             'HOST': os.environ['POSTGRES_HOST'],
-            'PORT': os.environ.get('POSTGRES_PORT', 5432),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
             'TEST': {
                 'NAME': 'test_dalme_db',
             },
@@ -576,7 +578,7 @@ class Development(Base, Configuration):
             'USER': os.environ['DAM_DB_USER'],
             'PASSWORD': os.environ['DAM_DB_PASSWORD'],
             'HOST': os.environ['DAM_DB_HOST'],
-            'PORT': os.environ.get('DAM_PORT', 3306),
+            'PORT': os.environ.get('DAM_PORT', '3306'),
         },
     }
 
@@ -735,7 +737,7 @@ class Production(Base, Configuration):
                 'USER': os.environ['POSTGRES_USER'],
                 'PASSWORD': os.environ['POSTGRES_PASSWORD'],
                 'HOST': os.environ['POSTGRES_HOST'],
-                'PORT': os.environ.get('POSTGRES_PORT', 5432),
+                'PORT': os.environ.get('POSTGRES_PORT', '5432'),
             },
             'dam': {
                 'ENGINE': 'django.db.backends.mysql',
@@ -743,7 +745,7 @@ class Production(Base, Configuration):
                 'USER': os.environ['DAM_DB_USER'],
                 'PASSWORD': os.environ['DAM_DB_PASSWORD'],
                 'HOST': os.environ['DAM_DB_HOST'],
-                'PORT': os.environ.get('DAM_PORT', 3306),
+                'PORT': os.environ.get('DAM_PORT', '3306'),
             },
         }
 
