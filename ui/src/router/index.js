@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { head, isEmpty, isNil, filter as rFilter } from "ramda";
+import { head, isNil, filter as rFilter } from "ramda";
 import {
   createMemoryHistory,
   createRouter,
@@ -9,7 +9,6 @@ import {
 
 import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
-import { useViewStore } from "@/stores/views";
 
 import routes from "./routes";
 
@@ -34,23 +33,18 @@ export const navRoutes = (menu = null) => {
   }
 };
 
-router.beforeEach((_, from) => {
+router.beforeEach(() => {
   const auth = useAuthStore();
   if (isNil(Cookies.get("csrftoken"))) {
     auth.setCSRFToken();
   }
-  const views = useViewStore();
-  if (from && !isEmpty(from.meta) && !from.meta.resetStateOnLoad && !isEmpty(views.view)) {
-    views.saveViewState(from.fullPath);
-  }
 });
 
 router.beforeResolve(async (to) => {
+  console.log("router.beforeResolve");
   const ui = useUiStore();
-  const views = useViewStore();
   await ui.setPageState(to);
   ui.setUiState(to);
-  views.setViewState(views, to);
 });
 
 export default router;

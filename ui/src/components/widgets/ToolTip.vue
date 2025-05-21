@@ -8,7 +8,7 @@
 <script>
 import { defineComponent } from "vue";
 
-import { useSettingsStore } from "@/stores/settings";
+import { Preferences } from "@/models";
 
 export default defineComponent({
   name: "ToolTip",
@@ -32,8 +32,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const settings = useSettingsStore();
-    return { showTips: settings.preferences.tooltipsOn.value };
+    return { showTips: Preferences.get("tooltipsOn") };
   },
 });
 </script>

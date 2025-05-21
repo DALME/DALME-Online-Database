@@ -1,4 +1,4 @@
-import { useTaskStore } from "@/stores/tasks";
+import { Tasks } from "@/models/task";
 
 const routes = [
   {
@@ -39,6 +39,7 @@ const routes = [
             path: ":id",
             meta: {
               viewDefaults: { tab: "info" },
+              viewDefaultState: "recordDetail",
             },
           },
         ],
@@ -229,9 +230,8 @@ const routes = [
             if ("id" in to.params) state["taskId"] = to.params.id;
             return { name: "Dashboard", state: state };
           } else {
-            const taskStore = useTaskStore();
-            if ("id" in to.params) taskStore.setViewer(to.params.id, true);
-            taskStore.showTaskModal();
+            if ("id" in to.params) Tasks.setCurrent(to.params.id, true);
+            Tasks.showModal();
             return false;
           }
         },

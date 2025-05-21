@@ -1,7 +1,7 @@
 <template>
   <div id="viewer-container" :style="`height: ${viewerHeight}px; width: ${viewerWidth}px`">
     <div
-      v-if="recordStore.pageCount > 1"
+      v-if="Records.pageCount > 1"
       @mouseleave="expandNav = false"
       @mouseover="expandNav = true"
       :class="`hot-zone nav ${tbVertAlt ? 'toolbar-v' : 'toolbar-h'}`"
@@ -17,19 +17,19 @@
             <div v-show="expandNav">
               <q-btn
                 @click="changePage('first')"
-                :disabled="recordStore.currentPageIndex === 0"
+                :disabled="Records.currentPageIndex === 0"
                 class="start"
                 icon="first_page"
               />
               <q-btn
                 @click="changePage('prev')"
-                :disabled="recordStore.currentPageIndex === 0"
+                :disabled="Records.currentPageIndex === 0"
                 icon="navigate_before"
               />
             </div>
           </transition>
         </div>
-        <div class="viewer-current-page">{{ recordStore.currentPage.name }}</div>
+        <div class="viewer-current-page">{{ Records.currentPage.name }}</div>
         <div class="nav-arrows">
           <transition
             :enter-active-class="`animated ${tbVertAlt ? 'fadeInDown' : 'fadeInLeft'}  delay-1s`"
@@ -39,12 +39,12 @@
             <div v-show="expandNav">
               <q-btn
                 @click="changePage('next')"
-                :disabled="recordStore.currentPageIndex === recordStore.pageCount - 1"
+                :disabled="Records.currentPageIndex === Records.pageCount - 1"
                 icon="navigate_next"
               />
               <q-btn
                 @click="changePage('last')"
-                :disabled="recordStore.currentPageIndex === recordStore.pageCount - 1"
+                :disabled="Records.currentPageIndex === Records.pageCount - 1"
                 class="end"
                 icon="last_page"
               />
@@ -60,7 +60,7 @@
     >
       <q-btn
         @click="changeSplitView"
-        :icon="recordStore.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'"
+        :icon="Records.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'"
         class="pivot"
       />
       <transition
@@ -76,12 +76,12 @@
           <q-btn
             @click="zoom('in')"
             :class="`${tbHorAlt ? 'zoom-btn' : 'zoom-btn start'}`"
-            :disabled="recordStore.viewerZoom >= maxZoomLevel"
+            :disabled="Records.viewerZoom >= maxZoomLevel"
             icon="zoom_in"
           />
           <q-btn
             @click="zoom('out')"
-            :disabled="recordStore.viewerZoom <= minZoomLevel"
+            :disabled="Records.viewerZoom <= minZoomLevel"
             class="zoom-btn"
             icon="zoom_out"
           />
@@ -99,7 +99,7 @@
       >
         <div v-show="expandTools" :style="toolPosition" class="viewer-toolbar toolbar-h">
           <q-btn
-            v-if="recordStore.pageCount > 1"
+            v-if="Records.pageCount > 1"
             @click="changeDrawerMini"
             :class="drawerButtonClasses"
             icon="o_auto_stories"
@@ -125,7 +125,7 @@ import {
   watch,
 } from "vue";
 
-import { useStores } from "@/use";
+import { Records } from "@/models";
 
 export default defineComponent({
   name: "IiifViewer",
@@ -133,12 +133,11 @@ export default defineComponent({
   setup(_, context) {
     var viewer = null;
     const { viewerHeight, viewerWidth } = inject("viewerDimensions");
-    const { recordStore, view } = useStores();
     const expandNav = ref(false);
     const expandTools = ref(false);
 
-    const tbHorAlt = computed(() => recordStore.splitterHorizontal && viewerHeight.value < 198);
-    const tbVertAlt = computed(() => !recordStore.splitterHorizontal && viewerWidth.value < 240);
+    const tbHorAlt = computed(() => Records.splitterHorizontal && viewerHeight.value < 198);
+    const tbVertAlt = computed(() => !Records.splitterHorizontal && viewerWidth.value < 240);
     const navPosition = computed(() => {
       let top = tbVertAlt.value ? 199 : 5;
       let posHor = tbVertAlt.value ? "left" : "right";
@@ -147,29 +146,29 @@ export default defineComponent({
     const toolPosition = computed(() => `top: -1px; left: ${tbHorAlt.value ? -153 : -33}px`);
     const zoomPosition = computed(() => {
       let top = tbHorAlt.value ? -1 : 29;
-      let left = tbHorAlt.value ? (recordStore.pageCount > 1 ? 29 : 0) : -31;
+      let left = tbHorAlt.value ? (Records.pageCount > 1 ? 29 : 0) : -31;
       return `top: ${top}px; left: ${left}px`;
     });
     const drawerButtonClasses = computed(() => {
       const cls = ["border-left"];
       tbHorAlt.value ? cls.push("border-right") : cls.push("end");
-      if (view.value.pageDrawerMini) cls.push("crossed-out");
+      if (Records.pageDrawerMini) cls.push("crossed-out");
       return cls.join(" ");
     });
 
     const minZoomLevel = ref(0.5);
     const maxZoomLevel = ref(8);
-    const defaultZoomLevel = computed(() => (recordStore.viewerZoom ? recordStore.viewerZoom : 1));
+    const defaultZoomLevel = computed(() => (Records.viewerZoom ? Records.viewerZoom : 1));
 
     const zoom = (type) => {
       if (type === "full") console.log("FULL ZOOM");
       if (type === "out") {
-        let level = recordStore.viewerZoom - 0.25;
+        let level = Records.viewerZoom - 0.25;
         if (level <= minZoomLevel.value) level = minZoomLevel.value;
         viewer.viewport.zoomTo(level);
       }
       if (type === "in") {
-        let level = recordStore.viewerZoom + 0.25;
+        let level = Records.viewerZoom + 0.25;
         if (level >= maxZoomLevel.value) level = maxZoomLevel.value;
         viewer.viewport.zoomTo(level);
       }
@@ -190,8 +189,8 @@ export default defineComponent({
     };
 
     const loadPage = () => {
-      if (!isEmpty(recordStore.currentPage)) {
-        viewer.open(recordStore.currentPage.manifestUrl);
+      if (!isEmpty(Records.currentPage)) {
+        viewer.open(Records.currentPage.manifestUrl);
         viewer.viewport.zoomTo(defaultZoomLevel.value);
       }
     };
@@ -214,21 +213,22 @@ export default defineComponent({
           sequenceMode: false,
           crossOriginPolicy: "Anonymous",
           prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-          tileSources: [recordStore.currentPage.manifestUrl],
+          tileSources: [Records.currentPage.manifestUrl],
         }),
       );
-      if (recordStore.viewerZoom) {
-        viewer.viewport.zoomTo(recordStore.viewerZoom);
+      if (Records.viewerZoom) {
+        viewer.viewport.zoomTo(Records.viewerZoom);
       } else {
-        recordStore.viewerZoom = viewer.viewport.getZoom(true);
+        Records.viewerZoom = viewer.viewport.getZoom(true);
       }
       viewer.addHandler("zoom", (evt) => {
-        recordStore.viewerZoom = evt.zoom;
+        console.log("storing zoom", evt.zoom);
+        Records.viewerZoom = evt.zoom;
       });
     });
 
     watch(
-      () => recordStore.currentPageId,
+      () => Records.currentState.currentPageId,
       () => loadPage(),
     );
 
@@ -241,7 +241,6 @@ export default defineComponent({
       changePage,
       changeSplitView,
       changeDrawerMini,
-      recordStore,
       minZoomLevel,
       maxZoomLevel,
       navPosition,
@@ -251,11 +250,11 @@ export default defineComponent({
       tbVertAlt,
       viewerHeight,
       viewerWidth,
-      view,
       zoom,
       expandNav,
       expandTools,
       drawerButtonClasses,
+      Records,
     };
   },
 });

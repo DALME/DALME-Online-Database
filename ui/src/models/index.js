@@ -1,4 +1,7 @@
+export { Field } from "./options";
+export { Metadata } from "./metadata";
 export { CustomModel, CustomRepository } from "./custom";
+export { Preferences } from "./preference";
 export { Groups } from "./group";
 export { Users } from "./user";
 export { Attributes } from "./attribute";

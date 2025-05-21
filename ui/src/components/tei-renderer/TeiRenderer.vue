@@ -9,7 +9,8 @@ import CETEI from "CETEIcean";
 import { computed, defineComponent, nextTick, ref, useTemplateRef, watch } from "vue";
 
 import { AdaptiveSpinner } from "@/components";
-import { useConstants, useStores } from "@/use";
+import { Records } from "@/models";
+import { useConstants } from "@/use";
 
 import { idaTeiBehaviours } from "./behaviours.js";
 
@@ -24,7 +25,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { currentPageData } = useStores();
     const { teiSelectors } = useConstants();
     const teiContainer = useTemplateRef("rendered-tei");
     const hasBraces = ref(false);
@@ -42,8 +42,8 @@ export default defineComponent({
     const teiDoc = computed(() => {
       const transcription = props.text
         ? props.text
-        : currentPageData.value.tei
-          ? currentPageData.value.tei
+        : Records.editorContent
+          ? Records.editorContent
           : "";
       return `<TEI xmlns="http://www.tei-c.org/ns/1.0">\
                   <text>\
@@ -289,8 +289,11 @@ export default defineComponent({
     // },
 
     watch(
-      () => currentPageData.value.tei,
-      () => generateTei(),
+      () => Records.editorContent,
+      () => {
+        console.log("TEI RENDERER", Records.editorContent, props.text, teiDoc.value);
+        generateTei();
+      },
       { immediate: true },
     );
 

@@ -4,8 +4,8 @@ import clipboard from "./clipboard";
 import comments from "./comments";
 import CRUD from "./crud";
 import editor from "./editor";
+import ORM from "./orm";
 import records from "./records";
-import settings from "./settings";
 import tasks from "./tasks";
 import tickets from "./tickets";
 import transcriptions from "./transcriptions";
@@ -15,17 +15,17 @@ import workflow from "./workflow";
 const notifier = {
   attributes,
   auth,
-  comments,
   clipboard,
+  comments,
   CRUD,
+  editor,
+  ORM,
   records,
-  settings,
   tasks,
   tickets,
   transcriptions,
   users,
   workflow,
-  editor,
 };
 
 export default notifier;

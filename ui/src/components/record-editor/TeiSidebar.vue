@@ -1,6 +1,6 @@
 <template>
   <transition name="collapse">
-    <div v-if="view.showTagMenu" :style="`height: ${editorHeight + 1}px`" class="col tag-menu">
+    <div v-if="Records.showTagMenu" :style="`height: ${editorHeight + 1}px`" class="col tag-menu">
       <q-input
         v-model="elementFilter"
         autocapitalize="off"
@@ -66,12 +66,13 @@
 <script>
 import { computed, defineComponent, inject, ref } from "vue";
 
+import { Records } from "@/models";
 import { useStores } from "@/use";
 
 export default defineComponent({
   name: "TeiSidebar",
   setup() {
-    const { editorStore, view } = useStores();
+    const { editorStore } = useStores();
     const { editorHeight } = inject("editorDimensions");
     const elementFilter = ref("");
     const teiElements = computed(() => editorStore.elements(elementFilter.value));
@@ -80,7 +81,7 @@ export default defineComponent({
       editorHeight,
       elementFilter,
       teiElements,
-      view,
+      Records,
     };
   },
 });

@@ -2,7 +2,7 @@
   <div class="bg-grey-2 q-px-sm row justify-between items-center">
     <div class="column q-pt-xs">
       <q-tabs
-        v-model="currentPageData.editorTab"
+        v-model="Records.editorTab"
         @update:model-value="onTabSwitch"
         active-bg-color="white"
         active-color="light-blue-10"
@@ -26,13 +26,13 @@
         leave-active-class="animated slideOutRight"
         appear
       >
-        <ToolBar v-show="currentPageData.editorTab === 'edit'" />
+        <ToolBar v-show="Records.editorTab === 'edit'" />
       </transition>
     </div>
   </div>
   <q-separator />
   <q-tab-panels
-    v-model="currentPageData.editorTab"
+    v-model="Records.editorTab"
     :style="`height: ${editorHeight}px;`"
     class="editor-panel text-body2"
     animated
@@ -71,7 +71,8 @@ import {
 } from "vue";
 
 import { TeiRenderer } from "@/components";
-import { useEventHandling, useStores } from "@/use";
+import { Preferences, Records } from "@/models";
+import { useConstants, useEventHandling } from "@/use";
 
 import {
   createEditorState,
@@ -95,22 +96,21 @@ export default defineComponent({
     ToolBar,
   },
   setup() {
-    const { currentPageData, view, preferences, settings } = useStores();
     const { eventBus } = useEventHandling();
     const { editorHeight, editorWidth } = inject("editorDimensions");
-    const disabled = computed(() => isEmpty(currentPageData.value.tei));
+    const disabled = computed(() => isEmpty(Records.editorContent));
     const currentInstance = getCurrentInstance();
     const { editorState, editorView, editorTools } = inject("editorControl");
     const container = shallowRef();
+    const { themeOptions } = useConstants();
 
     const currentTheme = computed(() =>
-      preferences.value.theme.value ? themes[preferences.value.theme.value] : themes["oneDark"],
+      Preferences.get("theme") ? themes[Preferences.get("theme")] : themes["oneDark"],
     );
 
-    const editorBackground = computed(() => {
-      const themeOpts = settings.getOptions("theme");
-      return themeOpts.find((x) => x.value == preferences.value.theme.value).bg;
-    });
+    const editorBackground = computed(
+      () => themeOptions.find((x) => x.value == Preferences.get("theme")).bg,
+    );
 
     // editorView.value.updateState: 0 = Idle, 1 = Measuring, 2 = Updating
     const updateTag = (changes) => {
@@ -132,8 +132,8 @@ export default defineComponent({
       console.log("Editor blur:");
     };
     const onEditorChange = (newDoc, _update) => {
-      if (newDoc !== currentPageData.value.tei) {
-        currentPageData.value.tei = newDoc;
+      if (newDoc !== Records.editorContent) {
+        Records.editorContent = newDoc;
       }
     };
 
@@ -143,12 +143,12 @@ export default defineComponent({
       console.log("generating extensions");
       const payload = [];
       payload.push(currentTheme.value);
-      if (preferences.value.visualTags.value) {
+      if (Preferences.get("visualTags")) {
         payload.push(tagPlugin);
       }
-      if (preferences.value.lineNumbers.value) payload.push(lineNumbers());
-      if (preferences.value.lineWrapping.value) payload.push(EditorView.lineWrapping);
-      if (preferences.value.editorTooltips.value) {
+      if (Preferences.get("lineNumbers")) payload.push(lineNumbers());
+      if (Preferences.get("lineWrapping")) payload.push(EditorView.lineWrapping);
+      if (Preferences.get("editorTooltips")) {
         payload.push(
           tooltips({
             position: "absolute",
@@ -156,11 +156,11 @@ export default defineComponent({
           }),
         );
       }
-      if (preferences.value.autoCompletion.value) {
+      if (Preferences.get("autoCompletion")) {
         payload.push(autocompletion({ override: [getCompletions] }));
       }
-      if (preferences.value.highlightSelection.value) payload.push(highlightSelectionMatches());
-      if (preferences.value.allowMultipleSelections.value) {
+      if (Preferences.get("highlightSelection")) payload.push(highlightSelectionMatches());
+      if (Preferences.get("allowMultipleSelections")) {
         payload.push(EditorState.allowMultipleSelections.of(true));
       }
       return payload;
@@ -169,7 +169,7 @@ export default defineComponent({
     const style = computed(() => ({
       height: `${editorHeight}px`,
       width: `${editorWidth}px`,
-      "font-size": `${preferences.value.fontSize.value}px`,
+      "font-size": `${Preferences.get("fontSize")}px`,
     }));
 
     const updateEditorRendering = () => {
@@ -185,7 +185,7 @@ export default defineComponent({
       console.log("switch tab to:", value);
       if (value === "preview") {
         if (!isNil(editorView.value)) {
-          currentPageData.value.tei = editorTools.value.getDoc();
+          Records.editorContent = editorTools.value.getDoc();
           destroyEditorView(editorView.value);
         }
       } else {
@@ -321,17 +321,17 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      console.log("TEIEDITOR mounted", currentPageData.value.editorTab);
+      console.log("TEIEDITOR mounted", Records.editorTab);
       if (isNil(editorState.value)) {
         editorState.value = createEditorState({
-          doc: currentPageData.value.tei,
+          doc: Records.editorContent,
           onUpdate: onEditorUpdate,
           onChange: onEditorChange,
           onFocus: onEditorFocus,
           onBlur: onEditorBlur,
         });
       }
-      if (currentPageData.value.editorTab === "edit") {
+      if (Records.editorTab === "edit") {
         nextTick(loadEditor);
       }
     });
@@ -356,7 +356,7 @@ export default defineComponent({
     });
 
     watch(
-      () => currentPageData.value.tei,
+      () => Records.editorContent,
       (newValue) => {
         if (!isNil(editorView.value) && newValue !== editorTools.value.getDoc()) {
           editorTools.value.setDoc(newValue);
@@ -418,13 +418,12 @@ export default defineComponent({
 
     return {
       container,
-      currentPageData,
       disabled,
       editorHeight,
       editorWidth,
       onTabSwitch,
-      view,
       editorBackground,
+      Records,
     };
   },
 });

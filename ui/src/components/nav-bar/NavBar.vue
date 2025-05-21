@@ -153,14 +153,14 @@
         <q-space />
 
         <q-btn
-          @click="preferences.tooltipsOn.value = !preferences.tooltipsOn.value"
-          :class="{ 'bg-green-1': preferences.tooltipsOn.value }"
+          @click="Preferences.set('tooltipsOn', !Preferences.get('tooltipsOn'))"
+          :class="{ 'bg-green-1': Preferences.get('tooltipsOn') }"
           :icon="
-            preferences.tooltipsOn.value
+            Preferences.get('tooltipsOn')
               ? 'mdi-tooltip-remove-outline'
               : 'mdi-tooltip-check-outline'
           "
-          :text-color="preferences.tooltipsOn.value ? 'green-7' : 'grey-7'"
+          :text-color="Preferences.get('tooltipsOn') ? 'green-7' : 'grey-7'"
           class="mc-button"
           size="12px"
         >
@@ -199,6 +199,7 @@ import { computed, defineComponent, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { ToolTip } from "@/components";
+import { Preferences } from "@/models";
 import { navRoutes } from "@/router";
 import { useStores } from "@/use";
 import { nully } from "@/utils";
@@ -280,6 +281,7 @@ export default defineComponent({
       nully,
       ongoingEdit,
       showInfoAreaToggle,
+      Preferences,
     };
   },
 });

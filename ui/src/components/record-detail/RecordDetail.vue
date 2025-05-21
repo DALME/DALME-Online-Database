@@ -7,9 +7,9 @@
             <div class="column">
               <div class="row items-center text-h5">
                 <template v-if="!loading">
-                  {{ recordStore.current.name }}
+                  {{ Records.current.name }}
                   <TagPill
-                    v-if="recordStore.current.workflow.isPublic"
+                    v-if="Records.current.workflow.isPublic"
                     class="q-ml-md q-mt-xs"
                     colour="green-1"
                     module="standalone"
@@ -24,22 +24,22 @@
                 <template v-if="!loading">
                   <span>
                     Created on
-                    {{ formatDate(recordStore.current.creationTimestamp, "DATETIME_AT") }} by
+                    {{ formatDate(Records.current.creationTimestamp, "DATETIME_AT") }} by
                   </span>
                   <UserPill
                     :show-avatar="false"
-                    :user="recordStore.current.creationUser"
+                    :user="Records.current.creationUser"
                     text-size="12px"
                     inline
                   />
                   <span
                     >, last modified on
-                    {{ formatDate(recordStore.current.modificationTimestamp, "DATETIME_AT") }}
+                    {{ formatDate(Records.current.modificationTimestamp, "DATETIME_AT") }}
                     by
                   </span>
                   <UserPill
                     :show-avatar="false"
-                    :user="recordStore.current.modificationUser"
+                    :user="Records.current.modificationUser"
                     text-size="12px"
                     inline
                   />
@@ -51,7 +51,7 @@
         </transition>
         <div class="row">
           <q-tabs
-            v-model="recordStore.tab"
+            v-model="Records.tab"
             active-class="active-tab"
             align="left"
             class="bg-white text-grey-8 tab-container"
@@ -63,14 +63,14 @@
             <q-tab icon="o_info" label="Info" name="info" />
             <template v-if="!loading">
               <q-tab
-                v-if="recordStore.current.pages.length > 0"
+                v-if="Records.pageCount > 0"
                 class="side-tab"
                 icon="o_import_contacts"
                 label="Folios"
                 name="pages"
               >
                 <q-badge
-                  :label="recordStore.current.pages.length"
+                  :label="Records.pageCount"
                   class="text-grey-8 q-mx-xs"
                   color="indigo-1"
                   rounded
@@ -92,8 +92,8 @@
               </q-tab>
               <q-tab icon="o_forum" label="Discussion & Activity" name="comments">
                 <q-badge
-                  v-if="recordStore.current.commentCount > 0"
-                  :label="recordStore.current.commentCount"
+                  v-if="Records.current.commentCount > 0"
+                  :label="Records.current.commentCount"
                   class="text-indigo-1 q-mx-xs"
                   color="indigo-5"
                   rounded
@@ -110,21 +110,17 @@
             <div class="row q-mr-sm">
               <BooleanValue
                 :only-true="true"
-                :value="recordStore.current.workflow.helpFlag"
+                :value="Records.current.workflow.helpFlag"
                 class="q-ml-xs"
                 true-colour="red-4"
                 true-icon="flag"
               />
             </div>
-            <WorkflowManager
-              v-if="auth.user.isSuperuser"
-              @state-changed="updateWorkflow"
-              :data="recordStore.current.workflow"
-            />
+            <WorkflowManager v-if="auth.user.isSuperuser" :data="Records.current.workflow" />
             <q-btn
-              v-if="showEditBtn"
+              v-if="Records.showEditBtn"
               @click="eventBus.emit('toggleEditor')"
-              :icon="editOn ? 'mdi-pencil-off' : 'mdi-pencil'"
+              :icon="Records.editOn ? 'mdi-pencil-off' : 'mdi-pencil'"
               class="bg-grey-2 q-ml-xs"
               size="sm"
               text-color="grey-7"
@@ -138,7 +134,7 @@
     <div class="row q-pt-sm content-container-row">
       <div class="col content-container">
         <template v-if="!loading">
-          <q-tab-panels v-model="recordStore.tab" animated keep-alive>
+          <q-tab-panels v-model="Records.tab" animated keep-alive>
             <q-tab-panel class="q-pt-none q-px-none" name="info">
               <div class="col-9 q-pr-lg q-pt-md">
                 <div class="row no-wrap">
@@ -150,46 +146,49 @@
                       pad-container-list
                     >
                       <InputField
-                        :id="recordStore.current.id"
-                        :repository="recordStore.Records"
+                        :id="Records.current.id"
+                        :repository="Records"
                         field="name"
                         label="Name"
                       />
                       <InputField
-                        :id="recordStore.current.id"
-                        :repository="recordStore.Records"
+                        :id="Records.current.id"
+                        :repository="Records"
                         field="shortName"
                         label="Short name"
                       />
                       <SelectField
-                        :id="recordStore.current.id"
-                        :repository="recordStore.Records"
+                        :id="Records.current.id"
+                        :repository="Records"
                         field="ownerId"
                         label="Owner"
                       />
                     </DetailCard>
                     <MarkdownField
-                      :id="recordStore.current.attributes.find((x) => x.name === 'description').id"
+                      :id="descriptionId"
+                      :creating="descriptionId ? false : true"
                       :repository="Attributes"
                       class="q-mt-md"
                       icon="subject"
+                      label="Description"
+                      placeholder="This record has no description."
                     />
                     <DetailCard
-                      v-if="recordStore.current.pages.length > 0"
-                      @value-changed="onValueChange"
+                      v-if="Records.pageCount > 0"
                       class="q-mt-md"
                       icon="auto_stories"
                       title="Folios"
                       show-filter
                     >
-                      <RecordPages :pages="recordStore.current.pages" />
+                      <RecordPages :pages="Records.current.pages" />
                     </DetailCard>
                   </div>
                   <div class="col-6">
                     <AttributesCard
-                      :id="recordStore.current.id"
+                      :id="Records.current.id"
                       :exclusions="['description']"
-                      :repository="recordStore.Records"
+                      :order="attributesOrder"
+                      :repository="Records"
                     />
                   </div>
                 </div>
@@ -202,22 +201,20 @@
             <q-tab-panel class="q-pt-none q-px-none" name="entities">
               <div class="col-9 q-pr-sm">
                 <DetailCard
-                  v-if="recordStore.current.agents.length > 0"
-                  @value-changed="onValueChange"
+                  v-if="Records.current.agents.length > 0"
                   class="q-mt-md"
                   icon="people"
                   title="Agents"
                   show-filter
                 >
-                  <RecordAgents :agents="recordStore.current.agents" />
+                  <RecordAgents :agents="Records.current.agents" />
                 </DetailCard>
 
                 <DetailCard
-                  v-if="recordStore.current.places.length > 0"
-                  @value-changed="onValueChange"
+                  v-if="locations.length > 0"
                   class="q-mt-md"
                   icon="mdi-map-marker"
-                  title="Places"
+                  title="Locations"
                   show-filter
                 >
                   <RecordPlaces :places="recordStore.current.places" />
@@ -228,7 +225,7 @@
             <q-tab-panel class="q-pt-md q-px-lg" name="comments">
               <CommentBox
                 @on-count-changed="updateCommentCount"
-                :worklog="recordStore.current.workflow.workLog"
+                :worklog="Records.current.workflow.workLog"
               />
             </q-tab-panel>
           </q-tab-panels>
@@ -247,11 +244,12 @@
       <div v-if="!loading && Records.tab !== 'pages'" class="col-3 q-pl-md q-pt-md">
         <SidebarItem :content="Records.current.id" label="Unique Id" clipboard />
         <SelectField
-          :id="recordStore.current.id"
-          :repository="recordStore.Records"
+          :id="Records.current.id"
+          :repository="Records"
           chip-icon="mdi-folder-outline"
           field="collectionIds"
           label="Collections"
+          placeholder="Not included in any collection."
           multiple
           sidebar
         />
@@ -261,11 +259,11 @@
               <UserPill
                 :bold="false"
                 :show-avatar="false"
-                :user="recordStore.current.creationUser"
+                :user="Records.current.creationUser"
                 text-size="13px"
               />
               <div class="text-detail text-grey-7 text-weight-medium">
-                {{ formatDate(recordStore.current.creationTimestamp, "DATETIME_AT") }}
+                {{ formatDate(Records.current.creationTimestamp, "DATETIME_AT") }}
               </div>
             </div>
           </template>
@@ -276,11 +274,11 @@
               <UserPill
                 :bold="false"
                 :show-avatar="false"
-                :user="recordStore.current.modificationUser"
+                :user="Records.current.modificationUser"
                 text-size="13px"
               />
               <div class="text-detail text-grey-7 text-weight-medium">
-                {{ formatDate(recordStore.current.modificationTimestamp, "DATETIME_AT") }}
+                {{ formatDate(Records.current.modificationTimestamp, "DATETIME_AT") }}
               </div>
             </div>
           </template>
@@ -291,13 +289,10 @@
 </template>
 
 <script>
-import { snakeCase } from "change-case";
 import { useMeta, useQuasar } from "quasar";
-import { isEmpty, isNil, filter as rFilter } from "ramda";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 
-import { requests } from "@/api";
 import {
   AdaptiveSpinner,
   AttributesCard,
@@ -312,12 +307,10 @@ import {
   WorkflowManager,
 } from "@/components";
 import { InputField, MarkdownField, SelectField } from "@/components/fields";
-import { Attributes } from "@/models";
-import { attributeSchema, recordDetailSchema, workflowSchema } from "@/schemas";
-import { useAPI, useEventHandling, useStores } from "@/use";
-import { formatDate, getColumns, isObject, nully } from "@/utils";
+import { Attributes, Records } from "@/models";
+import { useEventHandling, useStores } from "@/use";
+import { formatDate, getColumns, nully } from "@/utils";
 
-import { metadata } from "./metadata";
 import { columnMap } from "./pageColumns";
 import RecordAgents from "./RecordAgents.vue";
 import RecordPages from "./RecordPages.vue";
@@ -346,156 +339,71 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const $route = useRoute();
-    const { eventBus, notifier } = useEventHandling();
-    const { apiInterface } = useAPI();
-    const { auth, ui, view, views, showEditBtn, showInfoArea, editOn, recordStore } = useStores();
-    const { success, data, fetchAPI } = apiInterface();
+    const { eventBus } = useEventHandling();
+    const { auth, ui, showInfoArea } = useStores();
     const id = ref($route.params.id);
     const pageColumns = ref(getColumns(columnMap));
-    const refRegister = ref({});
     const loading = ref(true);
 
     const cardWidth = computed(() => {
       return "200";
     });
 
-    const sidebarData = computed(() =>
-      addMetadata([
-        ["id", recordStore.current.id],
-        ["mk1Identifier", recordStore.current.attr("mk1Identifier")],
-        ["mk2Identifier", recordStore.current.attr("mk2Identifier")],
-        ["altIdentifier", recordStore.current.attr("altIdentifier")],
-      ]),
-    );
+    const descriptionId = computed(() => {
+      const descAttr = Records.current.attributes.find((x) => x.name === "description");
+      return descAttr ? descAttr.id : null;
+    });
 
-    const infoCardData = computed(() =>
-      addMetadata([
-        ["name", recordStore.current.name],
-        ["shortName", recordStore.current.shortName],
-        ["recordType", recordStore.current.attr("recordType")],
-        ["hasInventory", recordStore.current.attr("hasInventory")],
-        ["parent", recordStore.current.parent],
-        ["owner", recordStore.current.owner],
-        ["date", recordStore.current.attr("date")],
-        ["startDate", recordStore.current.attr("startDate")],
-        ["endDate", recordStore.current.attr("endDate")],
-        ["language", recordStore.current.attr("language")],
-        ["locale", recordStore.current.attr("locale")],
-        ["debtPhrase", recordStore.current.attr("debtPhrase")],
-        ["debtAmount", recordStore.current.attr("debtAmount")],
-        ["debtUnit", recordStore.current.attr("debtUnit")],
-        ["debtUnitSource", recordStore.current.attr("debtUnitSource")],
-        ["debtSource", recordStore.current.attr("debtSource")],
-      ]),
-    );
+    const locations = computed(() => {
+      const locales = Records.current.attributes.filter((x) => x.name === "locale");
+      const places = Records.current.places;
+      let locs = [];
+      console.log("locale attr", locales, places);
+      if (locales.length > 0) locs = locs.concat(locales);
+      if (places.length > 0) locs = locs.concat(places);
+      return locs.length > 0 ? locs : null;
+    });
 
-    const descriptionData = computed(() =>
-      addMetadata([["description", recordStore.current.attr("description")]]),
-    );
-
-    const addMetadata = (fields) =>
-      rFilter((x) => !isNil(x[1]) && !isEmpty(x[1]), fields).map(([k, v], i) =>
-        isObject(v)
-          ? Object.assign({ field: k, order: i }, metadata[k], v)
-          : Object.assign({ field: k, value: v, order: i }, metadata[k]),
-      );
+    const attributesOrder = [
+      "recordType",
+      "hasInventory",
+      "mk1Identifier",
+      "mk2Identifier",
+      "altIdentifier",
+      "date",
+      "startDate",
+      "endDate",
+      "language",
+      "locale",
+      "debtPhrase",
+      "debtAmount",
+      "debtUnit",
+      "debtUnitSource",
+      "debtSource",
+    ];
 
     const entityCount = computed(
-      () => recordStore.current.agents.length + recordStore.current.places.length,
+      () => Records.current.agents.length + Records.current.places.length,
     );
 
     useMeta(() => ({
-      title: !nully(view.value.recordData)
-        ? view.value.recordData.name.value
-        : `Record ${id.value}`,
+      title: !nully(Records.current) ? Records.current.name : `Record ${id.value}`,
     }));
 
     const updateCommentCount = (cnt) => {
-      view.value.commentCount = cnt;
-    };
-
-    const registerComponent = (name, reference) => {
-      console.log("Register component", name, reference);
-      if (reference) {
-        refRegister.value[name] = reference;
-      }
-    };
-
-    const updateWorkflow = async (newState) => {
-      await fetchAPI(requests.workflow.changeState(id.value, newState));
-      if (success.value) {
-        await workflowSchema.validate(data.value, { stripUnknown: false }).then((value) => {
-          view.value.workflowData = value;
-        });
-      } else {
-        notifier.workflow.updateFailed();
-      }
-    };
-
-    const editHandlers = (payload) => {
-      if (payload.source === "attribute") {
-        const request = payload.update
-          ? requests.attributes.updateValue(payload.id, payload.value)
-          : requests.records.addAttribute(id.value, snakeCase(payload.name), payload.value);
-        const notifier = (name) =>
-          payload.update
-            ? notifier.attributes.updateFailed(name)
-            : notifier.records.addAttributeFailed(name);
-        const handler = (name, value, _restore) =>
-          (view.value.recordData[name] = Object.assign(view.value.recordData[name], value));
-        const schema = attributeSchema;
-        return { request, notifier, handler, schema };
-      } else {
-        const request =
-          payload.source === "field"
-            ? requests.records.editRecord(
-                id.value,
-                { [snakeCase(payload.name)]: payload.value },
-                true,
-              )
-            : requests.records.updateRelated(
-                id.value,
-                snakeCase(payload.name),
-                isObject(payload.value) ? payload.value.value : payload.value,
-              );
-        const notifier = (name) => notifier.records.fieldUpdateFailed(name);
-        const handler = (name, value, _restore) =>
-          (view.value.recordData[name].value = _restore ? value : value[name]);
-        const schema = recordDetailSchema;
-        return { request, notifier, handler, schema };
-      }
-    };
-
-    const onValueChange = async (payload) => {
-      console.log("onValueChange", payload);
-      refRegister.value[payload.name].saving = true;
-      const handlers = editHandlers(payload);
-
-      await fetchAPI(handlers.request);
-      if (success.value) {
-        await handlers.schema.validate(data.value, { stripUnknown: false }).then((value) => {
-          handlers.handler(payload.name, value, false);
-          refRegister.value[payload.name].saving = false;
-        });
-      } else {
-        handlers.notifier(payload.name);
-        handlers.handler(payload.name, payload.oldValue, true);
-        refRegister.value[payload.name].saving = false;
-      }
+      Records.current.commentCount = cnt;
     };
 
     watch(
       () => $route.params.id,
       async (to) => {
-        console.log("RECORD DETAIL WATCHER");
         if (to) {
           loading.value = true;
           ui.resetBreadcrumbTail();
-          await recordStore.setCurrent(to);
-          id.value = recordStore.current.id;
-          ui.breadcrumbTail.push(recordStore.current.shortName);
+          await Records.setCurrent(to);
+          id.value = Records.current.id;
+          ui.breadcrumbTail.push(Records.current.shortName);
           loading.value = false;
-          window.testRS = recordStore;
         }
       },
       { immediate: true, flush: "post" },
@@ -506,7 +414,7 @@ export default defineComponent({
     provide("pageColumns", pageColumns);
 
     onBeforeRouteLeave(() => {
-      if (views.hasChanges) {
+      if (Records.hasChanges) {
         return new Promise((resolve) => {
           $q.dialog({
             component: CustomDialog,
@@ -532,26 +440,20 @@ export default defineComponent({
     });
 
     return {
-      updateCommentCount,
-      view,
-      ui,
-      updateWorkflow,
+      Attributes,
+      attributesOrder,
       auth,
-      registerComponent,
-      onValueChange,
-      showInfoArea,
+      cardWidth,
+      descriptionId,
       entityCount,
-      showEditBtn,
-      editOn,
       eventBus,
       formatDate,
       loading,
-      recordStore,
-      sidebarData,
-      infoCardData,
-      descriptionData,
-      cardWidth,
-      Attributes,
+      locations,
+      Records,
+      showInfoArea,
+      ui,
+      updateCommentCount,
     };
   },
 });

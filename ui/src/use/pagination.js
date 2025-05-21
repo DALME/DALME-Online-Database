@@ -2,14 +2,13 @@ import { equals, isEmpty } from "ramda";
 import S from "string";
 import { computed, ref, unref, watch } from "vue";
 
-import { useSettingsStore } from "@/stores/settings";
+import { Preferences } from "@/models";
 import { addToList, isInList, isObject, nully, removeFromList } from "@/utils";
 
 const transformField = (field) => S(field).underscore().s;
 
 export const usePagination = (fetchData, listName, defaults, embedded = false) => {
-  const settings = useSettingsStore();
-  const lists = settings.preferences.listPreferences.value;
+  const lists = Preferences.get("listPreferences");
 
   if (nully(lists[listName])) {
     lists[listName] = {

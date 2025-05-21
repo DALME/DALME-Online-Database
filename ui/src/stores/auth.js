@@ -13,7 +13,6 @@ import { API as apiInterface, requests } from "@/api";
 import { router as $router } from "@/router";
 import { userSchema } from "@/schemas";
 import { useUiStore } from "@/stores/ui";
-import { useViewStore } from "@/stores/views";
 import { useStoreMachine } from "@/use";
 
 const AUTHORIZATION_CALLBACK_URL = "api/oauth/authorize/callback/";
@@ -428,7 +427,6 @@ export const useAuthStore = defineStore(
     const logout = () => {
       actor.send({ type: "LOGOUT" });
       ui.$reset();
-      views.$reset();
     };
 
     watch(
@@ -457,7 +455,6 @@ export const useAuthStore = defineStore(
 
     // TODO: Decomplect these.
     const ui = useUiStore();
-    const views = useViewStore();
 
     return {
       accessToken,

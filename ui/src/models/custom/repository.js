@@ -1,11 +1,18 @@
-import { snakeCase } from "change-case";
-import { Repository } from "pinia-orm";
+import { kebabCase, snakeCase } from "change-case";
+import { Repository, useRepo } from "pinia-orm";
 import { isEmpty, isNil } from "ramda";
 
 import { API as apiInterface, requestOptions } from "@/api";
+import { Field, Metadata } from "@/models";
+import notifier from "@/notifier";
 import { contentTypeSchema, optionListSchema } from "@/schemas";
 
 import CustomQuery from "./query";
+
+const FieldRepo = useRepo(Field);
+const MetadataRepo = useRepo(Metadata);
+
+window.testFieldRepo = FieldRepo;
 
 export default class CustomRepository extends Repository {
   queue = [];
@@ -51,14 +58,19 @@ export default class CustomRepository extends Repository {
 
   save(records) {
     return new Promise((resolve) => {
-      console.log("called save on", this, records);
+      // console.log("called save on", this, records);
       if (this.autoFields) {
         let [data, entities] = this.query().normalize(records);
         if (!Array.isArray(data)) data = [data];
-        Promise.all(data.map((x) => this.processAutoFields(x))).then(() => {
-          this.query().saveEntities(entities);
-          resolve(this.revive(data));
-        });
+        Promise.all(data.map((x) => this.processAutoFields(x)))
+          .then(() => {
+            this.query().saveEntities(entities);
+            resolve(this.revive(data));
+          })
+          .catch((error) => {
+            notifier.ORM.error(`Unable to save ${this.entity}: ${error}`);
+            resolve(null);
+          });
       } else {
         // console.log("no autoFields, saving", this.entity);
         resolve(this.query().save(records));
@@ -68,17 +80,23 @@ export default class CustomRepository extends Repository {
 
   create(records) {
     console.log("called create on", this.entity);
-    return this.remoteCreate(records);
+    return this.remoteCreate(records).catch((error) => {
+      notifier.ORM.error(`Unable to create ${this.entity}: ${error}`);
+    });
   }
 
   update(id, payload) {
     console.log("called update on", this.entity);
-    return this.remoteUpdate(id, payload);
+    return this.remoteUpdate(id, payload).catch((error) => {
+      notifier.ORM.error(`Unable to update ${this.entity}: ${error}`);
+    });
   }
 
   destroy(ids) {
     console.log("called destroy on", this.entity);
-    return this.remoteDestroy(ids);
+    return this.remoteDestroy(ids).catch((error) => {
+      notifier.ORM.error(`Unable to delete ${this.entity}: ${error}`);
+    });
   }
 
   processAutoFields(record) {
@@ -88,7 +106,9 @@ export default class CustomRepository extends Repository {
         // console.log("autoField", this.entity, record.id, property);
         return this.autoFields[property].ensure(record[property]);
       }),
-    );
+    ).catch((error) => {
+      notifier.ORM.error(`Unable to process autoFields for ${this.entity}: ${error}`);
+    });
   }
 
   ensure(ids) {
@@ -106,21 +126,36 @@ export default class CustomRepository extends Repository {
     );
   }
 
-  options(field) {
+  options(field, originator = this.entity) {
     if (!field) return Promise.resolve(null);
     return new Promise((resolve) => {
-      if (field in this.store.options) resolve(this.store.options[field]);
-      this.retrieveOptions(field).then((response) => {
-        this.store.options[field] = response;
-        resolve(response);
-      });
+      const stored = FieldRepo.withAll().where("field", field).where("model", originator).get();
+      if (stored.length > 0) {
+        resolve(stored[0].options);
+      } else {
+        this.retrieveOptions(field, originator)
+          .then((response) => resolve(response))
+          .catch((error) => {
+            notifier.CRUD.failure(`Unable to retrieve options for ${this.entity}: ${error}`);
+            resolve(null);
+          });
+      }
     });
   }
 
   meta() {
     return new Promise((resolve) => {
-      if (!isEmpty(this.store.meta)) resolve(this.store.meta);
-      this.retrieveMetadata().then(() => resolve(this.store.meta));
+      const stored = MetadataRepo.withAll().where("entity", this.entity).get();
+      if (stored.length > 0) {
+        resolve(stored[0]);
+      } else {
+        this.retrieveMetadata()
+          .then((data) => resolve(data))
+          .catch((error) => {
+            notifier.CRUD.failure(`Unable to retrieve metadata for ${this.entity}: ${error}`);
+            resolve(null);
+          });
+      }
     });
   }
 
@@ -166,22 +201,26 @@ export default class CustomRepository extends Repository {
 
   // remote calls
   remoteCall(request, schema, action = this.save.bind(this)) {
-    return new Promise((resolve) => {
-      const { success, data, fetchAPI } = apiInterface();
+    return new Promise((resolve, reject) => {
+      const { success, data, error, fetchAPI } = apiInterface();
       fetchAPI(request).then(() => {
         if (success.value) {
-          console.log("validating...", data.value);
+          // console.log("validating...", data.value, schema, action);
           schema.validate(this.processResponse(data.value)).then((validated) => {
             action(validated).then((result) => {
               resolve(result);
             });
           });
+        } else {
+          reject(error.value);
         }
       });
     });
   }
 
-  remoteRetrieve(id) {
+  remoteRetrieve(id = null) {
+    console.log("REMOTE RETRIEVE", this.entity);
+    if (isNil(id)) return this.remoteCall(this.requests.list(), this.schema.list);
     return this.remoteCall(this.requests.get(id), this.schema.instance);
   }
 
@@ -197,31 +236,40 @@ export default class CustomRepository extends Repository {
 
   remoteDestroy(id) {
     console.log("Remote destroy", this.entity, id);
-    const action = (ids) => this.query().destroy(ids);
-    return this.remoteCall(this.requests.destroy(id), this.schema.instance, action);
+    return this.remoteCall(this.requests.destroy(id), this.schema.instance, (ids) =>
+      this.query().destroy(ids),
+    );
   }
 
-  retrieveOptions(field) {
-    return new Promise((resolve) => {
-      const { success, data, fetchAPI } = apiInterface();
-      fetchAPI(requestOptions(snakeCase(field), true, this.entity)).then(() => {
-        if (success.value) {
-          optionListSchema.validate(data.value, { stripUnknown: false }).then((validated) => {
-            resolve(validated);
-          });
-        } else {
-          resolve(null);
-        }
-      });
-    });
+  retrieveOptions(field, originator) {
+    console.log("retrieve options", this.entity, field);
+    return this.remoteCall(
+      requestOptions(snakeCase(field), true, this.entity),
+      optionListSchema,
+      (data) =>
+        new Promise((resolve) => {
+          const fieldRecord = FieldRepo.save({ field: field, model: originator, options: data });
+          resolve(fieldRecord.options);
+        }),
+    );
   }
 
   retrieveMetadata() {
-    const action = (data) => {
-      this.store.attributeTypes = data.attributeTypes;
-      this.store.contentType = data.id;
-    };
-    return this.remoteCall(this.requests.metadata(), contentTypeSchema, action);
+    console.log("retrieveMetadata", this.entity);
+    return this.remoteCall(
+      this.requests.metadata(),
+      contentTypeSchema,
+      (data) =>
+        new Promise((resolve) => {
+          resolve(
+            MetadataRepo.save({
+              contentType: data.id,
+              entity: kebabCase(data.name),
+              attributeTypes: data.attributeTypes,
+            }),
+          );
+        }),
+    );
   }
 
   // compatibility methods so that CustomRepository instances

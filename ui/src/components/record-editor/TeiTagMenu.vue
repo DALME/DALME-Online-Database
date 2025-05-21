@@ -105,7 +105,6 @@ import { groupBy, prop, filter as rFilter } from "ramda";
 import { computed, defineComponent, onMounted, ref, useTemplateRef, watch } from "vue";
 
 import { CustomIcon, ToolTip } from "@/components";
-import { useSettingsStore } from "@/stores/settings";
 import { nully } from "@/utils";
 
 export default defineComponent({
@@ -142,7 +141,6 @@ export default defineComponent({
   },
   emits: ["update", "insert"],
   setup(props, ctx) {
-    const settings = useSettingsStore();
     const menu = useTemplateRef("tag-menu");
     const isCompound = props.elData.compound;
     const icon = props.tagData.icon || props.elData.icon;
@@ -275,7 +273,6 @@ export default defineComponent({
       deleteTag,
       saveTag,
       cancelTag,
-      settings,
       icon,
       data,
       okButtonLabel,

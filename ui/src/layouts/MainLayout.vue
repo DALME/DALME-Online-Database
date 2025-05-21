@@ -27,6 +27,7 @@ import { computed, defineComponent, onMounted, provide, ref, useTemplateRef, wat
 import { useRoute } from "vue-router";
 
 import { AppDrawer, LoginModal, NavBar, UserDrawer } from "@/components";
+import { Preferences } from "@/models";
 import { provideAPI, provideEventHandling, provideStores, provideTransport } from "@/use";
 
 export default defineComponent({
@@ -39,11 +40,11 @@ export default defineComponent({
   },
   setup() {
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
-    const { auth, ui, settings, userDrawerOpen, appDrawerOpen } = provideStores();
+    const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
     const pageBackdrop = useTemplateRef("page-backdrop");
 
-    const render = computed(() => (auth.authorized || auth.reauthenticate) && settings.ready);
+    const render = computed(() => (auth.authorized || auth.reauthenticate) && Preferences.isReady);
     const originPage = window.localStorage.getItem("origin_background");
     const showMap = computed(() => auth.authenticate && !originPage);
     const pageBackdropLoaded = ref(originPage ? false : true);
@@ -79,8 +80,8 @@ export default defineComponent({
     watch(
       () => auth.authorized,
       () => {
-        if (auth.authorized && !settings.ready) {
-          settings.fetchPreferences();
+        if (auth.authorized && !Preferences.isReady) {
+          Preferences.init();
         }
       },
       { immediate: true },

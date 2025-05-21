@@ -18,25 +18,27 @@
               <q-item-label class="text-overline">Editor Preferences</q-item-label>
             </q-item-section>
           </q-item>
-          <template v-for="(setting, idx) in settings.preferences" :key="idx">
-            <q-item v-if="setting.group === 'Record Editor' && setting.dataType != 'JSON'">
+          <template v-for="(pref, idx) in Preferences.all()" :key="idx">
+            <q-item v-if="pref.group === 'Record Editor' && pref.dataType != 'JSON'">
               <q-item-section>
-                <q-item-label overline><span v-text="setting.label"></span></q-item-label>
+                <q-item-label overline><span v-text="pref.label"></span></q-item-label>
                 <q-item-label lines="2" caption
-                  ><span v-text="setting.description"></span
+                  ><span v-text="pref.description"></span
                 ></q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-toggle
-                  v-if="setting.dataType === 'BOOL'"
-                  v-model="setting.value"
+                  v-if="pref.dataType === 'BOOL'"
+                  @update:model-value="Preferences.set(pref.name, !pref.value)"
+                  :model-value="pref.value"
                   class="editor-prefs-toggle"
                 />
                 <q-slider
-                  v-else-if="setting.dataType === 'INT'"
-                  v-model="setting.value"
-                  :max="settings.getOptions(setting.name).max"
-                  :min="settings.getOptions(setting.name).min"
+                  v-else-if="pref.dataType === 'INT'"
+                  @update:model-value="(newValue) => Preferences.set(pref.name, newValue)"
+                  :max="fontSizeOptions.max"
+                  :min="fontSizeOptions.min"
+                  :model-value="pref.value"
                   class="editor-prefs-slider"
                   dense
                   label
@@ -44,8 +46,9 @@
                 />
                 <q-select
                   v-else
-                  v-model="setting.value"
-                  :options="settings.getOptions(setting.name)"
+                  @update:model-value="(newValue) => Preferences.set(pref.name, newValue)"
+                  :model-value="pref.value"
+                  :options="themeOptions"
                   dense
                   map-options
                   options-dense
@@ -57,8 +60,8 @@
         </q-list>
       </q-btn-dropdown>
       <q-btn
-        @click="view.showTagMenu = !view.showTagMenu"
-        :icon-right="view.showTagMenu ? 'arrow_drop_up' : 'arrow_drop_down'"
+        @click="Records.showTagMenu = !Records.showTagMenu"
+        :icon-right="Records.showTagMenu ? 'arrow_drop_up' : 'arrow_drop_down'"
         class="editor-tb-button"
         icon="code"
         size="sm"
@@ -71,7 +74,8 @@
 <script>
 import { defineComponent, inject } from "vue";
 
-import { useStores } from "@/use";
+import { Preferences, Records } from "@/models";
+import { useConstants, useStores } from "@/use";
 
 import TeiTagMenu from "./TeiTagMenu.vue";
 
@@ -80,14 +84,17 @@ export default defineComponent({
   components: { TeiTagMenu },
 
   setup() {
-    const { view, settings, editorStore } = useStores();
+    const { editorStore } = useStores();
+    const { fontSizeOptions, themeOptions } = useConstants();
     const insertTag = inject("insertTag");
 
     return {
-      view,
-      settings,
+      Records,
+      Preferences,
       insertTag,
       editorStore,
+      fontSizeOptions,
+      themeOptions,
     };
   },
 });
