@@ -1,7 +1,7 @@
 import { apiUrl, coreUrl, publicUrl, purlUrl } from "./config";
 
 const requestOptions = (field, serialize = false, model = null, filters = null) => {
-  let url = `${apiUrl}/attribute_types/${field}/opts/`;
+  let url = `${apiUrl}/attribute_types/${field}/options/`;
   if (model || filters || serialize) {
     const params = [];
     if (model) params.push(`model=${model}`);

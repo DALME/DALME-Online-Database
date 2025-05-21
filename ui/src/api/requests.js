@@ -12,6 +12,7 @@ import images from "./images";
 import languages from "./languages";
 import library from "./library";
 import locales from "./locales";
+import locations from "./locations";
 import pages from "./pages";
 import places from "./places";
 import preferences from "./preferences";
@@ -43,6 +44,7 @@ const requests = {
   languages,
   library,
   locales,
+  locations,
   pages,
   places,
   preferences,

@@ -3,10 +3,9 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/users`;
 
 const users = {
-  list(query = false) {
-    const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=0&offset=0`;
+  list(paras = { limit: 0, offset: 0 }) {
     return {
-      url: url,
+      url: `${endpoint}/?${new URLSearchParams(paras).toString()}`,
       method: "GET",
     };
   },

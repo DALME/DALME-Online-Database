@@ -9,11 +9,11 @@ const preferences = {
       method: "GET",
     };
   },
-  update(key, value) {
+  update(key, payload) {
     return {
       url: `${endpoint}/${key}/`,
       method: "PUT",
-      data: { value: value },
+      data: payload,
     };
   },
 };

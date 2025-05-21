@@ -16,7 +16,7 @@ const attributeTypes = {
     };
   },
   getListOptions(list, serialize = false) {
-    let url = `${endpoint}/options/?names=${list}`;
+    let url = `${endpoint}/options_for_list/?names=${list}`;
     if (serialize) url += "&serialize=True";
     return {
       url: url,
