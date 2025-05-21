@@ -244,69 +244,47 @@
           adaptive
         />
       </div>
-      <div v-if="!loading && recordStore.tab !== 'pages'" class="col-3 q-pl-md q-pt-md">
-        <DetailSidebar :data="sidebarData">
-          <template #extraElements>
-            <SelectField
-              :id="recordStore.current.id"
-              :repository="recordStore.Records"
-              chip-icon="mdi-folder-outline"
-              field="collectionIds"
-              label="Collections"
-              multiple
-              sidebar
-            />
-            <DetailElement v-if="recordStore.current.collections.length > 0" label="Collections">
-              <template #content>
-                <template
-                  v-for="collection in recordStore.current.collections"
-                  :key="collection.id"
-                >
-                  <q-chip
-                    color="deep-purple-6"
-                    icon="mdi-folder-outline"
-                    size="sm"
-                    text-color="white"
-                    clickable
-                    outline
-                  >
-                    {{ collection.name }}
-                  </q-chip>
-                </template>
-              </template>
-            </DetailElement>
-            <DetailElement label="Created">
-              <template #content>
-                <div>
-                  <UserPill
-                    :bold="false"
-                    :show-avatar="false"
-                    :user="recordStore.current.creationUser"
-                    text-size="13px"
-                  />
-                  <div class="text-detail text-grey-7 text-weight-medium">
-                    {{ formatDate(recordStore.current.creationTimestamp, "DATETIME_AT") }}
-                  </div>
-                </div>
-              </template>
-            </DetailElement>
-            <DetailElement label="Last modified">
-              <template #content>
-                <div>
-                  <UserPill
-                    :bold="false"
-                    :show-avatar="false"
-                    :user="recordStore.current.modificationUser"
-                    text-size="13px"
-                  />
-                  <div class="text-detail text-grey-7 text-weight-medium">
-                    {{ formatDate(recordStore.current.modificationTimestamp, "DATETIME_AT") }}
-                  </div>
-                </div>
-              </template>
-            </DetailElement>
+      <div v-if="!loading && Records.tab !== 'pages'" class="col-3 q-pl-md q-pt-md">
+        <SidebarItem :content="Records.current.id" label="Unique Id" clipboard />
+        <SelectField
+          :id="recordStore.current.id"
+          :repository="recordStore.Records"
+          chip-icon="mdi-folder-outline"
+          field="collectionIds"
+          label="Collections"
+          multiple
+          sidebar
+        />
+        <SidebarItem label="Created">
+          <template #content>
+            <div>
+              <UserPill
+                :bold="false"
+                :show-avatar="false"
+                :user="recordStore.current.creationUser"
+                text-size="13px"
+              />
+              <div class="text-detail text-grey-7 text-weight-medium">
+                {{ formatDate(recordStore.current.creationTimestamp, "DATETIME_AT") }}
+              </div>
+            </div>
           </template>
-        </DetailSidebar>
+        </SidebarItem>
+        <SidebarItem label="Last modified">
+          <template #content>
+            <div>
+              <UserPill
+                :bold="false"
+                :show-avatar="false"
+                :user="recordStore.current.modificationUser"
+                text-size="13px"
+              />
+              <div class="text-detail text-grey-7 text-weight-medium">
+                {{ formatDate(recordStore.current.modificationTimestamp, "DATETIME_AT") }}
+              </div>
+            </div>
+          </template>
+        </SidebarItem>
       </div>
     </div>
   </div>
@@ -327,9 +305,8 @@ import {
   CommentBox,
   CustomDialog,
   DetailCard,
-  DetailElement,
-  DetailSidebar,
   RecordEditor,
+  SidebarItem,
   TagPill,
   UserPill,
   WorkflowManager,
@@ -354,8 +331,6 @@ export default defineComponent({
     BooleanValue,
     CommentBox,
     DetailCard,
-    DetailElement,
-    DetailSidebar,
     RecordAgents,
     RecordEditor,
     MarkdownField,
@@ -366,6 +341,7 @@ export default defineComponent({
     WorkflowManager,
     InputField,
     SelectField,
+    SidebarItem,
   },
   setup() {
     const $q = useQuasar();

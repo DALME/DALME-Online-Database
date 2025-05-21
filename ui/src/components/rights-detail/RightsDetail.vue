@@ -139,39 +139,35 @@ AD_Savoie_-_Autorisation_de_publication.pdf"
         <AdaptiveSpinner v-else />
       </div>
       <div v-if="!loading" class="col-3 q-pl-md q-pt-md">
-        <DetailSidebar>
-          <template #extraElements>
-            <DetailElement label="Attachment">
-              <template #content>
-                <template v-if="policy.attachments">
-                  <AttachmentWidget :file="policy.attachments" color="indigo-6" compact />
-                </template>
-                <div v-else class="text-13">None yet</div>
-              </template>
-            </DetailElement>
-            <DetailElement :content="policy.id" label="Unique Id" clipboard />
-            <DetailElement label="Created">
-              <template #content>
-                <div>
-                  <UserPill :bold="false" :user="policy.creationUser" text-size="13px" />
-                  <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ formatDate(policy.creationTimestamp.value, "DATETIME_AT") }}
-                  </div>
-                </div>
-              </template>
-            </DetailElement>
-            <DetailElement label="Last modified">
-              <template #content>
-                <div>
-                  <UserPill :bold="false" :user="policy.modificationUser" text-size="13px" />
-                  <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ formatDate(policy.modificationTimestamp.value, "DATETIME_AT") }}
-                  </div>
-                </div>
-              </template>
-            </DetailElement>
+        <SidebarItem label="Attachment">
+          <template #content>
+            <template v-if="policy.attachments">
+              <AttachmentWidget :file="policy.attachments" color="indigo-6" compact />
+            </template>
+            <div v-else class="text-13">None yet</div>
           </template>
-        </DetailSidebar>
+        </SidebarItem>
+        <SidebarItem :content="policy.id" label="Unique Id" clipboard />
+        <SidebarItem label="Created">
+          <template #content>
+            <div>
+              <UserPill :bold="false" :user="policy.creationUser" text-size="13px" />
+              <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
+                {{ formatDate(policy.creationTimestamp.value, "DATETIME_AT") }}
+              </div>
+            </div>
+          </template>
+        </SidebarItem>
+        <SidebarItem label="Last modified">
+          <template #content>
+            <div>
+              <UserPill :bold="false" :user="policy.modificationUser" text-size="13px" />
+              <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
+                {{ formatDate(policy.modificationTimestamp.value, "DATETIME_AT") }}
+              </div>
+            </div>
+          </template>
+        </SidebarItem>
       </div>
     </div>
   </div>
@@ -189,8 +185,7 @@ import {
   BooleanValue,
   CommentBox,
   DetailCard,
-  DetailElement,
-  DetailSidebar,
+  SidebarItem,
   TagPill,
   UserPill,
 } from "@/components";
@@ -205,8 +200,7 @@ export default defineComponent({
     BooleanValue,
     CommentBox,
     DetailCard,
-    DetailSidebar,
-    DetailElement,
+    SidebarItem,
     TagPill,
     UserPill,
   },

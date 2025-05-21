@@ -92,57 +92,53 @@
         </q-card>
       </div>
       <div class="col-3 q-pl-md">
-        <DetailSidebar>
-          <template #extraElements>
-            <DetailElement label="Assignee">
-              <template #content>
-                <template v-if="ticket.assignedTo">
-                  <router-link
-                    :to="{
-                      name: 'User',
-                      params: { username: ticket.assignedTo.username },
-                    }"
-                  >
-                    {{ ticket.assignedTo.fullName }}
-                  </router-link>
-                </template>
-                <div v-else class="text-13">No one assigned</div>
-              </template>
-            </DetailElement>
-            <DetailElement label="Tags">
-              <template #content>
-                <template v-if="!isEmpty(cleanTags(ticket.tags))">
-                  <TagPill
-                    v-for="(tag, idx) in cleanTags(ticket.tags)"
-                    :key="idx"
-                    :name="tag.tag"
-                    :type="tag.tag"
-                    class="q-ml-sm"
-                    module="ticket"
-                    size="xs"
-                  />
-                </template>
-                <div v-else class="text-13">None yet</div>
-              </template>
-            </DetailElement>
-            <DetailElement label="Attachments">
-              <template #content>
-                <template v-if="!isEmpty(ticket.files)">
-                  <AttachmentWidget v-for="file in ticket.files" :key="file.id" :file="file" />
-                </template>
-                <div v-else class="text-13">None yet</div>
-              </template>
-            </DetailElement>
-            <DetailElement label="Link">
-              <template #content>
-                <template v-if="ticket.url">
-                  <ExternalLink :url="ticket.url" />
-                </template>
-                <div v-else class="text-13">None yet</div>
-              </template>
-            </DetailElement>
+        <SidebarItem label="Assignee">
+          <template #content>
+            <template v-if="ticket.assignedTo">
+              <router-link
+                :to="{
+                  name: 'User',
+                  params: { username: ticket.assignedTo.username },
+                }"
+              >
+                {{ ticket.assignedTo.fullName }}
+              </router-link>
+            </template>
+            <div v-else class="text-13">No one assigned</div>
           </template>
-        </DetailSidebar>
+        </SidebarItem>
+        <SidebarItem label="Tags">
+          <template #content>
+            <template v-if="!isEmpty(cleanTags(ticket.tags))">
+              <TagPill
+                v-for="(tag, idx) in cleanTags(ticket.tags)"
+                :key="idx"
+                :name="tag.tag"
+                :type="tag.tag"
+                class="q-ml-sm"
+                module="ticket"
+                size="xs"
+              />
+            </template>
+            <div v-else class="text-13">None yet</div>
+          </template>
+        </SidebarItem>
+        <SidebarItem label="Attachments">
+          <template #content>
+            <template v-if="!isEmpty(ticket.files)">
+              <AttachmentWidget v-for="file in ticket.files" :key="file.id" :file="file" />
+            </template>
+            <div v-else class="text-13">None yet</div>
+          </template>
+        </SidebarItem>
+        <SidebarItem label="Link">
+          <template #content>
+            <template v-if="ticket.url">
+              <ExternalLink :url="ticket.url" />
+            </template>
+            <div v-else class="text-13">None yet</div>
+          </template>
+        </SidebarItem>
       </div>
     </div>
   </div>
@@ -159,12 +155,11 @@ import { requests } from "@/api";
 import {
   AttachmentWidget,
   CommentBox,
-  DetailElement,
   DetailPopover,
-  DetailSidebar,
   ExternalLink,
   MarkdownEditor,
   OpaqueSpinner,
+  SidebarItem,
   TagPill,
 } from "@/components";
 import { ticketSchema } from "@/schemas";
@@ -176,8 +171,7 @@ export default defineComponent({
   components: {
     AttachmentWidget,
     CommentBox,
-    DetailSidebar,
-    DetailElement,
+    SidebarItem,
     DetailPopover,
     ExternalLink,
     MarkdownEditor,

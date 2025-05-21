@@ -152,31 +152,27 @@
         <AdaptiveSpinner v-else />
       </div>
       <div v-if="!loading" class="col-3 q-pl-md q-pt-md">
-        <DetailSidebar>
-          <template #extraElements>
-            <DetailElement :content="recordGroup.id" label="Unique Id" clipboard />
-            <DetailElement label="Created">
-              <template #content>
-                <div>
-                  <UserPill :bold="false" :user="recordGroup.creationUser" text-size="13px" />
-                  <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ formatDate(recordGroup.creationTimestamp.value, "DATETIME_AT") }}
-                  </div>
-                </div>
-              </template>
-            </DetailElement>
-            <DetailElement label="Last modified">
-              <template #content>
-                <div>
-                  <UserPill :bold="false" :user="recordGroup.modificationUser" text-size="13px" />
-                  <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
-                    {{ formatDate(recordGroup.modificationTimestamp.value, "DATETIME_AT") }}
-                  </div>
-                </div>
-              </template>
-            </DetailElement>
+        <SidebarItem :content="recordGroup.id" label="Unique Id" clipboard />
+        <SidebarItem label="Created">
+          <template #content>
+            <div>
+              <UserPill :bold="false" :user="recordGroup.creationUser" text-size="13px" />
+              <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
+                {{ formatDate(recordGroup.creationTimestamp.value, "DATETIME_AT") }}
+              </div>
+            </div>
           </template>
-        </DetailSidebar>
+        </SidebarItem>
+        <SidebarItem label="Last modified">
+          <template #content>
+            <div>
+              <UserPill :bold="false" :user="recordGroup.modificationUser" text-size="13px" />
+              <div class="text-detail text-grey-7 text-weight-medium q-pl-lg">
+                {{ formatDate(recordGroup.modificationTimestamp.value, "DATETIME_AT") }}
+              </div>
+            </div>
+          </template>
+        </SidebarItem>
       </div>
     </div>
   </div>
@@ -192,9 +188,8 @@ import {
   AdaptiveSpinner,
   CommentBox,
   DetailCard,
-  DetailElement,
-  DetailSidebar,
   MarkdownEditor,
+  SidebarItem,
   UserPill,
 } from "@/components";
 import { recordGroupSchema } from "@/schemas";
@@ -209,8 +204,7 @@ export default defineComponent({
     AdaptiveSpinner,
     CommentBox,
     DetailCard,
-    DetailSidebar,
-    DetailElement,
+    SidebarItem,
     MarkdownEditor,
     UserPill,
     RecordChildren,
