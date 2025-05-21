@@ -9,8 +9,18 @@ export const columnMap = {
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
   },
-  locationDetail: {
-    label: "Location",
+  type: {
+    label: "Type",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: true,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  detail: {
+    label: "Detail",
     align: "left",
     sortable: true,
     sortOrder: "ad",
@@ -19,7 +29,7 @@ export const columnMap = {
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
   },
-  locationGeometry: {
+  geometry: {
     label: "Geometry",
     align: "left",
     sortable: true,

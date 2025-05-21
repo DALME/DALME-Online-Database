@@ -19,6 +19,16 @@ export const columnMap = {
     headerClasses: "text-no-wrap",
     isDefaultVisible: true,
   },
+  user: {
+    label: "User",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: true,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
   attestationCount: {
     label: "Attest.",
     align: "center",
@@ -37,16 +47,6 @@ export const columnMap = {
     isSortDefault: false,
     classes: null,
     headerClasses: "text-no-wrap text-center",
-    isDefaultVisible: true,
-  },
-  user: {
-    label: "User",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: true,
-    classes: null,
-    headerClasses: "text-no-wrap",
     isDefaultVisible: true,
   },
 };

@@ -217,7 +217,7 @@
                   title="Locations"
                   show-filter
                 >
-                  <RecordPlaces :places="recordStore.current.places" />
+                  <RecordLocations :targets="locations" />
                 </DetailCard>
               </div>
             </q-tab-panel>
@@ -313,8 +313,8 @@ import { formatDate, getColumns, nully } from "@/utils";
 
 import { columnMap } from "./pageColumns";
 import RecordAgents from "./RecordAgents.vue";
+import RecordLocations from "./RecordLocations.vue";
 import RecordPages from "./RecordPages.vue";
-import RecordPlaces from "./RecordPlaces.vue";
 
 export default defineComponent({
   name: "RecordDetail",
@@ -328,7 +328,7 @@ export default defineComponent({
     RecordEditor,
     MarkdownField,
     RecordPages,
-    RecordPlaces,
+    RecordLocations,
     TagPill,
     UserPill,
     WorkflowManager,
