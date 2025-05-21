@@ -1,0 +1,83 @@
+export const dateFormats = {
+  DATE_SHORT: {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  },
+  DATE_MED: {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  },
+  DATE_MED_WITH_WEEKDAY: {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    weekday: "short",
+  },
+  DATE_FULL: {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  },
+  DATE_HUGE: {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  },
+  TIME_SIMPLE: {
+    hour: "numeric",
+    minute: "numeric",
+  },
+  TIME_WITH_SECONDS: {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  },
+  TIME_WITH_SHORT_OFFSET: {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    timeZoneName: "short",
+  },
+  TIME_24_SIMPLE: {
+    hour: "numeric",
+    minute: "numeric",
+    hourCycle: "h23",
+  },
+  TIME_24_WITH_SECONDS: {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hourCycle: "h23",
+  },
+  DATETIME_FULL: {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZoneName: "short",
+  },
+  DATETIME_HUGE: {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+    timeZoneName: "long",
+  },
+  DATETIME_HUGE_WITH_SECONDS: {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    timeZoneName: "long",
+  },
+  DATETIME_AT: ["DATE_MED_WITH_WEEKDAY", "@", "TIME_SIMPLE"],
+};
