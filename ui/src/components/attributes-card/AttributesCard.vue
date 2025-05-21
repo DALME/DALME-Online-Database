@@ -1,5 +1,5 @@
 <template>
-  <DetailCard icon="mdi-view-list" title="Attributes" pad-container-list>
+  <DetailCard :loading="loading" icon="mdi-view-list" title="Attributes" pad-container-list>
     <template #card-buttons>
       <q-btn
         v-if="!loading && attributeCandidates"
@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { useSortBy } from "pinia-orm/helpers";
 import { prop, sortBy } from "ramda";
 import {
   computed,
@@ -83,6 +84,11 @@ export default defineComponent({
       required: true,
     },
     exclusions: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    order: {
       type: Array,
       required: false,
       default: () => [],
@@ -185,7 +191,10 @@ export default defineComponent({
       props.repository.meta().then((meta) => {
         attributeTypes.value = meta.attributeTypes;
         contentType.value = meta.contentType;
-        attributes.value = Attributes.where("objectId", props.id).get();
+        const attrs = Attributes.where("objectId", props.id).get();
+        attributes.value = props.order
+          ? useSortBy(attrs, (attr) => props.order.indexOf(attr.name))
+          : attrs;
         loading.value = false;
       });
     });
