@@ -41,17 +41,23 @@
       <slot name="card-buttons" />
     </q-item>
     <q-separator class="bg-grey-4" />
-    <q-card-section :class="bodyClasses">
-      <slot>{{ noData }}</slot>
-    </q-card-section>
+    <template v-if="!loading">
+      <q-card-section :class="bodyClasses">
+        <slot>{{ noData }}</slot>
+      </q-card-section>
+    </template>
+    <AdaptiveSpinner v-else class="q-ml-md" color="indigo-3" size="xs" />
   </q-card>
 </template>
 
 <script>
 import { computed, defineComponent, provide, ref } from "vue";
 
+import { AdaptiveSpinner } from "@/components";
+
 export default defineComponent({
   name: "DetailCard",
+  components: { AdaptiveSpinner },
   props: {
     icon: {
       type: String,
@@ -81,6 +87,11 @@ export default defineComponent({
     },
     padContainerList: {
       type: Boolean,
+      default: false,
+    },
+    loading: {
+      type: Boolean,
+      required: false,
       default: false,
     },
   },
