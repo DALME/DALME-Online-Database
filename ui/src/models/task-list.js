@@ -2,7 +2,7 @@ import { useRepo } from "pinia-orm";
 import { ref } from "vue";
 
 import { requests } from "@/api";
-import { CustomModel, CustomRepository, Groups, Tasks, Users } from "@/models";
+import { CustomModel, CustomRepository, Groups, Users } from "@/models";
 import { taskListSchema, taskListsSchema } from "@/schemas";
 
 class TaskList extends CustomModel {
@@ -40,7 +40,7 @@ class TaskList extends CustomModel {
       taskCount: this.number(0),
       teamLinkId: this.attr(null),
       // related
-      tasks: this.hasMany(Tasks, "taskListId"),
+      // tasks: this.hasMany(Tasks, "taskListId"),
       creationUser: this.belongsTo(Users, "creationUserId"),
       modificationUser: this.belongsTo(Users, "modificationUserId"),
       owner: this.belongsTo(Users, "ownerId"),

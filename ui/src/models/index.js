@@ -9,7 +9,7 @@ export { Agents } from "./agent";
 export { Collections } from "./collection";
 export { Locations } from "./location";
 export { Places } from "./place";
-export { Tasks } from "./task";
 export { TaskLists } from "./task-list";
+export { Tasks } from "./task";
 export { Records, Pages, Workflows, Logs } from "./records";
 export { TeiElement, TeiTag, TeiSet, TeiSetMember } from "./tei-elements";

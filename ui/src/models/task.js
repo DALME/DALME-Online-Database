@@ -4,7 +4,7 @@ import { Dialog } from "quasar";
 import { defineAsyncComponent, ref } from "vue";
 
 import { requests } from "@/api";
-import { CustomModel, CustomRepository, Users } from "@/models";
+import { CustomModel, CustomRepository, TaskLists, Users } from "@/models";
 import { taskSchema, tasksSchema } from "@/schemas";
 import { useAuthStore } from "@/stores/auth";
 import { isObject } from "@/utils";
@@ -55,6 +55,7 @@ class Task extends CustomModel {
       modificationTimestamp: this.attr(null),
       modificationUserId: this.attr(null),
       // related
+      taskList: this.belongsTo(TaskLists, "taskListId"),
       creationUser: this.belongsTo(Users, "creationUserId"),
       modificationUser: this.belongsTo(Users, "modificationUserId"),
       completedBy: this.belongsTo(Users, "completedById"),
@@ -257,5 +258,3 @@ class TaskRepo extends CustomRepository {
 }
 
 export const Tasks = useRepo(TaskRepo);
-
-window.testTasks = Tasks;
