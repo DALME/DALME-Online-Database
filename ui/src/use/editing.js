@@ -17,11 +17,15 @@ export const useEditing = (props, context, input = null, modValue = null) => {
   const isAttribute = computed(() => repository.value.entity === "attribute");
   const dataField = computed(() => (isAttribute.value ? "value" : props.field));
   const optionsField = computed(() => (isAttribute.value ? record.value.name : props.field));
-  const fieldLabel = computed(() => (isAttribute.value ? record.value.label : props.label));
-  const fieldDescription = computed(() =>
-    isAttribute.value ? record.value.description : props.description,
+  const fieldLabel = computed(() =>
+    isAttribute.value && !props.creating ? record.value.label : props.label,
   );
-  const hasChanged = computed(() => processValue(record.value[dataField.value]) !== value.value);
+  const fieldDescription = computed(() =>
+    isAttribute.value && !props.creating ? record.value.description : props.description,
+  );
+  const hasChanged = computed(() =>
+    props.creating ? value.value : processValue(record.value[dataField.value]) !== value.value,
+  );
   const validator = computed(() => validators[dataField.value]);
   const showBottom = computed(() => fieldDescription.value || input?.value?.hasError);
 
@@ -50,7 +54,11 @@ export const useEditing = (props, context, input = null, modValue = null) => {
 
   const onCancel = () => {
     if (props.creating) {
-      context.emit("drop");
+      if (isAttribute.value) {
+        context.emit("drop");
+      } else {
+        value.value = null;
+      }
     } else {
       value.value = processValue(record.value[dataField.value]);
     }
