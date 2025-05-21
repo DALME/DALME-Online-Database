@@ -57,17 +57,15 @@
         <div v-if="help" class="text-caption">{{ help }}</div>
         <q-space />
         <q-btn
-          v-if="!inCard"
+          v-if="!inCard && hasChanged"
           @click="onCancel"
-          :disable="!hasChanged"
           class="md-button cancel text-roboto"
           label="cancel"
           dense
         />
         <q-btn
-          v-if="!inCard"
+          v-if="!inCard && hasChanged"
           @click="onSubmit"
-          :disable="!hasChanged"
           :label="submitLabel"
           class="md-button submit text-roboto"
           dense
