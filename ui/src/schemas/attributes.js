@@ -12,6 +12,8 @@ export const attributeDateSchema = yup.object().shape({
 
 export const attributeSchema = yup.object().shape({
   id: yup.string().uuid().required(),
+  objectId: yup.mixed().optional(),
+  objectType: yup.string().optional(),
   name: yup
     .string()
     .required()
