@@ -9,7 +9,6 @@ import {
   datasetFieldValidation,
   groupOptionsSchema,
   optionsSchema,
-  setSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = ["endpoint", "owner"];
@@ -70,5 +69,4 @@ export default {
   edit: datasetEditSchema,
   form: datasetFormSchema,
   requests: datasetRequests,
-  submit: setSubmitSchemas,
 };

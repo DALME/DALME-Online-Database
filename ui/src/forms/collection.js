@@ -8,7 +8,6 @@ import {
   collectionEditSchema,
   collectionFieldValidation,
   optionsSchema,
-  setSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = ["endpoint", "hasLanding", "isPublic", "owner"];
@@ -74,5 +73,4 @@ export default {
   edit: collectionEditSchema,
   form: collectionFormSchema,
   requests: collectionRequests,
-  submit: setSubmitSchemas,
 };

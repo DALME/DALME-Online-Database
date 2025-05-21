@@ -1,14 +1,13 @@
 import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
-import { AttributesField, InputField, MultipleSelectField, SelectField } from "@/components/forms";
+import { AttributesField, InputField, SelectField } from "@/components/forms";
 import {
   attributeValidators,
   bibliographyEditSchema,
   bibliographyFieldValidation,
   bibliographyTypeOptionsSchema,
   recordSubmitSchemas,
-  setOptionsSchema,
 } from "@/schemas";
 
 const resourceAttributes = ["defaultRights", "isPrivate", "owner", "parent", "zoteroKey"];
@@ -39,24 +38,6 @@ const bibliographyFormSchema = {
       fetcher(requests.sources.getBibliographyTypes()).then((response) => response.json()),
     optionsSchema: bibliographyTypeOptionsSchema,
     validation: bibliographyFieldValidation.type,
-  },
-  primaryDataset: {
-    field: "primaryDataset",
-    component: markRaw(SelectField),
-    label: "Primary dataset",
-    description: "Dataset used to assign permissions.",
-    getOptions: () => fetcher(requests.sets.getSetsByType(3)).then((response) => response.json()),
-    optionsSchema: setOptionsSchema,
-    validation: bibliographyFieldValidation.primaryDataset,
-  },
-  sets: {
-    field: "sets",
-    component: markRaw(MultipleSelectField),
-    label: "Sets",
-    description: "The sets of which the source a member.",
-    getOptions: () => fetcher(requests.sets.getSets()).then((response) => response.json()),
-    optionsSchema: setOptionsSchema,
-    validation: bibliographyFieldValidation.sets,
   },
   attributes: {
     field: "attributes",

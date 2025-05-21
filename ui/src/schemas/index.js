@@ -28,7 +28,6 @@ export * from "./records";
 export * from "./record-groups";
 export * from "./publications";
 export * from "./rights";
-export * from "./sets";
 export * from "./tickets";
 export * from "./worksets";
 export * from "./task-lists";

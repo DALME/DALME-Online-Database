@@ -2,12 +2,7 @@ import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
 import { AttributesField, InputField, SelectField } from "@/components/forms";
-import {
-  attributeValidators,
-  recordOptionsSchema,
-  recordSubmitSchemas,
-  setOptionsSchema,
-} from "@/schemas";
+import { attributeValidators, recordOptionsSchema, recordSubmitSchemas } from "@/schemas";
 
 const resourceAttributes = [
   "authority",
@@ -49,14 +44,6 @@ const archivalFileFormSchema = {
         response.json(),
       ),
     optionsSchema: recordOptionsSchema,
-  },
-  primaryDataset: {
-    field: "primaryDataset",
-    component: markRaw(SelectField),
-    label: "Primary dataset",
-    description: "Dataset used to assign permissions.",
-    getOptions: () => fetcher(requests.sets.getSetsByType(3)).then((response) => response.json()),
-    optionsSchema: setOptionsSchema,
   },
   attributes: {
     field: "attributes",

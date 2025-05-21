@@ -8,7 +8,6 @@ import {
   corpusEditSchema,
   corpusFieldValidation,
   optionsSchema,
-  setSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = ["endpoint", "hasLanding", "isPublic", "owner"];
@@ -60,5 +59,4 @@ export default {
   edit: corpusEditSchema,
   form: corpusFormSchema,
   requests: corpusRequests,
-  submit: setSubmitSchemas,
 };
