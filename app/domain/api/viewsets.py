@@ -4,6 +4,7 @@ from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
+from rest_framework.permissions import OperandHolder
 from rest_framework.response import Response
 
 from django.contrib.contenttypes.models import ContentType
@@ -42,6 +43,19 @@ class BaseViewSet(viewsets.ModelViewSet):
         return q_as == 'options'
 
     @property
+    def include_restricted(self):
+        """Return boolean indicating whether restricted fields should be included for the current user."""
+        pcs = []
+        for pc in self.permission_classes:
+            if isinstance(pc, OperandHolder):
+                for opc in [pc.op1_class, pc.op2_class]:
+                    if hasattr(opc, 'include_restricted_fields'):
+                        pcs.append(opc)
+            elif hasattr(pc, 'include_restricted_fields'):
+                pcs.append(pc)
+        return all(pc().include_restricted_fields(self.request, self) for pc in pcs)
+
+    @property
     def url_view(self):
         """Return boolean indicating whether the request is for url values."""
         q_as = self.request.GET.get('as')
@@ -50,8 +64,8 @@ class BaseViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def has_permission(self, request, pk=None):  # noqa: ARG002
         """Test if user has permission to perform action."""
-        pc = self.permission_classes[0]
-        pc().has_permission(request, self)
+        for pc in self.permission_classes:
+            pc().has_permission(request, self)
         return Response(200)
 
     @action(detail=False, methods=['delete'])
@@ -160,6 +174,7 @@ class BaseViewSet(viewsets.ModelViewSet):
         """Return serializer kwargs."""
         kwargs['context'] = self.get_serializer_context()
         kwargs['action'] = self.action
+        kwargs['include_restricted'] = self.include_restricted
 
         if self.options_view:
             kwargs['field_set'] = 'option'

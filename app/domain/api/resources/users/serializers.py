@@ -37,25 +37,51 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     avatar = serializers.URLField(max_length=255, source='avatar_url', required=False)
     group_ids = serializers.PrimaryKeyRelatedField(source='groups', required=False, read_only=True, many=True)
     preferences = PreferenceSerializer(many=True, required=False)
+    # option fields
+    detail = serializers.ReadOnlyField(source='username')
+    icon = serializers.URLField(max_length=255, source='avatar_url', required=False)
+    label = serializers.ReadOnlyField(source='full_name')
+    value = serializers.IntegerField(source='id')
 
     class Meta:
         model = get_user_model()
         fields = [
             'avatar',
             'date_joined',
+            'detail',
             'email',
             'first_name',
             'full_name',
             'group_ids',
+            'icon',
             'id',
             'is_active',
             'is_staff',
             'is_superuser',
+            'label',
             'last_login',
             'last_name',
             'password',
             'preferences',
             'username',
+            'value',
+        ]
+        default_exclude = [
+            'detail',
+            'icon',
+            'label',
+            'value',
+        ]
+        restricted = [
+            'date_joined',
+            'email',
+            'group_ids',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'preferences',
+            'password',
         ]
         field_sets = {
             'attribute': [
@@ -66,10 +92,10 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
                 'username',
             ],
             'option': [
-                'avatar',
-                'full_name',
-                'id',
-                'username',
+                'detail',
+                'icon',
+                'label',
+                'value',
             ],
         }
         extra_kwargs = {
