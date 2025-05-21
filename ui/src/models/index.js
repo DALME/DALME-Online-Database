@@ -7,6 +7,7 @@ export { Users } from "./user";
 export { Attributes } from "./attribute";
 export { Agents } from "./agent";
 export { Collections } from "./collection";
+export { Locations } from "./location";
 export { Places } from "./place";
 export { Tasks } from "./task";
 export { TaskLists } from "./task-list";
