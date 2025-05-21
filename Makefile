@@ -48,7 +48,7 @@ init: _infra.oidc.key _infra.env _app.init _ui.init _infra.hooks.install _infra.
 sync: app.sync ui.sync docs.sync infra.hooks.update
 .PHONY: sync
 
-test: app.test # ui.test
+test: app.test ui.test
 .PHONY: test
 
 ### Private (non-interface) targets.
