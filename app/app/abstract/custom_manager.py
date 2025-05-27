@@ -119,5 +119,4 @@ class CustomManager(models.Manager):
 
     def unscoped(self):
         """Return a non-tenant-scoped queryset when calling a related manager."""
-        queryset = models.QuerySet(self.model, using=self._db)
-        return self._apply_rel_filters(queryset)
+        return models.QuerySet(self.model, using=self._db)
