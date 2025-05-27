@@ -1,24 +1,30 @@
 """Define model factories for the auth system."""
 
 import factory
+from factory import fuzzy
 
 from oauth.models import GroupProperties
 
 from .tenant import TenantFactory
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(factory.django.DjangoModelFactory):
     """Generate User model fixtures."""
 
     class Meta:
         model = 'oauth.User'
         django_get_or_create = ('email', 'username')
+        skip_postgeneration_save = True
 
-    username = factory.Sequence(lambda n: 'User %03d' % n)  # noqa: UP031
+    class Params:
+        staff = factory.Trait(is_staff=True)
+        superuser = factory.Trait(staff=True, is_superuser=True)
+
+    username = factory.Sequence(lambda n: 'User%03d' % n)  # noqa: UP031
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     email = factory.Faker('email')
-    password = factory.Faker('password')
+    password = factory.django.Password('password')
     is_superuser = False
     is_staff = False
     is_active = True
@@ -43,7 +49,7 @@ class GroupPropertiesFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'oauth.GroupProperties'
 
-    group_type = factory.fuzzy.FuzzyChoice(GroupProperties.GROUP_TYPES, getter=lambda c: c[0])
+    group_type = fuzzy.FuzzyChoice(GroupProperties.GROUP_TYPES, getter=lambda c: c[0])
     description = factory.Sequence(lambda n: 'Some group description %03d' % n)  # noqa: UP031
     tenant = factory.SubFactory(TenantFactory)
 
