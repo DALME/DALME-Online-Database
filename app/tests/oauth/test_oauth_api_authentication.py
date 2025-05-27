@@ -12,7 +12,7 @@ from oauth.api.authentication import AuthorizationCode, Login
 
 
 @pytest.mark.urls('app.urls.urls_tenant')
-def test_oauth_authorization_code_no_credentials(arf, log):
+def test_oauth_authorization_code_no_credentials(arf, log, set_mock_tenant):  # noqa: ARG001
     view = AuthorizationCode.as_view()
 
     url = reverse('oauth:authorization-code')
@@ -32,7 +32,7 @@ def test_oauth_authorization_code_no_credentials(arf, log):
 @freeze_time('1970-01-01')
 @pytest.mark.urls('app.urls.urls_tenant')
 @pytest.mark.django_db
-def test_oauth_login_missing_credentials(arf, test_username, user, log):
+def test_oauth_login_missing_credentials(arf, test_username, user, log, set_mock_tenant):  # noqa: ARG001
     view = Login.as_view()
     session = SessionStore()
 
@@ -67,7 +67,7 @@ def test_oauth_login_missing_credentials(arf, test_username, user, log):
 @freeze_time('1970-01-01')
 @pytest.mark.urls('app.urls.urls_tenant')
 @pytest.mark.django_db
-def test_oauth_login_incorrect_credentials(arf, test_username, user, log):
+def test_oauth_login_incorrect_credentials(arf, test_username, user, log, set_mock_tenant):  # noqa: ARG001
     view = Login.as_view()
     session = SessionStore()
 
@@ -103,7 +103,7 @@ def test_oauth_login_incorrect_credentials(arf, test_username, user, log):
 @freeze_time('1970-01-01')
 @pytest.mark.urls('app.urls.urls_tenant')
 @pytest.mark.django_db
-def test_oauth_login(arf, test_username, test_password, user, unix_epoch_datetime, log):
+def test_oauth_login(arf, test_username, test_password, user, unix_epoch_datetime, log, set_mock_tenant):  # noqa: ARG001
     view = Login.as_view()
     session = SessionStore()
 

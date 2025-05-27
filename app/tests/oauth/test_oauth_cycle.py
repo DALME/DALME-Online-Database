@@ -32,6 +32,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
     oauth_application,
     log,
     test_domain,
+    set_mock_tenant,  # noqa: ARG001
 ):
     """A full integration test for the authorization code flow procedure.
 

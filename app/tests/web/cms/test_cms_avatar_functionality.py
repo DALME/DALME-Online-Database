@@ -8,7 +8,7 @@ from django.urls import reverse
 
 
 @pytest.mark.django_db
-def test_avatar_saving_user(auth_user, avatar_image):
+def test_avatar_saving_user(auth_user, avatar_image, setup_tenant_schema):  # noqa: ARG001
     auth_user.avatar.save(avatar_image.name, avatar_image, save=True)
 
     assert (
@@ -18,7 +18,7 @@ def test_avatar_saving_user(auth_user, avatar_image):
 
 
 @pytest.mark.django_db
-def test_avatar_saving_teammember(team_member, avatar_image):
+def test_avatar_saving_teammember(team_member, avatar_image, setup_tenant_schema, set_mock_tenant):  # noqa: ARG001
     team_member.avatar.save(avatar_image.name, avatar_image, save=True)
 
     assert (
@@ -28,7 +28,7 @@ def test_avatar_saving_teammember(team_member, avatar_image):
 
 
 @pytest.mark.django_db
-def test_avatar_url_retrieval(team_member, avatar_image):
+def test_avatar_url_retrieval(team_member, avatar_image, setup_tenant_schema, set_mock_tenant):  # noqa: ARG001
     user = team_member.user
     # Because the property `avatar_url` favours a team_member avatar over a user
     # avatar, the following assertion only works if the avatar is set in the `user` model first
@@ -48,7 +48,14 @@ def test_avatar_url_retrieval(team_member, avatar_image):
 
 @pytest.mark.django_db
 @pytest.mark.urls('app.urls.urls_tenant')
-def test_avatar_rendering_in_views(superuser, avatar_image, test_username, test_password):
+def test_avatar_rendering_in_views(
+    superuser,
+    avatar_image,
+    test_username,
+    test_password,
+    setup_tenant_schema,  # noqa: ARG001
+    set_mock_tenant,  # noqa: ARG001
+):
     client = Client(HTTP_HOST='dalme.localhost')
     client.login(username=test_username, password=test_password)
     response = client.get(reverse('wagtailadmin_home'))
