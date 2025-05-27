@@ -12,6 +12,7 @@ markdown==3.7
 notebook==6.5.6
 pre-commit==4.0.1
 pydot==3.0.3
+pyjwt==2.10.1
 pyparsing==3.2.0
 pytest-cov==6.1.1
 pytest-django-queries==1.2.0
