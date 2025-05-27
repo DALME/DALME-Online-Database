@@ -21,6 +21,7 @@ class TeamMemberFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'webteam.TeamMember'
+        skip_postgeneration_save = True
 
     user = factory.SubFactory(UserFactory)
     name = factory.Faker('name')
