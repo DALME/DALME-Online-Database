@@ -2,6 +2,7 @@
 
 import json
 
+import structlog
 from oauth2_provider.views import TokenView
 from rest_framework import permissions, status, views
 from rest_framework.response import Response
@@ -11,6 +12,8 @@ from django.contrib.auth import login
 
 from app.access_policies import BaseAccessPolicy
 from oauth.serializers import LoginSerializer
+
+logger = structlog.get_logger(__name__)
 
 
 class AuthAccessPolicy(BaseAccessPolicy):
@@ -32,12 +35,13 @@ class Login(views.APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, format=None):  # noqa: A002, ARG002
-        serializer = LoginSerializer(data=self.request.data, context={'request': self.request})
+        serializer = LoginSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
 
         login(request, user)
 
+        logger.info('User successfully logged in', user=user)
         return Response(None, status=status.HTTP_202_ACCEPTED)
 
 
@@ -80,7 +84,7 @@ class OAuthToken(TokenView):
             response.set_cookie(
                 'refresh_token',
                 refresh_token,
-                max_age=settings.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY,
+                max_age=int(settings.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY),
                 httponly=True,
                 samesite='Lax',
                 secure=not settings.IS_DEV,
