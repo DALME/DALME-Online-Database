@@ -1,5 +1,7 @@
 """Test the app.middleware.tenant_context_middleware module."""
 
+import contextvars
+import sys
 from unittest import mock
 
 import pytest
@@ -12,14 +14,18 @@ from tenants.middleware.tenant_context_middleware import TenantContextMiddleware
 from tenants.models import Tenant
 
 
-def test_get_current_tenant_fails_when_not_set(mock_get_current_tenant):
+def test_get_current_tenant_fails_when_not_set():
     """Assert trying to access the current tenant context throws if unset."""
-    # Unpatch the global mock for the getter.
-    mock_get_current_tenant.side_effect = get_current_tenant
+    from tenants.middleware import tenant_context_middleware
 
-    tenant = get_current_tenant()
+    # Explicitly reset the tenant context to simulate it not being set
+    tenant_context_middleware._tenant = contextvars.ContextVar('tenant')  # noqa: SLF001
+    tenant_context_middleware.TENANT = LocalProxy(tenant_context_middleware._tenant)  # noqa: SLF001
+    # Patch import used by get_current_tenant
+    sys.modules['tenants.middleware'].TENANT = tenant_context_middleware.TENANT
+
     with pytest.raises(RuntimeError) as exc:
-        tenant.pk
+        get_current_tenant().pk
 
     assert str(exc.value) == 'object is not bound'
 

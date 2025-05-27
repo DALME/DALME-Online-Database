@@ -17,7 +17,6 @@ def test_middleware_throws_if_tenant_not_found(mock_conn, mock_domain, rf):
     request = rf.get('/', headers={'HOST': 'some.domain'})
     mock_domain.DoesNotExist = Domain.DoesNotExist
     mock_domain.objects.select_related.return_value.get.side_effect = Domain.DoesNotExist
-
     get_response = mock.MagicMock()
     middleware = TenantMiddleware(get_response)
 
