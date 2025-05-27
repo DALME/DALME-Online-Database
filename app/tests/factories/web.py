@@ -24,7 +24,7 @@ class TeamMemberFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     name = factory.Faker('name')
-    roles = factory.RelatedFactory(TeamMemberRoleFactory, factory_related_name='team_member')
+    roles = factory.RelatedFactory(TeamMemberRoleFactory)
     title = factory.Faker('job')
     affiliation = factory.Faker('company')
     biography = factory.Faker('paragraph')
