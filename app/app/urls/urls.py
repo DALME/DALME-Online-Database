@@ -15,9 +15,9 @@ from oauth.urls import urls as auth_urls
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
     re_path(r'^maintenance-mode/', include(maintenance_mode_urls)),
-    re_path(r'^api/oauth/', include((auth_urls, 'api'), namespace='oauth2_provider')),
+    re_path(r'^api/oauth/', include((auth_urls, 'oauth'), namespace='oauth2_provider')),
     re_path(r'^api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    re_path(r'^api/', include((router.urls, 'api'), namespace='api_endpoint')),
+    re_path(r'^api/', include((router.urls, 'api'), namespace='api')),
     re_path(r'^$', TemplateView.as_view(template_name='web/home.html')),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
