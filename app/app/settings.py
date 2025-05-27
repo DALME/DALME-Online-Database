@@ -71,6 +71,8 @@ class Base(Configuration):
     SESSION_COOKIE_HTTPONLY = True
     USE_X_FORWARDED_HOST = True
 
+    FORMS_URLFIELD_ASSUME_HTTPS = True
+
     @property
     def IS_DEV(self):
         """Determine if we are running in a non-deploy environment."""
@@ -335,6 +337,21 @@ class Base(Configuration):
         'OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', str(3600 * 24 * 14)
     )  # 14 days
 
+    OAUTH2_APPLICATION_DEFAULTS = {
+        'algorithm': 'RS256',
+        'authorization_grant_type': 'authorization-code',
+        'client_type': 'confidential',
+        'name': 'IDA',
+        'skip_authorization': True,
+    }
+
+    OAUTH2_SCOPES = {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'groups': 'Auth groups scopes',
+        'openid': 'OpenID Connect scope',
+    }
+
     @property
     def OAUTH_CLIENT_ID(self):
         return os.environ['OAUTH_CLIENT_ID']
@@ -568,9 +585,6 @@ class Development(Base, Configuration):
             'PASSWORD': os.environ['POSTGRES_PASSWORD'],
             'HOST': os.environ['POSTGRES_HOST'],
             'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-            'TEST': {
-                'NAME': 'test_dalme_db',
-            },
         },
         'dam': {
             'ENGINE': 'django.db.backends.mysql',
@@ -590,19 +604,14 @@ class Development(Base, Configuration):
         """Configure OAuth and OIDC."""
         with open(os.environ['OIDC_RSA_PRIVATE_KEY']) as f:
             return {
-                'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
+                'ACCESS_TOKEN_EXPIRE_SECONDS': int(self.OAUTH2_ACCESS_TOKEN_EXPIRY),
                 'ALLOWED_REDIRECT_URI_SCHEMES': ['http'],
                 'OAUTH2_VALIDATOR_CLASS': 'oauth.validators.OAuth2Validator',
                 'OIDC_ENABLED': True,
                 'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
                 'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,
                 'OIDC_RSA_PRIVATE_KEY': f.read(),
-                'SCOPES': {
-                    'read': 'Read scope',
-                    'write': 'Write scope',
-                    'groups': 'Auth groups scopes',
-                    'openid': 'OpenID Connect scope',
-                },
+                'SCOPES': self.OAUTH2_SCOPES,
             }
 
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
@@ -770,19 +779,14 @@ class Production(Base, Configuration):
     def OAUTH2_PROVIDER(self):
         """Configure OAuth and OIDC."""
         return {
-            'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
+            'ACCESS_TOKEN_EXPIRE_SECONDS': int(self.OAUTH2_ACCESS_TOKEN_EXPIRY),
             'ALLOWED_REDIRECT_URI_SCHEMES': ['https'],
             'OAUTH2_VALIDATOR_CLASS': 'oauth.validators.OAuth2Validator',
             'OIDC_ENABLED': True,
             'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
             'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,
             'OIDC_RSA_PRIVATE_KEY': os.environ['OIDC_RSA_PRIVATE_KEY'],
-            'SCOPES': {
-                'read': 'Read scope',
-                'write': 'Write scope',
-                'groups': 'Auth groups scopes',
-                'openid': 'OpenID Connect scope',
-            },
+            'SCOPES': self.OAUTH2_SCOPES,
         }
 
     @property
