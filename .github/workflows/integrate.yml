@@ -46,7 +46,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16
         env:
           POSTGRES_DB: ida
           POSTGRES_USER: postgres
@@ -79,7 +79,7 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.app
@@ -91,7 +91,7 @@ jobs:
             type=gha,scope=app.base,mode=max
           target: base
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.app
@@ -104,7 +104,7 @@ jobs:
             type=gha,scope=app.dev-reqs,mode=max
           target: dev-reqs
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.app
@@ -118,7 +118,7 @@ jobs:
             type=gha,scope=app.install-dev,mode=max
           target: install-dev
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.app
@@ -145,16 +145,38 @@ jobs:
           target: ci
           tags: ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
 
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
         env:
           SKIP: ${{ env.SKIP_APP }}
 
-      - name: Test
-        run: >
-          docker run --rm
-          -e DJANGO_CONFIGURATION='CI'
-          ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
-          pytest --cov=. --cov-report=term-missing --hypothesis-show-statistics
+      - id: test
+        name: Test
+        uses: mathiasvr/command-output@v2.0.0
+        env:
+          TRAP: >
+            trap 'echo "exit-code=$?" >> "$GITHUB_OUTPUT"' EXIT
+          TEST: >
+            docker run
+            -e ENV=ci
+            -e DJANGO_CONFIGURATION='CI'
+            -v /tmp:/tmp
+            --rm ${{ env.NAMESPACE}}.app:${{ env.CI_TAG }}
+            pytest
+            --cov=.
+            --cov-report=term-missing:skip-covered
+            --hypothesis-show-statistics
+            --junitxml=/tmp/pytest.xml
+            | tee /tmp/pytest-coverage.txt
+        with:
+          run: |
+            ${{ env.TRAP }}
+            ${{ env.TEST }}
+
+      - uses: MishaKav/pytest-coverage-comment@v1.1.51
+        with:
+          coverage-path-prefix: app/
+          junitxml-path: /tmp/pytest.xml
+          pytest-coverage-path: /tmp/pytest-coverage.txt
 
   integrate_ui:
     name: 'Integrate UI'
@@ -169,7 +191,7 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.ui
@@ -181,7 +203,7 @@ jobs:
             type=gha,scope=ui.base,mode=max
           target: base
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.ui
@@ -194,7 +216,7 @@ jobs:
             type=gha,scope=ui.reqs,mode=max
           target: reqs
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.ui
@@ -209,7 +231,7 @@ jobs:
           target: ci
           tags: ${{ env.NAMESPACE }}.ui:${{ env.CI_TAG }}
 
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
         env:
           SKIP: ${{ env.SKIP_UI }}
 
@@ -231,7 +253,7 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.docs
@@ -243,7 +265,7 @@ jobs:
             type=gha,scope=docs.base,mode=max
           target: base
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.docs
@@ -256,7 +278,7 @@ jobs:
             type=gha,scope=docs.reqs,mode=max
           target: reqs
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.docs
@@ -270,7 +292,7 @@ jobs:
             type=gha,scope=docs.install,mode=max
           target: install
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.docs
@@ -305,7 +327,7 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.deploy
@@ -317,7 +339,7 @@ jobs:
             type=gha,scope=terraform.base,mode=max
           target: base
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.deploy
@@ -330,7 +352,7 @@ jobs:
             type=gha,scope=terraform.iamlive,mode=max
           target: iamlive
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.deploy
@@ -344,7 +366,7 @@ jobs:
             type=gha,scope=terraform.terragrunt,mode=max
           target: terragrunt
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.deploy
@@ -359,7 +381,7 @@ jobs:
             type=gha,scope=terraform.tfdocs,mode=max
           target: tfdocs
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.deploy
@@ -375,7 +397,7 @@ jobs:
             type=gha,scope=terraform.tfupdate,mode=max
           target: tfupdate
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.deploy
