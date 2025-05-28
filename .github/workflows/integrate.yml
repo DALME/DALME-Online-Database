@@ -48,7 +48,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_INITDB_ARGS: --no-sync
-        options: --health-cmd="pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: --health-cmd="pg_isready -d ida -U postgres" --health-interval=10s --health-timeout=5s --health-retries=5
         ports:
           - 5432:5432
 
@@ -121,7 +121,7 @@ jobs:
             DAM_DB_PASSWORD=dalme
             DAM_DB_HOST=127.0.0.1
             'DAM_DB_PORT=${{ job.services.mysql.ports[3306] }}'
-            POSTGRES_DB=${{ env.NAMESPACE }}
+            POSTGRES_DB=ida
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_HOST=172.17.0.1
