@@ -36,3 +36,7 @@ class OwnedMixin(models.Model):
                 kwargs[key] = value
 
         super().save(*args, **kwargs)
+
+    def class_name(self):
+        """Return specific model class name."""
+        return self.__class__.__name__
