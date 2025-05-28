@@ -1,4 +1,4 @@
-"""Unit tests for the Agents endpoint in the domain API."""
+"""Unit tests for the custom model manager."""
 
 import os
 from unittest import mock
