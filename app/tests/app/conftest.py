@@ -2,10 +2,18 @@
 
 import pytest
 
-from django.db import connection, models
-
 from app.abstract.custom_manager import CustomManager
-from app.abstract.owned_mixin import OwnedMixin
+
+# @pytest.fixture(scope='session', autouse=True)
+# def set_test_model(django_db_setup, django_db_blocker):
+#     with django_db_blocker.unblock(), schema_context('public'), connection.schema_editor() as schema_editor:
+#         if (
+#             not connection.cursor()
+#             .execute("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name='abstract_testmodel')")
+#             .fetchone()[0]
+#         ):
+#             # Create the table if it does not exist
+#             schema_editor.create_model(TestModel)
 
 
 @pytest.fixture
@@ -47,23 +55,3 @@ def dummy_list_field():
             pass
 
     return DummyListField
-
-
-@pytest.fixture
-def test_model():
-    # Concrete model for testing
-    class TestModel(OwnedMixin):
-        name = models.CharField(max_length=100)
-
-        class Meta:
-            app_label = 'abstract'
-
-    with connection.schema_editor() as schema_editor:
-        schema_editor.create_model(TestModel)
-
-    return TestModel
-
-
-@pytest.fixture
-def test_model_instance(test_model):
-    return test_model(name='test')
