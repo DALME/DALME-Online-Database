@@ -18,7 +18,7 @@ env:
     ${{ github.ref_name == 'master' && 'production' || github.ref_name == 'development.v2' && 'staging' || 'staging' }}
   CI_TAG: dev
   MYSQL_DB: test_db
-  MYSQL_USER: rootman
+  MYSQL_USER: root
   MYSQL_PASSWORD: root
   MYSQL_HOST: 127.0.0.1
   PYTHON: 3.11
