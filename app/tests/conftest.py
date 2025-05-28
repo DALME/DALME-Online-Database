@@ -1,7 +1,6 @@
 """Configure pytest for the tests module."""
 
 import uuid
-from unittest import mock
 
 import pytest
 from django_tenants.utils import schema_context
@@ -9,38 +8,12 @@ from rest_framework.test import APIRequestFactory
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import connections
+from django.db import connection
 
 from app.settings import TenantTypes
-from oauth.models import User
-from tenants.middleware import tenant_context_middleware
 from tenants.models import Domain, Tenant
 
 from tests.factories import ResourceFactory
-
-MOCK_USER = mock.MagicMock(
-    spec=User,
-    id=1,
-    username='hari.seldon',
-)
-MOCK_TENANT = mock.MagicMock(
-    spec=Tenant,
-    id=1,
-    pk=1,
-    name='DALME',
-    tenant_type=TenantTypes.PROJECT,
-    schema_name='dalme',
-)
-MOCK_DOMAIN = mock.MagicMock(
-    spec=Domain,
-    id=1,
-    domain='dalme.localhost',
-    is_primary=True,
-    tenant=MOCK_TENANT,
-)
-MOCK_TENANT.domains.first.return_value = MOCK_DOMAIN
-MOCK_TENANT.members.return_value = [MOCK_USER]
-MOCK_TENANT.get_tenant_type.return_value = TenantTypes.PROJECT
 
 
 def pytest_configure():
@@ -73,12 +46,8 @@ def pytest_collection_modifyitems(items):
 
 
 @pytest.fixture(scope='session')
-def set_mock_tenant():
-    tenant_context_middleware._tenant.set(MOCK_TENANT)  # noqa: SLF001
-
-
-@pytest.fixture(scope='session')
-def setup_tenant_schema(django_db_setup, django_db_blocker):  # noqa: ARG001
+def django_db_setup(django_db_setup, django_db_blocker):  # noqa: ARG001
+    """Create tenants and schemas and apply migrations."""
     tenants = settings.TENANTS()
     with django_db_blocker.unblock(), schema_context('public'):
         for tenant in tenants:
@@ -98,12 +67,11 @@ def setup_tenant_schema(django_db_setup, django_db_blocker):  # noqa: ARG001
 
                 if schema_name not in [
                     row[0]
-                    for row in connections['default']
-                    .cursor()
+                    for row in connection.cursor()
                     .execute('SELECT schema_name FROM information_schema.schemata')
                     .fetchall()
                 ]:
-                    connections['default'].cursor().execute(f'CREATE SCHEMA "{schema_name}"')
+                    connection.cursor().execute(f'CREATE SCHEMA "{schema_name}"')
                     call_command(
                         'migrate_schemas', tenant=True, schema_name=schema_name, interactive=False, verbosity=0
                     )
@@ -112,7 +80,13 @@ def setup_tenant_schema(django_db_setup, django_db_blocker):  # noqa: ARG001
 @pytest.fixture
 def test_domain():
     """Inject a test domain."""
-    return MOCK_DOMAIN
+    return Domain.objects.filter(tenant__tenant_type=TenantTypes.PROJECT).first()
+
+
+@pytest.fixture
+def test_tenant(test_domain):
+    """Inject a test tenant."""
+    return test_domain.tenant
 
 
 @pytest.fixture
@@ -177,7 +151,7 @@ def admin_user(factories, test_username, test_password):
     return factories.users.create(
         username=test_username,
         password=test_password,
-        is_staff=True,
+        staff=True,
     )
 
 
@@ -187,8 +161,7 @@ def superuser(factories, test_username, test_password):
     return factories.users.create(
         username=test_username,
         password=test_password,
-        is_staff=True,
-        is_superuser=True,
+        superuser=True,
     )
 
 

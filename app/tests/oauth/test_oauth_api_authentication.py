@@ -1,5 +1,7 @@
 """Test the oauth authentication API."""
 
+from unittest import mock
+
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
@@ -12,11 +14,13 @@ from oauth.api.authentication import AuthorizationCode, Login
 
 
 @pytest.mark.urls('app.urls.urls_tenant')
-def test_oauth_authorization_code_no_credentials(arf, log, set_mock_tenant):  # noqa: ARG001
+@pytest.mark.django_db
+@mock.patch('app.abstract.custom_manager.get_current_tenant')
+def test_oauth_authorization_code_no_credentials(mock_get_current_tenant, arf, test_domain, log):
+    mock_get_current_tenant.return_value = test_domain.tenant
     view = AuthorizationCode.as_view()
-
     url = reverse('oauth:authorization-code')
-    request = arf.get(url, format='json')
+    request = arf.get(url, format='json', headers={'HOST': test_domain.domain})
     response = view(request)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -32,7 +36,7 @@ def test_oauth_authorization_code_no_credentials(arf, log, set_mock_tenant):  # 
 @freeze_time('1970-01-01')
 @pytest.mark.urls('app.urls.urls_tenant')
 @pytest.mark.django_db
-def test_oauth_login_missing_credentials(arf, test_username, user, log, set_mock_tenant):  # noqa: ARG001
+def test_oauth_login_missing_credentials(arf, test_username, user, log):
     view = Login.as_view()
     session = SessionStore()
 
@@ -67,7 +71,7 @@ def test_oauth_login_missing_credentials(arf, test_username, user, log, set_mock
 @freeze_time('1970-01-01')
 @pytest.mark.urls('app.urls.urls_tenant')
 @pytest.mark.django_db
-def test_oauth_login_incorrect_credentials(arf, test_username, user, log, set_mock_tenant):  # noqa: ARG001
+def test_oauth_login_incorrect_credentials(arf, test_username, user, log):
     view = Login.as_view()
     session = SessionStore()
 
@@ -103,7 +107,7 @@ def test_oauth_login_incorrect_credentials(arf, test_username, user, log, set_mo
 @freeze_time('1970-01-01')
 @pytest.mark.urls('app.urls.urls_tenant')
 @pytest.mark.django_db
-def test_oauth_login(arf, test_username, test_password, user, unix_epoch_datetime, log, set_mock_tenant):  # noqa: ARG001
+def test_oauth_login(arf, test_username, test_password, user, unix_epoch_datetime, log):
     view = Login.as_view()
     session = SessionStore()
 

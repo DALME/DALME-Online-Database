@@ -1,8 +1,8 @@
 """Interface for the tests.factories module."""
 
+from tests.factories.app import OwnedModelFactory, TrackedModelFactory, UUIDModelFactory
 from tests.factories.domain import OrganizationFactory, PersonFactory
 from tests.factories.oauth import GroupFactory, GroupPropertiesFactory, UserFactory
-from tests.factories.tenant import DomainFactory, TenantFactory
 from tests.factories.web import TeamMemberFactory, TeamMemberRoleFactory
 
 
@@ -24,10 +24,11 @@ class ResourceFactory:
         'user_groups': GroupFactory,
         'user_group_properties': GroupPropertiesFactory,
         'users': UserFactory,
-        'tenants': TenantFactory,
-        'domains': DomainFactory,
         'team_members': TeamMemberFactory,
         'team_member_roles': TeamMemberRoleFactory,
+        'owned_models': OwnedModelFactory,
+        'uuid_models': UUIDModelFactory,
+        'tracked_models': TrackedModelFactory,
     }
 
     def __init__(self):

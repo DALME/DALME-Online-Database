@@ -13,11 +13,10 @@ from freezegun import freeze_time
 from oauth2_provider.settings import DEFAULTS as OAUTH_DEFAULTS
 from rest_framework import status
 
-from django.test import Client, override_settings
+from django.test import Client
 from django.urls import reverse
 
 
-@override_settings(ALLOWED_HOSTS=['dalme.localhost'])
 @freeze_time('1970-01-01')
 @pytest.mark.urls('app.urls.urls_tenant')
 @pytest.mark.django_db
@@ -32,7 +31,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
     oauth_application,
     log,
     test_domain,
-    set_mock_tenant,  # noqa: ARG001
 ):
     """A full integration test for the authorization code flow procedure.
 
@@ -44,9 +42,9 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
 
     """
     mock_domain.objects.select_related.return_value.get.return_value = test_domain
-    client = Client(HTTP_HOST='dalme.localhost')
+    client = Client(HTTP_HOST=test_domain.domain)
 
-    assert oauth_application.allowed_origins == 'http://dalme.localhost'
+    assert oauth_application.allowed_origins == f'http://{test_domain.domain}'
 
     # Let's accumulate the logs emitted per request so we can just check the
     # diff as they appear after each event.
@@ -65,7 +63,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request': f'GET {url}',
             'user_agent': None,
             'event': 'request_started',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'tenant': mock.ANY,
             'ip': '127.0.0.1',
             'request_id': mock.ANY,
@@ -75,7 +73,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request': f'GET {url}',
             'user_agent': None,
             'event': 'request_started',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'tenant': mock.ANY,
             'ip': '127.0.0.1',
             'request_id': mock.ANY,
@@ -85,7 +83,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'code': status.HTTP_403_FORBIDDEN,
             'request': f'GET {url}',
             'event': 'request_finished',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'tenant': mock.ANY,
             'ip': '127.0.0.1',
             'user_id': None,
@@ -125,7 +123,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request': f'POST {url}',
             'user_agent': None,
             'event': 'request_started',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
             'request_id': mock.ANY,
@@ -135,7 +133,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request': f'POST {url}',
             'user_agent': None,
             'event': 'request_started',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
             'request_id': mock.ANY,
@@ -144,7 +142,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
         {
             'user': user,
             'event': 'User successfully logged in',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
             'request_id': mock.ANY,
@@ -154,7 +152,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'code': status.HTTP_202_ACCEPTED,
             'request': f'POST {url}',
             'event': 'request_finished',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'user_id': user.id,
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
@@ -188,7 +186,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'tenant': mock.ANY,
             'request_id': mock.ANY,
             'ip': '127.0.0.1',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'level': 'info',
         },
         {
@@ -198,7 +196,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'tenant': mock.ANY,
             'request_id': mock.ANY,
             'ip': '127.0.0.1',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'level': 'info',
         },
         {
@@ -209,7 +207,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'tenant': mock.ANY,
             'request_id': mock.ANY,
             'ip': '127.0.0.1',
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'level': 'info',
         },
         {
@@ -237,7 +235,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
         'code_challenge': code_challenge,
         'code_challenge_method': 'S256',
         'client_id': settings.OAUTH_CLIENT_ID,
-        'redirect_uri': 'http://dalme.localhost/api/oauth/authorize/callback/',
+        'redirect_uri': f'http://{test_domain.domain}/api/oauth/authorize/callback/',
     }
     url = reverse('oauth:authorize')
     response = client.get(url, pkce_payload)
@@ -256,7 +254,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'event': 'request_started',
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'request_id': mock.ANY,
             'level': 'info',
         },
@@ -266,7 +264,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'event': 'request_started',
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'request_id': mock.ANY,
             'level': 'info',
         },
@@ -277,7 +275,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
             'user_id': user.id,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'request_id': mock.ANY,
             'level': 'info',
         },
@@ -307,7 +305,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'level': 'info',
             'request_id': mock.ANY,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'request': f'GET /api/oauth/authorize/callback/?code={code}',
@@ -317,7 +315,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'level': 'info',
             'request_id': mock.ANY,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -327,7 +325,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request': f'GET /api/oauth/authorize/callback/?code={code}',
             'request_id': mock.ANY,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
             'user_id': user.id,
         },
         {
@@ -351,7 +349,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
                 'code': code,
                 'code_verifier': code_verifier,
                 'grant_type': 'authorization_code',
-                'redirect_uri': 'http://dalme.localhost/api/oauth/authorize/callback/',
+                'redirect_uri': f'http://{test_domain.domain}/api/oauth/authorize/callback/',
             }
         ),
         content_type='application/x-www-form-urlencoded',
@@ -380,7 +378,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
         'iat': 0,
         'at_hash': mock.ANY,
         'sub': str(user.id),
-        'iss': 'http://dalme.localhost/api/oauth',
+        'iss': f'http://{test_domain.domain}/api/oauth',
         'exp': OAUTH_DEFAULTS['ID_TOKEN_EXPIRE_SECONDS'],
         'auth_time': 0,
         'jti': mock.ANY,  # https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7
@@ -396,7 +394,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'event': 'request_started',
@@ -406,7 +404,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -417,7 +415,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_id': user.id,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -452,7 +450,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'event': 'request_started',
@@ -462,7 +460,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -473,7 +471,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_id': user.id,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -522,7 +520,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'event': 'request_started',
@@ -532,7 +530,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -543,7 +541,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_id': user.id,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -577,7 +575,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'event': 'request_started',
@@ -587,7 +585,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -598,7 +596,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_id': user.id,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_200_OK,
@@ -631,7 +629,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'event': 'request_started',
@@ -641,7 +639,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_agent': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_401_UNAUTHORIZED,
@@ -652,7 +650,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'user_id': None,
             'tenant': mock.ANY,
-            'domain': 'dalme.localhost',
+            'domain': test_domain.domain,
         },
         {
             'code': status.HTTP_401_UNAUTHORIZED,

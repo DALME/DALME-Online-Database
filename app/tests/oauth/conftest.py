@@ -10,11 +10,11 @@ from oauth.models import Application
 
 
 @pytest.fixture
-def oauth_application():
+def oauth_application(test_domain):
     """Inject an OAuth application."""
     client_id = settings.OAUTH_CLIENT_ID
     client_secret = settings.OAUTH_CLIENT_SECRET
-    domains = ['http://dalme.localhost']
+    domains = [f'http://{test_domain.domain}']
     redirect_uris = [f'{domain}/api/oauth/authorize/callback/' for domain in domains]
     post_logout_redirect_uris = [f'{domain}/' for domain in domains]
     kwargs = {

@@ -4,8 +4,7 @@ import factory
 from factory import fuzzy
 
 from oauth.models import GroupProperties
-
-from .tenant import TenantFactory
+from tenants.models import Tenant
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -13,12 +12,12 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'oauth.User'
-        django_get_or_create = ('email', 'username')
+        django_get_or_create = ('username',)
         skip_postgeneration_save = True
 
     class Params:
         staff = factory.Trait(is_staff=True)
-        superuser = factory.Trait(staff=True, is_superuser=True)
+        superuser = factory.Trait(is_staff=True, is_superuser=True)
 
     username = factory.Sequence(lambda n: 'User%03d' % n)  # noqa: UP031
     first_name = factory.Faker('first_name')
@@ -51,7 +50,7 @@ class GroupPropertiesFactory(factory.django.DjangoModelFactory):
 
     group_type = fuzzy.FuzzyChoice(GroupProperties.GROUP_TYPES, getter=lambda c: c[0])
     description = factory.Sequence(lambda n: 'Some group description %03d' % n)  # noqa: UP031
-    tenant = factory.SubFactory(TenantFactory)
+    tenant = factory.Iterator(Tenant.objects.all())
 
 
 class GroupFactory(factory.django.DjangoModelFactory):
@@ -65,10 +64,9 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def permissions(self, create, extracted, **kwargs):  # noqa: ARG002
-        """Add objets to the permissions m2m relation.
+        """Add objects to the permissions m2m relation.
 
-        These should be passed in via the Permission:w
-        Factory in tests themselves.
+        These should be passed in via the Permission Factory in tests themselves.
 
         """
         if not create or not extracted:
