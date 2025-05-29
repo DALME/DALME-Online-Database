@@ -177,7 +177,7 @@ jobs:
           -e DJANGO_CONFIGURATION='CI'
           -v /tmp:/tmp
           --rm ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
-          python manage.py migrate_schemas
+          python manage.py migrate
 
       - id: test
         name: Test
