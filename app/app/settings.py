@@ -592,7 +592,7 @@ class Development(Base, Configuration):
             'USER': os.environ['DAM_DB_USER'],
             'PASSWORD': os.environ['DAM_DB_PASSWORD'],
             'HOST': os.environ['DAM_DB_HOST'],
-            'PORT': os.environ.get('DAM_PORT', '3306'),
+            'PORT': os.environ.get('DAM_DB_PORT', '3306'),
         },
     }
 
@@ -754,7 +754,7 @@ class Production(Base, Configuration):
                 'USER': os.environ['DAM_DB_USER'],
                 'PASSWORD': os.environ['DAM_DB_PASSWORD'],
                 'HOST': os.environ['DAM_DB_HOST'],
-                'PORT': os.environ.get('DAM_PORT', '3306'),
+                'PORT': os.environ.get('DAM_DB_PORT', '3306'),
             },
         }
 

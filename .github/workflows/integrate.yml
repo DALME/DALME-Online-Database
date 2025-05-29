@@ -67,6 +67,9 @@ jobs:
           MYSQL_ROOT_HOST: "%"
         ports:
           - 3306:3306
+        volumes:
+          - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+          - ./config/mysql:/docker-entrypoint-initdb.d
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
