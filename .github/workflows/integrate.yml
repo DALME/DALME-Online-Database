@@ -81,7 +81,7 @@ jobs:
       - name: Wait for MySQL to be ready
         run: |
           for i in {1..30}; do
-              mysqladmin ping -h 127.0.0.1 -u dalme --password=dalme && exit 0
+              mysqladmin ping -h 127.0.0.1 -u dalme --password=dalme --ssl-mode=DISABLED && exit 0
               echo "Waiting for MySQL..."
               sleep 4
           done
