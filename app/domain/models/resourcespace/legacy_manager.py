@@ -59,7 +59,7 @@ class LegacyQuerySet:
 
         self.db = MySQLdb.connect(
             host=settings.DATABASES['dam']['HOST'],
-            port=settings.DATABASES['dam']['PORT'],
+            # port=settings.DATABASES['dam']['PORT'],
             database=settings.DATABASES['dam']['NAME'],
             user=settings.DATABASES['dam']['USER'],
             password=settings.DATABASES['dam']['PASSWORD'],
@@ -127,7 +127,7 @@ class LegacyQuerySet:
     def connect(self):
         self.db = MySQLdb.connect(
             host=settings.DATABASES[self.queryset.db]['HOST'],
-            port=settings.DATABASES[self.queryset.db]['PORT'],
+            # port=settings.DATABASES[self.queryset.db]['PORT'],
             database=settings.DATABASES[self.queryset.db]['NAME'],
             user=settings.DATABASES[self.queryset.db]['USER'],
             password=settings.DATABASES[self.queryset.db]['PASSWORD'],
