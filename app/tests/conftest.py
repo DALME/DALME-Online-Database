@@ -8,7 +8,7 @@ from rest_framework.test import APIRequestFactory
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import connection
+from django.db import connections
 
 from app.settings import TenantTypes
 from tenants.models import Domain, Tenant
@@ -62,11 +62,12 @@ def django_db_setup(django_db_setup, django_db_blocker):  # noqa: ARG001
 
                 if schema_name not in [
                     row[0]
-                    for row in connection.cursor()
+                    for row in connections['default']
+                    .cursor()
                     .execute('SELECT schema_name FROM information_schema.schemata')
                     .fetchall()
                 ]:
-                    connection.cursor().execute(f'CREATE SCHEMA "{schema_name}"')
+                    connections['default'].cursor().execute(f'CREATE SCHEMA "{schema_name}"')
                     call_command(
                         'migrate_schemas', tenant=True, schema_name=schema_name, interactive=False, verbosity=0
                     )
