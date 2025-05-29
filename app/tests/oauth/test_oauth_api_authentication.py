@@ -14,7 +14,7 @@ from oauth.api.authentication import AuthorizationCode, Login
 
 
 @pytest.mark.urls('app.urls.urls_tenant')
-@pytest.mark.django_db(databases=['default', 'dam'])
+@pytest.mark.django_db
 @mock.patch('app.abstract.custom_manager.get_current_tenant')
 def test_oauth_authorization_code_no_credentials(mock_get_current_tenant, arf, test_domain, log):
     mock_get_current_tenant.return_value = test_domain.tenant

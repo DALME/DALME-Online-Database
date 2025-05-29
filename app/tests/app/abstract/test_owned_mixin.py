@@ -6,7 +6,7 @@ from unittest import mock
 import pytest
 
 
-@pytest.mark.django_db(databases=['default'])
+@pytest.mark.django_db
 @mock.patch('app.abstract.owned_mixin.get_current_user')
 def test_owner_set_on_create(mock_get_current_user, user, factories):
     mock_get_current_user.return_value = user
