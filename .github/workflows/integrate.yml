@@ -51,8 +51,8 @@ jobs:
         options: >-
           --health-cmd="pg_isready -d ida -U postgres"
           --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+          --health-timeout=10s
+          --health-retries=10
         ports:
           - 5432:5432
 
@@ -152,7 +152,7 @@ jobs:
             POSTGRES_DB=ida
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
-            POSTGRES_HOST=localhost
+            POSTGRES_HOST=172.17.0.1
             'POSTGRES_PORT=${{ job.services.postgres.ports[5432] }}'
           load: true
           push: false
@@ -171,8 +171,13 @@ jobs:
           SKIP: ${{ env.SKIP_APP }}
 
       - name: Apply database migrations
-        run: |
-          docker run -e ENV=ci -e DJANGO_CONFIGURATION='Development' -v /tmp:/tmp --rm ida.app:dev python manage.py migrate
+        run: >
+          docker run
+          -e ENV=ci
+          -e DJANGO_CONFIGURATION='CI'
+          -v /tmp:/tmp
+          --rm ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
+          python manage.py migrate_schemas
 
       - id: test
         name: Test
@@ -183,7 +188,7 @@ jobs:
           TEST: >
             docker run
             -e ENV=ci
-            -e DJANGO_CONFIGURATION='Development'
+            -e DJANGO_CONFIGURATION='CI'
             -v /tmp:/tmp
             --rm ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
             pytest
