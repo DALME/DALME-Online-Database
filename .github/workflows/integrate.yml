@@ -69,8 +69,8 @@ jobs:
         ports:
           - 3306:3306
         volumes:
-          - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
-          - ./config/mysql:/docker-entrypoint-initdb.d
+          - ${{ github.workspace }}/build/volume/config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+          - ${{ github.workspace }}/build/volume/config/mysql:/docker-entrypoint-initdb.d
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -79,6 +79,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Restart MySQL
+        # Restart MySQL after volumes have been checked out
+        uses: docker://docker
+        with:
+          args: docker restart mysql
 
       - uses: docker/setup-buildx-action@v3
 
