@@ -88,14 +88,9 @@ jobs:
           echo "MySQL failed to start in time" >&2
           exit 1
 
-      - uses: calxus/mysql-deploy-action@v1
-        with:
-          DATABASE_HOST: 127.0.0.1
-          DATABASE_PORT: 3306
-          DATABASE_NAME: resourcespace
-          DATABASE_USERNAME: dalme
-          DATABASE_PASSWORD: dalme
-          DATABASE_SCRIPT: config/mysql/mysql_rs_schema.sql
+      - name: Import MySQL schema
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u dalme --password=dalme resourcespace < config/mysql/mysql_rs_schema.sql
 
       - uses: docker/setup-buildx-action@v3
 
