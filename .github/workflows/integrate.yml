@@ -82,12 +82,12 @@ jobs:
 
       - uses: mirromutth/mysql-action@v1.1
         with:
-          character-set-server: utf8
-          collation-server: utf8_unicode_ci
-          mysql-version: 5.7.27
-          mysql-database: resourcespace
-          mysql-user: dalme
-          mysql-password: dalme
+          character set server: utf8
+          collation server: utf8_unicode_ci
+          mysql version: 5.7.27
+          mysql database: resourcespace
+          mysql user: dalme
+          mysql password: dalme
 
       - uses: calxus/mysql-deploy-action@v1
         with:
