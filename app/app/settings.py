@@ -731,21 +731,6 @@ class CI(Development):
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
 
-    # https://docs.djangoproject.com/en/3.2/ref/databases/#caveats
-    @property
-    def DATABASES(self):
-        """Configure the databases."""
-        return {
-            'default': {
-                'ENGINE': 'django_tenants.postgresql_backend',
-                'NAME': os.environ['POSTGRES_DB'],
-                'USER': os.environ['POSTGRES_USER'],
-                'PASSWORD': os.environ['POSTGRES_PASSWORD'],
-                'HOST': os.environ['POSTGRES_HOST'],
-                'PORT': os.environ['POSTGRES_PORT'],
-            },
-        }
-
 
 class Production(Base):
     """Production settings."""
