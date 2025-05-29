@@ -59,10 +59,10 @@ jobs:
     steps:
       - name: Wait for PostgreSQL to be ready
         run: |
-          for i in {1..15}; do
-            pg_isready -h localhost -p 5432 -U postgres && exit 0
-            echo "Waiting for PostgreSQL..."
-            sleep 4
+          for i in {1..30}; do
+              pg_isready -h localhost -p 5432 -U postgres && exit 0
+              echo "Waiting for PostgreSQL..."
+              sleep 4  # Retain 4-second intervals
           done
           echo "PostgreSQL failed to start in time" >&2
           exit 1
@@ -77,6 +77,16 @@ jobs:
           mysql database: resourcespace
           mysql user: dalme
           mysql password: dalme
+
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..30}; do
+              mysqladmin ping -h 127.0.0.1 -u dalme --password=dalme && exit 0
+              echo "Waiting for MySQL..."
+              sleep 4
+          done
+          echo "MySQL failed to start in time" >&2
+          exit 1
 
       - uses: calxus/mysql-deploy-action@v1
         with:
