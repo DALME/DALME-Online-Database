@@ -30,7 +30,8 @@ env:
   TG_VERSION: 0.67.16
 
 permissions:
-  contents: read
+  checks: write
+  contents: write
   id-token: write  # OIDC permission.
   pull-requests: write
 
@@ -78,17 +79,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: ${{ github.sha }}
+
+      - uses: docker/setup-buildx-action@v3
 
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON }}
 
-      - uses: docker/setup-buildx-action@v3
-
       - uses: docker/build-push-action@v5
         with:
           context: .
           file: config/docker/Dockerfile.app
+          build-args: |
+            BUILD=${{ github.sha }}
           load: false
           push: false
           cache-from: |
