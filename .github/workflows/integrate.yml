@@ -55,6 +55,7 @@ jobs:
       mysql:
         image: mysql:5.7.27
         env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: resourcespace
           MYSQL_USER: dalme
           MYSQL_PASSWORD: dalme
