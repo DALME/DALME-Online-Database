@@ -58,11 +58,11 @@ class LegacyQuerySet:
             self.sql, self.params = compiler.as_sql()
 
         self.db = MySQLdb.connect(
-            host=settings.DATABASES['dam']['HOST'],
-            port=settings.DATABASES['dam']['PORT'],
-            database=settings.DATABASES['dam']['NAME'],
-            user=settings.DATABASES['dam']['USER'],
-            password=settings.DATABASES['dam']['PASSWORD'],
+            host=settings.DAM_DB_HOST,
+            port=settings.DAM_DB_PORT,
+            database=settings.DAM_DB_NAME,
+            user=settings.DAM_DB_USER,
+            password=settings.DAM_DB_PASSWORD,
         )
         self.cursor = self.db.cursor()
 
@@ -126,11 +126,11 @@ class LegacyQuerySet:
 
     def connect(self):
         self.db = MySQLdb.connect(
-            host=settings.DATABASES[self.queryset.db]['HOST'],
-            port=settings.DATABASES[self.queryset.db]['PORT'],
-            database=settings.DATABASES[self.queryset.db]['NAME'],
-            user=settings.DATABASES[self.queryset.db]['USER'],
-            password=settings.DATABASES[self.queryset.db]['PASSWORD'],
+            host=settings.DAM_DB_HOST,
+            port=settings.DAM_DB_PORT,
+            database=settings.DAM_DB_NAME,
+            user=settings.DAM_DB_USER,
+            password=settings.DAM_DB_PASSWORD,
         )
         self.cursor = self.db.cursor()
 
