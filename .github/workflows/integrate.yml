@@ -90,7 +90,7 @@ jobs:
 
       - name: Import MySQL schema
         run: |
-          mysql -h 127.0.0.1 -P 3306 -u dalme --password=dalme resourcespace < config/mysql/mysql_rs_schema.sql
+          mysql -h 127.0.0.1 -P 3306 -u dalme --password=dalme --ssl-mode=DISABLED resourcespace < config/mysql/mysql_rs_schema.sql
 
       - uses: docker/setup-buildx-action@v3
 
