@@ -94,19 +94,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      # - uses: mirromutth/mysql-action@v1.1
-      #   with:
-      #     character set server: utf8
-      #     collation server: utf8_unicode_ci
-      #     mysql version: 5.7.27
-      #     mysql database: resourcespace
-      #     mysql user: dalme
-      #     mysql password: dalme
-
-      # - name: Import MySQL schema
-      #   run: |
-      #     mysql -h 127.0.0.1 -P 3306 -u dalme --password=dalme --ssl-mode=DISABLED resourcespace < config/mysql/mysql_rs_schema.sql
-
       - uses: docker/setup-buildx-action@v3
 
       - uses: actions/setup-python@v4
@@ -163,12 +150,12 @@ jobs:
             DAM_DB_USER=dalme
             DAM_DB_PASSWORD=dalme
             DAM_DB_HOST=127.0.0.1
-            'DAM_DB_PORT="${{ job.services.mysql.ports[3306] }}"'
+            DAM_DB_PORT="${{ job.services.mysql.ports[3306] }}"
             POSTGRES_DB=ida
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_HOST=172.17.0.1
-            'POSTGRES_PORT="${{ job.services.postgres.ports[5432] }}"'
+            POSTGRES_PORT="${{ job.services.postgres.ports[5432] }}"
           load: true
           push: false
           cache-from: |
