@@ -16,11 +16,6 @@ from tenants.models import Domain, Tenant
 from tests.factories import ResourceFactory
 
 
-def pytest_configure():
-    """Configure pytest runs globally here."""
-    settings.STORAGES['staticfiles'] = {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}
-
-
 def pytest_collection_modifyitems(items):
     """Automatically categorize tests if they rely on specific fixtures."""
     integration_fixtures = ['admin_client', 'client']

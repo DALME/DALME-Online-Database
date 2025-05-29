@@ -82,6 +82,8 @@ app.sync: _app.install _app.build
 app.test:
 	docker compose run --rm \
 		-e DEBUG='' \
+		-e ENV=test \
+		-e DJANGO_CONFIGURATION=Test \
 		$(NAMESPACE).app \
 		pytest -s \
 		--cov=. \
@@ -92,6 +94,8 @@ app.test:
 
 app.test.i:
 	docker compose run --rm \
+		-e ENV=test \
+		-e DJANGO_CONFIGURATION=Test \
 		$(NAMESPACE).app \
 		pytest -svv \
 		-m 'integration' \
@@ -102,6 +106,8 @@ app.test.i:
 
 app.test.p:
 	docker compose run --rm \
+		-e ENV=test \
+		-e DJANGO_CONFIGURATION=Test \
 		$(NAMESPACE).app \
 		pytest -svv \
 		-m 'property' \
@@ -113,6 +119,8 @@ app.test.p:
 
 app.test.u:
 	docker compose run --rm \
+		-e ENV=test \
+		-e DJANGO_CONFIGURATION=Test \
 		$(NAMESPACE).app \
 		pytest -svv \
 		-m 'unit' \
@@ -123,6 +131,8 @@ app.test.u:
 
 app.test.watch:
 	docker compose run --rm \
+		-e ENV=test \
+		-e DJANGO_CONFIGURATION=Test \
 		$(NAMESPACE).app \
 		ptw . $(args)
 .PHONY: app.test.watch

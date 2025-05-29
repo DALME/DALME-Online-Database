@@ -77,6 +77,7 @@ ENV LOG_LEVEL=ERROR
 ENV OAUTH_CLIENT_ID=oauth.ida.development
 ENV OAUTH_CLIENT_SECRET=django-insecure-development-environment-oauth-client-secret
 ENV OIDC_RSA_PRIVATE_KEY=/opt/app/oidc.key
+ENV DJANGO_CONFIGURATION='CI'
 WORKDIR /opt/app
 COPY ./app .
 RUN mkdir /opt/app/www

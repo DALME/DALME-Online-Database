@@ -489,8 +489,15 @@ class Base(Configuration):
         return enum.Enum('TENANTS', {key: TENANT(**tenant_data) for key, tenant_data in tenants.items()})
 
 
-class Development(Base, Configuration):
+class Development(Base):
     """Development settings."""
+
+    @classmethod
+    def setup(cls, *, assert_env: bool = True) -> None:
+        """Set up this settings module."""
+        super().setup()
+        if assert_env:
+            assert cls.ENV == 'development'
 
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
@@ -686,15 +693,68 @@ class Development(Base, Configuration):
     PLAUSIBLE_API_KEY = os.environ.get('PLAUSIBLE_API_KEY')
 
 
-class CI(Development, Configuration):
+class Test(Development):
+    """Test settings."""
+
+    @classmethod
+    def setup(cls, *, assert_env: bool = True) -> None:
+        """Set up this settings module."""
+        super().setup(assert_env=False)
+        if assert_env:
+            assert cls.ENV == 'test'
+
+    # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
+    STORAGES = {
+        'default': {
+            'BACKEND': 'tenants.storage_backends.LocalMediaStorage',
+            # 'BACKEND': 'django.core.files.storage.memory.InMemoryStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',
+        },
+        'avatars': {
+            'BACKEND': 'django.core.files.storage.memory.InMemoryStorage',
+        },
+    }
+
+
+class CI(Development):
     """Continuous integration pipeline settings."""
+
+    @classmethod
+    def setup(cls, *, assert_env: bool = True) -> None:
+        """Set up this settings module."""
+        super().setup(assert_env=False)
+        if assert_env:
+            assert cls.ENV == 'ci'
 
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
 
+    # https://docs.djangoproject.com/en/3.2/ref/databases/#caveats
+    @property
+    def DATABASES(self):
+        """Configure the databases."""
+        return {
+            'default': {
+                'ENGINE': 'django_tenants.postgresql_backend',
+                'USER': os.environ['POSTGRES_USER'],
+                'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+                'HOST': os.environ['POSTGRES_HOST'],
+                'PORT': os.environ['POSTGRES_PORT'],
+            },
+        }
 
-class Production(Base, Configuration):
+
+class Production(Base):
     """Production settings."""
+
+    @classmethod
+    def setup(cls, *, assert_env: bool = True) -> None:
+        """Set up this settings module."""
+        super().setup()
+        if assert_env:
+            assert cls.ENV == 'production'
 
     DEBUG = False
 
@@ -892,6 +952,13 @@ class Production(Base, Configuration):
 
 class Staging(Production, Configuration):
     """Staging settings."""
+
+    @classmethod
+    def setup(cls, *, assert_env: bool = True) -> None:
+        """Set up this settings module."""
+        super().setup(assert_env=False)
+        if assert_env:
+            assert cls.ENV == 'staging'
 
     DEBUG = False
 
