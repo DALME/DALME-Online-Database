@@ -144,6 +144,10 @@ jobs:
         env:
           SKIP: ${{ env.SKIP_APP }}
 
+      - name: Apply database migrations
+        run: |
+          docker run -e ENV=ci -e DJANGO_CONFIGURATION='Development' -v /tmp:/tmp --rm ida.app:dev python manage.py migrate
+
       - id: test
         name: Test
         uses: mathiasvr/command-output@v2.0.0
