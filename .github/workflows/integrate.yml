@@ -79,8 +79,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: ${{ github.sha }}
 
       - uses: docker/setup-buildx-action@v3
 
