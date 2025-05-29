@@ -94,7 +94,7 @@ jobs:
           DATABASE_PORT: 3306
           DATABASE_NAME: resourcespace
           DATABASE_USERNAME: dalme
-          DATABASE_PASSWORD: password
+          DATABASE_PASSWORD: dalme
           DATABASE_SCRIPT: config/mysql/mysql_rs_schema.sql
 
       - uses: docker/setup-buildx-action@v3
