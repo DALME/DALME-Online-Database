@@ -59,6 +59,7 @@ jobs:
           MYSQL_USER: dalme
           MYSQL_PASSWORD: dalme
           MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_HOST: "%"
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -151,9 +152,9 @@ jobs:
           TEST: >
             docker run
             -e ENV=ci
-            -e DJANGO_CONFIGURATION='CI'
+            -e DJANGO_CONFIGURATION='Development'
             -v /tmp:/tmp
-            --rm ${{ env.NAMESPACE}}.app:${{ env.CI_TAG }}
+            --rm ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
             pytest
             --cov=.
             --cov-report=term-missing:skip-covered
