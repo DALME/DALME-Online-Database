@@ -170,14 +170,14 @@ jobs:
         env:
           SKIP: ${{ env.SKIP_APP }}
 
-      - name: Apply database migrations
-        run: >
-          docker run
-          -e ENV=ci
-          -e DJANGO_CONFIGURATION='CI'
-          -v /tmp:/tmp
-          --rm ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
-          python manage.py migrate
+      # - name: Apply database migrations
+      #   run: >
+      #     docker run
+      #     -e ENV=ci
+      #     -e DJANGO_CONFIGURATION='CI'
+      #     -v /tmp:/tmp
+      #     --rm ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
+      #     python manage.py migrate
 
       - id: test
         name: Test
