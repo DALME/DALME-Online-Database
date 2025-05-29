@@ -42,6 +42,7 @@ ignore = [
   "FBT002",
   "ISC001",  # Recommended disable by the rust format.
   "PLC1901", # Too many false positives.
+  "PLW1508", # invalid-envvar-default - way too annoying
   "RUF012",  # Typing related.
   "TD002",
   "TD003",
