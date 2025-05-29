@@ -150,12 +150,12 @@ jobs:
             DAM_DB_USER=dalme
             DAM_DB_PASSWORD=dalme
             DAM_DB_HOST=127.0.0.1
-            'DAM_DB_PORT=${{ job.services.mysql.ports[3306] }}'
+            DAM_DB_PORT=3306
             POSTGRES_DB=ida
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_HOST=172.17.0.1
-            'POSTGRES_PORT=${{ job.services.postgres.ports[5432] }}'
+            POSTGRES_PORT=5432
           load: true
           push: false
           cache-from: |
