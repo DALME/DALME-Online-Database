@@ -57,34 +57,46 @@ jobs:
         ports:
           - 5432:5432
 
-      mysql:
-        image: mysql:5.7.27
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: resourcespace
-          MYSQL_USER: dalme
-          MYSQL_PASSWORD: dalme
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_ROOT_HOST: "%"
-        ports:
-          - 3306:3306
-        volumes:
-          - ${{ github.workspace }}/build/volume/config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
-          - ${{ github.workspace }}/build/volume/config/mysql:/docker-entrypoint-initdb.d
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+      # mysql:
+      #   image: mysql:5.7.27
+      #   env:
+      #     MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      #     MYSQL_DATABASE: resourcespace
+      #     MYSQL_USER: dalme
+      #     MYSQL_PASSWORD: dalme
+      #     MYSQL_ROOT_PASSWORD: root
+      #     MYSQL_ROOT_HOST: "%"
+      #   ports:
+      #     - 3306:3306
+      #   volumes:
+      #     - ${{ github.workspace }}/config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      #     - ${{ github.workspace }}/config/mysql:/docker-entrypoint-initdb.d
+      #   options: >-
+      #     --health-cmd="mysqladmin ping"
+      #     --health-interval=10s
+      #     --health-timeout=5s
+      #     --health-retries=3
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Restart MySQL
-        # Restart MySQL after volumes have been checked out
-        uses: docker://docker
+      - uses: mirromutth/mysql-action@v1.1
         with:
-          args: docker restart mysql
+          character-set-server: utf8
+          collation-server: utf8_unicode_ci
+          mysql-version: 5.7.27
+          mysql-database: resourcespace
+          mysql-user: dalme
+          mysql-password: dalme
+
+      - uses: calxus/mysql-deploy-action@v1
+        with:
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_PORT: 3306
+          DATABASE_NAME: resourcespace
+          DATABASE_USERNAME: dalme
+          DATABASE_PASSWORD: password
+          DATABASE_SCRIPT: ${{ github.workspace }}/config/mysql/mysql_rs_schema.sql
 
       - uses: docker/setup-buildx-action@v3
 
@@ -141,7 +153,7 @@ jobs:
             DAM_DB_NAME=resourcespace
             DAM_DB_USER=dalme
             DAM_DB_PASSWORD=dalme
-            DAM_DB_HOST=0.0.0.0
+            DAM_DB_HOST=127.0.0.1
             'DAM_DB_PORT=${{ job.services.mysql.ports[3306] }}'
             POSTGRES_DB=ida
             POSTGRES_USER=postgres
