@@ -48,7 +48,6 @@ jobs:
           POSTGRES_DB: ida
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_INITDB_ARGS: --no-sync
         options: >-
           --health-cmd="pg_isready -d ida -U postgres"
           --health-interval=10s
@@ -57,27 +56,17 @@ jobs:
         ports:
           - 5432:5432
 
-      # mysql:
-      #   image: mysql:5.7.27
-      #   env:
-      #     MYSQL_ALLOW_EMPTY_PASSWORD: yes
-      #     MYSQL_DATABASE: resourcespace
-      #     MYSQL_USER: dalme
-      #     MYSQL_PASSWORD: dalme
-      #     MYSQL_ROOT_PASSWORD: root
-      #     MYSQL_ROOT_HOST: "%"
-      #   ports:
-      #     - 3306:3306
-      #   volumes:
-      #     - ${{ github.workspace }}/config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
-      #     - ${{ github.workspace }}/config/mysql:/docker-entrypoint-initdb.d
-      #   options: >-
-      #     --health-cmd="mysqladmin ping"
-      #     --health-interval=10s
-      #     --health-timeout=5s
-      #     --health-retries=3
-
     steps:
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..15}; do
+            pg_isready -h localhost -p 5432 -U postgres && exit 0
+            echo "Waiting for PostgreSQL..."
+            sleep 4
+          done
+          echo "PostgreSQL failed to start in time" >&2
+          exit 1
+
       - uses: actions/checkout@v4
 
       - uses: mirromutth/mysql-action@v1.1
@@ -96,7 +85,7 @@ jobs:
           DATABASE_NAME: resourcespace
           DATABASE_USERNAME: dalme
           DATABASE_PASSWORD: password
-          DATABASE_SCRIPT: ${{ github.workspace }}/config/mysql/mysql_rs_schema.sql
+          DATABASE_SCRIPT: config/mysql/mysql_rs_schema.sql
 
       - uses: docker/setup-buildx-action@v3
 
@@ -158,7 +147,7 @@ jobs:
             POSTGRES_DB=ida
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
-            POSTGRES_HOST=172.17.0.1
+            POSTGRES_HOST=localhost
             'POSTGRES_PORT=${{ job.services.postgres.ports[5432] }}'
           load: true
           push: false
