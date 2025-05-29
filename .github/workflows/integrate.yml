@@ -149,7 +149,7 @@ jobs:
             DAM_DB_NAME=resourcespace
             DAM_DB_USER=dalme
             DAM_DB_PASSWORD=dalme
-            DAM_DB_HOST=127.0.0.1
+            DAM_DB_HOST=172.17.0.1
             'DAM_DB_PORT=${{ job.services.mysql.ports[3306] }}'
             POSTGRES_DB=ida
             POSTGRES_USER=postgres
