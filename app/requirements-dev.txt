@@ -9,6 +9,7 @@ ipdb==0.13.13
 ipython==8.31.0
 jupyter==1.0.0
 markdown==3.7
+moto[s3]==5.1.5
 notebook==6.5.6
 pre-commit==4.0.1
 pydot==3.0.3
