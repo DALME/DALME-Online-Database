@@ -86,6 +86,12 @@ def test_tenant(test_domain):
 
 
 @pytest.fixture
+def public_tenant():
+    """Inject the public test tenant."""
+    return Tenant.objects.get(schema_name='public')
+
+
+@pytest.fixture
 def arf():
     """Inject an instance of the DRF APIRequestFactory."""
     return APIRequestFactory()
