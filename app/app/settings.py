@@ -770,12 +770,10 @@ class Test(Development):
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
-            # 'BACKEND': 'tenants.storage_backends.LocalMediaStorage',
             'BACKEND': 'tenants.storage_backends.MemoryMediaStorage',
         },
         'staticfiles': {
             'BACKEND': 'tenants.storage_backends.MemoryStaticStorage',
-            # 'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',
         },
         'avatars': {
             'BACKEND': 'django.core.files.storage.memory.InMemoryStorage',
@@ -795,6 +793,12 @@ class CI(Development):
 
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
+    # Fake AWS settings for tests
+    AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
+    AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
+    AWS_DEFAULT_ACL = None
+    AWS_IS_GZIPPED = True
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
 
 class Production(Base):
