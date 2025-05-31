@@ -7,6 +7,7 @@ import factory
 from django.db import models
 
 from app.abstract import OwnedMixin, TrackingMixin, UuidMixin
+from tenants.models import TenantMixin
 
 
 def save_parent_override(obj, *args, **kwargs):  # noqa: ARG001
@@ -55,8 +56,6 @@ class GenericModelFactory(factory.django.DjangoModelFactory):
     class Meta:
         abstract = True
 
-    name = factory.Sequence(lambda n: 'Owned %03d' % n)  # noqa: UP031
-
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         """Create an instance of the model using the parent classes' save method."""
@@ -68,12 +67,16 @@ class GenericModelFactory(factory.django.DjangoModelFactory):
 class OwnedModelFactory(GenericModelFactory):
     """Generate owned model fixtures."""
 
+    name = factory.Sequence(lambda n: 'Owned%03d' % n)  # noqa: UP031
+
     class Meta:
         model = get_new_model('TestOwned', OwnedMixin)
 
 
 class UUIDModelFactory(GenericModelFactory):
     """Generate UUID model fixtures."""
+
+    name = factory.Sequence(lambda n: 'UUID%03d' % n)  # noqa: UP031
 
     class Meta:
         model = get_new_model('TestUUID', UuidMixin)
@@ -82,5 +85,16 @@ class UUIDModelFactory(GenericModelFactory):
 class TrackedModelFactory(GenericModelFactory):
     """Generate tracked model fixtures."""
 
+    name = factory.Sequence(lambda n: 'Tracked%03d' % n)  # noqa: UP031
+
     class Meta:
         model = get_new_model('TestTracked', TrackingMixin)
+
+
+class TenantedModelFactory(GenericModelFactory):
+    """Generate tenanted model fixtures."""
+
+    name = factory.Sequence(lambda n: 'Tenanted%03d' % n)  # noqa: UP031
+
+    class Meta:
+        model = get_new_model('TestTenanted', TenantMixin)

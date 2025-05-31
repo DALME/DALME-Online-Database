@@ -39,7 +39,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             # Simple build, or nothing to add, do nothing.
             return
 
-        self.permissions.add(*extracted)
+        self.groups.add(*extracted)
 
 
 class GroupPropertiesFactory(factory.django.DjangoModelFactory):
