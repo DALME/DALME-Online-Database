@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = 'app.settings'
-addopts = "--strict-markers"
+addopts = "--strict-markers --reuse-db"
 markers = [
   "integration: marks integration tests",
   "property: marks property tests",
@@ -11,6 +11,8 @@ markers = [
 omit = [
   "*/migrations/*",
   "app/tenants/management/commands/custom_createcachetable.py",
+  "domain/management/commands/stages/migrate_data.py",
+  "domain/management/commands/stages/*",
   "manage.py*",
   "*/tests/*",
 ]
