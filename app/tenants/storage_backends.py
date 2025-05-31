@@ -4,11 +4,7 @@ import structlog
 from django_tenants.utils import parse_tenant_config_path
 from storages.backends.s3boto3 import S3Boto3Storage, S3ManifestStaticStorage
 
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-from django.db import connection
-
-from app.context import get_current_tenant
+from django.core.files.storage import FileSystemStorage, InMemoryStorage
 
 logger = structlog.get_logger(__name__)
 
@@ -25,7 +21,7 @@ class TenantStorageMixin:
         return parse_tenant_config_path(f'{self.key}/%s')
 
 
-class StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
+class S3StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
     """Multitenant aware staticfiles storage class for S3.
 
     We have to make sure to recompute the manifest data whenever the tenant
@@ -48,7 +44,7 @@ class StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
             self.hashed_files, self.manifest_hash = self.load_manifest()
 
 
-class MediaStorage(TenantStorageMixin, S3Boto3Storage):
+class S3MediaStorage(TenantStorageMixin, S3Boto3Storage):
     """Multitenant aware media files storage class for S3."""
 
     file_overwrite = False
@@ -63,22 +59,39 @@ class MediaStorage(TenantStorageMixin, S3Boto3Storage):
             self.location = location
 
 
-class LocalMediaStorage(FileSystemStorage):
-    """Multitenant aware media files storage class for local filesystem."""
+class LocalTenantStorageMixin:
+    """Reusable local multitenant storage functionality."""
+
+    @property
+    def base_location(self):
+        return self._value_or_setting(self._location, parse_tenant_config_path(f'{self.key}/%s'))
 
     @property
     def base_url(self):
-        return f'{settings.MEDIA_URL}/{self.schema}/'
+        if self._base_url is not None and not self._base_url.endswith('/'):
+            self._base_url += '/'
+        return self._value_or_setting(self._base_url, parse_tenant_config_path(f'{self.key}/%s'))
 
-    @property
-    def schema(self):
-        """Get the tenant schema name."""
-        try:
-            return get_current_tenant().schema_name
-        except RuntimeError:
-            return connection.tenant.schema_name
 
-    @property
-    def location(self):
-        """Get the schema qualified filepath."""
-        return f'{settings.MEDIA_ROOT}/{self.schema}'
+class LocalMediaStorage(LocalTenantStorageMixin, FileSystemStorage):
+    """Multitenant aware media files storage class for local filesystem."""
+
+    key = 'media'
+
+
+class MemoryMediaStorage(LocalTenantStorageMixin, InMemoryStorage):
+    """Multitenant aware media files storage class for in-memory storage (for use during tests)."""
+
+    key = 'media'
+
+
+class LocalStaticStorage(LocalTenantStorageMixin, FileSystemStorage):
+    """Multitenant aware static file storage class for local filesystem."""
+
+    key = 'static'
+
+
+class MemoryStaticStorage(LocalTenantStorageMixin, InMemoryStorage):
+    """Multitenant aware static file storage class for in-memory storage (for use during tests)."""
+
+    key = 'static'

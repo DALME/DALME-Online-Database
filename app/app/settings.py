@@ -333,7 +333,9 @@ class Base(Configuration):
 
     OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.Application'
     OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', '3600')  # 1 hour
-    OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get('OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', 3600 * 24 * 14)  # 14 days
+    OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get(
+        'OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', str(3600 * 24 * 14)
+    )  # 14 days
 
     OAUTH2_APPLICATION_DEFAULTS = {
         'algorithm': 'RS256',
@@ -683,7 +685,7 @@ class Development(Base):
             'BACKEND': 'tenants.storage_backends.LocalMediaStorage',
         },
         'staticfiles': {
-            'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',
+            'BACKEND': 'tenants.storage_backends.LocalStaticStorage',
         },
         'avatars': {
             'BACKEND': 'django.core.files.storage.FileSystemStorage',
@@ -759,14 +761,21 @@ class Test(Development):
         if assert_env:
             assert cls.ENV == 'test'
 
+    AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
+    AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
+    AWS_DEFAULT_ACL = None
+    AWS_IS_GZIPPED = True
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
-            'BACKEND': 'tenants.storage_backends.LocalMediaStorage',
-            # 'BACKEND': 'django.core.files.storage.memory.InMemoryStorage',
+            # 'BACKEND': 'tenants.storage_backends.LocalMediaStorage',
+            'BACKEND': 'tenants.storage_backends.MemoryMediaStorage',
         },
         'staticfiles': {
-            'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',
+            'BACKEND': 'tenants.storage_backends.MemoryStaticStorage',
+            # 'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',
         },
         'avatars': {
             'BACKEND': 'django.core.files.storage.memory.InMemoryStorage',
@@ -918,10 +927,10 @@ class Production(Base):
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
-            'BACKEND': 'tenants.storage_backends.MediaStorage',
+            'BACKEND': 'tenants.storage_backends.S3MediaStorage',
         },
         'staticfiles': {
-            'BACKEND': 'tenants.storage_backends.StaticStorage',
+            'BACKEND': 'tenants.storage_backends.S3StaticStorage',
         },
         'avatars': {
             'BACKEND': 'storages.backends.s3.S3Storage',
