@@ -47,7 +47,9 @@ class BaseAccessPolicy(AccessPolicy):
             if view.__class__.__name__ in ['RecordDetail', 'dict']:
                 return 'update'
             return view.__class__.__name__
-
+        # TODO: The next couple of lines are technically unreachable
+        # I need to double-check that it's always the case that the
+        # name of the class should be used as the action.
         msg = 'Could not determine action of request'
         raise AccessPolicyException(msg)
 
