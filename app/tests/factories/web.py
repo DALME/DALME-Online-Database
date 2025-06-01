@@ -1,10 +1,18 @@
 """Define model factories for the web app."""
 
+from datetime import UTC
+
 import factory
+from faker import Faker as TheRealFaker
+from wagtail.models import Site
+from wagtail_factories import PageFactory
 
-from web.models import FeaturedPage
+from web.models import BasePage, FeaturedPage
 
+from .domain import RecordFactory
 from .oauth import UserFactory
+
+fake = TheRealFaker()
 
 
 # --- Snippet/utility models ---
@@ -54,105 +62,106 @@ class SettingsFactory(factory.django.DjangoModelFactory):
 
 
 # --- Page models ---
-class HomeFactory(factory.django.DjangoModelFactory):
+class BasePageFactory(PageFactory):
     class Meta:
-        model = 'web.Home'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-    # learn_more_page = None
-
-
-class SectionFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'web.Section'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-
-
-class FeaturesFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'web.Features'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-
-
-class FlatFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'web.Flat'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-    show_contact_form = False
-
-
-class BibliographyFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'web.Bibliography'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-
-
-class PeopleFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'web.People'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-
-
-class CollectionsFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'web.Collections'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-
-
-class CollectionFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'web.Collection'
-
-    title = factory.Faker('sentence')
-    short_title = factory.Faker('word')
-    header_position = 'top'
-    # record_collection = None
-
-
-class FeaturedPageFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = FeaturedPage
+        model = BasePage
         abstract = True
 
     title = factory.Faker('sentence')
     header_position = 'top'
     live = True
+    slug = factory.Faker('slug')
+    go_live_at = factory.Faker('date_time_this_decade', before_now=True, after_now=False, tzinfo=UTC)
+    last_published_at = factory.LazyAttribute(
+        lambda x: fake.date_time_between(start_date=x.go_live_at, end_date='now', tzinfo=UTC)
+    )
+
+
+class HomeFactory(BasePageFactory):
+    class Meta:
+        model = 'web.Home'
+
+    short_title = 'Home'
+    slug = 'home-page'
+    # learn_more_page = None
+
+
+class SectionFactory(BasePageFactory):
+    class Meta:
+        model = 'web.Section'
+
+    short_title = factory.Faker('word')
+    title = factory.Faker('word')
+
+
+class FeaturesFactory(BasePageFactory):
+    class Meta:
+        model = 'web.Features'
+
+
+class FlatFactory(BasePageFactory):
+    class Meta:
+        model = 'web.Flat'
+
+    short_title = factory.Faker('word')
+
+
+class BibliographyFactory(BasePageFactory):
+    class Meta:
+        model = 'web.Bibliography'
+
+    short_title = factory.Faker('word')
+
+
+class PeopleFactory(BasePageFactory):
+    class Meta:
+        model = 'web.People'
+
+
+class CollectionsFactory(BasePageFactory):
+    class Meta:
+        model = 'web.Collections'
+
+
+class CollectionFactory(BasePageFactory):
+    class Meta:
+        model = 'web.Collection'
+
+
+class FeaturedPageFactory(BasePageFactory):
+    class Meta:
+        model = FeaturedPage
+        abstract = True
+
     owner = factory.SubFactory(UserFactory)
-    last_published_at = factory.Faker('date_time_this_decade', before_now=True, after_now=False)
-    path = '000100010002000R'
-    depth = 4
 
 
 class FeaturedObjectFactory(FeaturedPageFactory):
     class Meta:
         model = 'web.FeaturedObject'
 
+    record = factory.SubFactory(RecordFactory)
+
 
 class FeaturedInventoryFactory(FeaturedPageFactory):
     class Meta:
         model = 'web.FeaturedInventory'
 
+    record = factory.SubFactory(RecordFactory)
+
 
 class EssayFactory(FeaturedPageFactory):
     class Meta:
         model = 'web.Essay'
+
+
+# --- Site model ---
+class SiteFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Site
+
+    hostname = factory.Faker('domain_name')
+    port = factory.Sequence(lambda n: 81 + n)
+    site_name = 'Test site'
+    root_page = factory.SubFactory(HomeFactory, parent=None)
+    is_default_site = False

@@ -19,6 +19,7 @@ from tests.factories.web import (
     PeopleFactory,
     SectionFactory,
     SettingsFactory,
+    SiteFactory,
     SocialMediaFactory,
     SponsorFactory,
 )
@@ -67,6 +68,7 @@ class ResourceFactory:
         'home_pages': HomeFactory,
         'footer_links_snippets': FooterLinkFactory,
         'people_pages': PeopleFactory,
+        'sites': SiteFactory,
     }
 
     def __init__(self):

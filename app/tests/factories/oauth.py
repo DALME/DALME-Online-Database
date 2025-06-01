@@ -58,6 +58,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'auth.Group'
+        skip_postgeneration_save = True
 
     name = factory.Sequence(lambda n: 'Group %03d' % n)  # noqa: UP031
     properties = factory.RelatedFactory(GroupPropertiesFactory, factory_related_name='group')
