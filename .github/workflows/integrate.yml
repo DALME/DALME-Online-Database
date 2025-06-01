@@ -73,11 +73,11 @@ jobs:
 
       elasticsearch:
         image: elasticsearch:7.8.0
-        environment:
-          - ES_JAVA_OPTS: -Xms512m -Xmx512m
-          - bootstrap.memory_lock: true
-          - discovery.type: single-node
-          - xpack.security.enabled: false
+        env:
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+          bootstrap.memory_lock: true
+          discovery.type: single-node
+          xpack.security.enabled: false
         ulimits:
           memlock:
             soft: -1
