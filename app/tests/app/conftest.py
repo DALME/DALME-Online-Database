@@ -56,12 +56,12 @@ def mock_request(user):
 
 @pytest.fixture
 def mock_object_1():
-    return SimpleNamespace(id=1)
+    return SimpleNamespace(id=1, owner=3)
 
 
 @pytest.fixture
 def mock_object_2():
-    return SimpleNamespace(id=2)
+    return SimpleNamespace(id=2, owner=3)
 
 
 @pytest.fixture

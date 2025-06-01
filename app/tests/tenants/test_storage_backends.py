@@ -5,6 +5,8 @@ from unittest import mock
 import pytest
 from moto import mock_aws
 
+from django.conf import settings
+
 from tenants import storage_backends
 
 
@@ -82,32 +84,26 @@ def test_s3mediastorage_remap_location_no_change(mock_parse_tenant_config_path):
     assert s.location == 'same/location'
 
 
-def test_localtenantstoragemixin_base_location_and_url(mock_parse_tenant_config_path):  # noqa: ARG001
-    class TestStorage(storage_backends.LocalTenantStorageMixin):
+def test_localstaticstorage_base_location_and_url(mock_parse_tenant_config_path):  # noqa: ARG001
+    class TestStorage(storage_backends.LocalStaticStorage):
         key = 'static'
         _location = None
         _base_url = None
 
-        def _value_or_setting(self, value, default):
-            return value or default
-
     s = TestStorage()
-    assert s.base_location == 'parsed/static/%s'
-    assert s.base_url == 'parsed/static/%s'
+    assert s.base_location == f'parsed/{settings.STATIC_ROOT}/%s'
+    assert s.base_url == settings.STATIC_URL
 
 
-def test_localtenantstoragemixin_base_url_trailing_slash(mock_parse_tenant_config_path):  # noqa: ARG001
-    class TestStorage(storage_backends.LocalTenantStorageMixin):
+def test_localmediastorage_base_location_and_url(mock_parse_tenant_config_path):  # noqa: ARG001
+    class TestStorage(storage_backends.LocalMediaStorage):
         key = 'media'
         _location = None
-        _base_url = 'http://test.com/path'
-
-        def _value_or_setting(self, value, default):
-            return value or default
+        _base_url = None
 
     s = TestStorage()
-    url = s.base_url
-    assert url.endswith('/')
+    assert s.base_location == f'parsed/{settings.MEDIA_ROOT}/%s'
+    assert s.base_url == f'parsed/{settings.MEDIA_URL}/%s'
 
 
 def test_localmediastorage_key():
@@ -115,6 +111,6 @@ def test_localmediastorage_key():
     assert s.key == 'media'
 
 
-def test_memorystaticstorage_key():
-    s = storage_backends.MemoryStaticStorage()
+def test_localstaticstorage_key():
+    s = storage_backends.LocalStaticStorage()
     assert s.key == 'static'

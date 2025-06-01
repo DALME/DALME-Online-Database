@@ -45,3 +45,9 @@ def test_save_kwargs_defaults(factories):
         assert kwargs.get('force_update', False) is False
         assert kwargs.get('using', None) is None
         assert kwargs.get('update_fields', None) is None
+
+
+@pytest.mark.django_db
+def test_class_name_returns_class_name(factories):
+    obj = factories.owned_models.create(name='test_update')
+    assert obj.class_name() == 'TestOwned'

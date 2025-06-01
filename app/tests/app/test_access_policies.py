@@ -76,7 +76,7 @@ def test_get_targets_with_object_attr(base_policy, mock_view_detail, mock_object
     assert targets == [mock_object_1]
 
 
-def test_get_targets_with_action_list_and_queryset(base_policy, mock_view_list, mock_object_1, mock_object_2):
+def test_get_targets_with_action_list_and_get_queryset(base_policy, mock_view_list, mock_object_1, mock_object_2):
     targets = base_policy.get_targets(mock_view_list)
     assert not isinstance(mock_view_list, dict)
     assert hasattr(mock_view_list, 'object') is False
@@ -87,6 +87,33 @@ def test_get_targets_with_action_list_and_queryset(base_policy, mock_view_list, 
     assert targets[0].id == mock_object_1.id
     assert targets[1].id == mock_object_2.id
     assert [obj.id for obj in targets] == [mock_object_1.id, mock_object_2.id]
+
+
+def test_get_targets_with_action_list_and_queryset(base_policy, mock_view_list, mock_object_1, mock_object_2):
+    mock_view_list.queryset = [mock_object_1, mock_object_2]
+    del mock_view_list.get_queryset
+    targets = base_policy.get_targets(mock_view_list)
+    assert not isinstance(mock_view_list, dict)
+    assert hasattr(mock_view_list, 'object') is False
+    assert isinstance(targets, list)
+    assert hasattr(mock_view_list, 'action')
+    assert mock_view_list.action == 'list'
+    assert len(targets) == 2  # noqa: PLR2004
+    assert targets[0].id == mock_object_1.id
+    assert targets[1].id == mock_object_2.id
+    assert [obj.id for obj in targets] == [mock_object_1.id, mock_object_2.id]
+
+
+def test_get_targets_with_action_list_and_no_qs(base_policy, mock_view_list):
+    del mock_view_list.get_queryset
+    del mock_view_list.queryset
+    targets = base_policy.get_targets(mock_view_list)
+    assert not isinstance(mock_view_list, dict)
+    assert hasattr(mock_view_list, 'object') is False
+    assert isinstance(targets, list)
+    assert hasattr(mock_view_list, 'action')
+    assert mock_view_list.action == 'list'
+    assert isinstance(targets[0], dict)
 
 
 @pytest.mark.django_db
@@ -222,3 +249,99 @@ def test_record_access_policy_scope_queryset_non_superuser():
     with mock.patch.object(access_policies.Permission.objects, 'filter', return_value=mock.Mock()):
         result = policy.scope_queryset(request, queryset)
         assert result == 'filtered'
+
+
+@pytest.mark.django_db
+def test_get_targets_parent_as_proxy(base_policy, mock_view_detail):
+    base_policy.targets = []
+    with mock.patch.object(base_policy, 'get_parent', return_value=('parent', 'proxy')):
+        targets = base_policy.get_targets(mock_view_detail, arg='parent_as_proxy')
+        assert targets == [('parent', 'proxy')]
+
+
+@pytest.mark.django_db
+def test_user_must_be_getattr_exception(base_policy, mock_request, mock_view_list):
+    fake_target = object()  # no 'owner' attribute
+    base_policy.targets = [fake_target]
+    result = base_policy.user_must_be(mock_request, mock_view_list, None, 'owner')
+    assert result is False
+    assert 'has no attribute' in base_policy.error
+
+
+@pytest.mark.django_db
+def test_parent_as_proxy_exception(base_policy, mock_request, mock_view_list):
+    fake_target = mock.Mock()
+    base_policy.targets = [fake_target]
+    with (
+        mock.patch.object(base_policy, 'get_parent', return_value=(fake_target, base_policy)),
+        mock.patch.object(base_policy, 'has_permission', side_effect=Exception('fail')),
+    ):
+        assert base_policy.parent_as_proxy(mock_request, mock_view_list, None) is False
+        assert 'fail' in base_policy.error
+
+
+# def test_get_targets_with_action_detail_and_assertionerror(base_policy, mock_view_detail, mock_request, mock_object_1):
+#     mock_request.data = {}
+#     mock_view_detail.get_object = AssertionError
+#     targets = base_policy.get_targets(mock_view_detail)
+#     assert not isinstance(mock_view_detail, dict)
+#     assert isinstance(targets, list)
+#     assert hasattr(mock_view_detail, 'action')
+#     assert mock_view_detail.action == 'detail'
+#     assert len(targets) == 1
+#     assert targets[0].id == mock_object_1.id
+
+
+# 153-154: get_permissions returns cached permissions
+# @pytest.mark.django_db
+# def test_get_permissions_returns_cached(base_policy, mock_request, mock_view_list):
+#     base_policy.permissions = {1: {'can_view': True}}
+#     perms = base_policy.get_permissions(mock_request, mock_view_list)
+#     assert perms == {1: {'can_view': True}}
+
+
+# 163-165: user_must_be returns False if targets is empty
+# @pytest.mark.django_db
+# def test_user_must_be_no_targets(base_policy, mock_request, mock_view_list):
+#     base_policy.targets = []
+#     result = base_policy.user_must_be(mock_request, mock_view_list, None, 'owner')
+#     assert result is False
+#     assert 'no target objects' in base_policy.error
+
+
+# 183-188: has_perm returns False if perms missing or exception
+# @pytest.mark.urls('app.urls.urls_tenant')
+# @pytest.mark.django_db
+# @mock.patch('oauth.models.user.get_current_tenant')
+# def test_has_perm_perms_missing(
+#     mock_get_current_tenant,
+#     factories,
+#     base_policy,
+#     mock_request,
+#     mock_view_list,
+#     test_tenant,
+# ):
+#     mock_get_current_tenant.return_value = test_tenant
+#     groups = factories.user_groups.create_batch(3)
+#     user = factories.users.create(groups=groups)
+#     mock_request.user = user
+#     base_policy.targets = [mock.Mock(id=99)]
+#     base_policy.permissions = {}
+#     with mock.patch.object(access_policies, 'PERMISSION_TYPES', ['can_view']):
+#         assert base_policy.has_perm(mock_request, mock_view_list, None, 'can_view') is False
+
+
+# @pytest.mark.django_db
+# def test_has_perm_exception_in_loop(base_policy, mock_request, mock_view_list):
+#     class BadTarget:
+#         id = 1
+
+#         def __getattr__(self, item):
+#             msg = 'fail'
+#             raise Exception(msg)
+
+#     base_policy.targets = [BadTarget()]
+#     base_policy.permissions = {1: {'can_view': True}}
+#     with mock.patch.object(access_policies, 'PERMISSION_TYPES', ['can_view']):
+#         assert base_policy.has_perm(mock_request, mock_view_list, None, 'can_view') is False
+#         assert 'fail' in base_policy.error
