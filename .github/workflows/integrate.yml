@@ -170,7 +170,7 @@ jobs:
             POSTGRES_PASSWORD=postgres
             POSTGRES_HOST=172.17.0.1
             'POSTGRES_PORT=${{ job.services.postgres.ports[5432] }}'
-            ELASTICSEARCH_ENDPOINT=172.17.0.1:9200
+            'ELASTICSEARCH_ENDPOINT=172.17.0.1:${{ job.services.elasticsearch.ports[9200] }}'
           load: true
           push: false
           cache-from: |

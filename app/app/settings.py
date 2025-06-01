@@ -802,7 +802,7 @@ class CI(Development):
 
     ELASTICSEARCH_DSL = {
         'default': {
-            'hosts': os.environ.get('ELASTICSEARCH_ENDPOINT', 'elasticsearch:9200'),
+            'hosts': os.environ.get('ELASTICSEARCH_ENDPOINT', '172.17.0.1:9200'),
         },
     }
 
