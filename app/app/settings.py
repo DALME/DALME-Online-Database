@@ -800,6 +800,12 @@ class CI(Development):
     AWS_IS_GZIPPED = True
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
+    ELASTICSEARCH_DSL = {
+        'default': {
+            'hosts': os.environ.get('ELASTICSEARCH_ENDPOINT', 'elasticsearch:9200'),
+        },
+    }
+
 
 class Production(Base):
     """Production settings."""
