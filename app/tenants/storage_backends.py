@@ -4,6 +4,7 @@ import structlog
 from django_tenants.utils import parse_tenant_config_path
 from storages.backends.s3boto3 import S3Boto3Storage, S3ManifestStaticStorage
 
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage, InMemoryStorage
 
 logger = structlog.get_logger(__name__)
@@ -62,15 +63,27 @@ class S3MediaStorage(TenantStorageMixin, S3Boto3Storage):
 class LocalTenantStorageMixin:
     """Reusable local multitenant storage functionality."""
 
+    key_dict = {
+        'media': {
+            'root': 'MEDIA_ROOT',
+            'url': 'MEDIA_URL',
+        },
+        'static': {
+            'root': 'STATIC_ROOT',
+            'url': 'STATIC_URL',
+        },
+    }
+
     @property
     def base_location(self):
-        return self._value_or_setting(self._location, parse_tenant_config_path(f'{self.key}/%s'))
+        """Get the schema qualified filepath."""
+        return parse_tenant_config_path(f'{getattr(settings, self.key_dict[self.key]["root"])}/%s')
 
     @property
     def base_url(self):
-        if self._base_url is not None and not self._base_url.endswith('/'):
-            self._base_url += '/'
-        return self._value_or_setting(self._base_url, parse_tenant_config_path(f'{self.key}/%s'))
+        if self.key == 'static':
+            return getattr(settings, self.key_dict[self.key]['url'])
+        return parse_tenant_config_path(f'{getattr(settings, self.key_dict[self.key]["url"])}/%s')
 
 
 class LocalMediaStorage(LocalTenantStorageMixin, FileSystemStorage):
