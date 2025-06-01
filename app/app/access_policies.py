@@ -3,7 +3,7 @@
 import json
 import pathlib
 
-from rest_access_policy import AccessPolicy, AccessPolicyException
+from rest_access_policy import AccessPolicy
 from rest_access_policy.access_policy import AccessEnforcement
 
 from django.conf import settings
@@ -43,15 +43,10 @@ class BaseAccessPolicy(AccessPolicy):
                 return 'update'
             return view.action
 
-        if hasattr(view, '__class__'):
-            if view.__class__.__name__ in ['RecordDetail', 'dict']:
-                return 'update'
-            return view.__class__.__name__
-        # TODO: The next couple of lines are technically unreachable
-        # I need to double-check that it's always the case that the
-        # name of the class should be used as the action.
-        msg = 'Could not determine action of request'
-        raise AccessPolicyException(msg)
+        if view.__class__.__name__ in ['RecordDetail', 'dict']:
+            return 'update'
+
+        return view.__class__.__name__
 
     def get_policy_statements(self, request, view):  # noqa: ARG002
         """Load policy statements."""
