@@ -1,4 +1,4 @@
-"""Define model factories for the domain app."""
+"""Define agent model factories for the domain app."""
 
 import factory
 from faker import Faker
