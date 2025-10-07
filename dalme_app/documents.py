@@ -120,7 +120,7 @@ class PublicSource(PublicSourceBase):
             if attribute.attribute_type.data_type == "DATE":
                 if attribute.value_DATE:
                     dates_list.append(attribute.value_DATE.strftime("%Y-%m-%d"))
-                elif attribute.value_DATE_y:
+                elif attribute.value_DATE_y and len(str(attribute.value_DATE_y)) == 4:
                     d = attribute.value_DATE_d or 1
                     m = attribute.value_DATE_m or 1
                     y = attribute.value_DATE_y
@@ -130,7 +130,10 @@ class PublicSource(PublicSourceBase):
                 attribute_list.append((label, attribute.value_TXT))
 
             else:
-                attribute_list.append((label, str(attribute)))
+                try:
+                    attribute_list.append((label, str(attribute)))
+                except TypeError:
+                    attribute_list.append((label, "none"))
 
         if dates_list:
             attribute_list.append(("date", dates_list))
@@ -158,7 +161,8 @@ class PublicSource(PublicSourceBase):
         if locales.exists():
             loc_id = locales[0].value_JSON["id"]
             locale = LocaleReference.objects.get(id=loc_id)
-            return f"{locale.latitude},{locale.longitude}"
+            if locale.latitude is not None and locale.longitude is not None:
+                return f"{locale.latitude},{locale.longitude}"
 
 
 @registry.register_document
