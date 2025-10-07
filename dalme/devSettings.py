@@ -10,14 +10,8 @@ from saml2.sigver import get_xmlsec_binary
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-SECRET_KEY = os.environ.get('SECRET_KEY', '')
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
-AWS_ES_ENDPOINT = os.environ.get('AWS_ES_ENDPOINT', '')
-AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+# AWS_ES_ENDPOINT = os.environ.get("AWS_ES_DEV_ENDPOINT", "")
+AWS_ES_ENDPOINT = os.environ.get("AWS_ES_ENDPOINT", "")
 # AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 
 RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY', '')
@@ -63,42 +57,16 @@ SESSION_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
 
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
-    '.127.0.0.1.sslip.io',
-    '.127.0.0.1.sslip.io:8443',
-    '.127.0.0.1.sslip.io:8000',
-    'data.127.0.0.1.sslip.io',
-    'data.127.0.0.1.sslip.io:8443',
-    'data.127.0.0.1.sslip.io:8000',
-    'db.127.0.0.1.sslip.io',
-    'db.127.0.0.1.sslip.io:8443',
-    'db.127.0.0.1.sslip.io:8000',
-    '127.0.0.1.sslip.io',
-    '127.0.0.1.sslip.io:8443',
-    '127.0.0.1.sslip.io:8000',
-    'purl.127.0.0.1.sslip.io:8443',
-    'purl.127.0.0.1.sslip.io:8000',
-    'purl.127.0.0.1.sslip.io'
+    "purl.127.0.0.1.sslip.io",
+    "http://localhost:8888",
 ]
 CSRF_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    'https://*.127.0.0.1.sslip.io:8443',
-    'https://*.127.0.0.1.sslip.io:8000',
-    'https://*.127.0.0.1.sslip.io',
-    'https://127.0.0.1.sslip.io:8443',
-    'https://127.0.0.1.sslip.io:8000',
-    'http://127.0.0.1.sslip.io',
-    'https://data.127.0.0.1.sslip.io:8443',
-    'https://data.127.0.0.1.sslip.io:8000',
-    'http://data.127.0.0.1.sslip.io',
-    'https://db.127.0.0.1.sslip.io:8443',
-    'https://db.127.0.0.1.sslip.io:8000',
-    'http://db.127.0.0.1.sslip.io',
-    'https://purl.127.0.0.1.sslip.io:8443',
-    'https://purl.127.0.0.1.sslip.io:8000',
-    'http://purl.127.0.0.1.sslip.io'
+    "http://purl.127.0.0.1.sslip.io",
+    "http://localhost:8888",
 ]
 
 ROOT_HOSTCONF = 'dalme.hosts'
@@ -457,3 +425,26 @@ if "LOG_TO_STDOUT" in os.environ:
 
 if "HEROKU_APP_NAME" in os.environ:
     ALLOWED_HOSTS = ["*"]
+
+# Jupyter notebook setup
+SHELL_PLUS = "ipython"
+SHELL_PLUS_PRINT_SQL = True
+NOTEBOOK_ARGUMENTS = [
+    "--ip",
+    "0.0.0.0",
+    "--port",
+    "8888",
+    "--allow-root",
+    "--no-browser",
+]
+IPYTHON_ARGUMENTS = [
+    "--ext",
+    "django_extensions.management.notebook_extension",
+    "--debug",
+]
+IPYTHON_KERNEL_DISPLAY_NAME = "Django Shell-Plus"
+SHELL_PLUS_POST_IMPORTS = [  # extra things to import in notebook
+    ("module1.submodule", ("func1", "func2", "class1", "etc")),
+    ("module2.submodule", ("func1", "func2", "class1", "etc")),
+]
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"

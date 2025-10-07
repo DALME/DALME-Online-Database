@@ -16,6 +16,8 @@ services:
       - "./ssl-certs:/opt/app/ssl-certs"
       - "./templates:/opt/app/templates"
       - "./static:/opt/app/static"
+      - ./notebooks:/opt/app/notebooks
+      - ./notebooks/ipython:/root/.ipython/profile_default
     command: >
       bash -c "python manage.py collectstatic --noinput && \ python manage.py compress --verbosity=0 && \ ./wait-for-it.sh db:3306 -- gunicorn -c gunicorn.conf.py dalme.wsgi"
     depends_on:
@@ -24,6 +26,7 @@ services:
       - app-network
     ports:
       - "8443"
+      - "8888"
     restart: unless-stopped
     stdin_open: true
     tty: true
@@ -62,6 +65,7 @@ services:
       - dalme.web
     ports:
       - "8000:443"
+      - "8888:8888"
 
 volumes:
   db-data:
