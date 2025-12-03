@@ -1,25 +1,23 @@
-from calendar import month_name
-import os
 import json
+import os
 import urllib
+from calendar import month_name
+from datetime import date
 
 from django import template
 from elasticsearch_dsl.utils import AttrDict
 
-from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.models import (
-    Collections,
     Essay,
     ExplorePage,
-    FeaturedObject,
     FeaturedInventory,
+    FeaturedObject,
     Features,
     Footer,
     Home,
-    SearchPage
+    SearchPage,
 )
-
-from datetime import date
+from dalme_public.serializers import PublicSourceSerializer
 
 register = template.Library()
 
@@ -328,7 +326,8 @@ def get_citation_data(context):
         ('rft.au', 'Laura Morreale'),
         ('rft.btitle', 'The Documentary Archaeology of Late Medieval Europe'),
         ('rft.date', f'{published.year}/{published.month}/{published.day}'),
-        # ('rft.identifier', 'info:doi/10.1000/xyz123')
+        ('rft.identifier', 'info:doi/10.34055/osf.io/6qg8m'),
+        ('rft.doi', '10.34055/osf.io/6qg8m')
     ]
     citation = {
         'editor': [
@@ -336,7 +335,8 @@ def get_citation_data(context):
             {'family': 'Pizzorno', 'given': 'Gabriel H.'},
             {'family': 'Morreale', 'given': 'Laura'}
         ],
-        "accessed": {"date-parts": [[accessed.year, accessed.month, accessed.day]]},
+        'accessed': {'date-parts': [[accessed.year, accessed.month, accessed.day]]},
+        'DOI': '10.34055/osf.io/6qg8m',
     }
 
     if page_class == 'Collections' and not record:
@@ -373,7 +373,8 @@ def get_citation_data(context):
             citation.update({
                 'author': [{'literal': i} for i in authors],
                 'title': title,
-                'URL': purl
+                'URL': purl,
+                'issued': {'date-parts': [[published.year]]},
             })
 
             if contributors:
@@ -430,7 +431,7 @@ def get_citation_data(context):
         coins_span = f'<span class="Z3988" title="{"&".join(coins_tokens)}"></span>'
 
         return [formats, citation, coins_span]
-    except:
+    except:  # noqa: E722
         return None
 
 
