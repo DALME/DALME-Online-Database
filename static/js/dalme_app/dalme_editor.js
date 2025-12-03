@@ -25,6 +25,7 @@ function startEditor() {
       folio_array = folio_list;
       folio_idx = 0;
       hasBraces = false;
+      hasQuotes = false;
       hasColumns = false;
       hasLeaders = false;
       hasMarginalNotes = false;
@@ -810,6 +811,11 @@ function addTag(item_id, value=null) {
 function setupTeiRendering() {
   $('#editor').scrollTop(0);
 
+  if ($('tei-quote').length) {
+    hasQuotes = true;
+    formatQuotes(); 
+  }
+
   if ($('tei-seg[type=brace]').length) {
     hasBraces = true;
     formatBraces(); 
@@ -1053,6 +1059,22 @@ function formatBraces() {
     trigger: 'click',
     html: true,
     sanitize: false,
+  });
+}
+
+function formatQuotes() {
+  $('tei-quote').each(function(index, el) {
+    // remove span elements added by CETEI.js
+    $(el).children('span').each(function(i, span_el) {
+      $(span_el).replaceWith($(span_el).html().trim());
+    });
+    // remove line breaks within quotes
+    $(el).find('tei-lb').remove();
+    // insert div for endquote symbol
+    const endquote = $('<div></div>');
+    endquote.addClass('end-quote-symbol');
+    endquote.html(' „');
+    $(el).append(endquote);
   });
 }
 

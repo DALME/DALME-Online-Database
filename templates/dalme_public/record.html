@@ -368,6 +368,7 @@
           hasColumns: false,
           hasLeaders: false,
           hasBraces: false,
+          hasQuotes: false,
           noteBarOn: false,
           showMarginalNotes: true,
           showImage: false,
@@ -632,6 +633,11 @@
           setupTeiRendering() {
             $('#tei-container').scrollTop(0);
 
+            if ($('tei-quote').length) {
+              this.hasQuotes = true;
+              this.formatQuotes();
+            }
+
             if ($('tei-seg[type=brace]').length) {
               this.hasBraces = true;
               this.formatBraces();
@@ -692,6 +698,7 @@
             }
             this.hasBraces = false;
             this.hasLeaders = false;
+            this.hasQuotes = false;
           },
           toggleTeiContainers() {
             const containerList = [
@@ -771,6 +778,21 @@
               trigger: 'click',
               html: true,
               sanitize: false,
+            });
+          },
+          formatQuotes() {
+            $('tei-quote').each(function(index, el) {
+              // remove span elements added by CETEI.js
+              $(el).children('span').each(function(i, span_el) {
+                $(span_el).replaceWith($(span_el).html().trim());
+              });
+              // remove line breaks within quotes
+              $(el).find('tei-lb').remove();
+              // insert div for endquote symbol
+              const endquote = $('<div></div>');
+              endquote.addClass('end-quote-symbol');
+              endquote.html(' „');
+              $(el).append(endquote);
             });
           },
           positionMarginalNotes() {

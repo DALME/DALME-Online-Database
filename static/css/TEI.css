@@ -2193,7 +2193,7 @@ tei-quote {
   color: #6b6b6b;
   border-top: 1px dotted #d4d4d4;
   border-bottom: 1px dotted #d4d4d4;
-  padding: 1rem 1rem 1.3rem 1rem;
+  padding: 1rem 1.5rem 1.3rem 1.5rem;
   display: flex;
   flex-wrap: wrap;
   width: 100%;
@@ -2203,7 +2203,29 @@ tei-quote {
   line-height: 1.5;
   align-items: baseline;
 }
-tei-quote > span + tei-rs {
+tei-quote tei-g {
+  line-height: 0.3;
+  display: contents;
+}
+tei-quote::before {
+  content: "\201c\00a0";
+  font-family: 'Lora', 'PT Serif', serif;
+  font-size: 35px;
+  color: #bbbbbb;
+  position: absolute;
+  left: -0;
+  line-height: 0.9;
+}
+.end-quote-symbol {
+  font-family: 'Lora', 'PT Serif', serif;
+  font-size: 35px;
+  color: #bbbbbb;
+  position: relative;
+  display: contents;
+  line-height: 0.3;
+}
+
+/* tei-quote > span + tei-rs {
   margin-left: 2px;
 }
 tei-quote > span + tei-rs::before {
@@ -2214,36 +2236,18 @@ tei-quote:not(:first-child) {
 }
 tei-quote:not(:last-child) {
   margin-bottom: -1rem;
-}
-tei-quote > span:first-of-type::before {
-  content: "\201c\00a0";
-  font-family: 'Lora', 'PT Serif', serif;
-  font-size: 35px;
-  color: #bbbbbb;
-  position: relative;
-  display: contents;
-  line-height: 0.8;
-}
-tei-quote > span:last-of-type::after {
-  content: "\00a0\201e";
-  font-family: 'Lora', 'PT Serif', serif;
-  font-size: 35px;
-  color: #bbbbbb;
-  position: relative;
-  display: contents;
-  line-height: 0.3;
-}
-tei-quote[next]:after {
+} */
+/* tei-quote[next]:after {
   content: "" !important;
 }
 tei-quote[prev]:before {
   content: "" !important;
-}
-tei-quote span {
-  display: contents;
+} */
+/* tei-quote span {
+  display: inline-flex;
   text-wrap: nowrap;
-}
-tei-quote span:only-of-type {
+} */
+/* tei-quote span:only-of-type {
   text-wrap: wrap !important;
 }
 tei-quote tei-lb:first-of-type {
@@ -2251,7 +2255,7 @@ tei-quote tei-lb:first-of-type {
 }
 tei-quote span ~ tei-lb:last-of-type {
   display: none;
-}
+} */
 
 tei-expan {
   color: #888888;
