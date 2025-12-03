@@ -330,11 +330,7 @@
           }));
         },
         downloadCitation(format) {
-          const blob = new Blob([this.citation.format(this.output_format, {
-            format: 'text',
-            template: this.template,
-            lang: this.lang
-          })], {
+          const blob = new Blob([this.citation.format(format)], {
             encoding: 'UTF-8',
             type: 'text/plain;charset=UTF-8'
           })
