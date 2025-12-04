@@ -309,10 +309,11 @@ def get_snippet(obj, width):
 def get_citation_data(context):
     accessed = date.today()
     page = context['page']
-    published = page.first_published_at or date.today()
     page_class = page.get_verbose_name()
     formats = None
     record = context.get('record', False)
+    first_published = page.first_published_at
+    last_published = page.last_published_at
 
     with open(os.path.join('dalme_app', 'config', '_citation_formats.json'), 'r', encoding='utf-8') as fp:
         formats = json.load(fp)
@@ -325,7 +326,7 @@ def get_citation_data(context):
         ('rft.au', 'Gabriel H. Pizzorno'),
         ('rft.au', 'Laura Morreale'),
         ('rft.btitle', 'The Documentary Archaeology of Late Medieval Europe'),
-        ('rft.date', f'{published.year}/{published.month}/{published.day}'),
+        ('rft.date', '2020/11/1'),
         ('rft.identifier', 'info:doi/10.34055/osf.io/6qg8m'),
         ('rft.doi', '10.34055/osf.io/6qg8m')
     ]
@@ -348,7 +349,7 @@ def get_citation_data(context):
             'type': 'book',
             'title': 'The Documentary Archaeology of Late Medieval Europe',
             'URL': 'https://dalme.org',
-            'issued': {'date-parts': [[published.year]]}
+            'issued': {'date-parts': [[last_published.year]]}
         })
     else:
         coins_list.append(('rft.genre', 'bookitem'))
@@ -374,7 +375,7 @@ def get_citation_data(context):
                 'author': [{'literal': i} for i in authors],
                 'title': title,
                 'URL': purl,
-                'issued': {'date-parts': [[published.year]]},
+                'issued': {'date-parts': [[first_published.year]]},
             })
 
             if contributors:
@@ -389,7 +390,7 @@ def get_citation_data(context):
             ]
 
             citation.update({
-                'issued': {'date-parts': [[published.year, published.month, published.day]]},
+                'issued': {'date-parts': [[first_published.year, first_published.month, first_published.day]]},
                 'title': page.title,
                 'URL': page.get_full_url(context['request'])
             })
@@ -403,7 +404,7 @@ def get_citation_data(context):
 
             citation.update({
                 'author': [{'literal': page.source_set.owner.profile.full_name}],
-                'issued': {'date-parts': [[published.year]]},
+                'issued': {'date-parts': [[last_published.year]]},
                 'title': page.title,
                 'URL': page.get_full_url(context['request'])
             })
@@ -419,9 +420,9 @@ def get_citation_data(context):
             citation.update({
                 'author': [{'literal': author}],
                 'issued': {'date-parts': [[
-                        published.year,
-                        published.month,
-                        published.day
+                        last_published.year,
+                        last_published.month,
+                        last_published.day,
                     ]]},
                 'title': page.title,
                 'URL': page.get_full_url(context['request'])
