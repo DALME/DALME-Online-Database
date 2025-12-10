@@ -67,7 +67,7 @@ No requirements.
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of instances in the cluster. | `number` | n/a | yes |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Instance type of data nodes in the cluster. | `string` | n/a | yes |
-| <a name="input_keepers"></a> [keepers](#input\_keepers) | Arbitrary key/value pairs that force secret regeneration on change. | <pre>object({<br>    master_user_version = number<br>  })</pre> | n/a | yes |
+| <a name="input_keepers"></a> [keepers](#input\_keepers) | Arbitrary key/value pairs that force secret regeneration on change. | <pre>object({<br/>    master_user_version = number<br/>  })</pre> | n/a | yes |
 | <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The project encryption key ARN. | `string` | n/a | yes |
 | <a name="input_log_retention_in_days"></a> [log\_retention\_in\_days](#input\_log\_retention\_in\_days) | How long to keep OpenSearch logs. | `number` | n/a | yes |
 | <a name="input_master_user_secret_arn"></a> [master\_user\_secret\_arn](#input\_master\_user\_secret\_arn) | ARN for the current OpenSearch master username/password secret version. | `string` | n/a | yes |

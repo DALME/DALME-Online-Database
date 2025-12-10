@@ -1,21 +1,5 @@
 # Entrypoint for the firewall module.
 
-# The firewall and its bucket needs to reside in us-east-1 as the WAF is scoped
-# to Cloudfront which can only exist in us-east-1. Even if we are, in fact,
-# actually deploying everything in us-east-1 its better just to make it
-# explicit in case that fact changes at some point in the future.
-provider "aws" {
-  alias  = "acm"
-  region = "us-east-1"
-
-  default_tags {
-    tags = {
-      Environment = var.environment
-      Namespace   = var.namespace
-    }
-  }
-}
-
 module "waf_logs" {
   source = "../..//_reusable/bucket/"
 

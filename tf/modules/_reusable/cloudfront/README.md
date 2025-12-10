@@ -5,15 +5,17 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
-| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.5 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.1.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
+| <a name="provider_aws.acm"></a> [aws.acm](#provider\_aws.acm) | 6.25.0 |
+| <a name="provider_aws.dns_account"></a> [aws.dns\_account](#provider\_aws.dns\_account) | 6.25.0 |
 
 ## Modules
 
@@ -27,11 +29,11 @@
 
 | Name | Type |
 |------|------|
-| [aws_acm_certificate.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/acm_certificate) | resource |
-| [aws_acm_certificate_validation.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/acm_certificate_validation) | resource |
-| [aws_cloudfront_distribution.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudfront_distribution) | resource |
-| [aws_route53_record.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
-| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/route53_zone) | data source |
+| [aws_acm_certificate.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/acm_certificate) | resource |
+| [aws_acm_certificate_validation.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/acm_certificate_validation) | resource |
+| [aws_cloudfront_distribution.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/cloudfront_distribution) | resource |
+| [aws_route53_record.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/route53_record) | resource |
+| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
 

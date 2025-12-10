@@ -1,12 +1,12 @@
 # Providers for the security module.
 
 terraform {
-  required_version = "~> 1.6"
+  required_version = "~> 1.14.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "5.70.0"
+      version = "6.25.0"
     }
   }
 }

@@ -2,6 +2,7 @@
 # vi: set ft=make :
 IAMLIVE := true
 REGION := us-east-1
+TF_ROOT := /opt/tf
 TF_LOG := WARN
 TF_MODULES := modules
 
@@ -10,7 +11,7 @@ SERVICE := $(NAMESPACE)-$(ENVIRONMENT)-ecs-service
 JUMP_HOST := $(NAMESPACE)-$(ENVIRONMENT)-network-jump-host-asg
 
 # DAG order of infra module application.
-APPLY := authorization \
+DAG := authorization \
 	security \
 	network \
 	firewall \
@@ -49,8 +50,8 @@ else
 		-e IAMLIVE=$(IAMLIVE) \
 		$(NAMESPACE).deploy \
 		terragrunt apply \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG)
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.apply
 
@@ -63,12 +64,29 @@ else
 		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt destroy \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-ignore-external-dependencies \
-		--terragrunt-log-level $(TF_LOG) \
-		--terragrunt-non-interactive
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--queue-exclude-external \
+		--log-level $(TF_LOG) \
+		--non-interactive
 endif
 .PHONY: deploy.destroy
+
+deploy.destroy.target: _deploy.confirm.destroy
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.destroy.target module=vpc target=aws_nat_gateway.this)
+else
+	docker compose run --rm \
+		-e AWS_PROFILE=$(AWS_PROFILE) \
+		$(NAMESPACE).deploy \
+		terragrunt destroy \
+		--target=$(target) \
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--queue-exclude-external \
+		--log-level $(TF_LOG) \
+		--non-interactive
+endif
+.PHONY: deploy.destroy.target
 
 deploy.unlock: _confirm
 ifndef uuid
@@ -81,8 +99,8 @@ else
 		$(NAMESPACE).deploy \
 		terragrunt force-unlock \
 		$(uuid) \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG)
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.unlock
 
@@ -91,8 +109,8 @@ deploy.graph:
 		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt graph-dependencies \
-		--terragrunt-working-dir environments/$(ENVIRONMENT) \
-		--terragrunt-log-level $(TF_LOG)
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT) \
+		--log-level $(TF_LOG)
 .PHONY: deploy.graph
 
 deploy.init: _deploy.ensure.cache
@@ -104,8 +122,9 @@ else
 		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt init \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG)
+		--backend-bootstrap \
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.init
 
@@ -118,12 +137,12 @@ else
 		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt init -upgrade \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG)
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.init.upgrade
 
-deploy.lint: _deploy.format _deploy.validate \
+deploy.lint: _deploy.format _deploy.hcl.validate _deploy.validate \
 	_deploy.docs _deploy.tfsec
 .PHONY: deploy.lint
 
@@ -137,8 +156,8 @@ else
 		-e IAMLIVE=$(IAMLIVE) \
 		$(NAMESPACE).deploy \
 		terragrunt plan \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG)
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.plan
 
@@ -157,8 +176,8 @@ else
 		-e AWS_PROFILE=$(AWS_PROFILE) \
 		$(NAMESPACE).deploy \
 		terragrunt state list \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG)
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.state.ls
 
@@ -174,8 +193,8 @@ else
 		$(NAMESPACE).deploy \
 		terragrunt state rm \
 		$(resource) \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG)
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.state.rm
 
@@ -205,20 +224,24 @@ deploy.update: _deploy.update.provider _deploy.update.module
 # which is easier than muddying everything else up with dynamic machinery.
 deploy.validate:
 ifdef IN_CI
-	docker compose run -T --rm \
+	BUILD_HASH=$(HEAD) \
 		-e TF_DISABLE_INIT=true \
+		docker compose run -T --rm \
 		$(NAMESPACE).deploy \
-		terragrunt run-all validate \
-		--terragrunt-working-dir environments/$(ENVIRONMENT) \
-		--terragrunt-log-level $(TF_LOG)
+		terragrunt run --all validate \
+		--no-auto-init \
+		--disable-bucket-update \
+		--working-dir environments/$(ENVIRONMENT) \
+		--log-level $(TF_LOG)
 else
 	docker compose run -T --rm \
 		-e TF_DISABLE_INIT=true \
 		$(NAMESPACE).deploy \
-		terragrunt run-all validate \
-		--terragrunt-working-dir environments/$(ENVIRONMENT) \
-		--terragrunt-log-level $(TF_LOG) \
-		--terragrunt-no-auto-init
+		terragrunt run --all validate \
+		--no-auto-init \
+		--disable-bucket-update \
+		--working-dir environments/$(ENVIRONMENT) \
+		--log-level $(TF_LOG)
 endif
 .PHONY: deploy.validate
 
@@ -231,8 +254,8 @@ else
 		-e TF_DISABLE_INIT=true \
 		$(NAMESPACE).deploy \
 		terragrunt validate \
-		--terragrunt-working-dir environments/$(ENVIRONMENT)/$(REGION)/$(module) \
-		--terragrunt-log-level $(TF_LOG) \
+		--working-dir $(TF_ROOT)/environments/$(ENVIRONMENT)/$(REGION)/$(module) \
+		--log-level $(TF_LOG) \
 		$(args)
 endif
 .PHONY: deploy.validate.module
@@ -263,16 +286,26 @@ _deploy.ensure.cache:
 _deploy.fmt:
 	docker compose run -T --rm \
 		$(NAMESPACE).deploy \
-		terraform fmt -diff -write
+		terraform fmt \
+		-diff \
+		-write
 .PHONY: _deploy.fmt
 
-_deploy.hclfmt:
+_deploy.hcl.fmt:
 	docker compose run -T --rm \
 		$(NAMESPACE).deploy \
-		terragrunt hclfmt -diff -write
+		terragrunt hcl fmt \
+		--diff
 .PHONY: _deploy.hclfmt
 
-_deploy.format: _deploy.fmt _deploy.hclfmt
+_deploy.hcl.validate:
+	docker compose run -T --rm \
+		$(NAMESPACE).deploy \
+		terragrunt hcl validate \
+		--log-level $(TF_LOG)
+.PHONY: _deploy.hcl.validate
+
+_deploy.format: _deploy.hcl.fmt _deploy.fmt
 .PHONY: _deploy.format
 
 _deploy.tfsec:

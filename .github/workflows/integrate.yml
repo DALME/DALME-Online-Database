@@ -2,6 +2,9 @@ name: Integrate
 on:
   push:
   pull_request:
+    branches:
+      - development.v2
+      - ocp/development.v2
     types:
       - opened
       - reopened
@@ -14,8 +17,7 @@ concurrency:
 
 env:
   NAMESPACE: ida
-  ENVIRONMENT: >
-    ${{ github.ref_name == 'master' && 'production' || github.ref_name == 'development.v2' && 'staging' || 'staging' }}
+  ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
   CI_TAG: dev
   PYTHON: 3.11
   SKIP_APP: |

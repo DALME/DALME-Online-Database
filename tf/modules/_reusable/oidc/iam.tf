@@ -21,11 +21,11 @@ data "aws_iam_policy_document" "this" {
       variable = "token.actions.githubusercontent.com:sub"
       values = concat(
         [
-          for item in var.oidc_allowed :
+          for item in var.allowed :
           "repo:${item["org"]}/${item["repo"]}:pull_request"
         ],
         [
-          for item in var.oidc_allowed :
+          for item in var.allowed :
           "repo:${item["org"]}/${item["repo"]}:ref:refs/heads/${item["branch"]}"
         ],
       )
@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  name               = module.oidc_role_label.id
+  name               = var.role_name
   assume_role_policy = data.aws_iam_policy_document.this.json
 
   tags = module.oidc_role_label.tags

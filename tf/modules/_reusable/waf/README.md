@@ -5,14 +5,14 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
 
 ## Modules
 
@@ -26,10 +26,10 @@
 
 | Name | Type |
 |------|------|
-| [aws_wafv2_ip_set.ipv4](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/wafv2_ip_set) | resource |
-| [aws_wafv2_ip_set.ipv6](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/wafv2_ip_set) | resource |
-| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/wafv2_web_acl) | resource |
-| [aws_wafv2_web_acl_logging_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/wafv2_web_acl_logging_configuration) | resource |
+| [aws_wafv2_ip_set.ipv4](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/wafv2_ip_set) | resource |
+| [aws_wafv2_ip_set.ipv6](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/wafv2_ip_set) | resource |
+| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/wafv2_web_acl) | resource |
+| [aws_wafv2_web_acl_logging_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/wafv2_web_acl_logging_configuration) | resource |
 
 ## Inputs
 
@@ -41,7 +41,7 @@
 | <a name="input_ipv6_ip_set_addresses"></a> [ipv6\_ip\_set\_addresses](#input\_ipv6\_ip\_set\_addresses) | Provide addresess for a WAFv2 IP set resource in ipv6 format. | `list(string)` | n/a | yes |
 | <a name="input_log_destination_configs"></a> [log\_destination\_configs](#input\_log\_destination\_configs) | Optional ARN of a resource to receive WAF logs. | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
-| <a name="input_rules"></a> [rules](#input\_rules) | Data for settings parameters in the rule declarations. | <pre>object({<br>    domestic_dos_limit = number,<br>    global_dos_limit   = number,<br>  })</pre> | n/a | yes |
+| <a name="input_rules"></a> [rules](#input\_rules) | Data for settings parameters in the rule declarations. | <pre>object({<br/>    domestic_dos_limit = number,<br/>    global_dos_limit   = number,<br/>  })</pre> | n/a | yes |
 | <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 
 ## Outputs

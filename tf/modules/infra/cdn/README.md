@@ -5,14 +5,14 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
 
 ## Modules
 
@@ -32,17 +32,17 @@
 
 | Name | Type |
 |------|------|
-| [aws_cloudfront_function.viewer_request](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudfront_function) | resource |
-| [aws_cloudfront_origin_access_control.s3](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudfront_origin_access_control) | resource |
-| [aws_route53_record.www_a](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
-| [aws_route53_record.www_aaaa](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
-| [aws_s3_bucket_policy.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/s3_bucket_policy) | resource |
-| [aws_s3_bucket_policy.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/s3_bucket_policy) | resource |
-| [aws_iam_policy_document.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/lb) | data source |
-| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/route53_zone) | data source |
-| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/wafv2_web_acl) | data source |
+| [aws_cloudfront_function.viewer_request](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/cloudfront_function) | resource |
+| [aws_cloudfront_origin_access_control.s3](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/cloudfront_origin_access_control) | resource |
+| [aws_route53_record.www_a](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/route53_record) | resource |
+| [aws_route53_record.www_aaaa](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/route53_record) | resource |
+| [aws_s3_bucket_policy.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/s3_bucket_policy) | resource |
+| [aws_s3_bucket_policy.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/s3_bucket_policy) | resource |
+| [aws_iam_policy_document.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/lb) | data source |
+| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/route53_zone) | data source |
+| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/wafv2_web_acl) | data source |
 
 ## Inputs
 

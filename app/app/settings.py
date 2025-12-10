@@ -1004,7 +1004,7 @@ class Staging(Production, Configuration):
 
     _TENANTS = {
         'IDA': {
-            'domain': 'ida.ocp.systems',
+            'domain': 'documentaryarchaeology.net',
             'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
@@ -1012,17 +1012,17 @@ class Staging(Production, Configuration):
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
-            'domain': 'dalme.ocp.systems',
+            'domain': 'dalme-beta.org',
             'additional_domains': [],
             'name': 'DALME',
-            'schema_name': 'dalme',
+            'schema_name': 'dalme',  # IMPORTANT: Do not use '-beta' here!
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
-            'domain': 'pharmacopeias.ocp.systems',
+            'domain': 'historical-pharmacopeias.org',
             'additional_domains': [],
-            'name': 'Pharmacopeias',
+            'name': 'Historical Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,

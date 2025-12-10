@@ -1,18 +1,5 @@
 # Entrypoint for the cdn module.
 
-# Cloudfront needs to reside in us-east-1 so ensure that.
-provider "aws" {
-  alias  = "acm"
-  region = "us-east-1"
-
-  default_tags {
-    tags = {
-      Environment = var.environment
-      Namespace   = var.namespace
-    }
-  }
-}
-
 locals {
   additional_domains    = slice(var.tenant_domains, 1, length(var.tenant_domains))
   allowed_methods       = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -23,7 +10,6 @@ locals {
   origin_id_mediafiles  = "${var.namespace}-${var.environment}-s3-origin-mediafiles"
 }
 
-# Buckets
 module "access_logs" {
   source = "../..//_reusable/bucket/"
 

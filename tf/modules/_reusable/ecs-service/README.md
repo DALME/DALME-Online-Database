@@ -5,14 +5,14 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
 
 ## Modules
 
@@ -27,10 +27,10 @@
 
 | Name | Type |
 |------|------|
-| [aws_appautoscaling_policy.ecs_policy_cpu](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/appautoscaling_policy) | resource |
-| [aws_appautoscaling_policy.ecs_policy_memory](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/appautoscaling_policy) | resource |
-| [aws_appautoscaling_target.ecs_target](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/appautoscaling_target) | resource |
-| [aws_ecs_service.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_service) | resource |
+| [aws_appautoscaling_policy.ecs_policy_cpu](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/appautoscaling_policy) | resource |
+| [aws_appautoscaling_policy.ecs_policy_memory](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/appautoscaling_policy) | resource |
+| [aws_appautoscaling_target.ecs_target](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/appautoscaling_target) | resource |
+| [aws_ecs_service.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecs_service) | resource |
 
 ## Inputs
 

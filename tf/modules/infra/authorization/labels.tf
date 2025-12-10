@@ -6,7 +6,7 @@ module "oidc_policy" {
 
   namespace   = var.namespace
   environment = var.environment
-  name        = "${var.gha_oidc_role_name}-policy"
+  name        = "oidc-github-actions-policy"
 
   labels_as_tags = ["name"]
 }

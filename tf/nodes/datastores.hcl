@@ -6,10 +6,10 @@ terraform {
 
 locals {
   env                                = read_terragrunt_config(find_in_parent_folders("environment.hcl"))
+  namespace                          = local.env.locals.namespace
   admins                             = local.env.locals.admins
   domain                             = local.env.locals.domain
   environment                        = local.env.locals.environment
-  namespace                          = local.env.locals.namespace
   opensearch_master_user_secret_name = local.env.locals.opensearch_master_user_secret_name
   opensearch_version                 = local.env.locals.opensearch_version
   ports                              = local.env.locals.ports

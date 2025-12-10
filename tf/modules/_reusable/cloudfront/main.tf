@@ -10,6 +10,8 @@ locals {
 }
 
 resource "aws_acm_certificate" "cloudfront" {
+  provider = aws.acm
+
   domain_name               = var.domain
   subject_alternative_names = local.subject_alternative_names
   validation_method         = "DNS"
@@ -22,6 +24,8 @@ resource "aws_acm_certificate" "cloudfront" {
 }
 
 resource "aws_route53_record" "cloudfront" {
+  provider = aws.dns_account
+
   for_each = {
     for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
       name    = dvo.resource_record_name
@@ -31,7 +35,7 @@ resource "aws_route53_record" "cloudfront" {
     } if !strcontains(dvo.domain_name, "*.")
   }
 
-  allow_overwrite = true
+  allow_overwrite = false
   name            = each.value.name
   records         = [each.value.record]
   ttl             = var.dns_ttl
@@ -40,6 +44,8 @@ resource "aws_route53_record" "cloudfront" {
 }
 
 resource "aws_acm_certificate_validation" "cloudfront" {
+  provider = aws.acm
+
   certificate_arn = aws_acm_certificate.cloudfront.arn
   validation_record_fqdns = [
     for record in aws_route53_record.cloudfront : record.fqdn

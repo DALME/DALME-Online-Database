@@ -15,7 +15,6 @@ locals {
     django_secret_key_version   = 1,
     oauth_client_secret_version = 1,
   }
-  namespace                          = local.env.locals.namespace
   oauth_client_id                    = local.env.locals.oauth_client_id
   opensearch_master_user_secret_name = local.env.locals.opensearch_master_user_secret_name
   ports                              = local.env.locals.ports
