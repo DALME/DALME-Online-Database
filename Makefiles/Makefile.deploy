@@ -91,7 +91,9 @@ endif
 deploy.unlock: _confirm
 ifndef uuid
 	$(error Supply lock uuid. \
-		Usage: make deploy.unlock uuid=00000000-0000-0000-0000-000000000000)
+		Usage: make deploy.unlock \
+		module=vpc \
+		uuid=00000000-0000-0000-0000-000000000000)
 else
 	docker compose run --rm \
 		-e AWS_PROFILE=$(AWS_PROFILE) \

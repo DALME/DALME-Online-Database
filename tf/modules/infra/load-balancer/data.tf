@@ -3,6 +3,13 @@
 # Any dependencies between this node and ancestors on the environment DAG
 # should be resolved here and then passed to resources in this module.
 
+data "aws_route53_zone" "tenant_zones" {
+  provider = aws.dns_account
+
+  for_each = toset(concat([var.domain], var.additional_domains))
+  name     = each.key
+}
+
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }

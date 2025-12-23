@@ -1,5 +1,6 @@
 # Entrypoint for the cloudfront module.
 
+# TODO: Hoist all this out into cdn main.tf file.
 locals {
   all_tldrs                 = concat([var.domain], var.additional_domains)
   wildcard_domains          = [for domain in local.all_tldrs : "*.${domain}"]

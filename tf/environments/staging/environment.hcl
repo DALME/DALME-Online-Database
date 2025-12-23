@@ -9,8 +9,8 @@ locals {
 
   aws_account = 209330743443
   admins = [
-    "jhrr@ocp.systems",
     "pizzorno@fas.harvard.edu",
+    "jhrr@ocp.systems",
   ]
   # NOTE: You can get this value by calling `aws sts get-caller-identity`
   # against whatever SSO profile you are using to invoke terraform.

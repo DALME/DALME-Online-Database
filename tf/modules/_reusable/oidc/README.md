@@ -41,8 +41,8 @@ Deploys a Github Actions OIDC provider to your environment.
 | <a name="input_allowed"></a> [allowed](#input\_allowed) | Github org/repos/branches allowed to assume to OIDC role. | `list(map(string))` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
-| <a name="input_provider_name"></a> [provider\_name](#input\_provider\_name) | Name of the github action OIDC provider resource. | `string` | n/a | yes |
-| <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the github action OIDC role. | `string` | n/a | yes |
+| <a name="input_provider_name"></a> [provider\_name](#input\_provider\_name) | Name of the github action OIDC provider resource. | `string` | `"oidc-github-actions-provider"` | no |
+| <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the github action OIDC role. | `string` | `"OIDCGithubActionsRole"` | no |
 | <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |
 
 ## Outputs
@@ -50,5 +50,6 @@ Deploys a Github Actions OIDC provider to your environment.
 | Name | Description |
 |------|-------------|
 | <a name="output_provider_arn"></a> [provider\_arn](#output\_provider\_arn) | The ARN of the github OIDC provider resource. |
-| <a name="output_role_name"></a> [role\_name](#output\_role\_name) | The full name of the Github Actions OIDC role. |
+| <a name="output_role_arn"></a> [role\_arn](#output\_role\_arn) | The ARN of the Github Actions OIDC role. |
+| <a name="output_role_name"></a> [role\_name](#output\_role\_name) | The name of the Github Actions OIDC role. |
 <!-- END_TF_DOCS -->
