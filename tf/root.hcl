@@ -25,8 +25,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Environment = "${local.environment}"
       Namespace   = "${local.namespace}"
+      Environment = "${local.environment}"
     }
   }
 }
@@ -38,8 +38,8 @@ provider "aws" {
 
   default_tags {
     tags = {
+      Namespace   = "${local.namespace}"
       Environment = "${local.environment}"
-      Namespace   = "${local.environment}"
     }
   }
 }
@@ -55,8 +55,8 @@ provider "aws" {
 
   default_tags {
     tags = {
+      Namespace   = "${local.namespace}"
       Environment = "${local.environment}"
-      Namespace   = "${local.environment}"
     }
   }
 }

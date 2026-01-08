@@ -11,6 +11,15 @@ module "cdn_label" {
   labels_as_tags = ["namespace", "environment", "name"]
 }
 
+module "cdn_certificate_label" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0"
+
+  attributes = ["ssl", "certificate"]
+
+  context = module.cdn_label.context
+}
+
 module "cdn_access_logs_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"

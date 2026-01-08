@@ -6,7 +6,7 @@
 data "aws_route53_zone" "tenant_zones" {
   provider = aws.dns_account
 
-  for_each = toset(concat([var.domain], var.additional_domains))
+  for_each = toset(local.zone_domains)
   name     = each.key
 }
 

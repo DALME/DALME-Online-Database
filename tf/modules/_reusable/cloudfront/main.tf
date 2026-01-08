@@ -1,58 +1,5 @@
 # Entrypoint for the cloudfront module.
 
-# TODO: Hoist all this out into cdn main.tf file.
-locals {
-  all_tldrs                 = concat([var.domain], var.additional_domains)
-  wildcard_domains          = [for domain in local.all_tldrs : "*.${domain}"]
-  subject_alternative_names = concat(var.additional_domains, local.wildcard_domains)
-  zone_ids = {
-    for zone in data.aws_route53_zone.tenant_zones : zone.name => zone.zone_id
-  }
-}
-
-resource "aws_acm_certificate" "cloudfront" {
-  provider = aws.acm
-
-  domain_name               = var.domain
-  subject_alternative_names = local.subject_alternative_names
-  validation_method         = "DNS"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = module.cloudfront_certificate_label.tags
-}
-
-resource "aws_route53_record" "cloudfront" {
-  provider = aws.dns_account
-
-  for_each = {
-    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
-      name    = dvo.resource_record_name
-      record  = dvo.resource_record_value
-      type    = dvo.resource_record_type
-      zone_id = local.zone_ids[dvo.domain_name]
-    } if !strcontains(dvo.domain_name, "*.")
-  }
-
-  allow_overwrite = false
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = var.dns_ttl
-  type            = each.value.type
-  zone_id         = each.value.zone_id
-}
-
-resource "aws_acm_certificate_validation" "cloudfront" {
-  provider = aws.acm
-
-  certificate_arn = aws_acm_certificate.cloudfront.arn
-  validation_record_fqdns = [
-    for record in aws_route53_record.cloudfront : record.fqdn
-  ]
-}
-
 # Cloudfront is a complicated resource and here I've just abstracted it to the
 # extent that we are actually using the functionality it offers. Should we need
 # to start using anything else not represented here, this definition can be
@@ -65,11 +12,6 @@ resource "aws_cloudfront_distribution" "this" {
   price_class         = var.price_class
   wait_for_deployment = true
   web_acl_id          = var.web_acl_id
-
-  # Cloudfront will fail on create unless the certificates are validated.
-  depends_on = [
-    aws_acm_certificate_validation.cloudfront
-  ]
 
   logging_config {
     bucket          = var.log_destination
@@ -232,7 +174,7 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    acm_certificate_arn      = var.certificate_arn
     minimum_protocol_version = "TLSv1.2_2021"
     ssl_support_method       = "sni-only"
   }

@@ -60,9 +60,8 @@ module "alb_access_logs" {
 }
 
 locals {
-  subject_alternative_names = distinct(
-    [for d in var.additional_domains : d if d != var.domain]
-  )
+  zone_domains              = distinct(concat([var.domain], var.additional_domains))
+  subject_alternative_names = [for d in local.zone_domains : d if d != var.domain]
   zone_ids = {
     for zone in data.aws_route53_zone.tenant_zones : zone.name => zone.zone_id
   }
@@ -119,7 +118,7 @@ module "alb" {
   ]
 
   alb_port        = var.alb_port
-  certificate_arn = aws_acm_certificate.this.arn
+  certificate_arn = aws_acm_certificate_validation.this.arn
   dns_ttl         = var.dns_ttl
   environment     = var.environment
   force_destroy   = var.force_destroy
