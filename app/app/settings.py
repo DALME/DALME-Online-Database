@@ -27,7 +27,6 @@ class TENANT:
     """Structure for defining application tenants."""
 
     domain: str
-    additional_domains: list[str]
     name: str
     schema_name: str
     is_primary: bool
@@ -506,7 +505,6 @@ class Development(Base):
     _TENANTS = {
         'IDA': {
             'domain': 'ida.localhost',
-            'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
@@ -514,7 +512,6 @@ class Development(Base):
         },
         'DALME': {
             'domain': 'dalme.localhost',
-            'additional_domains': [],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
@@ -522,7 +519,6 @@ class Development(Base):
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.localhost',
-            'additional_domains': [],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
@@ -1005,7 +1001,6 @@ class Staging(Production, Configuration):
     _TENANTS = {
         'IDA': {
             'domain': 'documentaryarchaeology.net',
-            'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
@@ -1013,7 +1008,6 @@ class Staging(Production, Configuration):
         },
         'DALME': {
             'domain': 'dalme-beta.org',
-            'additional_domains': [],
             'name': 'DALME',
             'schema_name': 'dalme',  # IMPORTANT: Do not use '-beta' here!
             'is_primary': False,
@@ -1021,7 +1015,6 @@ class Staging(Production, Configuration):
         },
         'PHARMACOPEIAS': {
             'domain': 'historical-pharmacopeias.org',
-            'additional_domains': [],
             'name': 'Historical Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,

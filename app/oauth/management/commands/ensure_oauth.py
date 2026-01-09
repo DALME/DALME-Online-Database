@@ -40,8 +40,6 @@ class Command(BaseCommand):
         domains = []
         for tenant in settings.TENANTS():
             domains.append(tenant.value.domain)
-            for additional_domain in tenant.value.additional_domains:
-                domains.append(additional_domain)
 
         domains = [f'http://{domain}:8000' if settings.IS_DEV else f'https://{domain}' for domain in domains]
 

@@ -20,7 +20,7 @@ class Command(BaseCommand):
         tenants = settings.TENANTS()
 
         for tenant in tenants:
-            domain, additional_domains, name, schema_name, is_primary, tenant_type = tenant.value
+            domain, name, schema_name, is_primary, tenant_type = tenant.value
 
             qs = Tenant.objects.filter(name=name)
             if not qs.exists():
@@ -40,14 +40,6 @@ class Command(BaseCommand):
                     domain=domain_obj,
                 )
 
-                if additional_domains:
-                    for additional_domain in additional_domains:
-                        domain_obj = Domain.objects.create(
-                            domain=additional_domain,
-                            tenant=tenant_obj,
-                            is_primary=False,
-                        )
-
             else:
                 logger.info(
                     'Existing tenant found for domain',
@@ -56,8 +48,9 @@ class Command(BaseCommand):
                 )
                 existing_tenant = qs.first()
 
-                # Let's catch a couple of conditions. Thi is highly unlikely to
-                # ever happen but we'll encode for the sake of future beings.
+                # Let's catch a couple of conditions. This is highly unlikely
+                # to ever happen but we'll encode for the sake of future
+                # beings.
                 if existing_tenant.name != name:
                     msg = "Don't mutate existing tenant names, they should be write-once/immutable."
                     raise ValueError(msg)
@@ -69,24 +62,10 @@ class Command(BaseCommand):
                 # You can update domain names though, if necessary. This is
                 # useful if staging origins need to be altered.
                 if existing_tenant.domain != domain:
-                    raise NotImplementedError
-
-                    # TODO: Update the primary tenant hare.
+                    existing_tenant.domain = domain
+                    existing_tenant.save()
                     logger.info(
                         'Updated tenant domain record.',
                         tenant=name,
                         domain=domain,
                     )
-
-                    if additional_domains:
-                        raise NotImplementedError
-
-                        # TODO: Query for all of them Domain.objects
-                        # Delete any that are't in the new list.
-                        # Create Any that don't exist create them.
-
-                        # domain_obj = Domain.objects.create(
-                        #     domain=additional_domain,
-                        #     tenant=existing_tenant,
-                        #     is_primary=False,
-                        # )
