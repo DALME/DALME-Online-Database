@@ -24,6 +24,7 @@
 
 | Name | Type |
 |------|------|
+| [aws_ecr_account_setting.basic_scan_type_version](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecr_account_setting) | resource |
 | [aws_ecr_lifecycle_policy.images](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecr_lifecycle_policy) | resource |
 | [aws_ecr_repository.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecr_repository) | resource |
 

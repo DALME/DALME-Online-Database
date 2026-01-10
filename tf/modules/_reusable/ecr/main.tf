@@ -4,6 +4,11 @@ locals {
   name = var.service == null ? "${var.namespace}.${var.image}" : "${var.namespace}.${var.service}.${var.image}"
 }
 
+resource "aws_ecr_account_setting" "basic_scan_type_version" {
+  name  = "BASIC_SCAN_TYPE_VERSION"
+  value = "AWS_NATIVE"
+}
+
 resource "aws_ecr_repository" "this" {
   name = local.name
   # tfsec:ignore:aws-ecr-enforce-immutable-repository

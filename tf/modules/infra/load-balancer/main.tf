@@ -93,7 +93,7 @@ resource "aws_route53_record" "this" {
     } if !strcontains(dvo.domain_name, "*.")
   }
 
-  allow_overwrite = false
+  allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
   ttl             = var.dns_ttl
