@@ -81,6 +81,15 @@ resource "aws_acm_certificate" "this" {
   tags = module.load_balancer_certificate_label.tags
 }
 
+resource "aws_acm_certificate_validation" "this" {
+  provider = aws.acm
+
+  certificate_arn = aws_acm_certificate.this.arn
+  validation_record_fqdns = [
+    for record in aws_route53_record.this : record.fqdn
+  ]
+}
+
 resource "aws_route53_record" "this" {
   provider = aws.dns_account
 
@@ -99,15 +108,6 @@ resource "aws_route53_record" "this" {
   ttl             = var.dns_ttl
   type            = each.value.type
   zone_id         = each.value.zone_id
-}
-
-resource "aws_acm_certificate_validation" "this" {
-  provider = aws.acm
-
-  certificate_arn = aws_acm_certificate.this.arn
-  validation_record_fqdns = [
-    for record in aws_route53_record.this : record.fqdn
-  ]
 }
 
 module "alb" {

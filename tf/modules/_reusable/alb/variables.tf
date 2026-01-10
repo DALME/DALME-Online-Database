@@ -6,7 +6,7 @@ variable "alb_port" {
 }
 
 variable "certificate_arn" {
-  description = "Reference to the SSL certificate encrypting HTTPS traffic."
+  description = "Reference to the SSL certificate encrypting traffic."
   type        = string
 }
 

@@ -18,6 +18,15 @@ module "opensearch_alarm_sns_label" {
   context = module.opensearch.label_context
 }
 
+module "opensearch_certificate_label" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0"
+
+  attributes = ["ssl", "certificate"]
+
+  context = module.opensearch.label_context
+}
+
 module "opensearch_sg_ingress_vpc_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"

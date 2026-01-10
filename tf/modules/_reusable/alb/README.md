@@ -39,7 +39,7 @@
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_alb_port"></a> [alb\_port](#input\_alb\_port) | Load balancer listening port. | `number` | n/a | yes |
-| <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | Reference to the SSL certificate encrypting HTTPS traffic. | `string` | n/a | yes |
+| <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | Reference to the SSL certificate encrypting traffic. | `string` | n/a | yes |
 | <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate's DNS record. | `number` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether deletion protection is active on buckets. | `bool` | n/a | yes |

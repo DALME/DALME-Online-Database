@@ -15,6 +15,11 @@ variable "aws_region" {
   type        = string
 }
 
+variable "certificate_arn" {
+  description = "Reference to the SSL certificate encrypting traffic."
+  type        = string
+}
+
 variable "custom_endpoint" {
   description = "Fully qualified domain for your custom endpoint."
   type        = string
@@ -34,11 +39,6 @@ variable "dedicated_master_type" {
   description = "Instance type of the dedicated main nodes in the cluster."
   type        = string
   default     = null
-}
-
-variable "dns_ttl" {
-  description = "Time to live for the certificate DNS record."
-  type        = number
 }
 
 variable "domain" {

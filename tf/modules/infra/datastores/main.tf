@@ -62,6 +62,48 @@ resource "aws_vpc_security_group_egress_rule" "jump_host_egress_postgres" {
 locals {
   domain_name      = "${var.namespace}-${var.environment}-opensearch"
   master_user_name = "${var.namespace}-${var.environment}-opensearch-master-username"
+  custom_endpoint  = "opensearch.${var.domain}"
+}
+
+resource "aws_acm_certificate" "opensearch" {
+  provider = aws.acm
+
+  domain_name       = local.custom_endpoint
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = module.opensearch_certificate_label.tags
+}
+
+resource "aws_acm_certificate_validation" "opensearch" {
+  provider = aws.acm
+
+  certificate_arn = aws_acm_certificate.opensearch.arn
+  validation_record_fqdns = [
+    for record in aws_route53_record.opensearch : record.fqdn
+  ]
+}
+
+resource "aws_route53_record" "opensearch" {
+  provider = aws.dns_account
+
+  for_each = {
+    for dvo in aws_acm_certificate.opensearch.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = var.dns_ttl
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.this.zone_id
 }
 
 module "opensearch_master_user_secret" {
@@ -84,10 +126,10 @@ module "opensearch" {
   admins                   = var.opensearch.admins
   aws_account              = var.aws_account
   aws_region               = var.aws_region
-  custom_endpoint          = "opensearch.${var.domain}"
+  certificate_arn          = aws_acm_certificate_validation.opensearch.certificate_arn
+  custom_endpoint          = local.custom_endpoint
   dedicated_master_count   = var.opensearch.dedicated_master_count
   dedicated_master_enabled = var.opensearch.dedicated_master_enabled
-  dns_ttl                  = var.opensearch.dns_ttl
   domain                   = var.domain
   domain_name              = local.domain_name
   ebs_enabled              = var.opensearch.ebs_enabled
@@ -135,6 +177,18 @@ resource "aws_sns_topic" "opensearch_alarm" {
   })
 
   tags = module.opensearch_alarm_sns_label.tags
+}
+
+# DNS canonical name record for the ES service/dashboard.
+resource "aws_route53_record" "cname" {
+  provider = aws.dns_account
+
+  name    = "opensearch.${data.aws_route53_zone.this.name}"
+  ttl     = "300"
+  type    = "CNAME"
+  zone_id = data.aws_route53_zone.this.zone_id
+
+  records = [module.opensearch.endpoint]
 }
 
 resource "aws_sns_topic_subscription" "opensearch_alarm" {

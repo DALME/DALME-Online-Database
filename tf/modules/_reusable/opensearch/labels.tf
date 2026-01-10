@@ -11,15 +11,6 @@ module "opensearch_label" {
   labels_as_tags = ["namespace", "environment", "name"]
 }
 
-module "opensearch_certificate_label" {
-  source  = "cloudposse/label/null"
-  version = "0.25.0"
-
-  attributes = ["ssl", "certificate"]
-
-  context = module.opensearch_label.context
-}
-
 module "opensearch_sg_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"

@@ -17,7 +17,8 @@ locals {
 }
 
 inputs = {
-  domain = local.domain
+  dns_ttl = 60
+  domain  = local.domain
   opensearch = {
     admins = local.admins
     # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-dedicatedmasternodes.html#dedicatedmasternodes-instance
@@ -25,7 +26,6 @@ inputs = {
     dedicated_master_enabled           = false
     dedicated_master_count             = 0
     dedicated_master_type              = null
-    dns_ttl                            = 60
     ebs_enabled                        = true
     ebs_throughput                     = 250
     ebs_volume_size                    = 45

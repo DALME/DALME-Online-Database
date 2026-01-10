@@ -5,55 +5,6 @@ locals {
   resource_arn = "arn:aws:es:${var.aws_region}:${var.aws_account}:domain/${var.domain_name}"
 }
 
-data "aws_route53_zone" "this" {
-  name = var.domain
-}
-
-resource "aws_acm_certificate" "this" {
-  domain_name       = var.custom_endpoint
-  validation_method = "DNS"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = module.opensearch_certificate_label.tags
-}
-
-resource "aws_acm_certificate_validation" "this" {
-  certificate_arn = aws_acm_certificate.this.arn
-  validation_record_fqdns = [
-    for record in aws_route53_record.this : record.fqdn
-  ]
-}
-
-resource "aws_route53_record" "this" {
-  for_each = {
-    for dvo in aws_acm_certificate.this.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = var.dns_ttl
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.this.zone_id
-}
-
-# DNS canonical name record for the ES service/dashboard.
-resource "aws_route53_record" "cname" {
-  name    = "opensearch.${data.aws_route53_zone.this.name}"
-  ttl     = "300"
-  type    = "CNAME"
-  zone_id = data.aws_route53_zone.this.zone_id
-
-  records = [aws_opensearch_domain.this.endpoint]
-}
-
 # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/slr-aos.html
 resource "aws_iam_service_linked_role" "this" {
   aws_service_name = "opensearchservice.amazonaws.com"
@@ -150,7 +101,6 @@ resource "aws_opensearch_domain" "this" {
   engine_version = var.engine_version
 
   depends_on = [
-    aws_acm_certificate_validation.this,
     aws_iam_service_linked_role.this,
   ]
 
@@ -188,7 +138,7 @@ resource "aws_opensearch_domain" "this" {
 
     custom_endpoint_enabled         = true
     custom_endpoint                 = var.custom_endpoint
-    custom_endpoint_certificate_arn = aws_acm_certificate.this.arn
+    custom_endpoint_certificate_arn = var.certificate_arn
   }
 
   ebs_options {
