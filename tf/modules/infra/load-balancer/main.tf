@@ -113,12 +113,8 @@ resource "aws_acm_certificate_validation" "this" {
 module "alb" {
   source = "../..//_reusable/alb/"
 
-  depends_on = [
-    aws_acm_certificate_validation.this,
-  ]
-
   alb_port        = var.alb_port
-  certificate_arn = aws_acm_certificate_validation.this.arn
+  certificate_arn = aws_acm_certificate_validation.this.certificate_arn
   dns_ttl         = var.dns_ttl
   environment     = var.environment
   force_destroy   = var.force_destroy
