@@ -9,16 +9,19 @@ locals {
   admins      = local.env.locals.admins
   domain      = local.env.locals.domain
   environment = local.env.locals.environment
+
   # https://registry.terraform.io/providers/hashicorp/random/latest/docs#resource-keepers
   keepers = {
     admin_user_version          = 1,
     django_secret_key_version   = 1,
     oauth_client_secret_version = 1,
   }
+
   oauth_client_id                    = local.env.locals.oauth_client_id
   opensearch_master_user_secret_name = local.env.locals.opensearch_master_user_secret_name
   ports                              = local.env.locals.ports
   postgres_version                   = local.env.locals.postgres_version
+
   # https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/publishEvents.html#CronExpressions
   scheduled_tasks = {
     cleartokens = {
@@ -32,6 +35,7 @@ locals {
       state               = "ENABLED",
     },
   }
+
   tenant_domains   = local.env.locals.tenant_domains
   unmanaged_suffix = local.env.locals.unmanaged_suffix
 }
@@ -87,7 +91,6 @@ inputs = {
   sfn_max_attempts                   = 3
   sfn_retry_interval                 = 3
   sfn_timeout                        = 300
-  task_assign_public_ip              = true
   tenant_domains                     = local.tenant_domains
   threads                            = 4
   unmanaged_suffix                   = local.unmanaged_suffix
