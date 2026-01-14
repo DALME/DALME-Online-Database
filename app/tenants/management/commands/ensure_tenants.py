@@ -4,6 +4,7 @@ import structlog
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from tenants.models import Domain, Tenant
 
@@ -15,8 +16,14 @@ class Command(BaseCommand):
 
     help = 'Create application tenant records.'
 
+    @transaction.atomic
     def handle(self, *args, **options) -> None:  # noqa: ARG002
-        """Create application tenant records."""
+        """Create application tenant records.
+
+        Run the method inside a db transaction to ensure tenant data is created
+        or modified in its entirity or not at all.
+
+        """
         tenants = settings.TENANTS()
 
         for tenant in tenants:
@@ -49,18 +56,27 @@ class Command(BaseCommand):
                 existing_tenant = qs.first()
 
                 # Let's catch a couple of conditions. This is highly unlikely
-                # to ever happen but we'll encode for the sake of future
+                # to ever happen but we'll encode them for the sake of future
                 # beings.
                 if existing_tenant.name != name:
                     msg = "Don't mutate existing tenant names, they should be write-once/immutable."
                     raise ValueError(msg)
 
                 if existing_tenant.schema_name != schema_name:
-                    msg = "Don't mutate existing schema names, they should be write-once/immutable."
+                    msg = "Don't mutate existing tenant schema names, they should be write-once/immutable."
                     raise ValueError(msg)
 
-                # You can update domain names though, if necessary. This is
-                # useful if staging origins need to be altered.
+                if existing_tenant.tenant_type != tenant_type:
+                    msg = "Don't mutate existing tenant types, they should be write-once/immutable."
+                    raise ValueError(msg)
+
+                if existing_tenant.is_primary != is_primary:
+                    msg = "Don't mutate existing tenant primary status, it should be write-once/immutable."
+                    raise ValueError(msg)
+
+                # You can update domain names if necessary. This is useful if
+                # staging origins need to be altered and its conceivable it
+                # might even need to happen in prod too.
                 if existing_tenant.domain != domain:
                     existing_tenant.domain = domain
                     existing_tenant.save()
