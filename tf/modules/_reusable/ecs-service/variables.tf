@@ -35,6 +35,18 @@ variable "cpu_target_value" {
   type        = number
 }
 
+variable "deployment_circuit_breaker" {
+  description = "Configure the deployment circuit breaker."
+  type = object({
+    enable   = bool
+    rollback = bool
+  })
+  default = {
+    enable   = false
+    rollback = false
+  }
+}
+
 variable "desired_count" {
   description = "Number of ECS services running in parallel."
   type        = number

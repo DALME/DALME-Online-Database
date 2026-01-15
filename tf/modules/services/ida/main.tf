@@ -365,33 +365,34 @@ resource "aws_ecs_task_definition" "this" {
 module "ecs_service" {
   source = "../..//_reusable/ecs-service/"
 
-  alb_target_group_arn      = data.aws_lb_target_group.this.arn
-  assign_public_ip          = var.assign_public_ip
-  cluster                   = data.aws_ecs_cluster.this.arn
-  cluster_name              = data.aws_ecs_cluster.this.cluster_name
-  cpu_scale_in_cooldown     = var.cpu_scale_in_cooldown
-  cpu_scale_out_cooldown    = var.cpu_scale_out_cooldown
-  cpu_target_value          = var.cpu_target_value
-  desired_count             = var.service_desired_count
-  environment               = var.environment
-  force_new_deployment      = var.force_new_deployment
-  health_check_grace_period = var.health_check_grace_period
-  launch_type               = var.launch_type
-  max_capacity              = var.max_capacity
-  max_percent               = var.max_percent
-  memory_scale_in_cooldown  = var.memory_scale_in_cooldown
-  memory_scale_out_cooldown = var.memory_scale_out_cooldown
-  memory_target_value       = var.memory_target_value
-  min_capacity              = var.min_capacity
-  min_healthy_percent       = var.min_healthy_percent
-  namespace                 = var.namespace
-  proxy_name                = local.proxy_name
-  proxy_port                = var.proxy_port
-  scaling_policy_type       = var.scaling_policy_type
-  scheduling_strategy       = var.scheduling_strategy
-  security_groups           = [data.aws_security_group.ecs.id]
-  subnets                   = data.aws_subnets.private.ids
-  task_definition           = aws_ecs_task_definition.this.arn
+  alb_target_group_arn       = data.aws_lb_target_group.this.arn
+  assign_public_ip           = var.assign_public_ip
+  cluster                    = data.aws_ecs_cluster.this.arn
+  cluster_name               = data.aws_ecs_cluster.this.cluster_name
+  cpu_scale_in_cooldown      = var.cpu_scale_in_cooldown
+  cpu_scale_out_cooldown     = var.cpu_scale_out_cooldown
+  cpu_target_value           = var.cpu_target_value
+  deployment_circuit_breaker = var.deployment_circuit_breaker
+  desired_count              = var.service_desired_count
+  environment                = var.environment
+  force_new_deployment       = var.force_new_deployment
+  health_check_grace_period  = var.health_check_grace_period
+  launch_type                = var.launch_type
+  max_capacity               = var.max_capacity
+  max_percent                = var.max_percent
+  memory_scale_in_cooldown   = var.memory_scale_in_cooldown
+  memory_scale_out_cooldown  = var.memory_scale_out_cooldown
+  memory_target_value        = var.memory_target_value
+  min_capacity               = var.min_capacity
+  min_healthy_percent        = var.min_healthy_percent
+  namespace                  = var.namespace
+  proxy_name                 = local.proxy_name
+  proxy_port                 = var.proxy_port
+  scaling_policy_type        = var.scaling_policy_type
+  scheduling_strategy        = var.scheduling_strategy
+  security_groups            = [data.aws_security_group.ecs.id]
+  subnets                    = data.aws_subnets.private.ids
+  task_definition            = aws_ecs_task_definition.this.arn
 }
 
 # Scheduled tasks/step functions.

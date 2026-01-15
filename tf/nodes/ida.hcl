@@ -57,6 +57,7 @@ inputs = {
   cpu_scale_in_cooldown              = 300
   cpu_scale_out_cooldown             = 300
   cpu_target_value                   = 60
+  deployment_circuit_breaker         = { enable = true, rollback = true }
   domain                             = local.domain
   fargate_cpu                        = 256
   fargate_memory                     = 1024
