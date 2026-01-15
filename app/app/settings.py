@@ -435,11 +435,10 @@ class Base(Configuration):
     URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
     URL_PORT = ':8000' if IS_DEV else ''
 
-    # analytics
-    PLAUSIBLE_API_URL = 'https://plausible.io/api/v2/query'  # plausible API
-    # list of metrics to retrieve and store locally
+    PLAUSIBLE_API_URL = 'https://plausible.io/api/v2/query'
+    # A list of metrics to retrieve and store locally.
     PLAUSIBLE_METRICS = ['visitors', 'visits', 'pageviews', 'bounce_rate', 'time_on_page']
-    PLAUSIBLE_UPDATE_INTERVAL = 1  # interval for updating analytics from plausible API - in days
+    PLAUSIBLE_UPDATE_INTERVAL = 1  # In days.
 
     # List of settings values to make available in templates.
     INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'API_URL', 'DAM_URL', 'WAGTAILADMIN_BASE_URL']
@@ -789,7 +788,9 @@ class CI(Development):
 
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
+
     # Fake AWS settings for tests
+    # WARNING: THIS SHOULDN'T BE HERE! IT INDICATES ILL-CONCEIVED TESTS.
     AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
     AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
     AWS_DEFAULT_ACL = None

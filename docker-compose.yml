@@ -176,7 +176,7 @@ services:
       MYSQL_PASSWORD: dalme
       MYSQL_HOST: rs.db
     volumes:
-      - ./config/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
       - ./sql/rs:/docker-entrypoint-initdb.d
       - rsdata:/var/lib/mysql
     networks:

@@ -48,16 +48,16 @@ class Command(BaseCommand):
                 )
 
             else:
+                existing_tenant = qs.first()
                 logger.info(
                     'Existing tenant found for domain',
                     tenant=name,
                     domain=domain,
                 )
-                existing_tenant = qs.first()
 
                 # Let's catch a couple of conditions. This is highly unlikely
-                # to ever happen but we'll encode them for the sake of future
-                # beings.
+                # to ever happen but we'll encode them and prevent them for the
+                # sake of future beings.
                 if existing_tenant.name != name:
                     msg = "Don't mutate existing tenant names, they should be write-once/immutable."
                     raise ValueError(msg)

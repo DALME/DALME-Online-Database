@@ -507,6 +507,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
         'expires_in': int(settings.OAUTH2_ACCESS_TOKEN_EXPIRY),
         'token_type': 'Bearer',
         'scope': ' '.join(settings.OAUTH2_SCOPES.keys()),
+        'id_token': mock.ANY,
     }
     assert authorization_payload['access_token'] != refresh_payload['access_token']
 

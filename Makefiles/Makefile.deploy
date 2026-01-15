@@ -227,11 +227,10 @@ deploy.update: _deploy.update.provider _deploy.update.module
 deploy.validate:
 ifdef IN_CI
 	BUILD_HASH=$(HEAD) \
-		-e TF_DISABLE_INIT=true \
 		docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
 		$(NAMESPACE).deploy \
 		terragrunt run --all validate \
-		--no-auto-init \
 		--disable-bucket-update \
 		--working-dir environments/$(ENVIRONMENT) \
 		--log-level $(TF_LOG)

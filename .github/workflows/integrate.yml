@@ -32,6 +32,7 @@ env:
   TG_VERSION: 0.67.16
 
 permissions:
+  artifact-metadata: write
   checks: write
   contents: write
   id-token: write  # OIDC permission.
@@ -212,7 +213,7 @@ jobs:
             ${{ env.TRAP }}
             ${{ env.TEST }}
 
-      - uses: MishaKav/pytest-coverage-comment@v1.1.51
+      - uses: MishaKav/pytest-coverage-comment@v1.2.0
         with:
           coverage-path-prefix: app/
           junitxml-path: /tmp/pytest.xml

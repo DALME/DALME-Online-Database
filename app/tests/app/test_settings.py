@@ -15,14 +15,13 @@ def test_tenanttypes_enum():
 def test_tenant_dataclass_iter():
     t = settings_mod.TENANT(
         domain='d',
-        additional_domains=['a'],
         name='n',
         schema_name='s',
         is_primary=True,
         tenant_type=settings_mod.TenantTypes.PUBLIC,
     )
     values = tuple(t)
-    assert values == ('d', ['a'], 'n', 's', True, settings_mod.TenantTypes.PUBLIC)
+    assert values == ('d', 'n', 's', True, settings_mod.TenantTypes.PUBLIC)
 
 
 def test_base_templates_property():
@@ -52,7 +51,6 @@ def test_base_tenants_env_override():
     tenants_dict = {
         'FOO': {
             'domain': 'foo.localhost',
-            'additional_domains': [],
             'name': 'Foo',
             'schema_name': 'foo',
             'is_primary': True,
@@ -206,6 +204,6 @@ def test_staging_tenants():
     staging = settings_mod.Staging()
     tenants = staging._TENANTS  # noqa: SLF001
     assert 'IDA' in tenants
-    assert tenants['IDA']['domain'] == 'ida.ocp.systems'
+    assert tenants['IDA']['domain'] == 'documentaryarchaeology.net'
     assert tenants['DALME']['schema_name'] == 'dalme'
     assert tenants['PHARMACOPEIAS']['tenant_type'] == settings_mod.TenantTypes.PROJECT
