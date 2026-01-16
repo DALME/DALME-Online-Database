@@ -742,7 +742,8 @@ class Development(Base):
     ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID')
     ZOTERO_LIBRARY_ID_GP = os.environ.get('ZOTERO_LIBRARY_ID_GP')
 
-    # analytics
+    # Analytics
+    # DEBT: Why do we need plausible in the Development environment?
     PLAUSIBLE_API_KEY = os.environ.get('PLAUSIBLE_API_KEY')
 
 
@@ -756,6 +757,8 @@ class Test(Development):
         if assert_env:
             assert cls.ENV == 'test'
 
+    # Fake AWS settings for tests
+    # DEBT: This shouldn't be here, it likely indicates ill-conceived tests.
     AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
     AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
     AWS_DEFAULT_ACL = None
@@ -790,13 +793,14 @@ class CI(Development):
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
 
     # Fake AWS settings for tests
-    # WARNING: THIS SHOULDN'T BE HERE! IT INDICATES ILL-CONCEIVED TESTS.
+    # DEBT: This shouldn't be here, it likely indicates ill-conceived tests.
     AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
     AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
     AWS_DEFAULT_ACL = None
     AWS_IS_GZIPPED = True
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
+    # DEBT: Do we really need an ES service during CI? Investigate this change.
     ELASTICSEARCH_DSL = {
         'default': {
             'hosts': os.environ.get('ELASTICSEARCH_ENDPOINT', '172.17.0.1:9200'),
