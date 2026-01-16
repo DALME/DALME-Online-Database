@@ -11,6 +11,13 @@ on:
       - synchronize
       - ready_for_review
 
+permissions:
+  artifact-metadata: write
+  checks: write
+  contents: write
+  id-token: write  # OIDC permission.
+  pull-requests: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -30,13 +37,6 @@ env:
   TF_ROOT: ./tf
   TF_VERSION: 1.6
   TG_VERSION: 0.67.16
-
-permissions:
-  artifact-metadata: write
-  checks: write
-  contents: write
-  id-token: write  # OIDC permission.
-  pull-requests: write
 
 jobs:
   integrate_app:
@@ -213,11 +213,11 @@ jobs:
             ${{ env.TRAP }}
             ${{ env.TEST }}
 
-      - uses: MishaKav/pytest-coverage-comment@v1.2.0
-        with:
-          coverage-path-prefix: app/
-          junitxml-path: /tmp/pytest.xml
-          pytest-coverage-path: /tmp/pytest-coverage.txt
+      # - uses: MishaKav/pytest-coverage-comment@v1.2.0
+      #   with:
+      #     coverage-path-prefix: app/
+      #     junitxml-path: /tmp/pytest.xml
+      #     pytest-coverage-path: /tmp/pytest-coverage.txt
 
   integrate_ui:
     name: 'Integrate UI'
