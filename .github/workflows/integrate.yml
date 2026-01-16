@@ -33,7 +33,7 @@ env:
     ruff,ruff-format,eslint,prettier,docs
   SKIP_UI: |
     ruff,ruff-format,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
-  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache/.tflint.d/plugins
+  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache
   TF_ROOT: ./tf
   TF_VERSION: 1.6
   TG_VERSION: 0.67.16
@@ -360,7 +360,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/${{ env.TFLINT_PLUGIN_CACHE }}
-          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('tf/.tflint.hcl') }}
+          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-tflint-plugin-cache-
 
       - uses: actions/setup-python@v4
         with:

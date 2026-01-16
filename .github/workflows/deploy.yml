@@ -14,7 +14,7 @@ env:
   ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
   REGION: us-east-1
   TAG: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
-  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache/.tflint.d/plugins
+  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache
   TF_ROOT: ./tf
   TF_VERSION: 1.6
   TG_VERSION: 0.67.16
@@ -226,7 +226,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/${{ env.TFLINT_PLUGIN_CACHE }}
-          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('tf/.tflint.hcl') }}
+          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-tflint-plugin-cache-
 
       - id: set-oidc-role
         uses: mathiasvr/command-output@v2.0.0
