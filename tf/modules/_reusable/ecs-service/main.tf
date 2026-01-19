@@ -12,16 +12,21 @@ resource "aws_ecs_service" "this" {
   scheduling_strategy                = var.scheduling_strategy
   task_definition                    = var.task_definition
 
-  network_configuration {
-    assign_public_ip = var.assign_public_ip
-    security_groups  = var.security_groups
-    subnets          = var.subnets
+  deployment_circuit_breaker {
+    enable   = var.deployment_circuit_breaker.enable
+    rollback = var.deployment_circuit_breaker.rollback
   }
 
   load_balancer {
     container_name   = var.proxy_name
     container_port   = var.proxy_port
     target_group_arn = var.alb_target_group_arn
+  }
+
+  network_configuration {
+    assign_public_ip = var.assign_public_ip
+    security_groups  = var.security_groups
+    subnets          = var.subnets
   }
 
   # Ignore desired_count as it is subject to automatic modification via the

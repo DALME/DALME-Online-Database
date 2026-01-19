@@ -2,7 +2,7 @@ name: Deploy
 on:
   workflow_dispatch:
     branches:
-      -development.v2
+      - development.v2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -10,16 +10,15 @@ concurrency:
 
 env:
   NAMESPACE: ida
-  ROLE: gha-oidc-role
-  ACCOUNT: ${{ github.repository_owner == 'DALME' && 905418315284 || 905418315284 }}
+  ACCOUNT: ${{ github.ref_name == 'master' && 'UNKNOWN' || 209330743443 }}
   ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
   REGION: us-east-1
-  ROLE_SESSION: GithubActionsOIDCDeploy
   TAG: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
-  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache/.tflint.d/plugins
+  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache
   TF_ROOT: ./tf
   TF_VERSION: 1.6
   TG_VERSION: 0.67.16
+  OIDC_ROLE_NAME: OIDCGithubActionsRole
 
 permissions:
   contents: write
@@ -35,16 +34,16 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - id: set-oidc-role
-        run: |
-          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
-          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        id: oidc-credentials
+        uses: mathiasvr/command-output@v2.0.0
         with:
-          aws-region: ${{ env.REGION }}
-          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
-          role-session-name: ${{ env.ROLE_SESSION }}
+          run: |
+            echo "arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.OIDC_ROLE_NAME }}"
+
+      - id: oidc-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.stdout }}
 
       - id: ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -85,16 +84,16 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - id: set-oidc-role
-        run: |
-          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
-          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        id: oidc-credentials
+        uses: mathiasvr/command-output@v2.0.0
         with:
-          aws-region: ${{ env.REGION }}
-          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
-          role-session-name: ${{ env.ROLE_SESSION }}
+          run: |
+            echo "arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.OIDC_ROLE_NAME }}"
+
+      - id: oidc-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.stdout }}
 
       - id: ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -131,16 +130,16 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - id: set-oidc-role
-        run: |
-          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
-          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        id: oidc-credentials
+        uses: mathiasvr/command-output@v2.0.0
         with:
-          aws-region: ${{ env.REGION }}
-          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
-          role-session-name: ${{ env.ROLE_SESSION }}
+          run: |
+            echo "arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.OIDC_ROLE_NAME }}"
+
+      - id: oidc-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.stdout }}
 
       - id: parse-oauth-client-id
         uses: mathiasvr/command-output@v2.0.0
@@ -200,7 +199,7 @@ jobs:
           fetch-depth: 0
 
       - id: changed-tf
-        uses: tj-actions/changed-files@v39
+        uses: tj-actions/changed-files@v46
         with:
           since_last_remote_commit: true
           files: tf/**/*.{tf,hcl}
@@ -227,30 +226,22 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/${{ env.TFLINT_PLUGIN_CACHE }}
-          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('tf/.tflint.hcl') }}
+          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-tflint-plugin-cache-
 
       - id: set-oidc-role
-        run: |
-          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
-          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        id: oidc-credentials
+        uses: mathiasvr/command-output@v2.0.0
         with:
-          aws-region: ${{ env.REGION }}
-          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
-          role-session-name: ${{ env.ROLE_SESSION }}
-          output-credentials: true
+          run: |
+            echo "arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.OIDC_ROLE_NAME }}"
 
-      - id: write-oidc-vars
-        env:
-          AUTO_VARS: terraform.auto.tfvars
-        run: |
-          vars=${{ env.TF_ROOT }}/${{ env.AUTO_VARS }}
-          token=${{ steps.oidc-credentials.outputs.aws-session-token }}
-          session=${{ env.ROLE_SESSION }}
-          echo "oidc_session_name = \"${session}\"" >> ${vars}
-          echo "oidc_web_identity_token = \"${token}\"" >> ${vars}
+      - id: oidc-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.stdout }}
+          output-credentials: true
 
       - uses: hashicorp/setup-terraform@v3
         with:
@@ -296,16 +287,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: set-oidc-role
-        run: |
-          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
-          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        id: oidc-credentials
+        uses: mathiasvr/command-output@v2.0.0
         with:
-          aws-region: ${{ env.REGION }}
-          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
-          role-session-name: ${{ env.ROLE_SESSION }}
+          run: |
+            echo "arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.OIDC_ROLE_NAME }}"
+
+      - id: oidc-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.stdout }}
 
       - uses: brunocascio/ecs-deploy@v2.0.0
         id: ecs-deploy
@@ -345,16 +336,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: set-oidc-role
-        run: |
-          name=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.ROLE }}
-          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        id: oidc-credentials
+        uses: mathiasvr/command-output@v2.0.0
         with:
-          aws-region: ${{ env.REGION }}
-          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
-          role-session-name: ${{ env.ROLE_SESSION }}
+          run: |
+            echo "arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.OIDC_ROLE_NAME }}"
+
+      - id: oidc-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.stdout }}
           output-credentials: true
 
       - id: set-distribution
@@ -392,7 +383,7 @@ jobs:
           fetch-depth: 0
 
       - id: changed-docs
-        uses: tj-actions/changed-files@v39
+        uses: tj-actions/changed-files@v46
         with:
           since_last_remote_commit: true
           files: docs/**/*.{md,py,rst,txt}
@@ -405,7 +396,7 @@ jobs:
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push' &&
-      github.ref_name == 'development.ocp' &&
+      github.ref_name == 'development.v2' &&
       needs.should-deploy-docs.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     steps:

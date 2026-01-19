@@ -3,6 +3,12 @@
 # Any dependencies between this node and ancestors on the environment DAG
 # should be resolved here and then passed to resources in this module.
 
+data "aws_route53_zone" "this" {
+  provider = aws.dns_account
+
+  name = var.domain
+}
+
 data "aws_kms_alias" "global" {
   name = "alias/${var.namespace}/${var.environment}/global"
 }

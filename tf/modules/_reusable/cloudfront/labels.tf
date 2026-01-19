@@ -11,15 +11,6 @@ module "cloudfront_label" {
   labels_as_tags = ["namespace", "environment", "name"]
 }
 
-module "cloudfront_certificate_label" {
-  source  = "cloudposse/label/null"
-  version = "0.25.0"
-
-  attributes = ["ssl", "certificate"]
-
-  context = module.cloudfront_label.context
-}
-
 module "cloudfront_oac_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"

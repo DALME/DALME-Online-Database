@@ -15,7 +15,6 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_opensearch_certificate_label"></a> [opensearch\_certificate\_label](#module\_opensearch\_certificate\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_label"></a> [opensearch\_label](#module\_opensearch\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_log_es_application_label"></a> [opensearch\_log\_es\_application\_label](#module\_opensearch\_log\_es\_application\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_opensearch_log_index_slow_label"></a> [opensearch\_log\_index\_slow\_label](#module\_opensearch\_log\_index\_slow\_label) | cloudposse/label/null | 0.25.0 |
@@ -29,19 +28,14 @@ No requirements.
 
 | Name | Type |
 |------|------|
-| [aws_acm_certificate.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
-| [aws_acm_certificate_validation.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
 | [aws_cloudwatch_log_group.es_application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.index_slow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.search_slow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_resource_policy.log_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_resource_policy) | resource |
 | [aws_iam_service_linked_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_service_linked_role) | resource |
 | [aws_opensearch_domain.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/opensearch_domain) | resource |
-| [aws_route53_record.cname](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
-| [aws_route53_record.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_security_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_iam_policy_document.log_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_route53_zone.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 | [aws_secretsmanager_secret_version.master_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version) | data source |
 
 ## Inputs
@@ -51,11 +45,11 @@ No requirements.
 | <a name="input_admins"></a> [admins](#input\_admins) | Project admin email addresses. | `list(string)` | n/a | yes |
 | <a name="input_aws_account"></a> [aws\_account](#input\_aws\_account) | The AWS account where resources are created. | `number` | n/a | yes |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region where resources are created. | `string` | n/a | yes |
+| <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | Reference to the SSL certificate encrypting traffic. | `string` | n/a | yes |
 | <a name="input_custom_endpoint"></a> [custom\_endpoint](#input\_custom\_endpoint) | Fully qualified domain for your custom endpoint. | `string` | n/a | yes |
 | <a name="input_dedicated_master_count"></a> [dedicated\_master\_count](#input\_dedicated\_master\_count) | Number of dedicated main nodes in the cluster. | `number` | n/a | yes |
 | <a name="input_dedicated_master_enabled"></a> [dedicated\_master\_enabled](#input\_dedicated\_master\_enabled) | Whether dedicated main nodes are enabled for the cluster. | `bool` | n/a | yes |
 | <a name="input_dedicated_master_type"></a> [dedicated\_master\_type](#input\_dedicated\_master\_type) | Instance type of the dedicated main nodes in the cluster. | `string` | `null` | no |
-| <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate DNS record. | `number` | n/a | yes |
 | <a name="input_domain"></a> [domain](#input\_domain) | The origin of the service. | `string` | n/a | yes |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name of the OpenSearch instance. | `string` | n/a | yes |
 | <a name="input_ebs_enabled"></a> [ebs\_enabled](#input\_ebs\_enabled) | Whether EBS volumes are attached to data nodes. | `bool` | n/a | yes |
@@ -67,7 +61,7 @@ No requirements.
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of instances in the cluster. | `number` | n/a | yes |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Instance type of data nodes in the cluster. | `string` | n/a | yes |
-| <a name="input_keepers"></a> [keepers](#input\_keepers) | Arbitrary key/value pairs that force secret regeneration on change. | <pre>object({<br>    master_user_version = number<br>  })</pre> | n/a | yes |
+| <a name="input_keepers"></a> [keepers](#input\_keepers) | Arbitrary key/value pairs that force secret regeneration on change. | <pre>object({<br/>    master_user_version = number<br/>  })</pre> | n/a | yes |
 | <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The project encryption key ARN. | `string` | n/a | yes |
 | <a name="input_log_retention_in_days"></a> [log\_retention\_in\_days](#input\_log\_retention\_in\_days) | How long to keep OpenSearch logs. | `number` | n/a | yes |
 | <a name="input_master_user_secret_arn"></a> [master\_user\_secret\_arn](#input\_master\_user\_secret\_arn) | ARN for the current OpenSearch master username/password secret version. | `string` | n/a | yes |

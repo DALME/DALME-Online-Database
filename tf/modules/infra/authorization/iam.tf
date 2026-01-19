@@ -517,16 +517,16 @@ resource "aws_iam_policy" "gha_oidc_policy_two" {
 }
 
 resource "aws_iam_role_policy_attachment" "gha_oidc_role_one" {
-  role       = module.oidc.gha_oidc_role_name
+  role       = module.oidc.role_name
   policy_arn = aws_iam_policy.gha_oidc_policy_one.arn
 }
 
 resource "aws_iam_role_policy_attachment" "gha_oidc_role_two" {
-  role       = module.oidc.gha_oidc_role_name
+  role       = module.oidc.role_name
   policy_arn = aws_iam_policy.gha_oidc_policy_two.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_full_access_policy_attachment" {
-  role       = module.oidc.gha_oidc_role_name
+  role       = module.oidc.role_name
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }

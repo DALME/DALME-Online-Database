@@ -6,7 +6,7 @@
 # when using the module but if we need anything else we can just expose those
 # parameters in our own variables.tf file and set them as necessary. This
 # wrapper also has the virtue of clearing up the output naming convention
-# which, I find on the original module, is somewhat overly verbose and messy.
+# which, on the original module, I find to be overly verbose and messy.
 #
 # https://github.com/terraform-aws-modules/terraform-aws-s3-bucket
 

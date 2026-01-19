@@ -40,8 +40,6 @@ class Command(BaseCommand):
         domains = []
         for tenant in settings.TENANTS():
             domains.append(tenant.value.domain)
-            for additional_domain in tenant.value.additional_domains:
-                domains.append(additional_domain)
 
         domains = [f'http://{domain}:8000' if settings.IS_DEV else f'https://{domain}' for domain in domains]
 
@@ -81,11 +79,12 @@ class Command(BaseCommand):
                     logger.error(output)  # noqa: TRY400
                     logger.error('Failed to create oauth application')  # noqa: TRY400
         else:
-            # We only support updating the values that are injected by a deploy
-            # environment here for rotation purposes. For anything else let's
-            # just speculate that some other kind of intervention will happen.
-            # This is not meant to be an all-purpose create application command.
             application.client_id = client_id
             application.client_secret = client_secret
+
+            application.allowed_origins = ' '.join(domains)
+            application.redirect_uris = ' '.join(redirect_uris)
+            application.post_logout_redirect_uris = ' '.join(post_logout_redirect_uris)
+
             application.save()
             logger.info('Refreshed existing oauth application with client_id: %s', client_id=client_id)

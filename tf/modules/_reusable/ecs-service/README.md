@@ -5,14 +5,14 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
 
 ## Modules
 
@@ -27,10 +27,10 @@
 
 | Name | Type |
 |------|------|
-| [aws_appautoscaling_policy.ecs_policy_cpu](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/appautoscaling_policy) | resource |
-| [aws_appautoscaling_policy.ecs_policy_memory](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/appautoscaling_policy) | resource |
-| [aws_appautoscaling_target.ecs_target](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/appautoscaling_target) | resource |
-| [aws_ecs_service.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_service) | resource |
+| [aws_appautoscaling_policy.ecs_policy_cpu](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/appautoscaling_policy) | resource |
+| [aws_appautoscaling_policy.ecs_policy_memory](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/appautoscaling_policy) | resource |
+| [aws_appautoscaling_target.ecs_target](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/appautoscaling_target) | resource |
+| [aws_ecs_service.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecs_service) | resource |
 
 ## Inputs
 
@@ -43,6 +43,7 @@
 | <a name="input_cpu_scale_in_cooldown"></a> [cpu\_scale\_in\_cooldown](#input\_cpu\_scale\_in\_cooldown) | How long (secs) after a CPU scale-in completes before another can start. | `number` | n/a | yes |
 | <a name="input_cpu_scale_out_cooldown"></a> [cpu\_scale\_out\_cooldown](#input\_cpu\_scale\_out\_cooldown) | How long (secs) after a CPU scale-out completes before another can start. | `number` | n/a | yes |
 | <a name="input_cpu_target_value"></a> [cpu\_target\_value](#input\_cpu\_target\_value) | Target value for the CPU metric. | `number` | n/a | yes |
+| <a name="input_deployment_circuit_breaker"></a> [deployment\_circuit\_breaker](#input\_deployment\_circuit\_breaker) | Configure the deployment circuit breaker. | <pre>object({<br/>    enable   = bool<br/>    rollback = bool<br/>  })</pre> | <pre>{<br/>  "enable": false,<br/>  "rollback": false<br/>}</pre> | no |
 | <a name="input_desired_count"></a> [desired\_count](#input\_desired\_count) | Number of ECS services running in parallel. | `number` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_force_new_deployment"></a> [force\_new\_deployment](#input\_force\_new\_deployment) | Should an update to the service redeploy task definitions | `bool` | n/a | yes |

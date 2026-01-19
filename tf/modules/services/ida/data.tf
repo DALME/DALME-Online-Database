@@ -81,11 +81,11 @@ data "external" "cloudfront" {
 
 # Secrets
 locals {
-  secret_prefix   = "${var.namespace}-${var.environment}-secret"
-  dam_secret      = "DAM"
-  oidc_rsa_secret = "OIDC-RSA-PRIVATE-KEY"
-  zotero_secret   = "ZOTERO"
-  plausible_secret= "PLAUSIBLE"
+  secret_prefix    = "${var.namespace}-${var.environment}-secret"
+  dam_secret       = "DAM"
+  oidc_rsa_secret  = "OIDC-RSA-PRIVATE-KEY"
+  zotero_secret    = "ZOTERO"
+  plausible_secret = "PLAUSIBLE"
 }
 
 # Any secret marked 'UNMANAGED' means we don't generate it ourselves here so we

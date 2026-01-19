@@ -2,11 +2,21 @@ name: Integrate
 on:
   push:
   pull_request:
+    branches:
+      - development.v2
+      - ocp/development.v2
     types:
       - opened
       - reopened
       - synchronize
       - ready_for_review
+
+permissions:
+  artifact-metadata: write
+  checks: write
+  contents: write
+  id-token: write  # OIDC permission.
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,8 +24,7 @@ concurrency:
 
 env:
   NAMESPACE: ida
-  ENVIRONMENT: >
-    ${{ github.ref_name == 'master' && 'production' || github.ref_name == 'development.v2' && 'staging' || 'staging' }}
+  ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
   CI_TAG: dev
   PYTHON: 3.11
   SKIP_APP: |
@@ -24,16 +33,10 @@ env:
     ruff,ruff-format,eslint,prettier,docs
   SKIP_UI: |
     ruff,ruff-format,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
-  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache/.tflint.d/plugins
+  TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache
   TF_ROOT: ./tf
   TF_VERSION: 1.6
   TG_VERSION: 0.67.16
-
-permissions:
-  checks: write
-  contents: write
-  id-token: write  # OIDC permission.
-  pull-requests: write
 
 jobs:
   integrate_app:
@@ -210,11 +213,11 @@ jobs:
             ${{ env.TRAP }}
             ${{ env.TEST }}
 
-      - uses: MishaKav/pytest-coverage-comment@v1.1.51
-        with:
-          coverage-path-prefix: app/
-          junitxml-path: /tmp/pytest.xml
-          pytest-coverage-path: /tmp/pytest-coverage.txt
+      # - uses: MishaKav/pytest-coverage-comment@v1.2.0
+      #   with:
+      #     coverage-path-prefix: app/
+      #     junitxml-path: /tmp/pytest.xml
+      #     pytest-coverage-path: /tmp/pytest-coverage.txt
 
   integrate_ui:
     name: 'Integrate UI'
@@ -357,7 +360,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/${{ env.TFLINT_PLUGIN_CACHE }}
-          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('tf/.tflint.hcl') }}
+          key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-tflint-plugin-cache-
 
       - uses: actions/setup-python@v4
         with:

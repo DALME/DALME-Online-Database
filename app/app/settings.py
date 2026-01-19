@@ -27,7 +27,6 @@ class TENANT:
     """Structure for defining application tenants."""
 
     domain: str
-    additional_domains: list[str]
     name: str
     schema_name: str
     is_primary: bool
@@ -436,11 +435,10 @@ class Base(Configuration):
     URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
     URL_PORT = ':8000' if IS_DEV else ''
 
-    # analytics
-    PLAUSIBLE_API_URL = 'https://plausible.io/api/v2/query'  # plausible API
-    # list of metrics to retrieve and store locally
+    PLAUSIBLE_API_URL = 'https://plausible.io/api/v2/query'
+    # A list of metrics to retrieve and store locally.
     PLAUSIBLE_METRICS = ['visitors', 'visits', 'pageviews', 'bounce_rate', 'time_on_page']
-    PLAUSIBLE_UPDATE_INTERVAL = 1  # interval for updating analytics from plausible API - in days
+    PLAUSIBLE_UPDATE_INTERVAL = 1  # In days.
 
     # List of settings values to make available in templates.
     INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'API_URL', 'DAM_URL', 'WAGTAILADMIN_BASE_URL']
@@ -506,7 +504,6 @@ class Development(Base):
     _TENANTS = {
         'IDA': {
             'domain': 'ida.localhost',
-            'additional_domains': [],
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
@@ -514,7 +511,6 @@ class Development(Base):
         },
         'DALME': {
             'domain': 'dalme.localhost',
-            'additional_domains': [],
             'name': 'DALME',
             'schema_name': 'dalme',
             'is_primary': False,
@@ -522,7 +518,6 @@ class Development(Base):
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.localhost',
-            'additional_domains': [],
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
@@ -747,7 +742,8 @@ class Development(Base):
     ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID')
     ZOTERO_LIBRARY_ID_GP = os.environ.get('ZOTERO_LIBRARY_ID_GP')
 
-    # analytics
+    # Analytics
+    # DEBT: Why do we need plausible in the Development environment?
     PLAUSIBLE_API_KEY = os.environ.get('PLAUSIBLE_API_KEY')
 
 
@@ -761,6 +757,8 @@ class Test(Development):
         if assert_env:
             assert cls.ENV == 'test'
 
+    # Fake AWS settings for tests
+    # DEBT: This shouldn't be here, it likely indicates ill-conceived tests.
     AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
     AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
     AWS_DEFAULT_ACL = None
@@ -793,13 +791,16 @@ class CI(Development):
 
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
+
     # Fake AWS settings for tests
+    # DEBT: This shouldn't be here, it likely indicates ill-conceived tests.
     AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
     AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
     AWS_DEFAULT_ACL = None
     AWS_IS_GZIPPED = True
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
+    # DEBT: Do we really need an ES service during CI? Investigate this change.
     ELASTICSEARCH_DSL = {
         'default': {
             'hosts': os.environ.get('ELASTICSEARCH_ENDPOINT', '172.17.0.1:9200'),
@@ -1004,25 +1005,22 @@ class Staging(Production, Configuration):
 
     _TENANTS = {
         'IDA': {
-            'domain': 'ida.ocp.systems',
-            'additional_domains': [],
+            'domain': 'documentaryarchaeology.net',
             'name': 'IDA',
             'schema_name': 'public',
             'is_primary': True,
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
-            'domain': 'dalme.ocp.systems',
-            'additional_domains': [],
+            'domain': 'dalme-beta.org',
             'name': 'DALME',
-            'schema_name': 'dalme',
+            'schema_name': 'dalme',  # IMPORTANT: Do not use '-beta' here!
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
-            'domain': 'pharmacopeias.ocp.systems',
-            'additional_domains': [],
-            'name': 'Pharmacopeias',
+            'domain': 'historical-pharmacopeias.org',
+            'name': 'Historical Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,

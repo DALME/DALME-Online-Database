@@ -5,21 +5,20 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
-| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.5 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.1.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudfront_certificate_label"></a> [cloudfront\_certificate\_label](#module\_cloudfront\_certificate\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cloudfront_label"></a> [cloudfront\_label](#module\_cloudfront\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cloudfront_oac_label"></a> [cloudfront\_oac\_label](#module\_cloudfront\_oac\_label) | cloudposse/label/null | 0.25.0 |
 
@@ -27,11 +26,7 @@
 
 | Name | Type |
 |------|------|
-| [aws_acm_certificate.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/acm_certificate) | resource |
-| [aws_acm_certificate_validation.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/acm_certificate_validation) | resource |
-| [aws_cloudfront_distribution.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudfront_distribution) | resource |
-| [aws_route53_record.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
-| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/route53_zone) | data source |
+| [aws_cloudfront_distribution.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/cloudfront_distribution) | resource |
 
 ## Inputs
 
@@ -39,6 +34,7 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_domains"></a> [additional\_domains](#input\_additional\_domains) | Other domains to be served by this distribution. | `list(string)` | n/a | yes |
 | <a name="input_aliases"></a> [aliases](#input\_aliases) | Extra CNAMEs (alternate domain names), if any, for this distribution. | `list(string)` | `null` | no |
+| <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | The ARN of the (validated) SSL certificate. | `string` | n/a | yes |
 | <a name="input_default_cache_behavior"></a> [default\_cache\_behavior](#input\_default\_cache\_behavior) | The default cache definition for the distribution. | `any` | n/a | yes |
 | <a name="input_default_root_object"></a> [default\_root\_object](#input\_default\_root\_object) | The object to return (for example, index.html) when the root URL is requested. | `string` | `null` | no |
 | <a name="input_dns_ttl"></a> [dns\_ttl](#input\_dns\_ttl) | Time to live for the certificate DNS record. | `number` | n/a | yes |

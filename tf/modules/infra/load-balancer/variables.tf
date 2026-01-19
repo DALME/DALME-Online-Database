@@ -52,11 +52,6 @@ variable "protocol" {
   type        = string
 }
 
-variable "proxy_port" {
-  description = "Reverse proxy listening port."
-  type        = number
-}
-
 variable "ssl_port" {
   description = "Secure HTTPS listening port."
   type        = number

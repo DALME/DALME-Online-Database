@@ -5,14 +5,14 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
 
 ## Modules
 
@@ -25,16 +25,16 @@
 
 | Name | Type |
 |------|------|
-| [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_cluster) | resource |
-| [aws_ecs_cluster_capacity_providers.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/ecs_cluster_capacity_providers) | resource |
-| [aws_security_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/security_group) | resource |
+| [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecs_cluster) | resource |
+| [aws_ecs_cluster_capacity_providers.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecs_cluster_capacity_providers) | resource |
+| [aws_security_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/security_group) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_capacity_providers"></a> [capacity\_providers](#input\_capacity\_providers) | Determine where the ECS scaling provisioning comes from. | `list(string)` | n/a | yes |
-| <a name="input_default_capacity_provider_strategy"></a> [default\_capacity\_provider\_strategy](#input\_default\_capacity\_provider\_strategy) | Tune the ECS capacity provider strategy | <pre>object({<br>    base              = number,<br>    weight            = number,<br>    capacity_provider = string,<br>  })</pre> | n/a | yes |
+| <a name="input_default_capacity_provider_strategy"></a> [default\_capacity\_provider\_strategy](#input\_default\_capacity\_provider\_strategy) | Tune the ECS capacity provider strategy | <pre>object({<br/>    base              = number,<br/>    weight            = number,<br/>    capacity_provider = string,<br/>  })</pre> | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The project namespace. | `string` | n/a | yes |
 | <a name="input_service"></a> [service](#input\_service) | An optional service namespace. | `string` | `null` | no |

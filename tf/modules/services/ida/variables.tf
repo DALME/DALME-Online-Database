@@ -35,6 +35,14 @@ variable "cpu_target_value" {
   type        = number
 }
 
+variable "deployment_circuit_breaker" {
+  description = "Configure the deployment circuit breaker."
+  type = object({
+    enable   = bool
+    rollback = bool
+  })
+}
+
 variable "domain" {
   description = "The origin of the service."
   type        = string

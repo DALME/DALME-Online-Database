@@ -1,23 +1,18 @@
 # Variables for the alb module.
 
-variable "additional_domains" {
-  description = "Other domains to be served by this ALB."
-  type        = list(string)
-}
-
 variable "alb_port" {
   description = "Load balancer listening port."
   type        = number
 }
 
+variable "certificate_arn" {
+  description = "Reference to the SSL certificate encrypting traffic."
+  type        = string
+}
+
 variable "dns_ttl" {
   description = "Time to live for the certificate's DNS record."
   type        = number
-}
-
-variable "domain" {
-  description = "The origin of the service."
-  type        = string
 }
 
 variable "environment" {

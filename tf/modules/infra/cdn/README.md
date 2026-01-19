@@ -5,14 +5,16 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.70.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.25.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.70.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
+| <a name="provider_aws.acm"></a> [aws.acm](#provider\_aws.acm) | 6.25.0 |
+| <a name="provider_aws.dns_account"></a> [aws.dns\_account](#provider\_aws.dns\_account) | 6.25.0 |
 
 ## Modules
 
@@ -21,6 +23,7 @@
 | <a name="module_access_logs"></a> [access\_logs](#module\_access\_logs) | ../..//_reusable/bucket/ | n/a |
 | <a name="module_assets"></a> [assets](#module\_assets) | ../..//_reusable/bucket/ | n/a |
 | <a name="module_cdn_access_logs_label"></a> [cdn\_access\_logs\_label](#module\_cdn\_access\_logs\_label) | cloudposse/label/null | 0.25.0 |
+| <a name="module_cdn_certificate_label"></a> [cdn\_certificate\_label](#module\_cdn\_certificate\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cdn_label"></a> [cdn\_label](#module\_cdn\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cdn_oac_label"></a> [cdn\_oac\_label](#module\_cdn\_oac\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cloudfront"></a> [cloudfront](#module\_cloudfront) | ../..//_reusable/cloudfront/ | n/a |
@@ -32,17 +35,20 @@
 
 | Name | Type |
 |------|------|
-| [aws_cloudfront_function.viewer_request](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudfront_function) | resource |
-| [aws_cloudfront_origin_access_control.s3](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/cloudfront_origin_access_control) | resource |
-| [aws_route53_record.www_a](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
-| [aws_route53_record.www_aaaa](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/route53_record) | resource |
-| [aws_s3_bucket_policy.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/s3_bucket_policy) | resource |
-| [aws_s3_bucket_policy.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/resources/s3_bucket_policy) | resource |
-| [aws_iam_policy_document.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/lb) | data source |
-| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/route53_zone) | data source |
-| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/5.70.0/docs/data-sources/wafv2_web_acl) | data source |
+| [aws_acm_certificate.cdn](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/acm_certificate) | resource |
+| [aws_acm_certificate_validation.cdn](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/acm_certificate_validation) | resource |
+| [aws_cloudfront_function.viewer_request](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/cloudfront_function) | resource |
+| [aws_cloudfront_origin_access_control.s3](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/cloudfront_origin_access_control) | resource |
+| [aws_route53_record.cdn](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/route53_record) | resource |
+| [aws_route53_record.www_a](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/route53_record) | resource |
+| [aws_route53_record.www_aaaa](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/route53_record) | resource |
+| [aws_s3_bucket_policy.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/s3_bucket_policy) | resource |
+| [aws_s3_bucket_policy.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/s3_bucket_policy) | resource |
+| [aws_iam_policy_document.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/lb) | data source |
+| [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/route53_zone) | data source |
+| [aws_wafv2_web_acl.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/data-sources/wafv2_web_acl) | data source |
 
 ## Inputs
 

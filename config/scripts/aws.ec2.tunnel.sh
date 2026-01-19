@@ -1,4 +1,28 @@
 #!/usr/bin/env bash
+set -eou pipefail
+
+usage() {
+  cat <<EOF
+Bind ports to open a secure tunnel into an AWS EC2 instance.
+Usage: $0 [options]
+
+Required options:
+  --jump_host   <value>
+  --profile     <value>
+  --region      <value>
+  --host        <value>
+  --host_bind   <value>
+  --local_bind  <value>
+
+Optional:
+  -h, --help    Show this help and exit
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+  usage >&2
+  exit 1
+fi
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -26,21 +50,20 @@ while [[ $# -gt 0 ]]; do
       local_bind="$2"
       shift 2
       ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
     *)
       echo "Invalid option: $1" >&2
+      usage >&2
       exit 1
       ;;
   esac
 done
 
 if [ -z "$jump_host" ] || [ -z "$profile" ] || [ -z "$region" ] || [ -z "$host" ] || [ -z "$host_bind" ] || [ -z "$local_bind" ]; then
-  echo "Usage: $0 \
-    --jump_host <value> \
-    --profile <value> \
-    --region <value> \
-    --host <value> \
-    --host_bind <value> \
-    --local_bind <value>" >&2
+  usage >&2
   exit 1
 fi
 

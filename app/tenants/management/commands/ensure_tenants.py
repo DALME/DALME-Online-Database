@@ -4,6 +4,7 @@ import structlog
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from tenants.models import Domain, Tenant
 
@@ -15,14 +16,21 @@ class Command(BaseCommand):
 
     help = 'Create application tenant records.'
 
+    @transaction.atomic
     def handle(self, *args, **options) -> None:  # noqa: ARG002
-        """Create application tenant records."""
+        """Create application tenant records.
+
+        Run the method inside a db transaction to ensure tenant data is created
+        or modified in its entirity or not at all.
+
+        """
         tenants = settings.TENANTS()
 
         for tenant in tenants:
-            domain, additional_domains, name, schema_name, is_primary, tenant_type = tenant.value
+            domain, name, schema_name, is_primary, tenant_type = tenant.value
 
-            if not Tenant.objects.filter(name=name).exists():
+            qs = Tenant.objects.filter(name=name)
+            if not qs.exists():
                 tenant_obj = Tenant.objects.create(
                     name=name,
                     schema_name=schema_name,
@@ -39,17 +47,41 @@ class Command(BaseCommand):
                     domain=domain_obj,
                 )
 
-                if additional_domains:
-                    for additional_domain in additional_domains:
-                        domain_obj = Domain.objects.create(
-                            domain=additional_domain,
-                            tenant=tenant_obj,
-                            is_primary=is_primary,
-                        )
-
             else:
+                existing_tenant = qs.first()
                 logger.info(
                     'Existing tenant found for domain',
                     tenant=name,
                     domain=domain,
                 )
+
+                # Let's catch a couple of conditions. This is highly unlikely
+                # to ever happen but we'll encode them and prevent them for the
+                # sake of future beings.
+                if existing_tenant.name != name:
+                    msg = "Don't mutate existing tenant names, they should be write-once/immutable."
+                    raise ValueError(msg)
+
+                if existing_tenant.schema_name != schema_name:
+                    msg = "Don't mutate existing tenant schema names, they should be write-once/immutable."
+                    raise ValueError(msg)
+
+                if existing_tenant.tenant_type != tenant_type:
+                    msg = "Don't mutate existing tenant types, they should be write-once/immutable."
+                    raise ValueError(msg)
+
+                if existing_tenant.is_primary != is_primary:
+                    msg = "Don't mutate existing tenant primary status, it should be write-once/immutable."
+                    raise ValueError(msg)
+
+                # You can update domain names if necessary. This is useful if
+                # staging origins need to be altered and its conceivable it
+                # might even need to happen in prod too.
+                if existing_tenant.domain != domain:
+                    existing_tenant.domain = domain
+                    existing_tenant.save()
+                    logger.info(
+                        'Updated tenant domain record.',
+                        tenant=name,
+                        domain=domain,
+                    )

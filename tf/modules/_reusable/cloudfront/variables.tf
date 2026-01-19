@@ -11,6 +11,11 @@ variable "additional_domains" {
   type        = list(string)
 }
 
+variable "certificate_arn" {
+  description = "The ARN of the (validated) SSL certificate."
+  type        = string
+}
+
 variable "default_cache_behavior" {
   description = "The default cache definition for the distribution."
   type        = any

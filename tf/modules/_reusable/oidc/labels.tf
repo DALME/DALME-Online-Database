@@ -6,7 +6,7 @@ module "oidc_label" {
 
   namespace   = var.namespace
   environment = var.environment
-  name        = "oidc-provider"
+  name        = var.provider_name
 
   labels_as_tags = ["namespace", "environment", "name"]
 }
@@ -15,7 +15,7 @@ module "oidc_role_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
 
-  name = var.gha_oidc_role_name
+  name = "oidc-github-actions-role"
 
   context = module.oidc_label.context
 }

@@ -9,8 +9,8 @@ RUN apt-get update && \
 
 FROM base AS iamlive
 ARG TARGETARCH
-ARG VERSION=v1.1.8
-RUN curl -Lo \
+ARG VERSION=v1.1.27
+RUN curl --fail --show-error -Lo \
   ./iamlive.tar.gz \
   https://github.com/iann0036/iamlive/releases/download/$VERSION/iamlive-$VERSION-$(uname)-$TARGETARCH.tar.gz
 RUN tar -xzf iamlive.tar.gz
@@ -19,8 +19,8 @@ RUN mv iamlive /usr/local/iamlive
 
 FROM base AS terragrunt
 ARG TARGETARCH
-ARG VERSION=v0.67.16
-RUN curl -Lo \
+ARG VERSION=v0.93.11
+RUN curl --fail --show-error -Lo \
   ./terragrunt \
   https://github.com/gruntwork-io/terragrunt/releases/download/$VERSION/terragrunt_$(uname)_$TARGETARCH
 RUN chmod +x terragrunt
@@ -28,8 +28,8 @@ RUN mv terragrunt /usr/local/terragrunt
 
 FROM base AS tfdocs
 ARG TARGETARCH
-ARG VERSION=v0.17.0
-RUN curl -Lo \
+ARG VERSION=v0.20.0
+RUN curl --fail --show-error -Lo \
   ./terraform-docs.tar.gz \
   https://github.com/terraform-docs/terraform-docs/releases/download/$VERSION/terraform-docs-$VERSION-$(uname)-$TARGETARCH.tar.gz
 RUN tar -xzf terraform-docs.tar.gz
@@ -39,8 +39,8 @@ RUN mv terraform-docs /usr/local/terraform-docs
 FROM base AS tfupdate
 ARG TARGETARCH
 # Omit the 'v' here as their release naming convention is asymmetrical.
-ARG VERSION=0.8.2
-RUN curl -Lo \
+ARG VERSION=0.9.3
+RUN curl --fail --show-error -Lo \
   tfupdate.tar.gz \
   https://github.com/minamijoyo/tfupdate/releases/download/v$VERSION/tfupdate_${VERSION}_$(uname)_$TARGETARCH.tar.gz
 RUN tar -xzf tfupdate.tar.gz
@@ -56,7 +56,7 @@ RUN apt-get update && \
     jq \
     procps && \
     apt-get clean
-COPY --from=hashicorp/terraform:1.8.3 /bin/terraform /usr/local/bin/terraform
+COPY --from=hashicorp/terraform:1.14.0 /bin/terraform /usr/local/bin/terraform
 COPY --from=iamlive /usr/local/iamlive /usr/local/bin/iamlive
 COPY --from=terragrunt /usr/local/terragrunt /usr/local/bin/terragrunt
 COPY --from=tfdocs /usr/local/terraform-docs /usr/local/bin/terraform-docs
