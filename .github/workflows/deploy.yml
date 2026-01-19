@@ -9,10 +9,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  AWS_ACCOUNT: ${{ github.ref_name == 'master' && 'UNKNOWN' || 209330743443 }}
+  AWS_REGION: us-east-1
   NAMESPACE: ida
-  ACCOUNT: ${{ github.ref_name == 'master' && 'UNKNOWN' || 209330743443 }}
   ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
-  REGION: us-east-1
   TAG: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
   TFLINT_PLUGIN_CACHE: .terraform.d/plugin-cache
   TF_ROOT: ./tf
@@ -54,7 +54,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.NAMESPACE }}.app
+            ${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.NAMESPACE }}.app
           tags: |
             type=raw,priority=200,value=${{ env.TAG }}
             type=sha,priority=100,prefix=,format=long
@@ -104,7 +104,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.NAMESPACE }}.proxy
+            ${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.NAMESPACE }}.proxy
           tags: |
             type=raw,priority=200,value=${{ env.TAG }}
             type=sha,priority=100,prefix=,format=long
@@ -270,7 +270,7 @@ jobs:
             trap 'echo "exit-code=$?" >> "$GITHUB_OUTPUT"' EXIT
           APPLY: >
             ./config/scripts/tf.apply.sh
-            ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}/${{ env.REGION }}
+            ${{ env.TF_ROOT }}/environments/${{ env.ENVIRONMENT }}/${{ env.AWS_REGION }}
             "${{ steps.define-modules.outputs.stdout }}"
         with:
           run: |
@@ -326,7 +326,7 @@ jobs:
         run: >
           aws s3 sync
           ${{ runner.temp }}/dist
-          s3://${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.BUCKET }}-${{ env.ACCOUNT }}
+          s3://${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.BUCKET }}-${{ env.AWS_ACCOUNT }}
           --delete
 
   invalidate:
@@ -359,7 +359,7 @@ jobs:
           get-resources
           --tag-filters Key=Name,Values=${{ env.NAMESPACE }}-${{ env.ENVIRONMENT }}-${{ env.NAME }}
           --resource-type-filters ${{ env.NAME }}
-          --region=${{ env.REGION }}
+          --region=${{ env.AWS_REGION }}
           | jq -r ${{ env.FILTER }}
           | sed 's:.*/::')"
           >> $GITHUB_OUTPUT
