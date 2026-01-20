@@ -132,7 +132,7 @@ locals {
     { name = "ZOTERO_API_KEY_GP", valueFrom = "${data.aws_secretsmanager_secret_version.zotero.arn}:api_key_gp::" },
     { name = "ZOTERO_LIBRARY_ID", valueFrom = "${data.aws_secretsmanager_secret_version.zotero.arn}:library_id::" },
     { name = "ZOTERO_LIBRARY_ID_GP", valueFrom = "${data.aws_secretsmanager_secret_version.zotero.arn}:library_id_gp::" },
-    { name = "PLAUSIBLE_API_KEY", valueFrom = "${data.aws_secretsmanager_secret_version.plausible.arn}:api_key::" },
+    { name = "PLAUSIBLE_API_KEY", valueFrom = data.aws_secretsmanager_secret_version.plausible.arn },
   ]
 }
 
