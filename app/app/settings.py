@@ -986,7 +986,7 @@ class Production(Base):
     def ZOTERO_LIBRARY_ID_GP(self):
         return os.environ['ZOTERO_LIBRARY_ID_GP']
 
-    # analytics
+    # Analytics
     @property
     def PLAUSIBLE_API_KEY(self):
         return os.environ['PLAUSIBLE_API_KEY']

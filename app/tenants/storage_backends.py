@@ -2,7 +2,7 @@
 
 import structlog
 from django_tenants.utils import parse_tenant_config_path
-from storages.backends.s3boto3 import S3Boto3Storage, S3ManifestStaticStorage
+from storages.backends.s3 import S3ManifestStaticStorage, S3Storage
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage, InMemoryStorage
@@ -45,7 +45,7 @@ class S3StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
             self.hashed_files, self.manifest_hash = self.load_manifest()
 
 
-class S3MediaStorage(TenantStorageMixin, S3Boto3Storage):
+class S3MediaStorage(TenantStorageMixin, S3Storage):
     """Multitenant aware media files storage class for S3."""
 
     file_overwrite = False
