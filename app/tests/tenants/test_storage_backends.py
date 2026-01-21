@@ -27,6 +27,7 @@ def test_tenant_storage_mixin_get_default_settings(mock_parse_tenant_config_path
 
     s = TestStorage()
     settings = s.get_default_settings()
+
     assert settings['foo'] == 'bar'
     assert settings['location'] == 'parsed/static/%s'
 
@@ -37,15 +38,20 @@ def test_tenant_storage_mixin_get_location(mock_parse_tenant_config_path):  # no
 
     s = TestStorage()
     loc = s._get_location()  # noqa: SLF001
+
     assert loc == 'parsed/media/%s'
 
 
 @mock_aws
-def test_s3staticstorage_remap_manifest_changes_location(mock_parse_tenant_config_path):  # noqa: ARG001
+def test_s3staticstorage_remap_manifest_changes_location(mock_parse_tenant_config_path, settings):  # noqa: ARG001
+    settings.AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
+    settings.AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
+
     s = storage_backends.S3StaticStorage()
     s.location = 'old/location'
     s._get_location = mock.Mock(return_value='new/location')  # noqa: SLF001
     s.load_manifest = mock.Mock(return_value=({'foo': 'bar'}, 'hash'))
+
     with mock.patch('tenants.storage_backends.S3ManifestStaticStorage') as mock_manifest:
         s._remap_manifest()  # noqa: SLF001
         assert s.location == 'new/location'
@@ -55,11 +61,15 @@ def test_s3staticstorage_remap_manifest_changes_location(mock_parse_tenant_confi
 
 
 @mock_aws
-def test_s3staticstorage_remap_manifest_no_change(mock_parse_tenant_config_path):  # noqa: ARG001
+def test_s3staticstorage_remap_manifest_no_change(mock_parse_tenant_config_path, settings):  # noqa: ARG001
+    settings.AWS_STORAGE_BUCKET_NAME = 'ida-test-bucket'
+    settings.AWS_S3_CUSTOM_DOMAIN = 'ida.localhost'
+
     s = storage_backends.S3StaticStorage()
     s.location = 'same/location'
     s._get_location = mock.Mock(return_value='same/location')  # noqa: SLF001
     s.load_manifest = mock.Mock()
+
     with mock.patch('tenants.storage_backends.S3ManifestStaticStorage') as mock_manifest:
         s._remap_manifest()  # noqa: SLF001
         mock_manifest.assert_not_called()
@@ -72,6 +82,7 @@ def test_s3mediastorage_remap_location_changes(mock_parse_tenant_config_path):  
     s.location = 'old/location'
     s._get_location = mock.Mock(return_value='new/location')  # noqa: SLF001
     s._remap_location()  # noqa: SLF001
+
     assert s.location == 'new/location'
 
 
@@ -81,6 +92,7 @@ def test_s3mediastorage_remap_location_no_change(mock_parse_tenant_config_path):
     s.location = 'same/location'
     s._get_location = mock.Mock(return_value='same/location')  # noqa: SLF001
     s._remap_location()  # noqa: SLF001
+
     assert s.location == 'same/location'
 
 
@@ -91,6 +103,7 @@ def test_localstaticstorage_base_location_and_url(mock_parse_tenant_config_path)
         _base_url = None
 
     s = TestStorage()
+
     assert s.base_location == f'parsed/{settings.STATIC_ROOT}/%s'
     assert s.base_url == settings.STATIC_URL
 
@@ -102,15 +115,18 @@ def test_localmediastorage_base_location_and_url(mock_parse_tenant_config_path):
         _base_url = None
 
     s = TestStorage()
+
     assert s.base_location == f'parsed/{settings.MEDIA_ROOT}/%s'
     assert s.base_url == f'parsed/{settings.MEDIA_URL}/%s'
 
 
 def test_localmediastorage_key():
     s = storage_backends.LocalMediaStorage()
+
     assert s.key == 'media'
 
 
 def test_localstaticstorage_key():
     s = storage_backends.LocalStaticStorage()
+
     assert s.key == 'static'
