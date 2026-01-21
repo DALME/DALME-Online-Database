@@ -6,6 +6,7 @@ FROM python:3.11-slim-bookworm AS base
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     gcc \
+    git \
     default-libmysqlclient-dev \
     libcurl4-openssl-dev \
     libmariadbd-dev \

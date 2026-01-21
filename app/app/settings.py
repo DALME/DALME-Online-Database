@@ -726,11 +726,7 @@ class Development(Base):
         '--debug',
     ]
     IPYTHON_KERNEL_DISPLAY_NAME = 'Django Shell-Plus'
-    SHELL_PLUS_POST_IMPORTS = [  # extra things to import in notebook
-        ('module1.submodule', ('func1', 'func2', 'class1', 'etc')),
-        ('module2.submodule', ('func1', 'func2', 'class1', 'etc')),
-    ]
-    os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
+    SHELL_PLUS_POST_IMPORTS = []  # NOTE: Don't put fake stuff in here it breaksk the local repl!!
 
     # Zotero
     # These might be unset if you're doing casual local dev so we'll use a

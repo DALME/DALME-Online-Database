@@ -46,7 +46,10 @@ app.migrate_data:
 app.notebook:
 	docker compose exec \
 		$(NAMESPACE).app \
-		python manage.py shell_plus --notebook
+		-e DJANGO_ALLOW_ASYNC_UNSAFE=true \
+		python manage.py \
+		shell_plus \
+		--notebook
 .PHONY: app.notebook
 
 app.open:
@@ -56,7 +59,9 @@ app.open:
 app.python:
 	docker compose exec \
 		$(NAMESPACE).app \
-		python manage.py shell_plus --print-sql
+		python manage.py \
+		shell_plus \
+		--print-sql
 .PHONY: app.python
 
 app.shell:
