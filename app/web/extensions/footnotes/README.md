@@ -34,15 +34,9 @@ urlpatterns = [
 - Add the `FootnotesPlaceMarker` block to any StreamField where footnotes should be available (or to the default set of blocks):
 
 ```python
-from web.extensions.footnotes.blocks import FootnotesPlaceMarker
+from web.extensions.footnotes.blocks import get_default_blocks
 
-DEFAULT_BLOCKS = [
-    # ...
-    ('footnotes_placemarker', FootnotesPlaceMarker()),
-    # ...
-]
-
-body = StreamField(DEFAULT_BLOCKS)
+body = StreamField(get_default_blocks())
 ```
 
 - Make sure that any page where footnotes are to be used inherits from `FootnoteMixin`:
