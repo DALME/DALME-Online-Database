@@ -8,7 +8,7 @@ from wagtail.utils.decorators import cached_classmethod
 
 from django.db import models
 
-from web.extensions.extras.blocks import get_default_blocks
+from web.extensions.extras.blocks import DEFAULT_BLOCKS
 from web.extensions.footnotes.models import FootnoteMixin
 from web.extensions.images.models import BaseImage
 
@@ -40,7 +40,7 @@ class BasePage(Page, FootnoteMixin):
         blank=True,
         help_text='An optional short title that will be displayed in certain space constrained contexts.',
     )
-    body = StreamField(get_default_blocks(), null=True)
+    body = StreamField(DEFAULT_BLOCKS, null=True)
 
     search_fields = [
         *Page.search_fields,

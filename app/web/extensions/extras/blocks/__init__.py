@@ -3,21 +3,17 @@
 from web.extensions.images.blocks import CarouselBlock, InlineImageBlock
 
 from .chart_embed import ChartEmbedBlock
-from .defaults import DEFAULT_TABLE_OPTIONS
+from .defaults import BASE_BLOCKS, DEFAULT_TABLE_OPTIONS
 from .document import DocumentBlock
 from .heading import HeadingBlock
+from .subsection import SubsectionBlock
 from .text_expandable import TextExpandableBlock
 from .uncommented_charblock import UncommentedCharBlock
 
-
-def get_default_blocks():
-    from .defaults import BASE_BLOCKS
-    from .subsection import SubsectionBlock
-
-    return sorted([*BASE_BLOCKS, ('subsection', SubsectionBlock())], key=lambda x: x[0])
-
+DEFAULT_BLOCKS = sorted([*BASE_BLOCKS, ('subsection', SubsectionBlock())], key=lambda x: x[0])
 
 __all__ = [
+    'DEFAULT_BLOCKS',
     'DEFAULT_TABLE_OPTIONS',
     'CarouselBlock',
     'ChartEmbedBlock',
@@ -27,5 +23,4 @@ __all__ = [
     'SubsectionBlock',
     'TextExpandableBlock',
     'UncommentedCharBlock',
-    'get_default_blocks',
 ]
