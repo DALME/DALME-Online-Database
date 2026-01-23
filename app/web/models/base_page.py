@@ -9,7 +9,6 @@ from django.db import models
 
 from web.extensions.block_registry import STREAMFIELD_INTERFACE, RegistryStreamField
 from web.extensions.footnotes.models import FootnoteMixin
-from web.extensions.images.models import BaseImage
 
 HEADER_POSITION = (
     ('top', 'Top'),
@@ -20,7 +19,7 @@ HEADER_POSITION = (
 
 class BasePage(Page, FootnoteMixin):
     header_image = models.ForeignKey(
-        BaseImage,
+        'webimages.BaseImage',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
