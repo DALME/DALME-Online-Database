@@ -1,42 +1,34 @@
 """Model for people list page."""
 
-from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
 from wagtail.contrib.routable_page.models import RoutablePageMixin, path
-from wagtail.contrib.table_block.blocks import TableBlock
-from wagtail.fields import StreamField
 
 from django.db.models import Q, Value
 from django.db.models.functions import Lower, Replace
 from django.http import Http404
 from django.template.response import TemplateResponse
 
-from web.extensions.extras.blocks.defaults import DEFAULT_TABLE_OPTIONS
-from web.extensions.extras.blocks.document import DocumentBlock
-from web.extensions.extras.blocks.heading import HeadingBlock
-from web.extensions.extras.blocks.subsection import SubsectionBlock
-from web.extensions.images.blocks import InlineImageBlock
-from web.extensions.team.blocks import TeamListBlock
+from web.extensions.block_registry import RegistryStreamField
 from web.extensions.team.models import TeamMember
 from web.models import BasePage, Essay, FeaturedInventory, FeaturedObject
 
-BLOCK_SET = [
-    ('document', DocumentBlock()),
-    ('heading', HeadingBlock()),
-    ('inline_image', InlineImageBlock()),
-    ('page', blocks.PageChooserBlock()),
-    ('pullquote', blocks.RichTextBlock(icon='openquote', editor='minimal')),
-    ('subsection', SubsectionBlock()),
-    ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS, icon='table-cells', form_classname='table-block')),
-    ('team_list', TeamListBlock()),
-    ('text', blocks.RichTextBlock(editor='minimal')),
+STREAMFIELD_INTERFACE = [
+    'document',
+    'heading',
+    'inline_image',
+    'page',
+    'pullquote',
+    'subsection',
+    'table',
+    'team_list',
+    'text',
 ]
 
 
 class People(RoutablePageMixin, BasePage):
     template = 'web/flat.html'
 
-    body = StreamField(BLOCK_SET, null=True)
+    body = RegistryStreamField(STREAMFIELD_INTERFACE, null=True)
 
     parent_page_types = [
         'web.Section',

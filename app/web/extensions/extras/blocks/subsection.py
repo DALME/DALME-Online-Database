@@ -2,8 +2,6 @@
 
 from wagtail import blocks
 
-from .defaults import BASE_BLOCKS
-
 
 class NestedSubsectionBlock(blocks.StructBlock):
     subsection = blocks.CharBlock(
@@ -12,7 +10,16 @@ class NestedSubsectionBlock(blocks.StructBlock):
     )
     collapsed = blocks.BooleanBlock(required=False, default=False, help_text='Render closed.')
     minor_heading = blocks.BooleanBlock(label='Minor', required=False, default=False, help_text='Render indented.')
-    body = blocks.StreamBlock(BASE_BLOCKS)
+
+    def __init__(self, **kwargs):
+        from web.extensions.block_registry import STREAMFIELD_INTERFACE, BlockRegistry
+
+        interface = [b for b in STREAMFIELD_INTERFACE if b != 'subsection']
+        definition = BlockRegistry.block_def(interface)
+        block = blocks.StreamBlock(definition)
+        self.body = block
+
+        super().__init__(**kwargs)
 
     class Meta:
         icon = 'diagram-successor'
@@ -21,14 +28,17 @@ class NestedSubsectionBlock(blocks.StructBlock):
         form_classname = 'struct-block subsection-block'
 
 
-EXTENDED_BLOCKS = [
-    *BASE_BLOCKS,
-    ('nested_subsection', NestedSubsectionBlock()),
-]
-
-
 class SubsectionBlock(NestedSubsectionBlock):
-    body = blocks.StreamBlock(EXTENDED_BLOCKS)
+    def __init__(self, **kwargs):
+        from web.extensions.block_registry import STREAMFIELD_INTERFACE, BlockRegistry
+
+        interface = [b for b in STREAMFIELD_INTERFACE if b != 'subsection']
+        definition = BlockRegistry.block_def(interface)
+        definition = [*definition, ('nested_subsection', NestedSubsectionBlock())]
+        block = blocks.StreamBlock(definition)
+        self.body = block
+
+        super().__init__(**kwargs)
 
     class Meta:
         icon = 'diagram-next'
