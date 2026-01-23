@@ -175,6 +175,7 @@ resource "aws_ecs_task_definition" "this" {
       {
         command = [
           "gunicorn",
+          "--preload",
           "--log-file=-",
           "--bind=:${var.app_port}",
           "--threads=${var.threads}",
