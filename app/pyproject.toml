@@ -29,8 +29,8 @@ indent-style = "space"
 [tool.ruff.lint]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 ignore = [
-  "A005",    # shadowing standard librery modules
-  "COM812",  # Recommended disable by the rust format.
+  "A005",    # shadowing standard library modules
+  "COM812",  # Recommended disable by ruff format.
   "D101",
   "D102",
   "D103",
@@ -42,7 +42,7 @@ ignore = [
   "DJ001",   # Worth doing, but not right now.
   "E501",
   "FBT002",
-  "ISC001",  # Recommended disable by the rust format.
+  "ISC001",  # Recommended disable by ruff format.
   "PLC1901", # Too many false positives.
   "RUF012",  # Typing related.
   "TD002",
