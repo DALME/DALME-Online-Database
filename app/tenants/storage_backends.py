@@ -19,7 +19,10 @@ class TenantStorageMixin:
         return settings
 
     def _get_location(self):
-        return parse_tenant_config_path(f'{self.key}/%s')
+        try:
+            return parse_tenant_config_path(f'{self.key}/%s')
+        except Exception:  # noqa: BLE001
+            return f'{self.key}/public'
 
 
 class S3StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
