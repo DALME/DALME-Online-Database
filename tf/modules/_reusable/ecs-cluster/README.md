@@ -25,6 +25,7 @@
 
 | Name | Type |
 |------|------|
+| [aws_ecs_account_setting_default.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecs_account_setting_default) | resource |
 | [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecs_cluster) | resource |
 | [aws_ecs_cluster_capacity_providers.this](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/ecs_cluster_capacity_providers) | resource |
 | [aws_security_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/6.25.0/docs/resources/security_group) | resource |

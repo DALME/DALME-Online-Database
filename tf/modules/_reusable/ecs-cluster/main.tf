@@ -1,5 +1,12 @@
 # Entrypoint for the ecs-cluster module.
 
+# An account level setting. The AWS API does not delete this resource. When you
+# run destroy, the provider will attempt to disable any such settings.
+resource "aws_ecs_account_setting_default" "this" {
+  name  = "defaultLogDriverMode"
+  value = "non-blocking"
+}
+
 resource "aws_ecs_cluster" "this" {
   name = module.ecs_cluster_label.id
 
