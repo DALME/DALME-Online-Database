@@ -21,7 +21,11 @@ class TenantStorageMixin:
     def _get_location(self):
         try:
             return parse_tenant_config_path(f'{self.key}/%s')
-        except Exception:  # noqa: BLE001
+        except AttributeError:
+            # This can happen at startup when the model definitions need to
+            # know about settings.STORAGES but the Django app hasn't booted up
+            # in full meaning the schema has not been set on the connection
+            # yet. In which case, just initialize it to the default schema.
             return f'{self.key}/public'
 
 
