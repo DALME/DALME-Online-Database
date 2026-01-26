@@ -10,6 +10,21 @@ from django.core.files.storage import FileSystemStorage, InMemoryStorage
 logger = structlog.get_logger(__name__)
 
 
+def safe_parse_tenant_config_path(key):
+    """Ensure this helper function cannot throw.
+
+    This can happen at startup when the model definitions need to
+    know about settings.STORAGES but the Django app hasn't booted up
+    in full meaning the schema has not been set on the connection
+    yet. In which case, just initialize it to the default schema.
+
+    """
+    try:
+        return parse_tenant_config_path(f'{key}/%s')
+    except AttributeError:
+        return f'{key}/public'
+
+
 class TenantStorageMixin:
     """Reusable multitenant storage functionality."""
 
@@ -19,14 +34,7 @@ class TenantStorageMixin:
         return settings
 
     def _get_location(self):
-        try:
-            return parse_tenant_config_path(f'{self.key}/%s')
-        except AttributeError:
-            # This can happen at startup when the model definitions need to
-            # know about settings.STORAGES but the Django app hasn't booted up
-            # in full meaning the schema has not been set on the connection
-            # yet. In which case, just initialize it to the default schema.
-            return f'{self.key}/public'
+        return safe_parse_tenant_config_path(self.key)
 
 
 class S3StaticStorage(TenantStorageMixin, S3ManifestStaticStorage):
@@ -84,13 +92,15 @@ class LocalTenantStorageMixin:
     @property
     def base_location(self):
         """Get the schema qualified filepath."""
-        return parse_tenant_config_path(f'{getattr(settings, self.key_dict[self.key]["root"])}/%s')
+        key = getattr(settings, self.key_dict[self.key]['root'])
+        return safe_parse_tenant_config_path(key)
 
     @property
     def base_url(self):
+        key = getattr(settings, self.key_dict[self.key]['url'])
         if self.key == 'static':
-            return getattr(settings, self.key_dict[self.key]['url'])
-        return parse_tenant_config_path(f'{getattr(settings, self.key_dict[self.key]["url"])}/%s')
+            return key
+        return safe_parse_tenant_config_path(key)
 
 
 class LocalMediaStorage(LocalTenantStorageMixin, FileSystemStorage):
