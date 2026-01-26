@@ -972,7 +972,7 @@ class Production(Base):
         return os.environ['PLAUSIBLE_API_KEY']
 
 
-class Staging(Production, Configuration):
+class Staging(Production):
     """Staging settings."""
 
     @classmethod
