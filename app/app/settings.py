@@ -566,13 +566,6 @@ class Base(Configuration):
 class Development(Base):
     """Development settings."""
 
-    @classmethod
-    def setup(cls, *, assert_env: bool = True) -> None:
-        """Set up this settings module."""
-        super().setup()
-        if assert_env:
-            assert cls.ENV == 'development'
-
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
     BASE_URL = 'http://ida.localhost:8000'
@@ -745,13 +738,6 @@ class Development(Base):
 class Test(Development):
     """Test settings."""
 
-    @classmethod
-    def setup(cls, *, assert_env: bool = True) -> None:
-        """Set up this settings module."""
-        super().setup(assert_env=False)
-        if assert_env:
-            assert cls.ENV == 'test'
-
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
@@ -769,13 +755,6 @@ class Test(Development):
 class CI(Development):
     """Continuous integration pipeline settings."""
 
-    @classmethod
-    def setup(cls, *, assert_env: bool = True) -> None:
-        """Set up this settings module."""
-        super().setup(assert_env=False)
-        if assert_env:
-            assert cls.ENV == 'ci'
-
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
 
@@ -789,13 +768,6 @@ class CI(Development):
 
 class Production(Base):
     """Production settings."""
-
-    @classmethod
-    def setup(cls, *, assert_env: bool = True) -> None:
-        """Set up this settings module."""
-        super().setup()
-        if assert_env:
-            assert cls.ENV == 'production'
 
     DEBUG = False
 
@@ -972,13 +944,6 @@ class Production(Base):
 
 class Staging(Production):
     """Staging settings."""
-
-    @classmethod
-    def setup(cls, *, assert_env: bool = True) -> None:
-        """Set up this settings module."""
-        super().setup(assert_env=False)
-        if assert_env:
-            assert cls.ENV == 'staging'
 
     DEBUG = False
 
