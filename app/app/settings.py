@@ -232,6 +232,81 @@ class Base(Configuration):
         'django_tenants.routers.TenantSyncRouter',
     ]
 
+    @property
+    def POSTGRES_DB(self):
+        return os.environ.get('POSTGRES_DB', 'ida')
+
+    @property
+    def POSTGRES_USER(self):
+        return os.environ.get('POSTGRES_USER', 'ida')
+
+    @property
+    def POSTGRES_PASSWORD(self):
+        return os.environ.get('POSTGRES_PASSWORD', 'ida')
+
+    @property
+    def POSTGRES_HOST(self):
+        return os.environ.get('POSTGRES_HOST', 'localhost')
+
+    @property
+    def POSTGRES_PORT(self):
+        env_port = os.environ.get('POSTGRES_PORT')
+        return (
+            int(env_port)
+            if isinstance(env_port, str) and env_port.isdigit()
+            else env_port
+            if isinstance(env_port, int)
+            else 5432
+        )
+
+    @property
+    def DAM_DB_NAME(self):
+        return os.environ.get('DAM_DB_NAME', 'dam')
+
+    @property
+    def DAM_DB_USER(self):
+        return os.environ.get('DAM_DB_USER', 'dam')
+
+    @property
+    def DAM_DB_PASSWORD(self):
+        return os.environ.get('DAM_DB_PASSWORD', 'dam')
+
+    @property
+    def DAM_DB_HOST(self):
+        return os.environ.get('DAM_DB_HOST', 'localhost')
+
+    @property
+    def DAM_DB_PORT(self):
+        env_port = os.environ.get('DAM_DB_PORT')
+        return (
+            int(env_port)
+            if isinstance(env_port, str) and env_port.isdigit()
+            else env_port
+            if isinstance(env_port, int)
+            else 3306
+        )
+
+    @property
+    def DATABASES(self):
+        return {
+            'default': {
+                'ENGINE': 'django_tenants.postgresql_backend',
+                'NAME': self.POSTGRES_DB,
+                'USER': self.POSTGRES_USER,
+                'PASSWORD': self.POSTGRES_PASSWORD,
+                'HOST': self.POSTGRES_HOST,
+                'PORT': self.POSTGRES_PORT,
+            },
+            'dam': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': self.DAM_DB_NAME,
+                'USER': self.DAM_DB_USER,
+                'PASSWORD': self.DAM_DB_PASSWORD,
+                'HOST': self.DAM_DB_HOST,
+                'PORT': self.DAM_DB_PORT,
+            },
+        }
+
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOGGING = {
         'version': 1,
@@ -579,83 +654,6 @@ class Development(Base):
     @property
     def STATIC_URL(self):
         return f'/{self.STATIC_LOCATION}/'
-
-    # MAIN DATABASE PARAMETERS
-    @property
-    def POSTGRES_DB(self):
-        return os.environ.get('POSTGRES_DB', 'ida')
-
-    @property
-    def POSTGRES_USER(self):
-        return os.environ.get('POSTGRES_USER', 'ida')
-
-    @property
-    def POSTGRES_PASSWORD(self):
-        return os.environ.get('POSTGRES_PASSWORD', 'ida')
-
-    @property
-    def POSTGRES_HOST(self):
-        return os.environ.get('POSTGRES_HOST', 'localhost')
-
-    @property
-    def POSTGRES_PORT(self):
-        env_port = os.environ.get('POSTGRES_PORT')
-        return (
-            int(env_port)
-            if isinstance(env_port, str) and env_port.isdigit()
-            else env_port
-            if isinstance(env_port, int)
-            else 5432
-        )
-
-    # DAM DATABASE PARAMETERS
-    @property
-    def DAM_DB_NAME(self):
-        return os.environ.get('DAM_DB_NAME', 'dam')
-
-    @property
-    def DAM_DB_USER(self):
-        return os.environ.get('DAM_DB_USER', 'dam')
-
-    @property
-    def DAM_DB_PASSWORD(self):
-        return os.environ.get('DAM_DB_PASSWORD', 'dam')
-
-    @property
-    def DAM_DB_HOST(self):
-        return os.environ.get('DAM_DB_HOST', 'localhost')
-
-    @property
-    def DAM_DB_PORT(self):
-        env_port = os.environ.get('DAM_DB_PORT')
-        return (
-            int(env_port)
-            if isinstance(env_port, str) and env_port.isdigit()
-            else env_port
-            if isinstance(env_port, int)
-            else 3306
-        )
-
-    @property
-    def DATABASES(self):
-        return {
-            'default': {
-                'ENGINE': 'django_tenants.postgresql_backend',
-                'NAME': self.POSTGRES_DB,
-                'USER': self.POSTGRES_USER,
-                'PASSWORD': self.POSTGRES_PASSWORD,
-                'HOST': self.POSTGRES_HOST,
-                'PORT': self.POSTGRES_PORT,
-            },
-            'dam': {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': self.DAM_DB_NAME,
-                'USER': self.DAM_DB_USER,
-                'PASSWORD': self.DAM_DB_PASSWORD,
-                'HOST': self.DAM_DB_HOST,
-                'PORT': self.DAM_DB_PORT,
-            },
-        }
 
     DAM_API_USER = os.environ.get('DAM_API_USER')
     DAM_API_KEY = os.environ.get('DAM_API_KEY')
