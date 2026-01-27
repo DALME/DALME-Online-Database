@@ -219,7 +219,7 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
-        command     = ["python3", "manage.py", "migrate_schemas"]
+        command     = ["python3", "manage.py", "migrate_schemas", "--executor=multiprocessing"]
         cpu         = 0
         environment = local.app_env
         essential   = false
@@ -240,8 +240,11 @@ resource "aws_ecs_task_definition" "this" {
         volumesFrom    = []
       },
       {
-        command     = ["python3", "manage.py", "custom_createcachetable"]
-        cpu         = 0
+        command = ["python3", "manage.py", "custom_createcachetable"]
+        cpu     = 0
+        dependsOn = [
+          { containerName = "migrate", condition = "COMPLETE" },
+        ]
         environment = local.app_env
         essential   = false
         image       = local.images.app
