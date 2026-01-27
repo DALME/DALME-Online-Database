@@ -121,16 +121,6 @@ def test_development_dam_db_properties():
         assert dev.DAM_DB_PORT == 3307  # noqa: PLR2004
 
 
-def test_development_dam_db_defaults():
-    with mock.patch.dict(os.environ, {}, clear=True):
-        dev = settings_mod.Development()
-        assert dev.DAM_DB_NAME == 'dam'
-        assert dev.DAM_DB_USER == 'dam'
-        assert dev.DAM_DB_PASSWORD == 'dam'
-        assert dev.DAM_DB_HOST == 'localhost'
-        assert dev.DAM_DB_PORT == 3306  # noqa: PLR2004
-
-
 def test_development_databases():
     dev = settings_mod.Development()
     dbs = dev.DATABASES

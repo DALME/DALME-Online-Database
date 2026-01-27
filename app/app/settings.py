@@ -261,19 +261,19 @@ class Base(Configuration):
 
     @property
     def DAM_DB_NAME(self):
-        return os.environ.get('DAM_DB_NAME', 'dam')
+        return os.environ['DAM_DB_NAME']
 
     @property
     def DAM_DB_USER(self):
-        return os.environ.get('DAM_DB_USER', 'dam')
+        return os.environ['DAM_DB_USER']
 
     @property
     def DAM_DB_PASSWORD(self):
-        return os.environ.get('DAM_DB_PASSWORD', 'dam')
+        return os.environ['DAM_DB_PASSWORD']
 
     @property
     def DAM_DB_HOST(self):
-        return os.environ.get('DAM_DB_HOST', 'localhost')
+        return os.environ['DAM_DB_HOST']
 
     @property
     def DAM_DB_PORT(self):
