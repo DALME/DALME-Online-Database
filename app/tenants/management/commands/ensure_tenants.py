@@ -4,7 +4,6 @@ import structlog
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db import transaction
 
 from tenants.models import Domain, Tenant
 
@@ -16,7 +15,6 @@ class Command(BaseCommand):
 
     help = 'Create application tenant records.'
 
-    @transaction.atomic
     def handle(self, *args, **options) -> None:  # noqa: ARG002
         """Create application tenant records.
 
