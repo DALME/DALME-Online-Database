@@ -68,16 +68,18 @@ class Command(BaseCommand):
                     msg = "Don't mutate existing tenant types, they should be write-once/immutable."
                     raise ValueError(msg)
 
-                if existing_tenant.is_primary != is_primary:
-                    msg = "Don't mutate existing tenant primary status, it should be write-once/immutable."
+                existing_domain = existing_tenant.domains.first()
+                if existing_domain.is_primary != is_primary:
+                    msg = "Don't mutate existing tenant domain primary status, it should be write-once/immutable."
                     raise ValueError(msg)
 
                 # You can update domain names if necessary. This is useful if
                 # staging origins need to be altered and its conceivable it
                 # might even need to happen in prod too.
-                if existing_tenant.domain != domain:
-                    existing_tenant.domain = domain
-                    existing_tenant.save()
+                if existing_domain.domain != domain:
+                    existing_domain.domain = domain
+                    existing_domain.save()
+
                     logger.info(
                         'Updated tenant domain record.',
                         tenant=name,
