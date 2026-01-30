@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - development.v2
-      - ocp/development.v2
     types:
       - opened
       - reopened
