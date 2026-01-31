@@ -17,11 +17,10 @@ def test_tenant_dataclass_iter():
         domain='d',
         name='n',
         schema_name='s',
-        is_primary=True,
         tenant_type=settings_mod.TenantTypes.PUBLIC,
     )
     values = tuple(t)
-    assert values == ('d', 'n', 's', True, settings_mod.TenantTypes.PUBLIC)
+    assert values == ('d', 'n', 's', settings_mod.TenantTypes.PUBLIC)
 
 
 def test_base_templates_property():
@@ -53,7 +52,6 @@ def test_base_tenants_env_override():
             'domain': 'foo.localhost',
             'name': 'Foo',
             'schema_name': 'foo',
-            'is_primary': True,
             'tenant_type': 'public',
         }
     }

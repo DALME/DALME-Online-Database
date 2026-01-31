@@ -9,6 +9,8 @@ from tenants.models import Domain, Tenant
 
 logger = structlog.get_logger(__name__)
 
+PRIMARY_TENANT = 'IDA'
+
 
 class Command(BaseCommand):
     """Define the ensure_tenants command."""
@@ -25,7 +27,8 @@ class Command(BaseCommand):
         tenants = settings.TENANTS()
 
         for tenant in tenants:
-            domain, name, schema_name, is_primary, tenant_type = tenant.value
+            domain, name, schema_name, tenant_type = tenant.value
+            is_primary = name == PRIMARY_TENANT
 
             qs = Tenant.objects.filter(name=name)
             if not qs.exists():
@@ -68,20 +71,20 @@ class Command(BaseCommand):
                     msg = "Don't mutate existing tenant types, they should be write-once/immutable."
                     raise ValueError(msg)
 
-                existing_domain = existing_tenant.domains.first()
-                if existing_domain.is_primary != is_primary:
-                    msg = "Don't mutate existing tenant domain primary status, it should be write-once/immutable."
-                    raise ValueError(msg)
-
                 # You can update domain names if necessary. This is useful if
                 # staging origins need to be altered and its conceivable it
-                # might even need to happen in prod too.
+                # might even need to happen in prod too, at some point.
+                existing_domain = existing_tenant.domains.first()
                 if existing_domain.domain != domain:
                     existing_domain.domain = domain
-                    existing_domain.save()
 
                     logger.info(
                         'Updated tenant domain record.',
                         tenant=name,
                         domain=domain,
                     )
+
+                # Domain primary status is invariant (it must be the IDA only)
+                # so let's silently enforce that contract.
+                existing_domain.is_primary = is_primary
+                existing_domain.save()

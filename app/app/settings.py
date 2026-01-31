@@ -29,7 +29,6 @@ class TENANT:
     domain: str
     name: str
     schema_name: str
-    is_primary: bool
     tenant_type: TenantTypes
 
     def __iter__(self):
@@ -575,21 +574,18 @@ class Development(Base):
             'domain': 'ida.localhost',
             'name': 'IDA',
             'schema_name': 'public',
-            'is_primary': True,
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
             'domain': 'dalme.localhost',
             'name': 'DALME',
             'schema_name': 'dalme',
-            'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.localhost',
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
-            'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
     }
@@ -952,21 +948,18 @@ class Staging(Production):
             'domain': 'documentaryarchaeology.net',
             'name': 'IDA',
             'schema_name': 'public',
-            'is_primary': True,
             'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
             'domain': 'dalme-beta.org',
             'name': 'DALME',
             'schema_name': 'dalme',  # IMPORTANT: Do not use '-beta' here!
-            'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
             'domain': 'historical-pharmacopeias.org',
             'name': 'Historical Pharmacopeias',
             'schema_name': 'pharmacopeias',
-            'is_primary': False,
             'tenant_type': TenantTypes.PROJECT,
         },
     }

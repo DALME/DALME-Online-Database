@@ -25,7 +25,6 @@ def test_ensure_tenants_existence(mock_logger, mock_tenant, mock_domain):
 
     mock_ida_tenant = mock.MagicMock(spec=Tenant)
     mock_ida_domain = mock.MagicMock(spec=Domain)
-    mock_ida_domain.is_primary = True
     mock_ida_domain.domain = settings.TENANTS().IDA.value.domain
     mock_ida_tenant.domains.first.return_value = mock_ida_domain
     for attr, value in settings.TENANTS().IDA.value.__dict__.items():
@@ -33,7 +32,6 @@ def test_ensure_tenants_existence(mock_logger, mock_tenant, mock_domain):
 
     mock_dalme_tenant = mock.MagicMock(spec=Tenant)
     mock_dalme_domain = mock.MagicMock(spec=Domain)
-    mock_dalme_domain.is_primary = False
     mock_dalme_domain.domain = settings.TENANTS().DALME.value.domain
     mock_dalme_tenant.domains.first.return_value = mock_dalme_domain
     for attr, value in settings.TENANTS().DALME.value.__dict__.items():
@@ -97,7 +95,6 @@ def test_ensure_tenants_name_updates_error(mock_logger, mock_tenant, mock_domain
 
     mock_ida_tenant = mock.MagicMock(spec=Tenant)
     mock_ida_domain = mock.MagicMock(spec=Domain)
-    mock_ida_domain.is_primary = True
     mock_ida_domain.domain = settings.TENANTS().IDA.value.domain
     mock_ida_tenant.domains.first.return_value = mock_ida_domain
     for attr, value in settings.TENANTS().IDA.value.__dict__.items():
@@ -106,7 +103,6 @@ def test_ensure_tenants_name_updates_error(mock_logger, mock_tenant, mock_domain
 
     mock_dalme_tenant = mock.MagicMock(spec=Tenant)
     mock_dalme_domain = mock.MagicMock(spec=Domain)
-    mock_dalme_domain.is_primary = False
     mock_dalme_domain.domain = settings.TENANTS().DALME.value.domain
     mock_dalme_tenant.domains.first.return_value = mock_dalme_domain
     for attr, value in settings.TENANTS().DALME.value.__dict__.items():
@@ -151,7 +147,6 @@ def test_ensure_tenants_schema_name_updates_error(mock_logger, mock_tenant, mock
 
     mock_ida_tenant = mock.MagicMock(spec=Tenant)
     mock_ida_domain = mock.MagicMock(spec=Domain)
-    mock_ida_domain.is_primary = True
     mock_ida_domain.domain = settings.TENANTS().IDA.value.domain
     mock_ida_tenant.domains.first.return_value = mock_ida_domain
     for attr, value in settings.TENANTS().IDA.value.__dict__.items():
@@ -160,7 +155,6 @@ def test_ensure_tenants_schema_name_updates_error(mock_logger, mock_tenant, mock
 
     mock_dalme_tenant = mock.MagicMock(spec=Tenant)
     mock_dalme_domain = mock.MagicMock(spec=Domain)
-    mock_dalme_domain.is_primary = False
     mock_dalme_domain.domain = settings.TENANTS().DALME.value.domain
     mock_dalme_tenant.domains.first.return_value = mock_dalme_domain
     for attr, value in settings.TENANTS().DALME.value.__dict__.items():
@@ -205,7 +199,6 @@ def test_ensure_tenants_tenant_type_updates_error(mock_logger, mock_tenant, mock
 
     mock_ida_tenant = mock.MagicMock(spec=Tenant)
     mock_ida_domain = mock.MagicMock(spec=Domain)
-    mock_ida_domain.is_primary = True
     mock_ida_domain.domain = settings.TENANTS().IDA.value.domain
     mock_ida_tenant.domains.first.return_value = mock_ida_domain
     for attr, value in settings.TENANTS().IDA.value.__dict__.items():
@@ -214,7 +207,6 @@ def test_ensure_tenants_tenant_type_updates_error(mock_logger, mock_tenant, mock
 
     mock_dalme_tenant = mock.MagicMock(spec=Tenant)
     mock_dalme_domain = mock.MagicMock(spec=Domain)
-    mock_dalme_domain.is_primary = False
     mock_dalme_domain.domain = settings.TENANTS().DALME.value.domain
     mock_dalme_tenant.domains.first.return_value = mock_dalme_domain
     for attr, value in settings.TENANTS().DALME.value.__dict__.items():
@@ -249,59 +241,6 @@ def test_ensure_tenants_tenant_type_updates_error(mock_logger, mock_tenant, mock
 @mock.patch('tenants.management.commands.ensure_tenants.Domain')
 @mock.patch('tenants.management.commands.ensure_tenants.Tenant')
 @mock.patch('tenants.management.commands.ensure_tenants.logger')
-def test_ensure_tenants_is_primary_updates_error(mock_logger, mock_tenant, mock_domain):
-    new_tenant = mock.MagicMock(spec=Tenant)
-    new_domain = mock.MagicMock(spec=Domain)
-    mock_tenant.objects.create.return_value = new_tenant
-    mock_domain.objects.create.return_value = new_domain
-
-    mock_qs = mock.MagicMock()
-
-    mock_ida_tenant = mock.MagicMock(spec=Tenant)
-    mock_ida_domain = mock.MagicMock(spec=Domain)
-    mock_ida_domain.is_primary = False
-    mock_ida_domain.domain = settings.TENANTS().IDA.value.domain
-    mock_ida_tenant.domains.first.return_value = mock_ida_domain
-    for attr, value in settings.TENANTS().IDA.value.__dict__.items():
-        setattr(mock_ida_tenant, attr, value)
-
-    mock_dalme_tenant = mock.MagicMock(spec=Tenant)
-    mock_dalme_domain = mock.MagicMock(spec=Domain)
-    mock_dalme_domain.is_primary = False
-    mock_dalme_domain.domain = settings.TENANTS().DALME.value.domain
-    mock_dalme_tenant.domains.first.return_value = mock_dalme_domain
-    for attr, value in settings.TENANTS().DALME.value.__dict__.items():
-        setattr(mock_dalme_tenant, attr, value)
-
-    mock_tenant.objects.filter.return_value = mock_qs
-    mock_qs.exists.side_effect = [True, True, False]
-    mock_qs.first.side_effect = [mock_ida_tenant, mock_dalme_tenant]
-
-    with pytest.raises(ValueError) as exc:  # noqa: PT011
-        EnsureTenants().handle()
-
-    assert str(exc.value) == "Don't mutate existing tenant domain primary status, it should be write-once/immutable."
-
-    assert mock_tenant.mock_calls == [
-        mock.call.objects.filter(name='IDA'),
-        mock.call.objects.filter().exists(),
-        mock.call.objects.filter().first(),
-    ]
-    assert not mock_domain.mock_calls
-
-    assert mock_logger.mock_calls == [
-        mock.call.info(
-            'Existing tenant found for domain',
-            tenant='IDA',
-            domain='ida.localhost',
-        ),
-    ]
-
-
-@pytest.mark.django_db
-@mock.patch('tenants.management.commands.ensure_tenants.Domain')
-@mock.patch('tenants.management.commands.ensure_tenants.Tenant')
-@mock.patch('tenants.management.commands.ensure_tenants.logger')
 def test_ensure_tenants_domain_updates(mock_logger, mock_tenant, mock_domain):
     new_tenant = mock.MagicMock(spec=Tenant)
     new_domain = mock.MagicMock(spec=Domain)
@@ -312,7 +251,6 @@ def test_ensure_tenants_domain_updates(mock_logger, mock_tenant, mock_domain):
 
     mock_ida_tenant = mock.MagicMock(spec=Tenant)
     mock_ida_domain = mock.MagicMock(spec=Domain)
-    mock_ida_domain.is_primary = True
     mock_ida_domain.domain = 'foobar.com'
     mock_ida_tenant.domains.first.return_value = mock_ida_domain
     for attr, value in settings.TENANTS().IDA.value.__dict__.items():
@@ -320,7 +258,6 @@ def test_ensure_tenants_domain_updates(mock_logger, mock_tenant, mock_domain):
 
     mock_dalme_tenant = mock.MagicMock(spec=Tenant)
     mock_dalme_domain = mock.MagicMock(spec=Domain)
-    mock_dalme_domain.is_primary = False
     mock_dalme_domain.domain = 'bazquux.com'
     mock_dalme_tenant.domains.first.return_value = mock_dalme_domain
     for attr, value in settings.TENANTS().DALME.value.__dict__.items():
