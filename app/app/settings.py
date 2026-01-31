@@ -958,7 +958,7 @@ class Staging(Production):
         },
         'PHARMACOPEIAS': {
             'domain': 'historical-pharmacopeias.org',
-            'name': 'Historical Pharmacopeias',
+            'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
             'tenant_type': TenantTypes.PROJECT,
         },
