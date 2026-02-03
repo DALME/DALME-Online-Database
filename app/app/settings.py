@@ -29,7 +29,6 @@ class TENANT:
     domain: str
     name: str
     schema_name: str
-    tenant_type: TenantTypes
 
     def __iter__(self):
         """Allow destructuring assignment."""
@@ -574,19 +573,16 @@ class Development(Base):
             'domain': 'ida.localhost',
             'name': 'IDA',
             'schema_name': 'public',
-            'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
             'domain': 'dalme.localhost',
             'name': 'DALME',
             'schema_name': 'dalme',
-            'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
             'domain': 'pharmacopeias.localhost',
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
-            'tenant_type': TenantTypes.PROJECT,
         },
     }
 
@@ -948,18 +944,15 @@ class Staging(Production):
             'domain': 'documentaryarchaeology.net',
             'name': 'IDA',
             'schema_name': 'public',
-            'tenant_type': TenantTypes.PUBLIC,
         },
         'DALME': {
             'domain': 'dalme-beta.org',
             'name': 'DALME',
             'schema_name': 'dalme',  # IMPORTANT: Do not use '-beta' here!
-            'tenant_type': TenantTypes.PROJECT,
         },
         'PHARMACOPEIAS': {
             'domain': 'historical-pharmacopeias.org',
             'name': 'Pharmacopeias',
             'schema_name': 'pharmacopeias',
-            'tenant_type': TenantTypes.PROJECT,
         },
     }

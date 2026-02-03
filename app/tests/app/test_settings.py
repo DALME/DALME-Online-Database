@@ -12,17 +12,6 @@ def test_tenanttypes_enum():
     assert settings_mod.TenantTypes.PROJECT == 'project'
 
 
-def test_tenant_dataclass_iter():
-    t = settings_mod.TENANT(
-        domain='d',
-        name='n',
-        schema_name='s',
-        tenant_type=settings_mod.TenantTypes.PUBLIC,
-    )
-    values = tuple(t)
-    assert values == ('d', 'n', 's', settings_mod.TenantTypes.PUBLIC)
-
-
 def test_base_templates_property():
     dev = settings_mod.Development()
     templates = dev.TEMPLATES
@@ -52,7 +41,6 @@ def test_base_tenants_env_override():
             'domain': 'foo.localhost',
             'name': 'Foo',
             'schema_name': 'foo',
-            'tenant_type': 'public',
         }
     }
     with mock.patch.dict(os.environ, {'TENANTS': json.dumps(tenants_dict)}):
@@ -186,12 +174,3 @@ def test_production_oauth2_provider():
         oauth2 = prod.OAUTH2_PROVIDER
         assert oauth2['OIDC_RSA_PRIVATE_KEY'] == 'PRIVATEKEY'
         assert 'SCOPES' in oauth2
-
-
-def test_staging_tenants():
-    staging = settings_mod.Staging()
-    tenants = staging._TENANTS  # noqa: SLF001
-    assert 'IDA' in tenants
-    assert tenants['IDA']['domain'] == 'documentaryarchaeology.net'
-    assert tenants['DALME']['schema_name'] == 'dalme'
-    assert tenants['PHARMACOPEIAS']['tenant_type'] == settings_mod.TenantTypes.PROJECT

@@ -5,6 +5,7 @@ import structlog
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from app.settings import TenantTypes
 from tenants.models import Domain, Tenant
 
 logger = structlog.get_logger(__name__)
@@ -27,15 +28,16 @@ class Command(BaseCommand):
         tenants = settings.TENANTS()
 
         for tenant in tenants:
-            domain, name, schema_name, tenant_type = tenant.value
+            domain, name, schema_name = tenant.value
             is_primary = name == PRIMARY_TENANT
+            tenant_type = TenantTypes.PUBLIC if is_primary else TenantTypes.PROJECT
 
             qs = Tenant.objects.filter(name=name)
             if not qs.exists():
                 tenant_obj = Tenant.objects.create(
                     name=name,
                     schema_name=schema_name,
-                    tenant_type=tenant_type.value,
+                    tenant_type=tenant_type,
                 )
                 domain_obj = Domain.objects.create(
                     domain=domain,
@@ -67,12 +69,8 @@ class Command(BaseCommand):
                     msg = "Don't mutate existing tenant schema names, they should be write-once/immutable."
                     raise ValueError(msg)
 
-                if existing_tenant.tenant_type != tenant_type:
-                    msg = "Don't mutate existing tenant types, they should be write-once/immutable."
-                    raise ValueError(msg)
-
                 # You can update domain names if necessary. This is useful if
-                # staging origins need to be altered and its conceivable it
+                # staging origins need to be altered and it's conceivable it
                 # might even need to happen in prod too, at some point.
                 existing_domain = existing_tenant.domains.first()
                 if existing_domain.domain != domain:
@@ -84,7 +82,5 @@ class Command(BaseCommand):
                         domain=domain,
                     )
 
-                # Domain primary status is invariant (it must be the IDA only)
-                # so let's silently enforce that contract.
                 existing_domain.is_primary = is_primary
                 existing_domain.save()

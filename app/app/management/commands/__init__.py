@@ -1,1 +1,1 @@
-"""Interface for the web.management.commands module."""
+"""Interface for the app.management.commands module."""

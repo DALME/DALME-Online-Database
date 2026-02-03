@@ -46,14 +46,15 @@ def django_db_setup(django_db_setup, django_db_blocker):  # noqa: ARG001
     tenants = settings.TENANTS()
     with django_db_blocker.unblock(), schema_context('public'):
         for tenant in tenants:
-            domain, name, schema_name, tenant_type = tenant.value
+            domain, name, schema_name = tenant.value
             is_primary = name == 'IDA'
+            tenant_type = TenantTypes.PUBLIC if is_primary else TenantTypes.PROJECT
 
             if not Tenant.objects.filter(name=name).exists():
                 tenant_obj = Tenant.objects.create(
                     name=name,
                     schema_name=schema_name,
-                    tenant_type=tenant_type.value,
+                    tenant_type=tenant_type,
                 )
                 Domain.objects.create(
                     domain=domain,
