@@ -65,23 +65,12 @@ class BlockRegistry:
         The arg 'blocks' must be a list of strings mapping to methods on this
         class.
         """
-        result = []
-        for block in blocks:
-            if isinstance(block, str):
-                value = (block, getattr(cls, block)())
-            else:
-                # Sometimes StreamField mutates the block list data somewhere
-                # (obscure that I can't detect) so we need to handle that case.
-                if isinstance(block, tuple):
-                    block_name, _ = block
-                    value = (block_name, getattr(cls, block_name)())
-                else:
-                    msg = 'Malformed block def: {blocks}'
-                    raise TypeError(msg)
-
-                result.append(value)
-
-        return sorted(result, key=lambda x: x[0])
+        try:
+            return [(block, getattr(cls, block)()) for block in sorted(blocks)]
+        except TypeError:
+            # Sometimes StreamField mutates the block list data somewhere
+            # (obscure that I can't detect) so we need to handle that case.
+            return [(block[0], getattr(cls, block[0])()) for block in sorted(blocks)]
 
     @staticmethod
     def bibliography():
