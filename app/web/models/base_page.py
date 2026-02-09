@@ -1,13 +1,14 @@
 """Model base page data."""
 
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
+from wagtail.fields import StreamField
 from wagtail.models import Page
 from wagtail.search import index
 from wagtail.utils.decorators import cached_classmethod
 
 from django.db import models
 
-from web.extensions.block_registry import STREAMFIELD_INTERFACE, RegistryStreamField
+from web.extensions.extras.blocks import DEFAULT_BLOCKS
 from web.extensions.footnotes.models import FootnoteMixin
 
 HEADER_POSITION = (
@@ -38,7 +39,7 @@ class BasePage(Page, FootnoteMixin):
         blank=True,
         help_text='An optional short title that will be displayed in certain space constrained contexts.',
     )
-    body = RegistryStreamField(STREAMFIELD_INTERFACE, null=True)
+    body = StreamField(DEFAULT_BLOCKS, null=True)
 
     search_fields = [
         *Page.search_fields,
