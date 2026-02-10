@@ -18,11 +18,14 @@ def safe_parse_tenant_config_path(key):
     in full meaning the schema has not been set on the connection
     yet. In which case, just initialize it to the default schema.
 
+    The function must also ensure that the there are no double slashes in the
+    returned path because some storage backends are not tolerant of that.
+
     """
     try:
-        return parse_tenant_config_path(f'{key}/%s')
+        return parse_tenant_config_path(f'{key}%s') if key.endswith('/') else parse_tenant_config_path(f'{key}/%s')
     except AttributeError:
-        return f'{key}/public'
+        return f'{key}public' if key.endswith('/') else f'{key}/public'
 
 
 class TenantStorageMixin:
@@ -97,10 +100,18 @@ class LocalTenantStorageMixin:
 
     @property
     def base_url(self):
+        """Get the schema qualified URL.
+
+        Must ensure that the returned URL always ends with a slash
+        because that's expected by the `url` method in Django's FileSystemStorage
+        base class.
+
+        """
         key = getattr(settings, self.key_dict[self.key]['url'])
         if self.key == 'static':
             return key
-        return safe_parse_tenant_config_path(key)
+        base = safe_parse_tenant_config_path(key)
+        return base if base.endswith('/') else f'{base}/'
 
 
 class LocalMediaStorage(LocalTenantStorageMixin, FileSystemStorage):
