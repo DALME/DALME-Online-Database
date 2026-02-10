@@ -7,7 +7,7 @@ boto3==1.35.86
 cuid2==2.0.1
 django-configurations==2.5.1
 django-cors-headers==4.6.0
-django-currentuser @ git+https://github.com/zsoldosp/django-currentuser.git#egg=django-currentuser
+django-currentuser==0.9.0
 django-elasticsearch-dsl==7.4
 django-filter==24.3
 django-maintenance-mode==0.21.1
