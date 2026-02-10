@@ -13,7 +13,7 @@ from tenants import storage_backends
 @pytest.fixture
 def mock_parse_tenant_config_path():
     with mock.patch('tenants.storage_backends.parse_tenant_config_path') as m:
-        m.side_effect = lambda s: f'parsed/{s}'
+        m.side_effect = lambda s: f'parsed{s}' if s.startswith('/') else f'parsed/{s}'
         yield m
 
 
@@ -104,7 +104,7 @@ def test_localstaticstorage_base_location_and_url(mock_parse_tenant_config_path)
 
     s = TestStorage()
 
-    assert s.base_location == f'parsed/{settings.STATIC_ROOT}/%s'
+    assert s.base_location == f'parsed{settings.STATIC_ROOT}/%s'
     assert s.base_url == settings.STATIC_URL
 
 
@@ -116,8 +116,8 @@ def test_localmediastorage_base_location_and_url(mock_parse_tenant_config_path):
 
     s = TestStorage()
 
-    assert s.base_location == f'parsed/{settings.MEDIA_ROOT}/%s'
-    assert s.base_url == f'parsed/{settings.MEDIA_URL}/%s'
+    assert s.base_url == f'parsed{settings.MEDIA_URL}%s/'
+    assert s.base_location == f'parsed{settings.MEDIA_ROOT}/%s'
 
 
 def test_localmediastorage_key():
