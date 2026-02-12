@@ -279,7 +279,11 @@ jobs:
 
   deploy:
     name: 'Deploy'
-    needs: provision-modules
+    needs:
+      - build_app
+      - build_proxy
+      - build_ui
+      - provision-modules
     if: >
       always() &&
       !failure() &&
