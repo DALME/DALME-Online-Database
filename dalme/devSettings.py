@@ -100,7 +100,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://db.127.0.0.1.sslip.io",
     "https://purl.127.0.0.1.sslip.io:8443",
     "https://purl.127.0.0.1.sslip.io:8000",
-    "http://purl.127.0.0.1.sslip.iohttp://localhost:8888",
+    "http://purl.127.0.0.1.sslip.io",
+    "http://localhost:8888",
 ]
 
 ROOT_HOSTCONF = "dalme.hosts"
