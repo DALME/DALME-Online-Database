@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
 from django_currentuser.middleware import get_current_user
-from dalme_app.models import rs_resource, Workflow, Work_log, Page, PublicRegister, Set_x_content, Source, Transcription, Source_pages
+from dalme_app.models import rs_resource, Workflow, Work_log, Page, Set_x_content, Source, Transcription, Source_pages
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -32,16 +32,6 @@ def source_post_save(sender, instance, created, **kwargs):
                 object_id=instance.id,
                 content_type=ContentType.objects.get_for_model(instance)
             )
-        # create or delete public registration
-        public = instance.workflow.is_public
-        registration = PublicRegister.objects.filter(object_id=instance.id)
-        if public and not registration.exists():
-            PublicRegister.objects.create(
-                object_id=instance.id,
-                content_type=ContentType.objects.get_for_model(instance)
-            )
-        if not public and registration.exists():
-            registration.first().delete()
 
 
 @receiver(models.signals.pre_delete, sender=Source)
@@ -53,10 +43,6 @@ def source_pre_delete(sender, instance, **kwargs):
                     if sp.transcription:
                         sp.transcription.delete()
             page.delete()
-
-    pr = PublicRegister.objects.filter(object_id=instance.id)
-    if pr.exists():
-        pr.first().delete()
 
 
 @receiver(models.signals.post_save, sender=Transcription)

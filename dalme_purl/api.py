@@ -1,6 +1,7 @@
 from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
 from django.http import HttpResponseRedirect
-from dalme_app.models import PublicRegister
+from dalme_app.models import Source
 from django.conf import settings
 
 
@@ -13,7 +14,11 @@ class Endpoint(viewsets.GenericViewSet):
         'json' -> json response
         'json-p' -> json-p response
     """
-    queryset = PublicRegister.objects.all()
+    # same visibility rule as the public site's record view (dalme_public.models)
+    queryset = Source.objects.filter(workflow__is_public=True)
+    # purls are public: auth for 'db'/'api' formats is enforced at the redirect target
+    authentication_classes = []
+    permission_classes = [AllowAny]
 
     def retrieve(self, request, pk=None, format=None):
         self.get_object()
