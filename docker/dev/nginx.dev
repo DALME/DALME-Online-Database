@@ -4,6 +4,9 @@ server {
     ssl_certificate       /var/certs/dev-localhost.cert;
     ssl_certificate_key   /var/certs/dev-localhost.key;
 
+    # plain http sent to this https port -> redirect to https
+    error_page 497 =301 https://$http_host$request_uri;
+
     location /static/ {
       alias /static/;
     }
@@ -17,6 +20,6 @@ server {
       # we don't want nginx trying to do something clever with
       # redirects, we set the Host: header above already.
       proxy_redirect off;
-      proxy_pass https://db.127.0.0.1.xip.io:8443;
+      proxy_pass http://127.0.0.1:8000;
     }
 }

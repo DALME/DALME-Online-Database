@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   static:
     image: static-dev
@@ -13,6 +11,7 @@ services:
     network_mode: 'service:web' # network interface of web container simulates aws-vpc
     env_file: dev.env
   db:
+    platform: linux/amd64
     image: mysql:8.0.19
     restart: always
     environment:
@@ -21,10 +20,17 @@ services:
         MYSQL_PASSWORD: dalme
         MYSQL_DATABASE: dalme_db
     volumes:
-        - ../../.mysql:/docker-entrypoint-initdb.d
+        - ../../sql/mysql_eb:/docker-entrypoint-initdb.d
         - ../../.mysql:/etc/mysql/conf.d
+        - mysql-data:/var/lib/mysql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30m # first boot imports the dump in sql/mysql_eb
   web:
     image: dalme-dev
     build:
@@ -33,11 +39,16 @@ services:
     volumes:
       - ../../:/app
     ports:
-      - "8443:8843" # forwards port to nginx container
+      - "8000:8843" # forwards port to nginx container (matches PARENT_HOST in devSettings)
+      - "8443:8843"
     links:
       - db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
         DATABASE_URL: mysql://dalme:dalme@db:3306/dalme_db
     env_file: dev.env
+
+volumes:
+  mysql-data:
