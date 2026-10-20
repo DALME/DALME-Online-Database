@@ -11,6 +11,7 @@ on:
       - ready_for_review
 
 permissions:
+  actions: read
   artifact-metadata: write
   checks: write
   contents: write
@@ -213,11 +214,11 @@ jobs:
             ${{ env.TRAP }}
             ${{ env.TEST }}
 
-      # - uses: MishaKav/pytest-coverage-comment@v1.2.0
-      #   with:
-      #     coverage-path-prefix: app/
-      #     junitxml-path: /tmp/pytest.xml
-      #     pytest-coverage-path: /tmp/pytest-coverage.txt
+      - uses: MishaKav/pytest-coverage-comment@v1.7.1
+        with:
+          coverage-path-prefix: app/
+          junitxml-path: /tmp/pytest.xml
+          pytest-coverage-path: /tmp/pytest-coverage.txt
 
   integrate_ui:
     name: 'Integrate UI'

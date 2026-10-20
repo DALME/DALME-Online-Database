@@ -134,6 +134,7 @@ data "aws_iam_policy_document" "gha_oidc_policy_one" {
     # tfsec:ignore:aws-iam-no-policy-wildcards
     actions = [
       "ecr:Describe*",
+      "ecr:GetAccountSetting",
       "ecr:GetAuthorizationToken",
     ]
     # tfsec:ignore:aws-iam-no-policy-wildcards

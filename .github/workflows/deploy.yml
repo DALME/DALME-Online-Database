@@ -64,6 +64,40 @@ jobs:
         with:
           context: .
           file: config/docker/Dockerfile.app
+          cache-from: |
+            type=gha,scope=app.base
+          cache-to: |
+            type=gha,scope=app.base,mode=max
+          target: base
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.app
+          cache-from: |
+            type=gha,scope=app.reqs
+            type=gha,scope=app.base
+          cache-to: |
+            type=gha,scope=app.reqs,mode=max
+          target: reqs
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.app
+          cache-from: |
+            type=gha,scope=app.install
+            type=gha,scope=app.reqs
+            type=gha,scope=app.base
+          cache-to: |
+            type=gha,scope=app.install,mode=max
+          target: install
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.app
+          load: false
           push: true
           cache-from: |
             type=gha,scope=app.production
@@ -149,6 +183,31 @@ jobs:
         with:
           run: |
             echo "${{ env.OAUTH_CLIENT_ID }}.${{ env.NAMESPACE }}.${{ env.ENVIRONMENT }}"
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: config/docker/Dockerfile.ui
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=ui.base
+          cache-to: |
+            type=gha,scope=ui.base,mode=max
+          target: base
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: config/docker/Dockerfile.ui
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=ui.reqs
+            type=gha,scope=ui.base
+          cache-to: |
+            type=gha,scope=ui.reqs,mode=max
+          target: reqs
 
       - uses: docker/build-push-action@v5
         env:
@@ -416,6 +475,42 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: false
+          cache-from: |
+            type=gha,scope=docs.base
+          cache-to: |
+            type=gha,scope=docs.base,mode=max
+          target: base
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: false
+          cache-from: |
+            type=gha,scope=docs.reqs
+            type=gha,scope=docs.base
+          cache-to: |
+            type=gha,scope=docs.reqs,mode=max
+          target: reqs
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: false
+          cache-from: |
+            type=gha,scope=docs.install
+            type=gha,scope=docs.reqs
+            type=gha,scope=docs.base
+          cache-to: |
+            type=gha,scope=docs.install,mode=max
+          target: install
 
       - uses: docker/build-push-action@v3
         with:
