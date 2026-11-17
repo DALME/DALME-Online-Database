@@ -12,6 +12,8 @@ IDA
    :caption: Contents:
 
    source/introduction
+   source/domain/index
+   source/process/index
    source/multitenancy
    source/auth
    source/state-machines
