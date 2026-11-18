@@ -62,8 +62,6 @@ COPY --from=terragrunt /usr/local/terragrunt /usr/local/bin/terragrunt
 COPY --from=tfdocs /usr/local/terraform-docs /usr/local/bin/terraform-docs
 COPY --from=tfupdate /usr/local/tfupdate /usr/local/bin/tfupdate
 COPY --from=aquasec/tfsec-ci:latest /usr/bin/tfsec /usr/local/bin/tfsec
-RUN pip install --user --no-cache-dir --upgrade pip
-RUN pip install --no-cache ecs-deploy
 WORKDIR /opt/tf
 ENV TF_CLI_CONFIG_FILE /opt/tf/.terraformrc
 COPY ./config/scripts/entrypoint.deploy.sh /usr/local/bin/entrypoint.sh

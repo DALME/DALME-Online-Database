@@ -33,6 +33,7 @@ terraform:
 # them. The `hook-*` checks belong here: they read configuration, and they exist
 # to catch a change to it, so they have to run wherever such a change arrives.
 shared:
+  - hook-images
   - hook-jobs
   - hook-targets
   - check-added-large-files

@@ -1,0 +1,71 @@
+name: Build image
+description: >
+  Build one target of one image, with its layer cache scoped by rule rather
+  than by hand.
+
+# A build writes its own `<image>.<target>` scope and reads every scope of its
+# image, so production reuses whatever CI cached and the reverse. The targets
+# each image is built at live in `targets.yml`, so the two workflows cannot
+# drift apart on them, and building a target missing from it fails.
+
+inputs:
+  image:
+    description: A key of targets.yml; builds config/docker/Dockerfile.<image>.
+    required: true
+  target:
+    description: The Dockerfile stage to build.
+    required: true
+  tags:
+    default: ''
+  labels:
+    default: ''
+  load:
+    default: 'false'
+  push:
+    default: 'false'
+  build-args:
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - id: cache
+      shell: bash
+      env:
+        IMAGE: ${{ inputs.image }}
+        TARGET: ${{ inputs.target }}
+      run: |
+        targets=$(yq -r '.[strenv(IMAGE)] // [] | .[]' "$GITHUB_ACTION_PATH/targets.yml" | xargs)
+
+        if [[ -z "$targets" ]]; then
+          echo "::error::No targets listed for image '$IMAGE'"
+          exit 1
+        fi
+
+        if [[ " $targets " != *" $TARGET "* ]]; then
+          echo "::error::'$TARGET' is not a listed target of '$IMAGE' ($targets)"
+          exit 1
+        fi
+
+        {
+          echo 'from<<EOF'
+          for target in $targets; do
+            echo "type=gha,scope=$IMAGE.$target"
+          done
+          echo 'EOF'
+          echo "to=type=gha,scope=$IMAGE.$TARGET,mode=max"
+          echo "file=config/docker/Dockerfile.$IMAGE"
+        } >> "$GITHUB_OUTPUT"
+
+    - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+      with:
+        context: .
+        file: ${{ steps.cache.outputs.file }}
+        target: ${{ inputs.target }}
+        build-args: ${{ inputs.build-args }}
+        load: ${{ inputs.load }}
+        push: ${{ inputs.push }}
+        tags: ${{ inputs.tags }}
+        labels: ${{ inputs.labels }}
+        cache-from: ${{ steps.cache.outputs.from }}
+        cache-to: ${{ steps.cache.outputs.to }}
