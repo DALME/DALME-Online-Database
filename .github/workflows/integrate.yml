@@ -26,9 +26,9 @@ env:
   NAMESPACE: ida
   ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
   CI_TAG: dev
-  SKIP_APP: eslint,prettier,docs,tf-format,tf-validate,tf-docs,tfsec
-  SKIP_TF: eslint,prettier,docs,ruff,ruff-format
-  SKIP_UI: docs,ruff,ruff-format,tf-format,tf-validate,tf-docs,tfsec
+  SKIP_APP: docs,eslint,migrations,prettier,tf-docs,tf-format,tf-validate,tfsec
+  SKIP_TF: docs,eslint,migrations,prettier,ruff,ruff-format,uv-lock
+  SKIP_UI: docs,migrations,ruff,ruff-format,tf-docs,tf-format,tf-validate,tfsec,uv-lock
   TF_PLUGIN_CACHE: .terraform.d/plugin-cache
   TFLINT_PLUGIN_CACHE: .tflint.d/plugins
   TF_ROOT: ./tf
@@ -184,6 +184,14 @@ jobs:
           prek-version: '0.5.11'
         env:
           SKIP: ${{ env.SKIP_APP }}
+
+      - name: Migrations
+        run: >
+          docker run
+          -e ENV=ci
+          -e DJANGO_CONFIGURATION='CI'
+          --rm ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
+          python manage.py makemigrations --check --dry-run
 
       - id: test
         name: Test

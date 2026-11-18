@@ -9,6 +9,7 @@ db.help:
 	@echo "  db.dump                  dump the dev database to sql (data only, no schema)"
 	@echo "  db.load                  load a local sql dump"
 	@echo "  db.load.restore          load a local sql dump into restore schema"
+	@echo "  db.migrations.check      fail if any model change lacks a migration"
 	@echo "  db.migrations.empty      generate an empty database revision"
 	@echo "  db.migrations.make       generate a database revision"
 	@echo "  db.migrations.merge      merge database revisions"
@@ -85,6 +86,12 @@ db.migrate.fake:
 		python manage.py migrate_schemas --fake $(args)
 .PHONY: db.migrate.fake
 
+db.migrations.check:
+	docker compose run --rm -T \
+		$(NAMESPACE).app \
+		python manage.py makemigrations --check --dry-run
+.PHONY: db.migrations.check
+
 db.migrations.make:
 	docker compose run --rm \
 		$(NAMESPACE).app \
@@ -105,7 +112,7 @@ endif
 db.migrations.merge:
 	docker compose run --rm \
 		$(NAMESPACE).app \
-		python manage.py migrations.make --merge
+		python manage.py makemigrations --merge
 .PHONY: db.migrations.merge
 
 db.migrations.show:

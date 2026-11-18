@@ -65,6 +65,11 @@ services:
       VITE_OAUTH_CLIENT_ID: oauth.ida.development
       DEV_PORT: ${DEV_PORT:-8000}
     volumes:
+      - ./ui/package.json:/opt/ui/package.json
+      - ./ui/quasar.config.js:/opt/ui/quasar.config.js
+      - ./ui/vitest.config.js:/opt/ui/vitest.config.js
+      - ./ui/public:/opt/ui/public
+      - ./ui/test:/opt/ui/test
       - ./ui/src:/opt/ui/src
     networks:
       - app-network

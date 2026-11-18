@@ -192,7 +192,7 @@ export const idaTeiBehaviours = {
           /* eslint-disable */
           tooltip.setAttribute(
             "data-template",
-            '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+            '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
           );
           e.innerHTML = '<i class="fas fa-sticky-note"></i>';
           e.appendChild(tooltip);

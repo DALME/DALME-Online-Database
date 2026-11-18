@@ -1,6 +1,7 @@
 <!-- eslint-disable prettier/prettier -->
 <!-- eslint-disable max-len -->
 <template>
+  <!-- prettier-ignore -->
   <svg id="#ida-logo" :style="`width: ${size};`" version="1.1" viewBox="0 0 606.9 390.4" xmlns="http://www.w3.org/2000/svg">
     <g>
       <g id="Layer_1">

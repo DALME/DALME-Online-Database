@@ -10,6 +10,7 @@
     "dev": "quasar dev",
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "lint": "eslint --ext .js,.vue ./",
+    "lint:fix": "yarn lint --fix",
     "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
     "test:unit": "vitest run --coverage",
     "test:unit:ci": "vitest run",

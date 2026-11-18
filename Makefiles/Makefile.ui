@@ -3,7 +3,8 @@
 NODE_MODULES := $(UI)/node_modules
 
 ui.help:
-	@echo "  ui.lint                  invoke eslint over the ui code"
+	@echo "  ui.format                format the ui code with prettier"
+	@echo "  ui.lint                  invoke eslint over the ui code and fix what it can"
 	@echo "  ui.open                  view the ui in your browser"
 	@echo "  ui.shell                 shell into the ui container"
 	@echo "  ui.sync                  install the ui dependencies and rebuild the service"
@@ -13,10 +14,16 @@ ui.help:
 	@echo ""
 .PHONY: ui.help
 
+ui.format:
+	docker compose run -T --rm \
+		$(NAMESPACE).ui \
+		yarn format
+.PHONY: ui.format
+
 ui.lint:
 	docker compose run -T --rm \
 		$(NAMESPACE).ui \
-		yarn lint
+		yarn lint:fix
 .PHONY: ui.lint
 
 ui.open:

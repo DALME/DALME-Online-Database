@@ -1,14 +1,9 @@
-ci:
-  autofix_commit_msg: '[pre-commit.ci] Auto-fixes from pre-commit.ci hooks'
-  autofix_prs: true
-  autoupdate_branch: ''
-  autoupdate_commit_msg: '[pre-commit.ci] Pre-commit autoupdate'
-  autoupdate_schedule: weekly
-  submodules: false
+default_language_version:
+  python: python3.11
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
     - id: check-added-large-files
       args: ['--maxkb=10000']
@@ -17,36 +12,68 @@ repos:
     - id: debug-statements
     - id: detect-private-key
     - id: end-of-file-fixer
-      exclude: '^(static/.*|media/.*|tf/.*README.md$|tf/.terragrunt-cache/.*)'
+      exclude: ^tf/.*README\.md$
     - id: forbid-new-submodules
     - id: trailing-whitespace
-      exclude: '^(static/.*|media/.*)'
 
   # JavaScript
   - repo: local
     hooks:
     - id: eslint
       name: eslint
-      entry: make -s ui.lint
+      entry: make ui.lint
       language: system
       types_or: [javascript, vue]
+      files: ^ui/
       require_serial: true
-
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
+      pass_filenames: false
     - id: prettier
-      args: [--no-error-on-unmatched-pattern, --cache-location=./ui/node_modules/.cache/prettier/.prettier-cache]
+      name: prettier
+      entry: make ui.format
+      language: system
       types_or: [javascript, vue, scss, html, json]
+      files: ^ui/
+      require_serial: true
+      pass_filenames: false
 
   # Python
-  # Needs to run before anything else (for Python).
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.10
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.13.9
+    hooks:
+      - id: uv-lock
+        files: ^(uv\.lock|((app|docs)/)?pyproject\.toml)$
+
+  - repo: local
+    hooks:
+    - id: migrations
+      name: migrations
+      entry: make db.migrations.check
+      language: system
+      types: [python]
+      files: ^app/
+      require_serial: true
+      pass_filenames: false
+    - id: hook-jobs
+      name: hook-jobs
+      entry: python config/scripts/hook_jobs.py
+      language: python
+      additional_dependencies: [pyyaml]
+      files: ^(\.pre-commit-config\.yaml|\.github/hook-jobs\.yml|\.github/workflows/integrate\.yml)$
+      pass_filenames: false
+    - id: hook-targets
+      name: hook-targets
+      entry: python config/scripts/hook_targets.py
+      language: python
+      additional_dependencies: [pyyaml]
+      files: ^(\.pre-commit-config\.yaml|Makefile|Makefiles/.*)$
+      pass_filenames: false
 
   # Documentation
   - repo: local
@@ -64,25 +91,25 @@ repos:
     hooks:
     - id: tf-format
       name: terraform fmt
-      entry: make -s _deploy.format
+      entry: make _deploy.format
       language: system
       types_or: [hcl, terraform]
       require_serial: true
     - id: tf-validate
       name: terraform validate
-      entry: make -s deploy.validate
+      entry: make deploy.validate
       language: system
       types_or: [hcl, terraform]
       require_serial: true
     - id: tf-docs
       name: terraform docs
-      entry: make -s _deploy.docs
+      entry: make _deploy.docs
       language: system
       types_or: [hcl, terraform]
       require_serial: true
     - id: tfsec
       name: terraform tfsec
-      entry: make -s _deploy.tfsec
+      entry: make _deploy.tfsec
       language: system
       types_or: [hcl, terraform]
       require_serial: true

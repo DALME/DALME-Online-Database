@@ -59,16 +59,7 @@ module.exports = {
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-unused-vars": "off",
     "prefer-promise-reject-errors": "off",
-    "prettier/prettier": [
-      "error",
-      {
-        semi: true,
-        doubleQuote: true,
-        tabWidth: 2,
-        trailingComma: "all",
-        printWidth: 100,
-      },
-    ],
+    "prettier/prettier": "error",
     quotes: ["error", "double", { avoidEscape: true }],
     semi: ["error", "always"],
     "sort-imports": [

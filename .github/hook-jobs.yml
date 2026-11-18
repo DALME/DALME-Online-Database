@@ -1,0 +1,54 @@
+# Which integrate job each prek hook belongs to.
+#
+# `integrate.yml` runs the whole hook set in the app, UI and Terraform jobs, and
+# narrows each with a `SKIP` list. A `SKIP` list says what to leave out, so a
+# hook nobody remembered to exclude runs in every job. That is how the
+# Terraform hooks came to run in the app and UI jobs.
+#
+# This file states the intent instead: which job each hook is for. The
+# `hook-jobs` hook checks it against the prek config and the three `SKIP`
+# lists, so a hook cannot be added without being classified, and the lists
+# cannot drift from the classification.
+
+# Runs in the app job only. Python tooling, and anything needing the app's
+# containers or database.
+app:
+  - ruff
+  - ruff-format
+  - uv-lock
+
+# Runs in the UI job only. JavaScript tooling, run in the UI image.
+ui:
+  - eslint
+  - prettier
+
+# Runs in the Terraform job only, in the deploy image.
+terraform:
+  - tf-docs
+  - tf-format
+  - tf-validate
+  - tfsec
+
+# Runs in every job. Cheap, repository-wide checks with no toolchain behind
+# them. The `hook-*` checks belong here: they read configuration, and they exist
+# to catch a change to it, so they have to run wherever such a change arrives.
+shared:
+  - hook-jobs
+  - hook-targets
+  - check-added-large-files
+  - check-ast
+  - check-merge-conflict
+  - debug-statements
+  - detect-private-key
+  - end-of-file-fixer
+  - forbid-new-submodules
+  - trailing-whitespace
+
+# Runs on a developer's machine only, because CI runs the same check another
+# way. The docs job builds `Dockerfile.docs` to its `render` target, which is
+# the same `sphinx-build -nW` this hook runs. The app job runs `migrations` as a
+# step against the built image, since the hook goes through compose and would
+# start a database of its own.
+local:
+  - docs
+  - migrations
