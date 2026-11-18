@@ -26,13 +26,9 @@ env:
   NAMESPACE: ida
   ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
   CI_TAG: dev
-  PYTHON: 3.11
-  SKIP_APP: |
-    eslint,prettier,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
-  SKIP_TF: |
-    ruff,ruff-format,eslint,prettier,docs
-  SKIP_UI: |
-    ruff,ruff-format,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
+  SKIP_APP: eslint,prettier,docs,tf-format,tf-validate,tf-docs,tfsec
+  SKIP_TF: eslint,prettier,docs,ruff,ruff-format
+  SKIP_UI: docs,ruff,ruff-format,tf-format,tf-validate,tf-docs,tfsec
   TF_PLUGIN_CACHE: .terraform.d/plugin-cache
   TFLINT_PLUGIN_CACHE: .tflint.d/plugins
   TF_ROOT: ./tf
@@ -114,10 +110,6 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON }}
-
       - uses: docker/build-push-action@v5
         with:
           context: .
@@ -187,7 +179,9 @@ jobs:
           target: ci
           tags: ${{ env.NAMESPACE }}.app:${{ env.CI_TAG }}
 
-      - uses: pre-commit/action@v3.0.1
+      - uses: j178/prek-action@7b101f8338a08d2bd6fdb3625e4e7692428763a3 # v3.1.1
+        with:
+          prek-version: '0.5.11'
         env:
           SKIP: ${{ env.SKIP_APP }}
 
@@ -226,10 +220,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON }}
 
       - uses: docker/setup-buildx-action@v3
 
@@ -273,7 +263,9 @@ jobs:
           target: ci
           tags: ${{ env.NAMESPACE }}.ui:${{ env.CI_TAG }}
 
-      - uses: pre-commit/action@v3.0.1
+      - uses: j178/prek-action@7b101f8338a08d2bd6fdb3625e4e7692428763a3 # v3.1.1
+        with:
+          prek-version: '0.5.11'
         env:
           SKIP: ${{ env.SKIP_UI }}
 
@@ -288,10 +280,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON }}
 
       - uses: docker/setup-buildx-action@v3
 
@@ -372,10 +360,6 @@ jobs:
           key: ${{ runner.os }}-tflint-plugin-cache-${{ hashFiles('**/.tflint.hcl') }}
           restore-keys: |
             ${{ runner.os }}-tflint-plugin-cache-
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON }}
 
       - uses: docker/setup-buildx-action@v3
 
@@ -467,7 +451,9 @@ jobs:
           target: tf
           tags: ${{ env.NAMESPACE }}.deploy
 
-      - uses: pre-commit/action@v3.0.0
+      - uses: j178/prek-action@7b101f8338a08d2bd6fdb3625e4e7692428763a3 # v3.1.1
+        with:
+          prek-version: '0.5.11'
         env:
           SKIP: ${{ env.SKIP_TF }}
           IN_CI: 1
