@@ -6,7 +6,7 @@
 
 ## Related Issue Number
 
-<!-- Please use "fixes/closes/resolves #123" style references so linked issues are closed when this PR is merged. -->
+<!-- Reference tickets as bare #123, never with fixes/closes/resolves: merging closes nothing, and the board is reconciled by hand. -->
 
 ## PR Type
 
