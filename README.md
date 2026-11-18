@@ -30,11 +30,21 @@ Instructions on how to set up a development environment to run the DALME Online 
 
 This software is licensed under a modified [BSD license](https://opensource.org/licenses/BSD-3-Clause). See the LICENSE file in the top distribution directory for the full license text.
 
-## Local Development Initialization
+## Getting Started
 
-Once your system is prepared with the dependencies, you can spin up the
-containers that run the services and migrate the application to the initial,
-required condition for development.
+List all development environment commands with `make` or `make help`.
+
+### System Requirements
+
+To bootstrap the developer environment for the first time, you will need to
+have [`docker`](https://www.docker.com/products/docker-desktop) and
+[`yarn`](https://yarnpkg.com/) installed locally. `make init` installs
+[`uv`](https://github.com/astral-sh/uv) for you if it is missing.
+
+### Initialization
+
+Spin up the containers that run the services and migrate the application to the
+initial, required condition for development.
 
 ```
 $ make init

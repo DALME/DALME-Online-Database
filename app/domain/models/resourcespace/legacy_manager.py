@@ -63,6 +63,7 @@ class LegacyQuerySet:
             database=settings.DAM_DB_NAME,
             user=settings.DAM_DB_USER,
             password=settings.DAM_DB_PASSWORD,
+            ssl_disabled=True,  # See the 'dam' entry in settings.DATABASES.
         )
         self.cursor = self.db.cursor()
 
@@ -131,6 +132,7 @@ class LegacyQuerySet:
             database=settings.DAM_DB_NAME,
             user=settings.DAM_DB_USER,
             password=settings.DAM_DB_PASSWORD,
+            ssl_disabled=True,  # See the 'dam' entry in settings.DATABASES.
         )
         self.cursor = self.db.cursor()
 

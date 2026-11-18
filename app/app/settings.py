@@ -302,6 +302,10 @@ class Base(Configuration):
                 'PASSWORD': self.DAM_DB_PASSWORD,
                 'HOST': self.DAM_DB_HOST,
                 'PORT': self.DAM_DB_PORT,
+                # PyMySQL tries TLS whenever the server offers it, and the DAM's
+                # MySQL 5.7 cannot complete a handshake modern OpenSSL accepts.
+                # mysqlclient never attempted TLS here, so this keeps parity.
+                'OPTIONS': {'ssl_disabled': True},
             },
         }
 

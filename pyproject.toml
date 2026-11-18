@@ -1,0 +1,12 @@
+# The uv workspace root. Each member owns its dependencies, following the
+# SHARIAsource Hub's per-component split: app/pyproject.toml and
+# docs/pyproject.toml. One uv.lock pins them all.
+
+[tool.uv.workspace]
+members = ["app", "docs"]
+
+[tool.uv]
+required-version = ">=0.13"
+
+[dependency-groups]
+dev = ["prek==0.5.11"]

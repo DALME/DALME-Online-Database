@@ -24,7 +24,7 @@ endif
 .PHONY: infra.bootstrap
 
 infra.hooks.update:
-	$(VENV_BIN)/pre-commit autoupdate
+	$(VENV_BIN)/prek update
 .PHONY: infra.hooks.update
 
 infra.log:
@@ -70,43 +70,15 @@ _infra.build:
 .PHONY: _infra.build
 
 _infra.env:
-	@$(MAKE) _infra.pg.check || $(MAKE) _infra.pg.warn
-	@$(MAKE) _infra.pyenv.check || $(MAKE) _infra.pyenv.warn
-	@$(MAKE) _infra.pyenv.local || $(MAKE) _infra.pyenv.install
-	pyenv exec python -m venv $(VENV)
-	$(VENV_BIN)/pip install --upgrade pip
+	@[ -x "$(UV)" ] || curl -LsSf https://astral.sh/uv/install.sh | sh
+	$(UV) python install $(PY)
 .PHONY: _infra.env
 
 _infra.hooks.install:
-	$(VENV_BIN)/pre-commit install
+	$(VENV_BIN)/prek install --force
 .PHONY: _infra.hooks.install
 
 _infra.oidc.key:
 	if [ ! -f $(CONFIG)/oidc.key ]; \
 		then openssl genrsa -out $(CONFIG)/oidc.key 4096; fi;
 .PHONY: _infra.oidc.key
-
-_infra.pg.check:
-	@command -v 'postgres' >/dev/null 2>&1
-.PHONY: _infra.pg.check
-
-_infra.pg.warn:
-	$(error 'ERROR: Install postgres so psycopg can be compiled locally)
-.PHONY: _infra.pg.warn
-
-_infra.pyenv.check:
-	@command -v 'pyenv' >/dev/null 2>&1
-.PHONY: _infra.pyenv.check
-
-_infra.pyenv.local:
-	pyenv local $(PY)
-.PHONY: _infra.pyenv.local
-
-_infra.pyenv.install:
-	pyenv install $(PY)
-	@$(MAKE) _infra.pyenv.local
-.PHONY: _infra.pyenv.install
-
-_infra.pyenv.warn:
-	$(error 'ERROR: Install pyenv')
-.PHONY: _infra.pyenv.warn

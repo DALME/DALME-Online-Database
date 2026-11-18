@@ -4,18 +4,20 @@ RESOLVER := /etc/resolver/localhost
 
 app.help:
 	@echo "  app.collectstatic        bundle static files for all apps and tenants"
+	@echo "  app.lock                 re-resolve uv.lock after editing a pyproject.toml"
 	@echo "  app.manage               call django management commands"
 	@echo "  app.notebook             start Jupyter notebook instance"
 	@echo "  app.open                 view the site in your browser"
 	@echo "  app.python               shell into python on the web container"
 	@echo "  app.renditions.update    regenerate Wagtail image renditions"
 	@echo "  app.shell                shell into the web container"
-	@echo "  app.sync                 install the web requirements and rebuild the service"
+	@echo "  app.sync                 sync the local venv from uv.lock and rebuild the service"
 	@echo "  app.test                 run the web test suite in full"
 	@echo "  app.test.i               run only the web integration tests"
 	@echo "  app.test.p               run only the web property tests"
 	@echo "  app.test.u               run only the web unit tests"
 	@echo "  app.test.watch           re-run the test suite on code changes"
+	@echo "  app.upgrade              upgrade every locked dependency to its latest allowed version"
 	@echo ""
 .PHONY: app.help
 
@@ -81,8 +83,16 @@ else
 endif
 .PHONY: app.renditions.update
 
+app.lock:
+	$(UV) lock
+.PHONY: app.lock
+
 app.sync: _app.install _app.build
 .PHONY: app.sync
+
+app.upgrade:
+	$(UV) lock --upgrade
+.PHONY: app.upgrade
 
 app.test:
 	docker compose run --rm \
@@ -156,6 +166,5 @@ _app.init: _app.install _app.dns
 .PHONY: _app.init
 
 _app.install:
-	$(VENV_BIN)/python3 -m \
-		pip install -r $(ROOT)/app/requirements-dev.txt
+	$(UV) sync --frozen --all-packages
 .PHONY: _app.install

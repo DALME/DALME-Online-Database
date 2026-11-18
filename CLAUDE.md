@@ -39,8 +39,8 @@ fundamentals with the SHARIAsource Hub's, but the two may diverge in detail.
 
 Mandatory once you have produced a real diff. Run them yourself.
 
-1. **Always:** `.venv/bin/pre-commit run --all-files` (lint and format for
-   backend, frontend, docs and Terraform). Moving to prek and uv under #50.
+1. **Always:** `.venv/bin/prek run --all-files` (lint and format for backend,
+   frontend, docs and Terraform).
 2. **Scoped tests:**
 
 | Changed | Run |
@@ -71,6 +71,8 @@ Never run `git commit`. Give the user the exact message and command.
 make init                             # Bootstrap the dev environment
 make dev                              # Start all services and follow logs
 make sync                             # Rebuild after dependency changes
+make app.lock                         # Re-resolve uv.lock after editing a pyproject.toml
+make app.upgrade                      # Upgrade every locked dependency
 make test                             # app.test + ui.test
 
 make app.test [args='...']            # pytest with coverage

@@ -27,7 +27,7 @@
 - [ ] The PR title is descriptive and includes the ticket number (if there is one to include).
 - [ ] All automated checks and tests pass green during CI.
 - [ ] Added or modified tests that cover the codebase changes made in this diff.
-- [ ] Satisfied all pre-commit hooks locally, manually tested the changes and investigated potential regressions.
+- [ ] Satisfied all prek hooks locally, manually tested the changes and investigated potential regressions.
 - [ ] Documentation and code comments have been added (where applicable).
 - [ ] Any hacks or questionable design decisions have been highlighted in the code and in the PR.
 - [ ] Does the PR require any infrastructure changes before deployment? Detail them below if so.

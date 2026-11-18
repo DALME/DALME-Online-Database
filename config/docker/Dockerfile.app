@@ -2,24 +2,25 @@
 # vim: set ft=dockerfile:
 ARG BUILD
 
+FROM ghcr.io/astral-sh/uv:0.13.9 AS uv
+
+# Resolves the app's locked dependencies into /opt/venv. Every package in
+# uv.lock ships a wheel or is pure Python, so no compiler is needed.
 FROM python:3.11-slim-bookworm AS base
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    gcc \
-    git \
-    default-libmysqlclient-dev \
-    libcurl4-openssl-dev \
-    libmariadbd-dev \
-    libpq-dev \
-    libssl-dev \
-    python3-dev && \
-    apt-get clean
+COPY --from=uv /uv /uvx /bin/
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=/opt/venv
+WORKDIR /opt/build
+COPY ./pyproject.toml ./uv.lock ./
+COPY ./app/pyproject.toml ./app/
+COPY ./docs/pyproject.toml ./docs/
 
 ### Development stages
 FROM base AS dev-reqs
-WORKDIR /opt/build
-COPY ./app/requirements.txt ./app/requirements-dev.txt ./
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements-dev.txt
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --package dalme-app
 
 FROM python:3.11-slim-bookworm AS install-dev
 RUN apt-get update && \
@@ -28,7 +29,6 @@ RUN apt-get update && \
     libxmlsec1 \
     libxmlsec1-dev \
     libxmlsec1-openssl \
-    libmariadbd-dev \
     libpq-dev \
     vim \
     xmlsec1 \
@@ -36,9 +36,8 @@ RUN apt-get update && \
     python3-dev \
     graphviz && \
     apt-get clean
-COPY --from=dev-reqs /opt/build/wheels ./wheels
-RUN pip install --user --no-cache-dir --upgrade pip
-RUN pip install --no-cache ./wheels/*
+COPY --from=dev-reqs /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 ### TARGET: development
 FROM install-dev AS development
@@ -86,9 +85,8 @@ RUN openssl genrsa -out /opt/app/oidc.key 4096
 
 ### Production stages
 FROM base AS reqs
-WORKDIR /opt/build
-COPY ./app/requirements.txt ./
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --package dalme-app --no-dev
 
 FROM python:3.11-slim-bookworm AS install
 RUN apt-get update && \
@@ -97,13 +95,11 @@ RUN apt-get update && \
     libxmlsec1 \
     libxmlsec1-dev \
     libxmlsec1-openssl \
-    libmariadbd-dev \
     libpq-dev \
     xmlsec1 && \
     apt-get clean
-COPY --from=reqs /opt/build/wheels ./wheels
-RUN pip install --user --no-cache-dir --upgrade pip
-RUN pip install --no-cache ./wheels/*
+COPY --from=reqs /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 ### TARGET: production
 FROM install AS production

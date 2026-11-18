@@ -1,27 +1,27 @@
 # ; -*- mode: dockerfile;-*-
 # vim: set ft=dockerfile:
+FROM ghcr.io/astral-sh/uv:0.13.9 AS uv
+
 FROM python:3.11-slim-bookworm AS base
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc && \
-    apt-get clean
+COPY --from=uv /uv /uvx /bin/
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=/opt/venv
+WORKDIR /opt/build
+COPY ./pyproject.toml ./uv.lock ./
+COPY ./app/pyproject.toml ./app/
+COPY ./docs/pyproject.toml ./docs/
 
 FROM base AS reqs
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-WORKDIR /opt/build
-COPY ./docs/requirements.txt ./
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --package dalme-docs
 
 FROM python:3.11-slim-bookworm AS install
-COPY --from=reqs /opt/build/wheels ./wheels
-RUN pip install --user --no-cache-dir --upgrade pip
-RUN pip install --no-cache ./wheels/*
-COPY --from=node:20-bookworm-slim /usr/local/include/node /usr/local/include/node
-COPY --from=node:20-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
-COPY --from=node:20-bookworm-slim /usr/local/bin/node /usr/local/bin/node
-RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
-RUN npm install -g typedoc
-ENV PATH="${PATH}:/usr/local/lib/node_modules"
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+COPY --from=reqs /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 FROM install AS serve
 WORKDIR /opt/docs

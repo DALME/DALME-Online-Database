@@ -1,0 +1,9 @@
+.coverage
+.coverage.*
+.hypothesis/
+.pytest-queries
+.pytest_cache/
+htmlcov/
+
+# Local media and collected static files (MEDIA_ROOT and STATIC_ROOT in dev).
+www/

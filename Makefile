@@ -13,6 +13,7 @@ export ENVIRONMENT := staging
 export PY := $(shell cat "$(ROOT)/.python-version")
 export VENV := $(ROOT)/.venv
 export VENV_BIN := $(abspath ${VENV})/bin
+export UV := $(or $(shell command -v uv),$(HOME)/.local/bin/uv)
 
 -include Makefiles/Makefile.app
 -include Makefiles/Makefile.db
