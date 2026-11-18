@@ -1,0 +1,7 @@
+failure-threshold: warning
+
+ignored:
+  # Debian package versions are left unpinned. The base image's tag fixes the
+  # release, and the archive drops a superseded version, so a pinned one breaks
+  # the build the day it is replaced.
+  - DL3008

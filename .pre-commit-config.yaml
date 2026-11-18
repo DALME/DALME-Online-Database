@@ -67,13 +67,6 @@ repos:
       additional_dependencies: [pyyaml]
       files: ^(\.pre-commit-config\.yaml|\.github/hook-jobs\.yml|\.github/workflows/integrate\.yml)$
       pass_filenames: false
-    - id: hook-images
-      name: hook-images
-      entry: python config/scripts/hook_images.py
-      language: python
-      additional_dependencies: [pyyaml]
-      files: ^(\.github/actions/build-image/targets\.yml|config/docker/Dockerfile\..*)$
-      pass_filenames: false
     - id: hook-targets
       name: hook-targets
       entry: python config/scripts/hook_targets.py
@@ -81,6 +74,20 @@ repos:
       additional_dependencies: [pyyaml]
       files: ^(\.pre-commit-config\.yaml|Makefile|Makefiles/.*)$
       pass_filenames: false
+
+  # Pipeline
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint-docker
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.15.1
+    hooks:
+      - id: hadolint-docker
+        entry: ghcr.io/hadolint/hadolint:v2.15.1 hadolint
+        types: [text]
+        files: ^config/docker/Dockerfile\.
 
   # Documentation
   - repo: local

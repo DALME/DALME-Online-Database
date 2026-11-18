@@ -18,12 +18,11 @@ git rebase origin/development.v2
 
 ## Pipelines
 
-- **Integrate** (`workflows/integrate.yml`) runs on every push to every branch,
-  and on PRs from forks once they are ready for review. A red pipeline is a
-  review in itself: do not request a review on a failing build.
-- Its `metadata` job runs only the jobs whose files changed since the branch's
-  last green run, or since it left `development.v2` if it has none. A change to
-  the pipeline's own configuration counts for every job it configures.
+- **Integrate** (`workflows/integrate.yml`) runs every job on every push to
+  every branch, and on PRs from forks once they are ready for review. Nothing is
+  skipped for being untouched: the layer cache makes that cheap, and a skipped
+  job would count as a pass. `All green` is the single required check. A red
+  pipeline is a review in itself: do not request a review on a failing build.
 - **Deploy** (`workflows/deploy.yml`) is manual. A maintainer dispatches it
   against `development.v2`, and it refuses any other ref. There is no automatic
   CD.
@@ -40,12 +39,16 @@ gh workflow run deploy.yml --ref development.v2
   a list that has drifted.
 - A make target a hook calls passes `-T` to `docker compose run` and `exec`,
   because CI has no terminal (`hook-targets`).
-- Images build through `actions/build-image`, at a target listed in its
-  `targets.yml`. The `hook-images` hook checks that each target is a stage of
-  its Dockerfile.
+- Workflows pass `actionlint`, and Dockerfiles pass `hadolint` at its warning
+  threshold (`.hadolint.yaml`).
 
 ### Conventions nothing checks
 
+- Images build through `actions/build-image`: one builder and one cache scope
+  per build, at the BuildKit version the action pins. Only a push to
+  `development.v2` writes the cache; every other run only reads it.
+- Every job has a timeout, and permissions are granted per job beyond the
+  workflow's `contents: read`.
 - A step that needs a database runs the built image with `--network host`
   against the job's service containers. Compose mounts local secrets and starts
   databases of its own.

@@ -12,7 +12,7 @@ ARG TARGETARCH
 ARG VERSION=v1.1.27
 RUN curl --fail --show-error -Lo \
   ./iamlive.tar.gz \
-  https://github.com/iann0036/iamlive/releases/download/$VERSION/iamlive-$VERSION-$(uname)-$TARGETARCH.tar.gz
+  "https://github.com/iann0036/iamlive/releases/download/$VERSION/iamlive-$VERSION-$(uname)-$TARGETARCH.tar.gz"
 RUN tar -xzf iamlive.tar.gz
 RUN chmod +x iamlive.tar.gz
 RUN mv iamlive /usr/local/iamlive
@@ -22,7 +22,7 @@ ARG TARGETARCH
 ARG VERSION=v0.93.11
 RUN curl --fail --show-error -Lo \
   ./terragrunt \
-  https://github.com/gruntwork-io/terragrunt/releases/download/$VERSION/terragrunt_$(uname)_$TARGETARCH
+  "https://github.com/gruntwork-io/terragrunt/releases/download/$VERSION/terragrunt_$(uname)_$TARGETARCH"
 RUN chmod +x terragrunt
 RUN mv terragrunt /usr/local/terragrunt
 
@@ -31,7 +31,7 @@ ARG TARGETARCH
 ARG VERSION=v0.20.0
 RUN curl --fail --show-error -Lo \
   ./terraform-docs.tar.gz \
-  https://github.com/terraform-docs/terraform-docs/releases/download/$VERSION/terraform-docs-$VERSION-$(uname)-$TARGETARCH.tar.gz
+  "https://github.com/terraform-docs/terraform-docs/releases/download/$VERSION/terraform-docs-$VERSION-$(uname)-$TARGETARCH.tar.gz"
 RUN tar -xzf terraform-docs.tar.gz
 RUN chmod +x terraform-docs
 RUN mv terraform-docs /usr/local/terraform-docs
@@ -42,7 +42,7 @@ ARG TARGETARCH
 ARG VERSION=0.9.3
 RUN curl --fail --show-error -Lo \
   tfupdate.tar.gz \
-  https://github.com/minamijoyo/tfupdate/releases/download/v$VERSION/tfupdate_${VERSION}_$(uname)_$TARGETARCH.tar.gz
+  "https://github.com/minamijoyo/tfupdate/releases/download/v$VERSION/tfupdate_${VERSION}_$(uname)_$TARGETARCH.tar.gz"
 RUN tar -xzf tfupdate.tar.gz
 RUN chmod +x tfupdate
 RUN mv tfupdate /usr/local/tfupdate

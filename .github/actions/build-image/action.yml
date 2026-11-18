@@ -3,69 +3,63 @@ description: >
   Build one target of one image, with its layer cache scoped by rule rather
   than by hand.
 
-# A build writes its own `<image>.<target>` scope and reads every scope of its
-# image, so production reuses whatever CI cached and the reverse. The targets
-# each image is built at live in `targets.yml`, so the two workflows cannot
-# drift apart on them, and building a target missing from it fails.
+# A build runs on a builder of its own, and reads and writes only its own
+# `<image>.<target>` scope, so there is exactly one cache source per build.
+# With more than one, BuildKit before 0.35 found a step only in whichever
+# source answered first (moby/buildkit#6418); a shared builder's local layers
+# are a second source too. A target that is not a stage of its Dockerfile fails
+# the build by name.
 
 inputs:
   image:
-    description: A key of targets.yml; builds config/docker/Dockerfile.<image>.
+    description: The image to build, from config/docker/Dockerfile.<image>.
     required: true
   target:
     description: The Dockerfile stage to build.
     required: true
+  buildkit-version:
+    description: The BuildKit version the build's builder runs.
+    default: '0.35.0'
   tags:
+    description: Image tags, one per line.
     default: ''
   labels:
+    description: Image labels, one per line.
     default: ''
   load:
+    description: Load the result into the runner's docker images.
     default: 'false'
   push:
+    description: Push the result to the registries named in its tags.
     default: 'false'
   build-args:
+    description: Build arguments, one KEY=value per line.
     default: ''
+  cache-write:
+    description: Write this build's layers to its scope; 'false' only reads.
+    default: 'true'
 
 runs:
   using: composite
   steps:
-    - id: cache
-      shell: bash
-      env:
-        IMAGE: ${{ inputs.image }}
-        TARGET: ${{ inputs.target }}
-      run: |
-        targets=$(yq -r '.[strenv(IMAGE)] // [] | .[]' "$GITHUB_ACTION_PATH/targets.yml" | xargs)
-
-        if [[ -z "$targets" ]]; then
-          echo "::error::No targets listed for image '$IMAGE'"
-          exit 1
-        fi
-
-        if [[ " $targets " != *" $TARGET "* ]]; then
-          echo "::error::'$TARGET' is not a listed target of '$IMAGE' ($targets)"
-          exit 1
-        fi
-
-        {
-          echo 'from<<EOF'
-          for target in $targets; do
-            echo "type=gha,scope=$IMAGE.$target"
-          done
-          echo 'EOF'
-          echo "to=type=gha,scope=$IMAGE.$TARGET,mode=max"
-          echo "file=config/docker/Dockerfile.$IMAGE"
-        } >> "$GITHUB_OUTPUT"
+    - id: builder
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      with:
+        driver-opts: image=moby/buildkit:v${{ inputs.buildkit-version }}
 
     - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
+        builder: ${{ steps.builder.outputs.name }}
         context: .
-        file: ${{ steps.cache.outputs.file }}
+        file: config/docker/Dockerfile.${{ inputs.image }}
         target: ${{ inputs.target }}
         build-args: ${{ inputs.build-args }}
         load: ${{ inputs.load }}
         push: ${{ inputs.push }}
         tags: ${{ inputs.tags }}
         labels: ${{ inputs.labels }}
-        cache-from: ${{ steps.cache.outputs.from }}
-        cache-to: ${{ steps.cache.outputs.to }}
+        cache-from: type=gha,scope=${{ inputs.image }}.${{ inputs.target }}
+        cache-to: >-
+          ${{ inputs.cache-write == 'true'
+          && format('type=gha,scope={0}.{1},mode=max',
+          inputs.image, inputs.target) || '' }}

@@ -15,16 +15,14 @@ on:
       - synchronize
       - ready_for_review
 
+# A newer push cancels the run it supersedes, except on development.v2, whose
+# runs are the ones that write the layer cache.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/development.v2' }}
 
 permissions:
-  actions: read
-  checks: write
-  contents: write
-  id-token: write  # OIDC permission.
-  pull-requests: write
+  contents: read
 
 env:
   NAMESPACE: ida
@@ -35,107 +33,38 @@ env:
   SKIP_UI: docs,migrations,ruff,ruff-format,tf-docs,tf-format,tf-validate,tfsec,uv-lock
   TAG: dev
 
+# Every job runs on every push. What a change did not touch costs little,
+# because its layers are cached, and a green commit is then one on which every
+# gate passed, against that day's service images.
 jobs:
+  # The one place later jobs ask whether this run writes the layer cache. Only a
+  # push to development.v2 does: what a branch writes is visible to that branch
+  # alone, yet counts against the repository's cache cap, where it would evict
+  # development.v2's layers.
   metadata:
     name: 'Metadata'
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    if: >
+      github.event_name == 'push' ||
+      (github.event.pull_request.head.repo.full_name != github.repository &&
+      github.event.pull_request.draft == false)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
-      app: ${{ steps.changed-app.outputs.any_changed }}
-      docs: ${{ steps.changed-docs.outputs.any_changed }}
-      terraform: ${{ steps.changed-terraform.outputs.any_changed }}
-      ui: ${{ steps.changed-ui.outputs.any_changed }}
+      cache-write: ${{ steps.cache.outputs.write }}
     steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          filter: tree:0
-
-      # A branch with no green run yet compares against where it left
-      # development.v2, not against its last commit alone.
-      - id: fork-point
-        if: github.ref_name != 'development.v2'
-        run: echo "sha=$(git merge-base HEAD origin/development.v2)" >> "$GITHUB_OUTPUT"
-
-      - id: last-successful-commit
-        uses: nrwl/nx-set-shas@e602fada7ad5987b0f7b1905e7a99ea1c661514c # v5.1.0
-        with:
-          main-branch-name: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-          workflow-id: 'integrate.yml'
-          fallback-sha: ${{ steps.fork-point.outputs.sha }}
-
-      # The pipeline's own configuration counts as a change to every job it
-      # configures. Without it, a PR that edits the hooks or this workflow
-      # gates itself out of the jobs it changes and reports green having run
-      # none of them.
-      - id: changed-app
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        with:
-          base_sha: ${{ steps.last-successful-commit.outputs.base }}
-          files: |
-            app/**
-            config/docker/Dockerfile.app
-            pyproject.toml
-            uv.lock
-            .github/actions/**
-            .github/hook-jobs.yml
-            .github/workflows/integrate.yml
-            .pre-commit-config.yaml
-            Makefile
-            Makefiles/**
-            config/scripts/hook_*.py
-            docker-compose.yml
-
-      - id: changed-docs
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        with:
-          base_sha: ${{ steps.last-successful-commit.outputs.base }}
-          files: |
-            docs/**
-            config/docker/Dockerfile.docs
-            pyproject.toml
-            uv.lock
-            .github/actions/**
-            .github/workflows/integrate.yml
-
-      - id: changed-terraform
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        with:
-          base_sha: ${{ steps.last-successful-commit.outputs.base }}
-          files: |
-            tf/**
-            config/docker/Dockerfile.deploy
-            config/scripts/entrypoint.deploy.sh
-            .github/actions/**
-            .github/hook-jobs.yml
-            .github/workflows/integrate.yml
-            .pre-commit-config.yaml
-            Makefile
-            Makefiles/**
-            config/scripts/hook_*.py
-            docker-compose.yml
-
-      - id: changed-ui
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        with:
-          base_sha: ${{ steps.last-successful-commit.outputs.base }}
-          files: |
-            ui/**
-            config/docker/Dockerfile.ui
-            .github/actions/**
-            .github/hook-jobs.yml
-            .github/workflows/integrate.yml
-            .pre-commit-config.yaml
-            Makefile
-            Makefiles/**
-            config/scripts/hook_*.py
-            docker-compose.yml
+      - id: cache
+        env:
+          WRITE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development.v2' }}
+        run: echo "write=$WRITE" >> "$GITHUB_OUTPUT"
 
   integrate_app:
     name: 'Integrate App'
     needs: metadata
-    if: needs.metadata.outputs.app == 'true' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write  # The coverage comment.
 
     services:
       postgres:
@@ -201,14 +130,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-
       - uses: ./.github/actions/build-image
         with:
           image: app
           target: ci
           load: true
           tags: ${{ env.NAMESPACE }}.app:${{ env.TAG }}
+          cache-write: ${{ needs.metadata.outputs.cache-write }}
 
       - uses: j178/prek-action@7b101f8338a08d2bd6fdb3625e4e7692428763a3 # v3.1.1
         with:
@@ -245,6 +173,7 @@ jobs:
           | tee /tmp/pytest-coverage.txt
 
       - uses: MishaKav/pytest-coverage-comment@4cfb48edc8f875ac019afdcfd97c48d78ad2b723 # v1.13.1
+        if: always()
         with:
           coverage-path-prefix: app/
           junitxml-path: /tmp/pytest.xml
@@ -253,23 +182,22 @@ jobs:
   integrate_docs:
     name: 'Integrate Docs'
     needs: metadata
-    if: needs.metadata.outputs.docs == 'true' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - uses: ./.github/actions/build-image
         with:
           image: docs
           target: render
+          cache-write: ${{ needs.metadata.outputs.cache-write }}
 
   integrate_terraform:
     name: 'Integrate Terraform'
     needs: metadata
-    if: needs.metadata.outputs.terraform == 'true' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       TF_PLUGIN_CACHE: .terraform.d/plugin-cache
       TFLINT_PLUGIN_CACHE: .tflint.d/plugins
@@ -292,14 +220,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-tflint-plugin-cache-
 
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-
       - uses: ./.github/actions/build-image
         with:
           image: deploy
           target: tf
           load: true
           tags: ${{ env.NAMESPACE }}.deploy:${{ env.TAG }}
+          cache-write: ${{ needs.metadata.outputs.cache-write }}
 
       - uses: j178/prek-action@7b101f8338a08d2bd6fdb3625e4e7692428763a3 # v3.1.1
         with:
@@ -310,17 +237,16 @@ jobs:
 
       # The container writes into the checkout as root, and the runner cannot
       # clean up after the job unless it owns those files again.
-      - run: sudo chown -R "$USER:$USER" tf/environments
+      - if: always()
+        run: sudo chown -R "$USER:$USER" tf/environments
 
   integrate_ui:
     name: 'Integrate UI'
     needs: metadata
-    if: needs.metadata.outputs.ui == 'true' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
-
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - uses: ./.github/actions/build-image
         with:
@@ -328,6 +254,7 @@ jobs:
           target: ci
           load: true
           tags: ${{ env.NAMESPACE }}.ui:${{ env.TAG }}
+          cache-write: ${{ needs.metadata.outputs.cache-write }}
 
       - uses: j178/prek-action@7b101f8338a08d2bd6fdb3625e4e7692428763a3 # v3.1.1
         with:
@@ -339,3 +266,21 @@ jobs:
         run: >
           docker run --rm ${{ env.NAMESPACE }}.ui:${{ env.TAG }}
           yarn test:unit:ci
+
+  # The single required check: green only if every job passed on this commit.
+  # It is skipped with the rest when a PR's run is left to its branch's push.
+  all_green:
+    name: 'All green'
+    if: always() && needs.metadata.result != 'skipped'
+    needs:
+      - metadata
+      - integrate_app
+      - integrate_docs
+      - integrate_terraform
+      - integrate_ui
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
+        with:
+          jobs: ${{ toJSON(needs) }}
