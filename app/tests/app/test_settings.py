@@ -124,6 +124,21 @@ def test_test_storages():
     assert storages['avatars']['BACKEND'] == 'django.core.files.storage.memory.InMemoryStorage'
 
 
+def test_url_protocol_and_port_follow_the_environment():
+    with mock.patch.dict(os.environ, {'DEV_PORT': '8000'}):
+        dev = settings_mod.Development()
+        assert dev.URL_PROTOCOL == 'http://'
+        assert dev.URL_PORT == ':8000'
+
+    with mock.patch.dict(os.environ, {'DEV_PORT': '8001'}):
+        assert dev.URL_PORT == ':8001'
+
+    with mock.patch.object(settings_mod.Production, 'ENV', 'production'):
+        prod = settings_mod.Production()
+        assert prod.URL_PROTOCOL == 'https://'
+        assert prod.URL_PORT == ''
+
+
 def test_production_properties():
     with mock.patch.dict(
         os.environ,

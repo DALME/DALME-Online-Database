@@ -8,9 +8,10 @@ import { fileURLToPath } from "node:url";
 
 import { configure } from "quasar/wrappers";
 
+const devPort = process.env.DEV_PORT ?? 8000;
+
 const getDevCSP = () => {
-  const defaultSrc =
-    "default-src 'self' data: ws://0.0.0.0:8000 https://dam.dalme.org https://ka-f.fontawesome.com/";
+  const defaultSrc = `default-src 'self' data: ws://0.0.0.0:${devPort} https://dam.dalme.org https://ka-f.fontawesome.com/`;
   const imgSrc =
     "img-src 'self' https://dam.dalme.org https://tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com";
   const scriptSrc =
@@ -111,7 +112,7 @@ export default configure((ctx) => {
         protocol: "ws",
         host: "0.0.0.0",
         port: 3000,
-        clientPort: 8000,
+        clientPort: devPort,
         path: "hmr",
       },
     },

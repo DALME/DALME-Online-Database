@@ -55,7 +55,7 @@ app.notebook:
 .PHONY: app.notebook
 
 app.open:
-	open http://dalme.localhost:8000/
+	open http://dalme.localhost:$(DEV_PORT)/
 .PHONY: app.open
 
 app.python:

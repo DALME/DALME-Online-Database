@@ -41,7 +41,7 @@ class Command(BaseCommand):
         for tenant in settings.TENANTS():
             domains.append(tenant.value.domain)
 
-        domains = [f'http://{domain}:8000' if settings.IS_DEV else f'https://{domain}' for domain in domains]
+        domains = [f'{settings.URL_PROTOCOL}{domain}{settings.URL_PORT}' for domain in domains]
 
         redirect_uris = [f'{domain}/{self.CALLBACK_URL}' for domain in domains]
         post_logout_redirect_uris = [f'{domain}/' for domain in domains]

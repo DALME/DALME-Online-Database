@@ -1,7 +1,6 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 NODE_MODULES := $(UI)/node_modules
-PROXY_PORT := 8000
 
 ui.help:
 	@echo "  ui.lint                  invoke eslint over the ui code"
@@ -21,7 +20,7 @@ ui.lint:
 .PHONY: ui.lint
 
 ui.open:
-	open http://localhost:$(PROXY_PORT)/db
+	open http://localhost:$(DEV_PORT)/db
 .PHONY: ui.open
 
 ui.shell:

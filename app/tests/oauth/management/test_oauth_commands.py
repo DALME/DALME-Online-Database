@@ -7,6 +7,7 @@ from unittest import mock
 import pytest
 from oauth2_provider.models import Application
 
+from django.conf import settings
 from django.core.management import call_command
 from django.test import override_settings
 
@@ -41,9 +42,12 @@ def test_ensure_oauth_create_application_some_failure(mock_application, mock_cal
             algorithm='RS256',
             name='IDA',
             redirect_uris=' '.join(
-                f'http://{tenant}.localhost:8000/api/oauth/authorize/callback/' for tenant in EXPECTED_TENANTS
+                f'http://{tenant}.localhost{settings.URL_PORT}/api/oauth/authorize/callback/'
+                for tenant in EXPECTED_TENANTS
             ),
-            post_logout_redirect_uris=' '.join(f'http://{tenant}.localhost:8000/' for tenant in EXPECTED_TENANTS),
+            post_logout_redirect_uris=' '.join(
+                f'http://{tenant}.localhost{settings.URL_PORT}/' for tenant in EXPECTED_TENANTS
+            ),
             skip_authorization=True,
         )
     ]
@@ -79,14 +83,17 @@ def test_ensure_oauth_create(mock_application, mock_call_command, mock_io, log):
             algorithm='RS256',
             name='IDA',
             redirect_uris=' '.join(
-                f'http://{tenant}.localhost:8000/api/oauth/authorize/callback/' for tenant in EXPECTED_TENANTS
+                f'http://{tenant}.localhost{settings.URL_PORT}/api/oauth/authorize/callback/'
+                for tenant in EXPECTED_TENANTS
             ),
-            post_logout_redirect_uris=' '.join(f'http://{tenant}.localhost:8000/' for tenant in EXPECTED_TENANTS),
+            post_logout_redirect_uris=' '.join(
+                f'http://{tenant}.localhost{settings.URL_PORT}/' for tenant in EXPECTED_TENANTS
+            ),
             skip_authorization=True,
         )
     ]
     assert mock_oauth_application.allowed_origins == ' '.join(
-        f'http://{tenant}.localhost:8000' for tenant in EXPECTED_TENANTS
+        f'http://{tenant}.localhost{settings.URL_PORT}' for tenant in EXPECTED_TENANTS
     )
     assert mock_oauth_application.mock_calls == [
         mock.call.save(),

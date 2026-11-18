@@ -26,6 +26,7 @@ services:
       OAUTH_CLIENT_ID: oauth.ida.development
       OAUTH_CLIENT_SECRET: django-insecure-development-environment-oauth-client-secret
       OIDC_RSA_PRIVATE_KEY: /opt/app/oidc.key
+      DEV_PORT: ${DEV_PORT:-8000}
       POSTGRES_DB: ida
       POSTGRES_HOST: ida.db
       POSTGRES_PASSWORD: ida
@@ -62,6 +63,7 @@ services:
       NODE_ENV: development
       VITE_INSPECT_ACTORS: "true"
       VITE_OAUTH_CLIENT_ID: oauth.ida.development
+      DEV_PORT: ${DEV_PORT:-8000}
     volumes:
       - ./ui/src:/opt/ui/src
     networks:
@@ -100,7 +102,7 @@ services:
     networks:
       - app-network
     ports:
-      - "8000:80"
+      - "${DEV_PORT:-8000}:80"
       - "8888:8888"
 
   ida.es:

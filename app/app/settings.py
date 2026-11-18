@@ -510,8 +510,18 @@ class Base(Configuration):
         return '/api'
 
     DAM_URL = 'https://dam.dalme.org'
-    URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
-    URL_PORT = ':8000' if IS_DEV else ''
+
+    @property
+    def DEV_PORT(self):
+        return os.environ.get('DEV_PORT', '8000')
+
+    @property
+    def URL_PROTOCOL(self):
+        return 'http://' if self.IS_DEV else 'https://'
+
+    @property
+    def URL_PORT(self):
+        return f':{self.DEV_PORT}' if self.IS_DEV else ''
 
     PLAUSIBLE_API_URL = 'https://plausible.io/api/v2/query'
     # A list of metrics to retrieve and store locally.
@@ -570,7 +580,10 @@ class Development(Base):
 
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
-    BASE_URL = 'http://ida.localhost:8000'
+
+    @property
+    def BASE_URL(self):
+        return f'http://ida.localhost{self.URL_PORT}'
 
     _TENANTS = {
         'IDA': {
@@ -598,19 +611,14 @@ class Development(Base):
 
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ALLOWED_ORIGINS = [
-        'http://ida.localhost:8000',
-        'http://dalme.localhost:8000',
-        'http://pharmacopeias.localhost:8000',
-        'http://localhost:8888',
-    ]
 
-    CSRF_TRUSTED_ORIGINS = [
-        'http://ida.localhost:8000',
-        'http://dalme.localhost:8000',
-        'http://pharmacopeias.localhost:8000',
-        'http://localhost:8888',
-    ]
+    @property
+    def CORS_ALLOWED_ORIGINS(self):
+        return [*(f'http://{host}{self.URL_PORT}' for host in self.ALLOWED_HOSTS), 'http://localhost:8888']
+
+    @property
+    def CSRF_TRUSTED_ORIGINS(self):
+        return self.CORS_ALLOWED_ORIGINS
 
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
