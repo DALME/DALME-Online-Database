@@ -18,12 +18,12 @@ git rebase origin/development.v2
 
 ## Pipelines
 
-- **Integrate** (`workflows/integrate.yml`) runs on pushes to `development.v2`
-  and on PRs into it that are ready for review. A draft PR runs nothing. A red
-  pipeline is a review in itself: do not request a review on a failing build.
-- Its `metadata` job runs only the jobs whose files changed since the last green
-  run. A change to the pipeline's own configuration counts for every job it
-  configures.
+- **Integrate** (`workflows/integrate.yml`) runs on every push to every branch,
+  and on PRs from forks once they are ready for review. A red pipeline is a
+  review in itself: do not request a review on a failing build.
+- Its `metadata` job runs only the jobs whose files changed since the branch's
+  last green run, or since it left `development.v2` if it has none. A change to
+  the pipeline's own configuration counts for every job it configures.
 - **Deploy** (`workflows/deploy.yml`) is manual. A maintainer dispatches it
   against `development.v2`, and it refuses any other ref. There is no automatic
   CD.

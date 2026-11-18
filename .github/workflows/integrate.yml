@@ -1,8 +1,11 @@
 name: Integrate
+# Every branch pushed here runs on its push. A PR only runs its own when it
+# comes from a fork, whose pushes never reach this repository; one from a branch
+# here would run twice.
 on:
   push:
     branches:
-      - development.v2
+      - '**'
   pull_request:
     branches:
       - development.v2
@@ -35,6 +38,7 @@ env:
 jobs:
   metadata:
     name: 'Metadata'
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     outputs:
       app: ${{ steps.changed-app.outputs.any_changed }}
@@ -47,11 +51,18 @@ jobs:
           fetch-depth: 0
           filter: tree:0
 
+      # A branch with no green run yet compares against where it left
+      # development.v2, not against its last commit alone.
+      - id: fork-point
+        if: github.ref_name != 'development.v2'
+        run: echo "sha=$(git merge-base HEAD origin/development.v2)" >> "$GITHUB_OUTPUT"
+
       - id: last-successful-commit
         uses: nrwl/nx-set-shas@e602fada7ad5987b0f7b1905e7a99ea1c661514c # v5.1.0
         with:
           main-branch-name: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
           workflow-id: 'integrate.yml'
+          fallback-sha: ${{ steps.fork-point.outputs.sha }}
 
       # The pipeline's own configuration counts as a change to every job it
       # configures. Without it, a PR that edits the hooks or this workflow
