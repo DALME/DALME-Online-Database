@@ -128,6 +128,36 @@ def test_ensure_oauth_refresh(mock_application, mock_call_command, log):
     ]
 
 
+@pytest.mark.django_db
+def test_createsuperuser_refuses():
+    with pytest.raises(CommandError, match='create_superuser'):
+        call_command('createsuperuser', interactive=False, username='dev', email='dev@example.com')
+
+    assert not User.objects.filter(username='dev').exists()
+
+
+@pytest.mark.django_db
+@override_settings(ENV='production')
+def test_create_superuser_refuses_outside_development():
+    with pytest.raises(CommandError, match='development'):
+        call_command('create_superuser', interactive=False, username='dev', email='dev@example.com')
+
+    assert not User.objects.filter(username='dev').exists()
+
+
+@pytest.mark.django_db
+@override_settings(ENV='development')
+@mock.patch.dict(os.environ, {'DJANGO_SUPERUSER_PASSWORD': 'password123'})
+def test_create_superuser():
+    call_command('create_superuser', interactive=False, username='dev', email='dev@example.com')
+
+    user = User.objects.get(username='dev')
+    assert user.is_superuser
+    assert user.first_name == 'Development'
+    assert user.last_name == 'Superuser'
+    assert user.full_name == 'Development Superuser'
+
+
 @mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'test@example.com'})
 @override_settings(ENV='production')
 def test_ensure_superuser_no_creds(log):

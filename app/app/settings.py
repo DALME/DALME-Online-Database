@@ -106,7 +106,6 @@ class Base(Configuration):
         'wagtail.users',
         # IDA apps.
         'tenants',
-        'oauth',
         'app',
         'domain',
         'search',
@@ -149,6 +148,9 @@ class Base(Configuration):
         'public': {
             'APPS': [
                 'django.contrib.contenttypes',
+                # Ahead of `django.contrib.auth`, so its `createsuperuser`
+                # shadows the builtin.
+                'oauth',
                 'django.contrib.auth',
                 'django.contrib.admin',
                 'django.contrib.sessions',
