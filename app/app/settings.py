@@ -191,6 +191,11 @@ class Base(Configuration):
         'wagtail.contrib.redirects.middleware.RedirectMiddleware',
     ]
 
+    # nginx is the single arbiter of URL slash conventions
+    # (`config/nginx/*/nginx.conf`), so a Django 404 is a real 404, not a
+    # redirect that turns a POST into a GET.
+    APPEND_SLASH = False
+
     @property
     def TEMPLATES(self):
         return [
