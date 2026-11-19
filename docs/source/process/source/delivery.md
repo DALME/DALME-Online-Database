@@ -50,5 +50,6 @@ ticket, linked from the METAs it constrains.
   `development.v2`.
 - Commit messages are a single line: a capitalised imperative verb, short, no
   trailing period, no ticket number. The pull request carries the context.
-- A pull request names the ticket it closes, and a red pipeline is a review in
-  itself.
+- A pull request references its tickets as bare `#N`. Merging closes nothing;
+  the tickets are reconciled by hand.
+- A red pipeline is a review in itself.

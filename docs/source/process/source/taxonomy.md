@@ -103,6 +103,22 @@ deliberate as what it includes.
 - **Bodies** open with the ticket's code, `` `ida/#N` ``.
 - **Branches** take the same name, `ida/#N`.
 
+## Writing tickets
+
+- **UI is always its own EPIC,** never folded into a backend epic, and each UI
+  stack gets its own.
+- **Propose, do not infer.** Never read intent from where a ticket sits on a
+  board, and never move or rewrite someone else's ticket without agreeing it
+  with them.
+- **A QA report that is really a requirement** is captured as a STORY. The
+  report is closed as absorbed into it, crediting the reporter.
+- **Prior work is best effort.** Its gaps are runway, not oversight, and tickets
+  say so.
+- **Prose is terse and declarative.** Issue bodies are not hard-wrapped: GitHub
+  breaks lines on newlines, so each paragraph or list item is one line.
+- **Draft before posting.** Every ticket, comment and pull request is drafted in
+  full and agreed before it is posted.
+
 ## Labels
 
 Labels are facets, independent of where a ticket sits in the tree: who owns it,
