@@ -100,7 +100,7 @@ def test_ensure_oauth_create(mock_application, mock_call_command, mock_io, log):
     ]
     assert log.events == [
         {
-            'event': 'Created oauth application with client_id: %s',
+            'event': 'Created oauth application',
             'client_id': 'oauth.ida.development',
             'level': 'info',
         },
@@ -121,7 +121,7 @@ def test_ensure_oauth_refresh(mock_application, mock_call_command, log):
     assert not mock_call_command.mock_calls
     assert log.events == [
         {
-            'event': 'Refreshed existing oauth application with client_id: %s',
+            'event': 'Refreshed existing oauth application',
             'client_id': 'oauth.ida.development',
             'level': 'info',
         }
@@ -175,29 +175,29 @@ def test_ensure_superuser_no_creds(log):
     ]
 
 
+@pytest.mark.django_db
 @mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
-@mock.patch('oauth.management.commands.ensure_superuser.User')
-@mock.patch('oauth.management.commands.ensure_superuser.logger')
-def test_ensure_superuser_create(mock_logger, mock_user):
-    mock_user.DoesNotExist = User.DoesNotExist
-    mock_user.objects.get.side_effect = User.DoesNotExist('Some error')
+@override_settings(ENV='development')
+def test_ensure_superuser_refuses_outside_deployment():
+    with pytest.raises(CommandError, match='create_superuser'):
+        EnsureSuperuser().handle()
 
+    assert not User.objects.filter(username='foo').exists()
+
+
+@pytest.mark.django_db
+@mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
+@override_settings(ENV='production')
+def test_ensure_superuser_create():
     EnsureSuperuser().handle()
 
-    assert mock_user.mock_calls == [
-        mock.call.objects.get(username='foo'),
-        mock.call.objects.create(
-            username='foo',
-            password='bar',
-            is_superuser=True,
-        ),
-    ]
-    assert mock_logger.mock_calls == [
-        mock.call.info('Created superuser', user='foo'),
-    ]
+    user = User.objects.get(username='foo')
+    assert user.is_superuser
+    assert user.check_password('bar')
 
 
 @mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
+@override_settings(ENV='production')
 @mock.patch('oauth.management.commands.ensure_superuser.User')
 @mock.patch('oauth.management.commands.ensure_superuser.logger')
 def test_ensure_superuser_refresh(mock_logger, mock_user):

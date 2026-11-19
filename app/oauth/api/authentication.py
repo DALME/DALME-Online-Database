@@ -69,7 +69,7 @@ class OAuthToken(TokenView):
         """
         data = request.POST.copy()
         data['client_secret'] = settings.OAUTH_CLIENT_SECRET
-        if data['grant_type'] == 'refresh_token':
+        if data.get('grant_type') == 'refresh_token':
             refresh_token = request.COOKIES.get('refresh_token')
             data['refresh_token'] = refresh_token
         request.POST = data

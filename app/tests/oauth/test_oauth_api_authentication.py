@@ -1,5 +1,6 @@
 """Test the oauth authentication API."""
 
+import json
 from unittest import mock
 
 import pytest
@@ -10,7 +11,15 @@ from rest_framework.exceptions import ErrorDetail
 from django.contrib.sessions.backends.db import SessionStore
 from django.urls import reverse
 
-from oauth.api.authentication import AuthorizationCode, Login
+from oauth.api.authentication import AuthorizationCode, Login, OAuthToken
+
+
+@pytest.mark.django_db
+def test_oauth_token_missing_grant_type(rf):
+    response = OAuthToken.as_view()(rf.post('/api/oauth/token/', {}))
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert 'error' in json.loads(response.content)
 
 
 @pytest.mark.urls('app.urls.urls_tenant')

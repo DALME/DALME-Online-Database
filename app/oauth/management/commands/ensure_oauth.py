@@ -74,7 +74,7 @@ class Command(BaseCommand):
                     application.allowed_origins = ' '.join(domains)
                     application.save()
 
-                    logger.info('Created oauth application with client_id: %s', client_id=client_id)
+                    logger.info('Created oauth application', client_id=client_id)
                 else:
                     logger.error(output)  # noqa: TRY400
                     msg = 'Failed to create oauth application'
@@ -88,4 +88,4 @@ class Command(BaseCommand):
             application.post_logout_redirect_uris = ' '.join(post_logout_redirect_uris)
 
             application.save()
-            logger.info('Refreshed existing oauth application with client_id: %s', client_id=client_id)
+            logger.info('Refreshed existing oauth application', client_id=client_id)

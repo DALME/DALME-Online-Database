@@ -4,10 +4,13 @@ import os
 
 import structlog
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 logger = structlog.get_logger(__name__)
+
+DEPLOY_ENVS = {'staging', 'production'}
 
 
 User = get_user_model()
@@ -22,12 +25,17 @@ class Command(BaseCommand):
         """Create a superuser using credentials from the environment.
 
         This command only runs automated as part of an ecs task definition.
+        Developers make a superuser with `create_superuser` instead.
 
         We also take care to ensure that the superuser record stays up-to-date
         with its corresponding secret that might at some point get rotated by
         terraform apply.
 
         """
+        if settings.ENV not in DEPLOY_ENVS:
+            msg = 'ensure_superuser runs only in deployments: use create_superuser in development'
+            raise CommandError(msg)
+
         try:
             username = os.environ['ADMIN_USERNAME']
             password = os.environ['ADMIN_PASSWORD']
@@ -39,7 +47,7 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            User.objects.create(
+            User.objects.create_user(
                 username=username,
                 password=password,
                 is_superuser=True,
