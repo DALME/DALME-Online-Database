@@ -516,6 +516,10 @@ class Base(Configuration):
         return os.environ.get('DEV_PORT', '8000')
 
     @property
+    def NOTEBOOK_PORT(self):
+        return os.environ.get('NOTEBOOK_PORT', '8888')
+
+    @property
     def URL_PROTOCOL(self):
         return 'http://' if self.IS_DEV else 'https://'
 
@@ -614,7 +618,10 @@ class Development(Base):
 
     @property
     def CORS_ALLOWED_ORIGINS(self):
-        return [*(f'http://{host}{self.URL_PORT}' for host in self.ALLOWED_HOSTS), 'http://localhost:8888']
+        return [
+            *(f'http://{host}{self.URL_PORT}' for host in self.ALLOWED_HOSTS),
+            f'http://localhost:{self.NOTEBOOK_PORT}',
+        ]
 
     @property
     def CSRF_TRUSTED_ORIGINS(self):

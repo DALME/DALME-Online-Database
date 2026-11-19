@@ -141,6 +141,14 @@ def test_url_protocol_and_port_follow_the_environment():
         assert prod.URL_PORT == ''
 
 
+def test_development_cors_allowed_origins_follow_the_notebook_port():
+    with mock.patch.dict(os.environ, {'NOTEBOOK_PORT': '8889'}):
+        origins = settings_mod.Development().CORS_ALLOWED_ORIGINS
+
+    assert 'http://localhost:8889' in origins
+    assert 'http://localhost:8888' not in origins
+
+
 def test_production_properties():
     with mock.patch.dict(
         os.environ,

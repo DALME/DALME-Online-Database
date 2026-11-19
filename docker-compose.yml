@@ -12,6 +12,7 @@ services:
       OAUTH_CLIENT_ID: oauth.ida.development
       OAUTH_CLIENT_SECRET: django-insecure-development-environment-oauth-client-secret
       DEV_PORT: ${DEV_PORT:-8000}
+      NOTEBOOK_PORT: ${NOTEBOOK_PORT:-8888}
       POSTGRES_DB: ida
       POSTGRES_HOST: ida.db
       POSTGRES_PASSWORD: ida
@@ -92,7 +93,7 @@ services:
       - app-network
     ports:
       - "${DEV_PORT:-8000}:80"
-      - "8888:8888"
+      - "${NOTEBOOK_PORT:-8888}:8888"
 
   ida.es:
     image: elasticsearch:7.8.0
@@ -111,7 +112,7 @@ services:
     networks:
       - app-network
     ports:
-      - "9200:9200"
+      - "${ES_PORT:-9200}:9200"
 
   ida.deploy:
     image: ida.deploy:dev
@@ -140,7 +141,7 @@ services:
       - app-network
     restart: unless-stopped
     ports:
-      - "8002:8002"
+      - "${DOCS_PORT:-8002}:8002"
 
   ida.pgadmin:
     container_name: ida.pgadmin
@@ -154,7 +155,7 @@ services:
     networks:
       - app-network
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT:-5050}:80"
 
   rs.db:
     image: mysql:5.7.27

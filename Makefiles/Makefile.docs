@@ -25,7 +25,7 @@ docs.sync: _docs.build
 .PHONY: docs.sync
 
 docs.write:
-	open http://localhost:8002
+	open http://localhost:$(DOCS_PORT)
 .PHONY: docs.write
 
 ### Private (non-interface) targets.

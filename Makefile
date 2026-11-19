@@ -14,7 +14,14 @@ export PY := $(shell cat "$(ROOT)/.python-version")
 export VENV := $(ROOT)/.venv
 export VENV_BIN := $(abspath ${VENV})/bin
 export UV := $(or $(shell command -v uv),$(HOME)/.local/bin/uv)
+
+# Host ports, overridable per run (`make dev DEV_PORT=8001`). Compose repeats
+# these defaults so that it also runs on its own.
 export DEV_PORT ?= 8000
+export DOCS_PORT ?= 8002
+export ES_PORT ?= 9200
+export NOTEBOOK_PORT ?= 8888
+export PGADMIN_PORT ?= 5050
 
 -include Makefiles/Makefile.app
 -include Makefiles/Makefile.db

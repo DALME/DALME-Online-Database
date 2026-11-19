@@ -92,7 +92,10 @@ make docs.render                      # Static Sphinx build
 make deploy.plan module='...'         # Terragrunt, staging only
 ```
 
-Local tenants are served on port 8000 (override with `DEV_PORT`):
+Host ports are defined once in the `Makefile` and overridden per run, as in
+`make dev DEV_PORT=8001`: `DEV_PORT` (8000), `DOCS_PORT` (8002), `ES_PORT`
+(9200), `NOTEBOOK_PORT` (8888) and `PGADMIN_PORT` (5050). Local tenants are
+served on `DEV_PORT`:
 `ida.localhost`, `dalme.localhost` and `pharmacopeias.localhost`. After `make init` and `make db.migrate`, run
 `make app.manage args="ensure_tenants"` and `make app.manage args="ensure_oauth"`.
 
