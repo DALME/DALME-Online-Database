@@ -77,8 +77,3 @@ _infra.env:
 _infra.hooks.install:
 	$(VENV_BIN)/prek install --force
 .PHONY: _infra.hooks.install
-
-_infra.oidc.key:
-	if [ ! -f $(CONFIG)/oidc.key ]; \
-		then openssl genrsa -out $(CONFIG)/oidc.key 4096; fi;
-.PHONY: _infra.oidc.key

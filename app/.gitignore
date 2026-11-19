@@ -1,3 +1,4 @@
+!.config/oidc.key
 .coverage
 .coverage.*
 .hypothesis/

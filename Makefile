@@ -44,7 +44,7 @@ help:
 dev: infra.start infra.log
 .PHONY: dev
 
-init: _infra.oidc.key _infra.env _app.init _ui.init _infra.hooks.install _infra.build
+init: _infra.env _app.init _ui.init _infra.hooks.install _infra.build
 .PHONY: init
 
 sync: app.sync ui.sync docs.sync infra.hooks.update

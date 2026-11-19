@@ -657,8 +657,12 @@ class Development(Base):
 
     @property
     def OAUTH2_PROVIDER(self):
-        """Configure OAuth and OIDC."""
-        with open(os.environ['OIDC_RSA_PRIVATE_KEY']) as f:
+        """Configure OAuth and OIDC.
+
+        Development and CI sign with the committed key in `app/.config`.
+
+        """
+        with (self.PROJECT_ROOT / '.config' / 'oidc.key').open() as f:
             return {
                 'ACCESS_TOKEN_EXPIRE_SECONDS': int(self.OAUTH2_ACCESS_TOKEN_EXPIRY),
                 'ALLOWED_REDIRECT_URI_SCHEMES': ['http'],

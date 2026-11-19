@@ -11,6 +11,7 @@ repos:
     - id: check-merge-conflict
     - id: debug-statements
     - id: detect-private-key
+      exclude: ^app/\.config/oidc\.key$
     - id: end-of-file-fixer
       exclude: ^tf/.*README\.md$
     - id: forbid-new-submodules

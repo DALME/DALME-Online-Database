@@ -4,6 +4,8 @@ import json
 import os
 from unittest import mock
 
+from jwcrypto import jwk
+
 import app.settings as settings_mod
 
 
@@ -180,6 +182,16 @@ def test_production_elasticsearch_dsl():
         assert es['default']['http_auth'] == ('esuser', 'espass')
         assert es['default']['use_ssl'] is True
         assert es['default']['verify_certs'] is True
+
+
+def test_development_oauth2_provider():
+    with mock.patch.dict(os.environ):
+        os.environ.pop('OIDC_RSA_PRIVATE_KEY', None)
+        dev = settings_mod.Development()
+        key = jwk.JWK.from_pem(dev.OAUTH2_PROVIDER['OIDC_RSA_PRIVATE_KEY'].encode())
+
+    assert key['kty'] == 'RSA'
+    assert key.has_private
 
 
 def test_production_oauth2_provider():

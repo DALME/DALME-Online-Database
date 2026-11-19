@@ -6,7 +6,7 @@ import structlog
 
 from django.conf import settings
 from django.core.management import call_command
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from oauth.models import Application
 
@@ -77,7 +77,8 @@ class Command(BaseCommand):
                     logger.info('Created oauth application with client_id: %s', client_id=client_id)
                 else:
                     logger.error(output)  # noqa: TRY400
-                    logger.error('Failed to create oauth application')  # noqa: TRY400
+                    msg = 'Failed to create oauth application'
+                    raise CommandError(msg) from None
         else:
             application.client_id = client_id
             application.client_secret = client_secret

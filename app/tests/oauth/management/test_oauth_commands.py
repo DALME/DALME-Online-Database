@@ -8,7 +8,7 @@ import pytest
 from oauth2_provider.models import Application
 
 from django.conf import settings
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.test import override_settings
 
 from oauth.management.commands.ensure_oauth import Command as EnsureOAuth
@@ -26,7 +26,8 @@ def test_ensure_oauth_create_application_some_failure(mock_application, mock_cal
     mock_application.objects.get.side_effect = Application.DoesNotExist('Some error')
     mock_io.return_value.__enter__.return_value.getvalue.return_value = 'Some error message'
 
-    EnsureOAuth().handle()
+    with pytest.raises(CommandError, match='Failed to create oauth application'):
+        EnsureOAuth().handle()
 
     assert mock_application.mock_calls == [
         mock.call.objects.get(client_id='oauth.ida.development'),
@@ -53,7 +54,6 @@ def test_ensure_oauth_create_application_some_failure(mock_application, mock_cal
     ]
     assert log.events == [
         {'event': 'Some error message', 'level': 'error'},
-        {'event': 'Failed to create oauth application', 'level': 'error'},
     ]
 
 

@@ -21,8 +21,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:  # noqa: ARG002
         """Create application tenant records.
 
-        Run the method inside a db transaction to ensure tenant data is created
-        or modified in its entirity or not at all.
+        Safe to re-run. It runs outside a transaction, because creating a
+        tenant migrates its schema, which misbehaves under Wagtail inside one
+        (ebb3dec4). So a run can stop between a tenant and its domain, and the
+        next run restores the missing domain.
 
         """
         tenants = settings.TENANTS()
@@ -73,7 +75,16 @@ class Command(BaseCommand):
                 # staging origins need to be altered and it's conceivable it
                 # might even need to happen in prod too, at some point.
                 existing_domain = existing_tenant.domains.first()
-                if existing_domain.domain != domain:
+                if existing_domain is None:
+                    existing_domain = Domain(domain=domain, tenant=existing_tenant)
+
+                    logger.info(
+                        'Restored missing tenant domain record.',
+                        tenant=name,
+                        domain=domain,
+                    )
+
+                elif existing_domain.domain != domain:
                     existing_domain.domain = domain
 
                     logger.info(

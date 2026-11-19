@@ -58,13 +58,10 @@ ENV LOG_LEVEL=ERROR
 ENV OAUTH_CLIENT_ID=oauth.ida.development
 # hadolint ignore=DL3064
 ENV OAUTH_CLIENT_SECRET=django-insecure-development-environment-oauth-client-secret
-# hadolint ignore=DL3064
-ENV OIDC_RSA_PRIVATE_KEY=/opt/app/oidc.key
 ENV DJANGO_CONFIGURATION='CI'
 WORKDIR /opt/app
 COPY ./app .
 RUN mkdir /opt/app/www
-RUN openssl genrsa -out /opt/app/oidc.key 4096
 
 ### Production stages
 FROM base AS reqs

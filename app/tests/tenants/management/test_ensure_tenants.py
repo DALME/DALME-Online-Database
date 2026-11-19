@@ -82,6 +82,16 @@ def test_ensure_tenants_existence(mock_logger, mock_tenant, mock_domain):
 
 
 @pytest.mark.django_db
+def test_ensure_tenants_restores_a_missing_domain():
+    tenant = Tenant.objects.get(name='DALME')
+    tenant.domains.all().delete()
+
+    EnsureTenants().handle()
+
+    assert tenant.domains.get().domain == settings.TENANTS().DALME.value.domain
+
+
+@pytest.mark.django_db
 @mock.patch('tenants.management.commands.ensure_tenants.Domain')
 @mock.patch('tenants.management.commands.ensure_tenants.Tenant')
 @mock.patch('tenants.management.commands.ensure_tenants.logger')
