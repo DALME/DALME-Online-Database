@@ -1,7 +1,7 @@
 (the-process-overview)=
 # Overview
 
-{term}`The Process` is domain-driven design in its most practical form: the
+**{term}`The Process`** is domain-driven design in its most practical form: the
 conversation, before any code, in which we decide *what* is worth building and
 *why*, in terms that a stakeholder and a developer can both hold in their heads
 at once.
@@ -40,7 +40,7 @@ Code only ever tells you *how* a system does what it does, never *why*. A
 newcomer can reconstruct the mechanism and still not know which details are
 essential and which are accidents of the day they were written. A domain model
 stated in the domain's own terms does not rot when the technology does. That is
-the deepest reason The Process is worth the trouble, and it matters most on a
+the deepest reason **The Process** is worth the trouble, and it matters most on a
 project whose maintainers come and go in bursts.
 
 The mechanics (the issue types, the templates, the shape of the tree) are set

@@ -1,7 +1,7 @@
 # CLAUDE.md: Git Flow, CI and GitHub
 
 How to work with branches, pull requests and the pipelines in this repository.
-Tickets and The Process are in the root `CLAUDE.md`.
+Tickets and **The Process** are in the root `CLAUDE.md`.
 
 ## Git Flow
 

@@ -14,7 +14,7 @@ tells us what to build and why. The code is one realization of it, and a
 replaceable one.
 
 :::{important}
-DALME's domain model is older than {term}`The Process`. At its heart is a
+DALME's domain model is older than **{term}`The Process`**. At its heart is a
 relational ontology designed by Gabriel Pizzorno and realized today in the
 `domain` Django app. We are writing that model down with the people who designed
 it, one {term}`Bounded Context` at a time, rather than reverse-engineering it
