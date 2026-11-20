@@ -4,9 +4,36 @@ import json
 import os
 from unittest import mock
 
+import pytest
 from jwcrypto import jwk
 
 import app.settings as settings_mod
+
+
+def test_no_middleware_is_registered_twice():
+    middleware = settings_mod.Base.MIDDLEWARE
+
+    assert len(middleware) == len(set(middleware))
+
+
+def console_renderer(configuration):
+    logging = configuration().LOGGING
+    formatter = logging['handlers']['console']['formatter']
+    return logging['formatters'][formatter]['processor']
+
+
+@pytest.mark.parametrize('configuration', [settings_mod.Production, settings_mod.Staging])
+def test_deploy_logs_carry_no_colour(configuration):
+    with mock.patch.object(configuration, 'ENV', configuration.__name__.lower()):
+        render = console_renderer(configuration)
+
+    assert '\x1b[' not in render(None, 'info', {'event': 'request_started'})
+
+
+def test_development_logs_carry_colour():
+    render = console_renderer(settings_mod.Development)
+
+    assert '\x1b[' in render(None, 'info', {'event': 'request_started'})
 
 
 def test_tenanttypes_enum():

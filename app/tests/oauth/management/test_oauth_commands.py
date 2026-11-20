@@ -170,9 +170,10 @@ def test_ensure_superuser_no_creds(log):
         {
             'event': 'Missing admin user credentials in environment',
             'level': 'error',
-            'exc_info': True,
+            'exception': mock.ANY,
         }
     ]
+    assert "KeyError: 'ADMIN_PASSWORD'" in log.events[0]['exception']
 
 
 @pytest.mark.django_db

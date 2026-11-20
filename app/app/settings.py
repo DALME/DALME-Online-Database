@@ -58,7 +58,6 @@ class Base(Configuration):
     TIME_ZONE = 'America/New_York'
     SQL_TIMEOUT = 30000
     USE_I18N = True
-    USE_L10N = True
     USE_TZ = True
     WSGI_APPLICATION = 'app.wsgi.application'
 
@@ -183,7 +182,6 @@ class Base(Configuration):
         'django.middleware.security.SecurityMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'app.middleware.SubdomainRedirectMiddleware',
-        'django_structlog.middlewares.RequestMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django_currentuser.middleware.ThreadLocalUserMiddleware',
@@ -213,7 +211,6 @@ class Base(Configuration):
                         'django.template.context_processors.request',
                         'django.contrib.auth.context_processors.auth',
                         'django.contrib.messages.context_processors.messages',
-                        'django.template.context_processors.request',
                         'wagtail.contrib.settings.context_processors.settings',
                     ],
                     'debug': self.DEBUG,
@@ -317,81 +314,93 @@ class Base(Configuration):
         }
 
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'colored_console': {
-                '()': structlog.stdlib.ProcessorFormatter,
-                'processor': structlog.dev.ConsoleRenderer(colors=True),
+
+    @property
+    def LOGGING(self):
+        # Colour only where a person reads a terminal; deploy logs go to
+        # CloudWatch, where escape codes are noise.
+        return {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'formatters': {
+                'console': {
+                    '()': structlog.stdlib.ProcessorFormatter,
+                    'processor': structlog.dev.ConsoleRenderer(colors=self.IS_DEV),
+                    # Django's and gunicorn's own records pass through here
+                    # too, so they get the same level, name and time.
+                    'foreign_pre_chain': [
+                        structlog.stdlib.add_log_level,
+                        structlog.stdlib.add_logger_name,
+                        structlog.processors.TimeStamper(fmt='iso'),
+                    ],
+                },
+                'json_formatter': {
+                    '()': structlog.stdlib.ProcessorFormatter,
+                    'processor': structlog.processors.JSONRenderer(),
+                },
+                'key_value': {
+                    '()': structlog.stdlib.ProcessorFormatter,
+                    'processor': structlog.processors.KeyValueRenderer(
+                        key_order=['timestamp', 'level', 'event', 'logger'],
+                    ),
+                },
             },
-            'json_formatter': {
-                '()': structlog.stdlib.ProcessorFormatter,
-                'processor': structlog.processors.JSONRenderer(),
+            'handlers': {
+                'console': {
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'console',
+                },
+                'flat_line': {
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'key_value',
+                },
+                'json': {
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'json_formatter',
+                },
+                'null': {
+                    'class': 'logging.NullHandler',
+                },
             },
-            'key_value': {
-                '()': structlog.stdlib.ProcessorFormatter,
-                'processor': structlog.processors.KeyValueRenderer(
-                    key_order=['timestamp', 'level', 'event', 'logger'],
-                ),
+            'root': {
+                'handlers': ['console'],
+                'level': self.LOG_LEVEL,
             },
-        },
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'colored_console',
+            'loggers': {
+                'django_structlog': {
+                    'level': self.LOG_LEVEL,
+                },
+                'app': {
+                    'level': self.LOG_LEVEL,
+                },
+                'domain': {
+                    'level': self.LOG_LEVEL,
+                },
+                'web': {
+                    'level': self.LOG_LEVEL,
+                },
+                'gunicorn.access': {
+                    'level': self.LOG_LEVEL,
+                },
+                'gunicorn.error': {
+                    'level': self.LOG_LEVEL,
+                },
+                'django.request': {
+                    'handlers': ['null'],
+                    'propagate': False,
+                },
+                # Prevent extreme logging noise when the app is crawled in prod.
+                'django.security.DisallowedHost': {
+                    'handlers': ['null'],
+                    'propagate': False,
+                },
+                # Nulled to prefer structlog middleware.
+                'django.server': {
+                    'handlers': ['null'],
+                    'propagate': False,
+                },
             },
-            'flat_line': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'key_value',
-            },
-            'json': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'json_formatter',
-            },
-            'null': {
-                'class': 'logging.NullHandler',
-            },
-        },
-        'root': {
-            'handlers': ['console'],
-            'level': LOG_LEVEL,
-        },
-        'loggers': {
-            'django_structlog': {
-                'level': LOG_LEVEL,
-            },
-            'app': {
-                'level': LOG_LEVEL,
-            },
-            'domain': {
-                'level': LOG_LEVEL,
-            },
-            'web': {
-                'level': LOG_LEVEL,
-            },
-            'gunicorn.access': {
-                'level': LOG_LEVEL,
-            },
-            'gunicorn.error': {
-                'level': LOG_LEVEL,
-            },
-            'django.request': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
-            # Prevent extreme logging noise when the app is crawled in prod.
-            'django.security.DisallowedHost': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
-            # Nulled to prefer structlog middleware.
-            'django.server': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
-        },
-    }
+        }
 
     AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
     PASSWORD_MINIMUM_LENGTH = 8
@@ -621,7 +630,6 @@ class Development(Base):
     ]
 
     CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOW_CREDENTIALS = True
 
     @property
     def CORS_ALLOWED_ORIGINS(self):

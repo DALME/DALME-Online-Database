@@ -70,16 +70,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'level': 'info',
         },
         {
-            'request': f'GET {url}',
-            'user_agent': None,
-            'event': 'request_started',
-            'domain': test_domain.domain,
-            'tenant': mock.ANY,
-            'ip': '127.0.0.1',
-            'request_id': mock.ANY,
-            'level': 'info',
-        },
-        {
             'code': status.HTTP_403_FORBIDDEN,
             'request': f'GET {url}',
             'event': 'request_finished',
@@ -88,13 +78,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'ip': '127.0.0.1',
             'user_id': None,
             'request_id': mock.ANY,
-            'level': 'warning',
-        },
-        {
-            'code': status.HTTP_403_FORBIDDEN,
-            'request': f'GET {url}',
-            'event': 'request_finished',
-            'user_id': None,
             'level': 'warning',
         },
     ]
@@ -130,16 +113,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'level': 'info',
         },
         {
-            'request': f'POST {url}',
-            'user_agent': None,
-            'event': 'request_started',
-            'domain': test_domain.domain,
-            'ip': '127.0.0.1',
-            'tenant': mock.ANY,
-            'request_id': mock.ANY,
-            'level': 'info',
-        },
-        {
             'user': user,
             'event': 'User successfully logged in',
             'domain': test_domain.domain,
@@ -157,13 +130,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'ip': '127.0.0.1',
             'tenant': mock.ANY,
             'request_id': mock.ANY,
-            'level': 'info',
-        },
-        {
-            'code': status.HTTP_202_ACCEPTED,
-            'request': f'POST {url}',
-            'event': 'request_finished',
-            'user_id': user.id,
             'level': 'info',
         },
     ]
@@ -190,16 +156,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'level': 'info',
         },
         {
-            'request': f'GET {url}',
-            'user_agent': None,
-            'event': 'request_started',
-            'tenant': mock.ANY,
-            'request_id': mock.ANY,
-            'ip': '127.0.0.1',
-            'domain': test_domain.domain,
-            'level': 'info',
-        },
-        {
             'code': status.HTTP_200_OK,
             'request': f'GET {url}',
             'event': 'request_finished',
@@ -208,13 +164,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'ip': '127.0.0.1',
             'domain': test_domain.domain,
-            'level': 'info',
-        },
-        {
-            'code': status.HTTP_200_OK,
-            'request': f'GET {url}',
-            'event': 'request_finished',
-            'user_id': user.id,
             'level': 'info',
         },
     ]
@@ -259,16 +208,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'level': 'info',
         },
         {
-            'request': f'GET {url}?{urlencode(pkce_payload)}',
-            'user_agent': None,
-            'event': 'request_started',
-            'ip': '127.0.0.1',
-            'tenant': mock.ANY,
-            'domain': test_domain.domain,
-            'request_id': mock.ANY,
-            'level': 'info',
-        },
-        {
             'code': status.HTTP_302_FOUND,
             'request': f'GET {url}?{urlencode(pkce_payload)}',
             'event': 'request_finished',
@@ -277,13 +216,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'user_id': user.id,
             'domain': test_domain.domain,
             'request_id': mock.ANY,
-            'level': 'info',
-        },
-        {
-            'code': status.HTTP_302_FOUND,
-            'request': f'GET {url}?{urlencode(pkce_payload)}',
-            'event': 'request_finished',
-            'user_id': user.id,
             'level': 'info',
         },
     ]
@@ -308,16 +240,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'domain': test_domain.domain,
         },
         {
-            'request': f'GET /api/oauth/authorize/callback/?code={code}',
-            'user_agent': None,
-            'event': 'request_started',
-            'ip': '127.0.0.1',
-            'level': 'info',
-            'request_id': mock.ANY,
-            'tenant': mock.ANY,
-            'domain': test_domain.domain,
-        },
-        {
             'code': status.HTTP_200_OK,
             'event': 'request_finished',
             'ip': '127.0.0.1',
@@ -326,13 +248,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'request_id': mock.ANY,
             'tenant': mock.ANY,
             'domain': test_domain.domain,
-            'user_id': user.id,
-        },
-        {
-            'code': status.HTTP_200_OK,
-            'event': 'request_finished',
-            'level': 'info',
-            'request': f'GET /api/oauth/authorize/callback/?code={code}',
             'user_id': user.id,
         },
     ]
@@ -397,16 +312,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'domain': test_domain.domain,
         },
         {
-            'event': 'request_started',
-            'ip': '127.0.0.1',
-            'level': 'info',
-            'request': f'POST {url}',
-            'request_id': mock.ANY,
-            'user_agent': None,
-            'tenant': mock.ANY,
-            'domain': test_domain.domain,
-        },
-        {
             'code': status.HTTP_200_OK,
             'event': 'request_finished',
             'ip': '127.0.0.1',
@@ -416,13 +321,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'user_id': user.id,
             'tenant': mock.ANY,
             'domain': test_domain.domain,
-        },
-        {
-            'code': status.HTTP_200_OK,
-            'event': 'request_finished',
-            'level': 'info',
-            'user_id': user.id,
-            'request': f'POST {url}',
         },
     ]
     assert log.events == expected_logs
@@ -453,16 +351,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'domain': test_domain.domain,
         },
         {
-            'event': 'request_started',
-            'ip': '127.0.0.1',
-            'level': 'info',
-            'request': f'GET {url}',
-            'request_id': mock.ANY,
-            'user_agent': None,
-            'tenant': mock.ANY,
-            'domain': test_domain.domain,
-        },
-        {
             'code': status.HTTP_200_OK,
             'event': 'request_finished',
             'ip': '127.0.0.1',
@@ -472,13 +360,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'user_id': user.id,
             'tenant': mock.ANY,
             'domain': test_domain.domain,
-        },
-        {
-            'code': status.HTTP_200_OK,
-            'event': 'request_finished',
-            'level': 'info',
-            'request': f'GET {url}',
-            'user_id': user.id,
         },
     ]
     assert log.events == expected_logs
@@ -524,16 +405,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'domain': test_domain.domain,
         },
         {
-            'event': 'request_started',
-            'ip': '127.0.0.1',
-            'level': 'info',
-            'request': f'POST {url}',
-            'request_id': mock.ANY,
-            'user_agent': None,
-            'tenant': mock.ANY,
-            'domain': test_domain.domain,
-        },
-        {
             'code': status.HTTP_200_OK,
             'event': 'request_finished',
             'ip': '127.0.0.1',
@@ -543,13 +414,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'user_id': user.id,
             'tenant': mock.ANY,
             'domain': test_domain.domain,
-        },
-        {
-            'code': status.HTTP_200_OK,
-            'event': 'request_finished',
-            'level': 'info',
-            'request': f'POST {url}',
-            'user_id': user.id,
         },
     ]
     assert log.events == expected_logs
@@ -579,16 +443,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'domain': test_domain.domain,
         },
         {
-            'event': 'request_started',
-            'ip': '127.0.0.1',
-            'level': 'info',
-            'request': f'GET {url}',
-            'request_id': mock.ANY,
-            'user_agent': None,
-            'tenant': mock.ANY,
-            'domain': test_domain.domain,
-        },
-        {
             'code': status.HTTP_200_OK,
             'event': 'request_finished',
             'ip': '127.0.0.1',
@@ -598,13 +452,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'user_id': user.id,
             'tenant': mock.ANY,
             'domain': test_domain.domain,
-        },
-        {
-            'code': status.HTTP_200_OK,
-            'event': 'request_finished',
-            'level': 'info',
-            'request': f'GET {url}',
-            'user_id': user.id,
         },
     ]
     assert log.events == expected_logs
@@ -633,16 +480,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'domain': test_domain.domain,
         },
         {
-            'event': 'request_started',
-            'ip': '127.0.0.1',
-            'level': 'info',
-            'request': f'GET {url}',
-            'request_id': mock.ANY,
-            'user_agent': None,
-            'tenant': mock.ANY,
-            'domain': test_domain.domain,
-        },
-        {
             'code': status.HTTP_401_UNAUTHORIZED,
             'event': 'request_finished',
             'ip': '127.0.0.1',
@@ -652,13 +489,6 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
             'user_id': None,
             'tenant': mock.ANY,
             'domain': test_domain.domain,
-        },
-        {
-            'code': status.HTTP_401_UNAUTHORIZED,
-            'event': 'request_finished',
-            'level': 'warning',
-            'request': f'GET {url}',
-            'user_id': None,
         },
     ]
     assert log.events == expected_logs
