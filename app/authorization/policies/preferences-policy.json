@@ -1,7 +1,15 @@
 [
     {
         "action": [
-            "list",
+            "list"
+        ],
+        "principal": [
+            "authenticated"
+        ],
+        "effect": "allow"
+    },
+    {
+        "action": [
             "update",
             "partial_update"
         ],
