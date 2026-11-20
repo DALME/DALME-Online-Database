@@ -8,7 +8,7 @@ services:
       target: "development"
     environment:
       ENV_FILE: /opt/app/env.app
-      LOG_LEVEL: ERROR
+      LOG_LEVEL: INFO
       OAUTH_CLIENT_ID: oauth.ida.development
       OAUTH_CLIENT_SECRET: django-insecure-development-environment-oauth-client-secret
       DEV_PORT: ${DEV_PORT:-8000}

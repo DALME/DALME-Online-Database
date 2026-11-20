@@ -693,6 +693,11 @@ class Development(Base):
                 'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
                 'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,
                 'OIDC_RSA_PRIVATE_KEY': f.read(),
+                # Refresh tokens rotate on every use. The editor's app refreshes
+                # from more than one place at once, so the grace period lets the
+                # request that loses the race succeed rather than strand it.
+                'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 60,
+                'ROTATE_REFRESH_TOKEN': True,
                 'SCOPES': self.OAUTH2_SCOPES,
             }
 
@@ -868,6 +873,9 @@ class Production(Base):
             'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
             'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,
             'OIDC_RSA_PRIVATE_KEY': os.environ['OIDC_RSA_PRIVATE_KEY'],
+            # See Development: rotation with a grace period for concurrent refreshes.
+            'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 60,
+            'ROTATE_REFRESH_TOKEN': True,
             'SCOPES': self.OAUTH2_SCOPES,
         }
 

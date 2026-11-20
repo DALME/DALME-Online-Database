@@ -364,6 +364,8 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
     ]
     assert log.events == expected_logs
 
+    stale_refresh_token = client.cookies['refresh_token'].value
+
     # Generate a new access token via the refresh cycle. The `refresh_token` is
     # in the cookie so we don't need to include that anywhere in the request,
     # it's handled by the endpoint itself.
@@ -391,6 +393,44 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
         'id_token': mock.ANY,
     }
     assert authorization_payload['access_token'] != refresh_payload['access_token']
+
+    expected_logs = [
+        *expected_logs,
+        {
+            'event': 'request_started',
+            'ip': '127.0.0.1',
+            'level': 'info',
+            'request': f'POST {url}',
+            'request_id': mock.ANY,
+            'user_agent': None,
+            'tenant': mock.ANY,
+            'domain': test_domain.domain,
+        },
+        {
+            'code': status.HTTP_200_OK,
+            'event': 'request_finished',
+            'ip': '127.0.0.1',
+            'level': 'info',
+            'request': f'POST {url}',
+            'request_id': mock.ANY,
+            'user_id': user.id,
+            'tenant': mock.ANY,
+            'domain': test_domain.domain,
+        },
+    ]
+    assert log.events == expected_logs
+
+    # A second tab that read the cookie before the rotation refreshes with the
+    # old token. Within the grace period that succeeds rather than failing.
+    client.cookies['refresh_token'] = stale_refresh_token
+    response = client.post(
+        url,
+        urlencode({'client_id': settings.OAUTH_CLIENT_ID, 'grant_type': 'refresh_token'}),
+        content_type='application/x-www-form-urlencoded',
+        headers={'Cache-Control': 'no-cache'},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
 
     expected_logs = [
         *expected_logs,
