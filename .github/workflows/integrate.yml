@@ -62,9 +62,6 @@ jobs:
     needs: metadata
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    permissions:
-      contents: read
-      pull-requests: write  # The coverage comment.
 
     services:
       postgres:
@@ -163,21 +160,18 @@ jobs:
         run: >
           docker run --rm --network host
           --env-file "$RUNNER_TEMP/services.env"
-          -v /tmp:/tmp
           ${{ env.NAMESPACE }}.app:${{ env.TAG }}
           pytest
           --cov=.
           --cov-report=term-missing:skip-covered
           --hypothesis-show-statistics
-          --junitxml=/tmp/pytest.xml
           | tee /tmp/pytest-coverage.txt
 
-      - uses: MishaKav/pytest-coverage-comment@4cfb48edc8f875ac019afdcfd97c48d78ad2b723 # v1.13.1
+      # The summary, not a PR comment: branches here run on push, which has no
+      # PR to comment on, and a fork's PR gets a read-only token.
+      - name: Coverage
         if: always()
-        with:
-          coverage-path-prefix: app/
-          junitxml-path: /tmp/pytest.xml
-          pytest-coverage-path: /tmp/pytest-coverage.txt
+        run: cat /tmp/pytest-coverage.txt >> "$GITHUB_STEP_SUMMARY"
 
   integrate_docs:
     name: 'Integrate Docs'
