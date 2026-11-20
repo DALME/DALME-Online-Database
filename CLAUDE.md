@@ -61,6 +61,8 @@ Never run `git commit`. Give the user the exact message and command.
 ## Workflow Rules
 
 - Git flow, pull requests and the pipelines: `.github/CLAUDE.md`.
+- Module guidance: `app/CLAUDE.md`, `ui/CLAUDE.md`, `docs/CLAUDE.md` and
+  `tf/CLAUDE.md`.
 - Drive every task through `make`, tests above all: never call `manage.py`,
   `pytest`, `yarn` or `vitest` directly, on the host or through
   `docker compose exec`. If no target fits, ask before reaching round one.

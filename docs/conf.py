@@ -29,7 +29,14 @@ myst_enable_extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = [".DS_Store", "*.txt", "_build", "README.md", "Thumbs.db"]
+exclude_patterns = [
+    ".DS_Store",
+    "*.txt",
+    "_build",
+    "CLAUDE.md",
+    "README.md",
+    "Thumbs.db",
+]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
