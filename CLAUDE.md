@@ -115,9 +115,10 @@ Backend packages under `app/`:
 - `search/`: Elasticsearch/OpenSearch indexing.
 - `authorization/`: drf-access-policy statements.
 
-Tenancy comes in two kinds: Postgres schemas for the CMS, and tenant ids on rows
-for the backend and ontology. Only some data is tenanted; the rest is
-deliberately **shared**.
+Tenancy comes in two kinds: Postgres schemas for each project's CMS, and a tenant
+key on the rows of each project's working material (collections, tasks,
+comments, tags, saved searches). The ontology itself is deliberately **shared**
+across projects (#57).
 
 Frontend in `ui/`; infrastructure in `tf/` (Terragrunt on AWS); docs in `docs/`
 (Sphinx + MyST).
