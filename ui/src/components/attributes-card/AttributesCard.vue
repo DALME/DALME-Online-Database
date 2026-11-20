@@ -174,15 +174,12 @@ export default defineComponent({
     };
 
     const onCreated = (newRecord, fieldEl) => {
-      console.log("Attr oncreated", newRecord, creating.value);
       if (newRecord.isUnique) creating.value = creating.value.filter((x) => x !== newRecord.name);
-      console.log("Attr oncreated removed creating", creating.value);
       attributes.value.push(newRecord);
       fieldEl.remove();
     };
 
     const onDestroyed = (id) => {
-      console.log("Attr ondestroyed", id);
       attributes.value = attributes.value.filter((x) => x.id !== id);
     };
 

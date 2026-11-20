@@ -58,7 +58,6 @@ export default class CustomRepository extends Repository {
 
   save(records) {
     return new Promise((resolve) => {
-      // console.log("called save on", this, records);
       if (this.autoFields) {
         let [data, entities] = this.query().normalize(records);
         if (!Array.isArray(data)) data = [data];
@@ -72,38 +71,32 @@ export default class CustomRepository extends Repository {
             resolve(null);
           });
       } else {
-        // console.log("no autoFields, saving", this.entity);
         resolve(this.query().save(records));
       }
     });
   }
 
   create(records) {
-    console.log("called create on", this.entity);
     return this.remoteCreate(records).catch((error) => {
       notifier.ORM.error(`Unable to create ${this.entity}: ${error}`);
     });
   }
 
   update(id, payload) {
-    console.log("called update on", this.entity);
     return this.remoteUpdate(id, payload).catch((error) => {
       notifier.ORM.error(`Unable to update ${this.entity}: ${error}`);
     });
   }
 
   destroy(ids) {
-    console.log("called destroy on", this.entity);
     return this.remoteDestroy(ids).catch((error) => {
       notifier.ORM.error(`Unable to delete ${this.entity}: ${error}`);
     });
   }
 
   processAutoFields(record) {
-    // console.log("starting autoFields", this.entity, record.id);
     return Promise.all(
       Object.keys(this.autoFields).map((property) => {
-        // console.log("autoField", this.entity, record.id, property);
         return this.autoFields[property].ensure(record[property]);
       }),
     ).catch((error) => {
@@ -118,7 +111,6 @@ export default class CustomRepository extends Repository {
   }
 
   refresh() {
-    console.log("refreshing", this.entity);
     return Promise.all(
       this.query()
         .all()
@@ -166,12 +158,7 @@ export default class CustomRepository extends Repository {
       const isInProgress = this.inProgress.includes(id);
       const isLoaded = Boolean(rec);
       const isStale = isLoaded ? rec.isStale : false;
-      // console.log(
-      //   `ENQUEUE ${this.entity} ${id}:`,
-      //   `inQ: ${isInQueue}, inP: ${isInProgress}, loaded: ${isLoaded}, stale: ${isStale}`,
-      // );
       if (!isInQueue && !isInProgress && (!isLoaded || isStale)) {
-        // console.log("enqueuing", this.entity, id, this.queue);
         this.queue.push({ id, resolve });
         this.dequeue();
       } else {
@@ -205,7 +192,6 @@ export default class CustomRepository extends Repository {
       const { success, data, error, fetchAPI } = apiInterface();
       fetchAPI(request).then(() => {
         if (success.value) {
-          // console.log("validating...", data.value, schema, action);
           schema.validate(this.processResponse(data.value)).then((validated) => {
             action(validated).then((result) => {
               resolve(result);
@@ -219,30 +205,25 @@ export default class CustomRepository extends Repository {
   }
 
   remoteRetrieve(id = null) {
-    console.log("REMOTE RETRIEVE", this.entity);
     if (isNil(id)) return this.remoteCall(this.requests.list(), this.schema.list);
     return this.remoteCall(this.requests.get(id), this.schema.instance);
   }
 
   remoteUpdate(id, payload) {
-    console.log("Remote update", this.entity, id, payload);
     return this.remoteCall(this.requests.update(id, payload), this.schema.instance);
   }
 
   remoteCreate(payload) {
-    console.log("Remote create", this.entity, payload);
     return this.remoteCall(this.requests.create(payload), this.schema.instance);
   }
 
   remoteDestroy(id) {
-    console.log("Remote destroy", this.entity, id);
     return this.remoteCall(this.requests.destroy(id), this.schema.instance, (ids) =>
       this.query().destroy(ids),
     );
   }
 
   retrieveOptions(field, originator) {
-    console.log("retrieve options", this.entity, field);
     return this.remoteCall(
       requestOptions(snakeCase(field), true, this.entity),
       optionListSchema,
@@ -255,7 +236,6 @@ export default class CustomRepository extends Repository {
   }
 
   retrieveMetadata() {
-    console.log("retrieveMetadata", this.entity);
     return this.remoteCall(
       this.requests.metadata(),
       contentTypeSchema,

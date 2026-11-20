@@ -358,7 +358,6 @@ export default defineComponent({
       const locales = Records.current.attributes.filter((x) => x.name === "locale");
       const places = Records.current.places;
       let locs = [];
-      console.log("locale attr", locales, places);
       if (locales.length > 0) locs = locs.concat(locales);
       if (places.length > 0) locs = locs.concat(places);
       return locs.length > 0 ? locs : null;

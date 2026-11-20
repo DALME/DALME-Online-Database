@@ -8,11 +8,13 @@
 </template>
 
 <script>
+import logger from "@/logger";
+
 export default {
   name: "UploadField",
   setup() {
     const url = "";
-    const handleRejected = (rejected) => console.log(rejected);
+    const handleRejected = (rejected) => logger.log("Upload rejected", rejected);
 
     return { handleRejected, url };
   },

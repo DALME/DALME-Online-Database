@@ -85,9 +85,7 @@ export default defineComponent({
       return locs;
     });
 
-    onBeforeMount(() => {
-      console.log("RecordLocations onBeforeMount", props.targets);
-    });
+    onBeforeMount(() => {});
 
     return {
       columns,

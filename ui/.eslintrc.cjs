@@ -56,6 +56,8 @@ module.exports = {
     ],
     "linebreak-style": ["error", "unix"],
     "max-len": ["error", { code: 100, ignoreUrls: true }],
+    // Debug output goes through `src/logger.js`, which is silent outside development.
+    "no-console": ["error", { allow: ["warn", "error"] }],
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-unused-vars": "off",
     "prefer-promise-reject-errors": "off",

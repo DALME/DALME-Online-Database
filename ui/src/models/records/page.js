@@ -28,7 +28,6 @@ class Page extends CustomModel {
   }
 
   static saved(model) {
-    console.log("Page saved", model);
     if (!model.state) {
       PageStates.save({ id: model.id });
     }

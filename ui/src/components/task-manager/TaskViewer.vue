@@ -327,13 +327,9 @@ export default {
       }
     });
 
-    const onAction = () => {
-      console.log("action");
-    };
+    const onAction = () => {};
 
-    const changeDueDate = () => {
-      console.log("changeDueDate");
-    };
+    const changeDueDate = () => {};
 
     provide("attachment", attachment);
     provide("model", "Task");

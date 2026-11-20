@@ -193,9 +193,8 @@ export default defineComponent({
       context.emit("update:modelValue", newValue);
       confirm.value = false;
     };
-    const handleDrag = (idx) => {
+    const handleDrag = (_idx) => {
       // TODO: Implement dragging re-order.
-      console.assert(idx);
     };
     const handlePreview = ({ value: damId }) => {
       const key = `folio-${damId}`;

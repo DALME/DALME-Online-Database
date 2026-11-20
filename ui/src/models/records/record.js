@@ -87,8 +87,7 @@ class Record extends CustomModel {
     };
   }
 
-  static saving(model, record) {
-    console.log("saving record", model, record);
+  static saving(model, _record) {
     if (!model.state) {
       RecordStates.save({ id: model.id });
     }

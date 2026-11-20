@@ -144,7 +144,6 @@ export default defineComponent({
         chartType.value = widget.type;
         fetchData(widget.query, widget.handler).then((result) => {
           dataset.value = result;
-          console.log(result);
           loading.value = false;
         });
       } else {

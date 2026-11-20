@@ -187,7 +187,6 @@ export default defineComponent({
     });
 
     const toggleSplitter = () => {
-      console.log("toggleSplitter from", Records.splitterHorizontal, Records.editorSplitter);
       let targetSplit = nextSplitterPixels.value
         ? nextSplitterPixels.value
         : Records.splitterHorizontal
@@ -196,7 +195,6 @@ export default defineComponent({
       Records.lastSplitter = currentSplitterPercentage.value;
       Records.splitterHorizontal = !Records.splitterHorizontal;
       Records.editorSplitter = targetSplit;
-      console.log("toggleSplitter to", Records.splitterHorizontal, Records.editorSplitter);
     };
 
     const toggleMini = () => {
@@ -222,7 +220,6 @@ export default defineComponent({
             okayButtonLabel: "Save",
           },
         }).onOk(() => {
-          console.log("Save changes");
           eventBus.emit("destroyEditor");
           Records.editOn = !Records.editOn;
         });
@@ -252,9 +249,7 @@ export default defineComponent({
     provide("editorControl", { editorState, editorView, editorTools });
 
     onMounted(() => {
-      console.log("mounted editor");
       if (!editorStore.ready) {
-        console.log("editor store not ready:", editorStore.ready);
         editorStore.initialize().then(() => {
           // TODO: temp workaround - this should be set by the UI
           editorStore.currentSetId = editorStore.sets()[0].id;

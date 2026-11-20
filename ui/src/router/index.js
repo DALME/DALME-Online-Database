@@ -41,7 +41,6 @@ router.beforeEach(() => {
 });
 
 router.beforeResolve(async (to) => {
-  console.log("router.beforeResolve");
   const ui = useUiStore();
   await ui.setPageState(to);
   ui.setUiState(to);

@@ -38,7 +38,6 @@ export const baseExtensions = [
 ];
 
 export const createEditorState = ({ doc, onUpdate, onChange, onFocus, onBlur }) => {
-  console.log("creation editor state");
   return EditorState.create({
     doc: doc,
     extensions: [
@@ -60,11 +59,9 @@ export const createEditorState = ({ doc, onUpdate, onChange, onFocus, onBlur }) 
 };
 
 export const createEditorView = (config) => {
-  console.log("creating editor view");
   return new EditorView({ ...config });
 };
 export const destroyEditorView = (view) => {
-  console.log("destroying editor view");
   view.destroy();
 };
 

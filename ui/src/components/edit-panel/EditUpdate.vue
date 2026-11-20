@@ -65,7 +65,6 @@ export default defineComponent({
         actorSend({ type: "SHOW" });
       } else {
         loading.value = true;
-        console.log(forms[resource.value]);
         const {
           edit: editSchema,
           requests: { get },

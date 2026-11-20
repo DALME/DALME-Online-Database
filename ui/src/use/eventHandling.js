@@ -18,12 +18,11 @@ export const provideEventHandling = () => {
 
   const onRenderError = (err, instance, info) => {
     displayErrorAlert("rendererror-errorHandler triggered", err);
-    console.log("rendererror-errorHandler triggered", err, instance, info);
+    console.error("rendererror-errorHandler triggered", err, instance, info);
     return false;
   };
 
   const initEventHandler = () => {
-    console.log("starting error handler");
     window.addEventListener("error", onError, { capture: true });
   };
 

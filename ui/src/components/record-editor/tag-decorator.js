@@ -2,6 +2,7 @@ import { ensureSyntaxTree, matchBrackets, syntaxTree } from "@codemirror/languag
 import { Decoration, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
 import { h, render } from "vue";
 
+import logger from "@/logger";
 import { useEditorStore } from "@/stores/editor";
 
 import TeiTagMenu from "./TeiTagMenu.vue";
@@ -26,7 +27,6 @@ const deconstructTag = (text) => {
 };
 
 const getPairedTag = (state, node, type) => {
-  // console.log("called getPairedTag", node, type);
   if (type.selfClose) return node;
   const dir = type.open ? 1 : -1;
   const pos = type.open ? node.from : node.to;
@@ -132,7 +132,6 @@ class TagPill extends WidgetType {
       return true;
     } else if (other.tag === this.tag) {
       // this = in place, other = newly generated
-      console.log(`merging widgets ${this.from}-${this.to} and ${other.from}-${other.to}`);
       this.from = other.from;
       this.to = other.to;
       return false;
@@ -141,12 +140,9 @@ class TagPill extends WidgetType {
     }
   }
 
-  destroy() {
-    console.log(`destroying widget ${this.from}-${this.to}`);
-  }
+  destroy() {}
 
   updateDOM(_elt, _view) {
-    console.log("updateDOM called", this.from, this.to);
     // elt.setAttribute("data-from", this.from);
     // elt.setAttribute("data-to", this.to);
     return true;
@@ -157,7 +153,6 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
   return ViewPlugin.fromClass(
     class {
       constructor(view) {
-        console.log("creating tagPlugin");
         this.store = useEditorStore();
         this.compInstance = currentInstance;
         this.updateTag = updateTag;
@@ -172,7 +167,7 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
         syntaxTree(state).iterate({
           enter: (node) => {
             if (node.name === "MismatchedCloseTag") {
-              console.log("MISMATCHED TAG", node.name, node.from, node.to);
+              logger.log("MISMATCHED TAG", node.name, node.from, node.to);
               changes.push({ from: node.from, to: node.to });
             } else if (["OpenTag", "CloseTag", "SelfClosingTag"].includes(node.name)) {
               const type = {
@@ -181,7 +176,6 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
                 selfClose: node.name === "SelfClosingTag",
               };
               const pairedTag = getPairedTag(state, node, type);
-              // console.log("parser: node|paired", node.name, pairedTag);
               if (pairedTag !== null) {
                 const { tag, attributes, tagData } = this.getTagData(
                   state,
@@ -203,11 +197,11 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
                     });
                     ranges.push(deco.range(node.from, node.to));
                   } catch (e) {
-                    console.log("TagPill error", e, tag, attributes, tagData);
+                    console.error("TagPill error", e, tag, attributes, tagData);
                   }
                 }
               } else {
-                console.log("ORPHAN TAG", node.name, node.from, node.to);
+                logger.log("ORPHAN TAG", node.name, node.from, node.to);
                 changes.push({ from: node.from, to: node.to });
               }
             }
@@ -220,7 +214,6 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
       }
 
       getTagData(state, node) {
-        // console.log("getTagData", node);
         const { tag, attributes } = deconstructTag(state.doc.sliceString(node.from, node.to));
         const tagData = this.store.tags(tag, attributes);
         return {
@@ -236,14 +229,11 @@ export const tagDecoratorPlugin = (currentInstance, updateTag) => {
           update.viewportChanged ||
           syntaxTree(update.startState) != syntaxTree(update.state)
         ) {
-          console.log("update called", update);
           this.tags = this.getDecorations(update.state);
         }
       }
 
-      destroy() {
-        console.log("destroying tagPlugin");
-      }
+      destroy() {}
     },
     {
       decorations: (instance) => instance.tags,

@@ -5,7 +5,9 @@ import { createActor } from "xstate";
 
 const inspect =
   process.env.NODE_ENV === "development" && process.env.VITE_INSPECT_ACTORS === "true"
-    ? (event) => console.log(event)
+    ? // Opt-in actor inspection: development only, behind VITE_INSPECT_ACTORS.
+      // eslint-disable-next-line no-console
+      (event) => console.log(event)
     : null;
 
 const rehydrate = (machine) => {

@@ -45,7 +45,6 @@ const setExtent = (e) => {
       tooltip.setAttribute("class", "tei-tooltip");
       tooltip.setAttribute("data-toggle", "tooltip");
       e.appendChild(tooltip);
-      console.log("added tooltip");
     } else if (unit.startsWith("line") || unit.startsWith("page")) {
       if (quantity) {
         let qual = tagName === "SPACE" ? " blank " : " ";
@@ -91,7 +90,6 @@ const setTitle = (e) => {
   tooltip.setAttribute("class", "tei-tooltip");
   tooltip.setAttribute("data-toggle", "tooltip");
   e.appendChild(tooltip);
-  console.log("added tooltip");
   return e;
 };
 

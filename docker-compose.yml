@@ -50,6 +50,9 @@ services:
       VITE_OAUTH_CLIENT_ID: oauth.ida.development
       DEV_PORT: ${DEV_PORT:-8000}
     volumes:
+      - ./ui/.eslintignore:/opt/ui/.eslintignore
+      - ./ui/.eslintrc.cjs:/opt/ui/.eslintrc.cjs
+      - ./ui/.prettierrc:/opt/ui/.prettierrc
       - ./ui/package.json:/opt/ui/package.json
       - ./ui/quasar.config.js:/opt/ui/quasar.config.js
       - ./ui/vitest.config.js:/opt/ui/vitest.config.js

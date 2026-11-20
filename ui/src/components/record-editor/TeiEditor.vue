@@ -114,7 +114,6 @@ export default defineComponent({
 
     // editorView.value.updateState: 0 = Idle, 1 = Measuring, 2 = Updating
     const updateTag = (changes) => {
-      console.log("updateTag", changes, editorView.value.updateState);
       if (editorView.value.updateState !== 0) {
         Promise.resolve().then(() => editorView.value.dispatch({ changes }));
       } else {
@@ -122,15 +121,9 @@ export default defineComponent({
       }
     };
 
-    const onEditorUpdate = (_update) => {
-      console.log("Editor update:");
-    };
-    const onEditorFocus = (_update) => {
-      console.log("Editor focus:");
-    };
-    const onEditorBlur = (_update) => {
-      console.log("Editor blur:");
-    };
+    const onEditorUpdate = (_update) => {};
+    const onEditorFocus = (_update) => {};
+    const onEditorBlur = (_update) => {};
     const onEditorChange = (newDoc, _update) => {
       if (newDoc !== Records.editorContent) {
         Records.editorContent = newDoc;
@@ -140,7 +133,6 @@ export default defineComponent({
     const tagPlugin = tagDecoratorPlugin(currentInstance, updateTag);
 
     const extensions = computed(() => {
-      console.log("generating extensions");
       const payload = [];
       payload.push(currentTheme.value);
       if (Preferences.get("visualTags")) {
@@ -173,7 +165,6 @@ export default defineComponent({
     }));
 
     const updateEditorRendering = () => {
-      console.log("updating editor rendering", editorView.value.updateState);
       editorView.value.requestMeasure();
     };
 
@@ -182,7 +173,6 @@ export default defineComponent({
     };
 
     const onTabSwitch = (value) => {
-      console.log("switch tab to:", value);
       if (value === "preview") {
         if (!isNil(editorView.value)) {
           Records.editorContent = editorTools.value.getDoc();
@@ -195,7 +185,6 @@ export default defineComponent({
 
     // eslint-disable-next-line unused-imports/no-unused-vars
     const insertTag = (el, evt) => {
-      console.log("insertTag", el, evt);
       // const selection = editorView.value.state.selection.main;
       // const selectionText = editorView.value.state.doc.sliceString(selection.from, selection.to);
       // const isCompound = el.compound;
@@ -213,7 +202,6 @@ export default defineComponent({
       //   result += `>${selectionText}</${tag.name}>`;
       //   changes.push({ from: selection.from, to: selection.to, insert: result });
       // }
-      // console.log(selection, selectionText, changes, isCompound, tags, label);
       // editorView.value.dispatch({ changes });
     };
     // const insertTag = (type, tag, attributes) => {
@@ -321,7 +309,6 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      console.log("TEIEDITOR mounted", Records.editorTab);
       if (isNil(editorState.value)) {
         editorState.value = createEditorState({
           doc: Records.editorContent,
@@ -337,7 +324,6 @@ export default defineComponent({
     });
 
     onUnmounted(() => {
-      console.log("unmounted TEIEDITOR");
       if (editorView.value) {
         destroyEditorView(editorView.value);
       }
@@ -393,28 +379,6 @@ export default defineComponent({
       },
       { immediate: true },
     );
-
-    // const test = () => {
-    //   console.log("test");
-    //   currentPageData.value.tei = "BOO!";
-    // };
-
-    // const parse = () => {
-    //   // const tree = ensureSyntaxTree(editorState.value, editorState.value.doc.length, 5000);
-    //   // const from = editorView.value.viewport.from;
-    //   // const to = editorView.value.viewport.to;
-    //   // console.log("PARSING:", from, to);
-    //   syntaxTree(editorState.value).iterate({
-    //     enter: (node) => {
-    //       // if (cursor.name === "MissingCloseTag") {
-    //       console.log(
-    //         node.node.name,
-    //         editorState.value.doc.sliceString(node.node.from, node.node.to),
-    //         node.node,
-    //       );
-    //     },
-    //   });
-    // };
 
     return {
       container,

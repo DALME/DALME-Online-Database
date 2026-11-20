@@ -208,7 +208,6 @@ class TaskRepo extends CustomRepository {
   }
 
   remoteListByUser(userId) {
-    console.log("remoteListByUser", userId, this);
     return this.remoteCall(this.requests.getByUser(userId), this.schema.list);
   }
 
@@ -231,16 +230,13 @@ class TaskRepo extends CustomRepository {
         : (this.showCounts[type] += 1);
 
     if (target > this.loadedCounts[type] && this.loadedCounts[type] < this.totalCounts[type]) {
-      console.log("onShowMore", type, target, this.totalCounts[type], this.loadedCounts[type]);
       // fetchData(Tasks, "task", type, 1, this.loadedCounts[type]).then(() => {
       //   this.showCounts.value[type] = target;
       // });
     }
   }
 
-  onChangeStatus(evt) {
-    console.log("onChangeStatus", evt);
-  }
+  onChangeStatus(_evt) {}
 
   setCurrent(task) {
     this.current = isObject(task) ? task.id : task;

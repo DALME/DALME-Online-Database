@@ -117,10 +117,8 @@ export default defineComponent({
         // set up marginal notes
         if (hasMarginalNotes.value) {
           const notesContainer = html.querySelector(".notes-container");
-          console.log("MARGINAL NOTES", html.querySelectorAll(teiSelectors.marginalNotes));
           html.querySelectorAll(teiSelectors.marginalNotes).forEach((el) => {
             el.style.top = `${Math.round(el.getBoundingClientRect().top)}px`;
-            console.log("notesContainer", notesContainer);
             notesContainer.append(el);
           });
           notesContainer.style.height = `${html.querySelector("tei-text").offsetHeight}px`;
@@ -291,7 +289,6 @@ export default defineComponent({
     watch(
       () => Records.editorContent,
       () => {
-        console.log("TEI RENDERER", Records.editorContent, props.text, teiDoc.value);
         generateTei();
       },
       { immediate: true },

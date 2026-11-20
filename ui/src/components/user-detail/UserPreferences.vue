@@ -277,9 +277,7 @@ export default defineComponent({
     // highlightGutterLine: boolean
     // showFoldWidgets: boolean (defaults to true)
 
-    const onSubmit = () => {
-      console.log("submit");
-    };
+    const onSubmit = () => {};
 
     return {
       onSubmit,

@@ -194,7 +194,6 @@ export default defineComponent({
     };
 
     const generateTagAttributes = (refAttrs, localAttrs, kind, action, group) => {
-      // console.log("generating from", refAttrs);
       const result = [];
       for (const attr of refAttrs) {
         if (action !== "create" && kind === "supplied" && attr.value === "text") {
@@ -222,7 +221,6 @@ export default defineComponent({
           });
         }
       }
-      // console.log("result = ", result);
       return result;
     };
 
@@ -235,9 +233,6 @@ export default defineComponent({
           props.action,
           props.tagData.name,
         );
-        if (props.action === "create" && props.elData.label === "Gloss") {
-          // console.log("og result", data.value);
-        }
         if (props.action === "create" && isCompound) {
           for (const tag of props.elData.tags) {
             if (tag.attributes.length) {
@@ -247,9 +242,6 @@ export default defineComponent({
             }
           }
         }
-        if (props.action === "create" && props.elData.label === "Gloss") {
-          // console.log("final result", data.value);
-        }
         data.value = result;
         resolve();
       });
@@ -257,9 +249,6 @@ export default defineComponent({
 
     onMounted(() => {
       generateData();
-      if (props.action === "create" && props.elData.label === "Gloss") {
-        // console.log("data", data.value);
-      }
 
       watch(
         () => data.value,

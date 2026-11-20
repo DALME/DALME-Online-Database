@@ -161,7 +161,6 @@ export default defineComponent({
     const defaultZoomLevel = computed(() => (Records.viewerZoom ? Records.viewerZoom : 1));
 
     const zoom = (type) => {
-      if (type === "full") console.log("FULL ZOOM");
       if (type === "out") {
         let level = Records.viewerZoom - 0.25;
         if (level <= minZoomLevel.value) level = minZoomLevel.value;
@@ -222,7 +221,6 @@ export default defineComponent({
         Records.viewerZoom = viewer.viewport.getZoom(true);
       }
       viewer.addHandler("zoom", (evt) => {
-        console.log("storing zoom", evt.zoom);
         Records.viewerZoom = evt.zoom;
       });
     });
