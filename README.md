@@ -91,6 +91,32 @@ $ make app.manage args="create_superuser"
 $ make app.open
 ```
 
+### Loading a database dump
+
+A freshly migrated database is empty, and most of the app needs data to work.
+Ask a maintainer for a dump of a migrated database and its media, then load
+them in place of the empty database.
+
+```
+$ cp <dump>.dump sql/dumps/
+$ make db.load dump=<dump>.dump
+$ make db.migrate
+$ make app.manage args="all_tenants_command reset_sequences"
+$ make app.manage args="ensure_oauth"
+$ make app.manage args="create_superuser"
+```
+
+Copy the media into `app/www/media/`, keeping its `dalme/`, `pharmacopeias/` and
+`public/` folders.
+
+- `db.load` replaces the whole development database.
+- A restored dump's id sequences lag behind its rows, so every insert fails with
+  a duplicate key until `reset_sequences` has run. It runs once per schema. The
+  errors it logs for the CMS apps on `public` are expected, because those tables
+  only exist in the project schemas.
+- `ensure_oauth` reads the port from the running app container. Start the stack
+  with the port you use (`make dev DEV_PORT=8001`) before running it.
+
 When you have completed the above bootstrapping sequence, you can just call the
 following command whenever you want to return to work.
 
