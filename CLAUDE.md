@@ -61,7 +61,9 @@ Never run `git commit`. Give the user the exact message and command.
 ## Workflow Rules
 
 - Git flow, pull requests and the pipelines: `.github/CLAUDE.md`.
-- Drive tasks through `make`, not direct `manage.py`, `pytest` or `yarn` calls.
+- Drive every task through `make`, tests above all: never call `manage.py`,
+  `pytest`, `yarn` or `vitest` directly, on the host or through
+  `docker compose exec`. If no target fits, ask before reaching round one.
 - Do not scan `node_modules`, `.venv`, `.terraform`, `.terragrunt-cache` or
   `docs/_build` unless asked.
 - Never commit secrets. `config/env.web.dev` and `*.key` files are gitignored.
