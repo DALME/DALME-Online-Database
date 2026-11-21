@@ -44,3 +44,35 @@ def test_each_record_gets_its_own_name(factories):
     first, second = factories.records.create_batch(2)
 
     assert first.name != second.name
+
+
+TENANTED = ['task_lists', 'tasks', 'collections', 'options_values']
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('resource', TENANTED)
+def test_tenanted_factories_take_the_bound_tenant(resource, factories, current_tenant):
+    instance = getattr(factories, resource).create()
+
+    assert instance.tenant.pk == current_tenant.pk
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('resource', TENANTED)
+def test_tenanted_factories_take_an_explicit_tenant(resource, factories, current_tenant, other_tenant):  # noqa: ARG001
+    instance = getattr(factories, resource).create(tenant=other_tenant)
+
+    assert instance.tenant.pk == other_tenant.pk
+
+
+@pytest.mark.django_db
+def test_a_task_shares_its_lists_tenant(factories, current_tenant, other_tenant):  # noqa: ARG001
+    task = factories.tasks.create(tenant=other_tenant)
+
+    assert task.task_list.tenant.pk == other_tenant.pk
+
+
+@pytest.mark.django_db
+def test_tenanted_factories_need_a_tenant(factories):
+    with pytest.raises(RuntimeError, match='Bind a tenant'):
+        factories.task_lists.create()

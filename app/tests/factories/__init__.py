@@ -1,7 +1,17 @@
 """Interface for the tests.factories module."""
 
 from tests.factories.app import OwnedModelFactory, TenantedModelFactory, TrackedModelFactory, UUIDModelFactory
-from tests.factories.domain import OrganizationFactory, PersonFactory, RecordFactory
+from tests.factories.domain import (
+    DomainCollectionFactory,
+    OptionsListFactory,
+    OptionsValueFactory,
+    OrganizationFactory,
+    PersonFactory,
+    PreferenceKeyFactory,
+    RecordFactory,
+    TaskFactory,
+    TaskListFactory,
+)
 from tests.factories.oauth import GroupFactory, GroupPropertiesFactory, UserFactory
 from tests.factories.tenants import DomainModelFactory, TenantModelFactory
 from tests.factories.web import (
@@ -42,6 +52,12 @@ class ResourceFactory:
         'organizations': OrganizationFactory,
         'people': PersonFactory,
         'records': RecordFactory,
+        'collections': DomainCollectionFactory,
+        'options_lists': OptionsListFactory,
+        'options_values': OptionsValueFactory,
+        'preference_keys': PreferenceKeyFactory,
+        'task_lists': TaskListFactory,
+        'tasks': TaskFactory,
         'user_groups': GroupFactory,
         'user_group_properties': GroupPropertiesFactory,
         'users': UserFactory,
