@@ -7,7 +7,32 @@ from unittest import mock
 import pytest
 from jwcrypto import jwk
 
+from django.core.exceptions import ImproperlyConfigured
+
 import app.settings as settings_mod
+
+CONFIGURATIONS = [
+    (settings_mod.Development, 'development'),
+    (settings_mod.Test, 'test'),
+    (settings_mod.CI, 'ci'),
+    (settings_mod.Production, 'production'),
+    (settings_mod.Staging, 'staging'),
+]
+
+
+@pytest.mark.parametrize(('configuration', 'env'), CONFIGURATIONS)
+def test_each_configuration_loads_under_its_own_env(configuration, env):
+    with mock.patch.object(configuration, 'ENV', env):
+        configuration.setup()
+
+
+@pytest.mark.parametrize(('configuration', 'env'), CONFIGURATIONS)
+def test_each_configuration_refuses_any_other_env(configuration, env):
+    with (
+        mock.patch.object(configuration, 'ENV', f'not-{env}'),
+        pytest.raises(ImproperlyConfigured, match=configuration.__name__),
+    ):
+        configuration.setup()
 
 
 def test_no_middleware_is_registered_twice():

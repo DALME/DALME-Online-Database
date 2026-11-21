@@ -14,6 +14,8 @@ import elasticsearch
 import structlog
 from configurations import Configuration, pristinemethod
 
+from django.core.exceptions import ImproperlyConfigured
+
 
 class TenantTypes(str, enum.Enum):
     """Enumerate the possible tenant types."""
@@ -42,6 +44,21 @@ class Base(Configuration):
     PROJECT_ROOT = BASE_DIR / 'app'
 
     ENV = os.environ.get('ENV', 'development')
+
+    @classmethod
+    def setup(cls):
+        """Refuse to load under any `ENV` but the configuration's own.
+
+        `ENV` and `DJANGO_CONFIGURATION` are set separately (the Makefile, the
+        Dockerfile, Terraform and `manage.py`), so a mismatch fails here rather
+        than running one environment's settings in another.
+
+        """
+        super().setup()
+        if cls.ENV != cls.ENVIRONMENT:
+            msg = f'The {cls.__name__} configuration needs ENV={cls.ENVIRONMENT!r}, not {cls.ENV!r}.'
+            raise ImproperlyConfigured(msg)
+
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     AUTH_USER_MODEL = 'oauth.User'
     TENANT_MODEL = 'tenants.Tenant'
@@ -598,6 +615,7 @@ class Base(Configuration):
 class Development(Base):
     """Development settings."""
 
+    ENVIRONMENT = 'development'
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
 
@@ -773,6 +791,8 @@ class Development(Base):
 class Test(Development):
     """Test settings."""
 
+    ENVIRONMENT = 'test'
+
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
@@ -790,6 +810,7 @@ class Test(Development):
 class CI(Development):
     """Continuous integration pipeline settings."""
 
+    ENVIRONMENT = 'ci'
     DEBUG = False
     SECRET_KEY = 'django-insecure-continuous-integration-environment-secret-key'
 
@@ -804,6 +825,7 @@ class CI(Development):
 class Production(Base):
     """Production settings."""
 
+    ENVIRONMENT = 'production'
     DEBUG = False
 
     def INSTALLED_APPS(self):
@@ -983,6 +1005,7 @@ class Production(Base):
 class Staging(Production):
     """Staging settings."""
 
+    ENVIRONMENT = 'staging'
     DEBUG = False
 
     _TENANTS = {
