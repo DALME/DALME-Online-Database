@@ -1,7 +1,7 @@
 """Interface for the tests.factories module."""
 
 from tests.factories.app import OwnedModelFactory, TenantedModelFactory, TrackedModelFactory, UUIDModelFactory
-from tests.factories.domain import OrganizationFactory, PersonFactory
+from tests.factories.domain import OrganizationFactory, PersonFactory, RecordFactory
 from tests.factories.oauth import GroupFactory, GroupPropertiesFactory, UserFactory
 from tests.factories.tenants import DomainModelFactory, TenantModelFactory
 from tests.factories.web import (
@@ -41,6 +41,7 @@ class ResourceFactory:
     FACTORIES = {
         'organizations': OrganizationFactory,
         'people': PersonFactory,
+        'records': RecordFactory,
         'user_groups': GroupFactory,
         'user_group_properties': GroupPropertiesFactory,
         'users': UserFactory,

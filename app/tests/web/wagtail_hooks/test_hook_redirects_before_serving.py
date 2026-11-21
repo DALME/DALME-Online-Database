@@ -47,7 +47,7 @@ def test_redirects_section_without_child(mock_redirect, mock_get_current_tenant,
     section = factories.pages_sections.create(parent=home_page, slug='section')
     assert section._meta.label == 'web.Section'  # noqa: SLF001
     assert section.get_children().live().first() is None
-    assert section.get_ancestors().last().slug == 'home-page'
+    assert section.get_ancestors().last().slug == home_page.slug
     request = rf.get(f'{section.get_full_url()}', headers={'HOST': test_site.hostname})
     result = add_redirects_before_serving_pages(section, request, None, None)
     mock_redirect.assert_called_once_with(home_page.get_children().live().first().get_url(request), permanent=False)

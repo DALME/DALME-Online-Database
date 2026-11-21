@@ -3,16 +3,14 @@
 from datetime import UTC
 
 import factory
-from faker import Faker as TheRealFaker
 from wagtail.models import Site
 from wagtail_factories import PageFactory
 
 from web.models import BasePage, FeaturedPage
 
 from .domain import RecordFactory
+from .fakers import fake
 from .oauth import UserFactory
-
-fake = TheRealFaker()
 
 
 # --- Snippet/utility models ---
@@ -81,8 +79,8 @@ class HomeFactory(BasePageFactory):
     class Meta:
         model = 'web.Home'
 
-    short_title = 'Home'
-    slug = 'home-page'
+    short_title = factory.LazyFunction(fake.word)
+    slug = factory.LazyFunction(fake.slug)
     # learn_more_page = None
 
 
@@ -162,6 +160,6 @@ class SiteFactory(factory.django.DjangoModelFactory):
 
     hostname = factory.Faker('domain_name')
     port = factory.Sequence(lambda n: 81 + n)
-    site_name = 'Test site'
+    site_name = factory.LazyFunction(fake.company)
     root_page = factory.SubFactory(HomeFactory, parent=None)
     is_default_site = False

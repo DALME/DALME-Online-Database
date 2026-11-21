@@ -110,12 +110,15 @@ repos:
       language: system
       types_or: [hcl, terraform]
       require_serial: true
+    # Manual until the ops work under #62 restores the local provider cache;
+    # run it with `prek run --hook-stage manual tf-validate`.
     - id: tf-validate
       name: terraform validate
       entry: make deploy.validate
       language: system
       types_or: [hcl, terraform]
       require_serial: true
+      stages: [manual]
     - id: tf-docs
       name: terraform docs
       entry: make _deploy.docs

@@ -1,7 +1,8 @@
 """Define agent model factories for the domain app."""
 
 import factory
-from faker import Faker
+
+from tests.factories.fakers import fake
 
 
 def _generate_initialism(name):
@@ -17,11 +18,7 @@ class OrganizationFactory(factory.django.DjangoModelFactory):
 
     short_name = factory.LazyAttribute(lambda x: _generate_initialism(x.name))
 
-    @factory.lazy_attribute
-    def name(self):
-        """Randomly generate an English organization name."""
-        fake = Faker(['en_US'])
-        return fake.company()
+    name = factory.LazyFunction(fake.company)
 
 
 class PersonFactory(factory.django.DjangoModelFactory):
@@ -39,9 +36,4 @@ class PersonFactory(factory.django.DjangoModelFactory):
         bare_agent = factory.Trait(user=None)
 
     user = None
-
-    @factory.lazy_attribute
-    def name(self):
-        """Randomly generate an English name."""
-        fake = Faker(['en_US'])
-        return fake.name()
+    name = factory.LazyFunction(fake.historical_name)

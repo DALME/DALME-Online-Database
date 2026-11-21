@@ -1,16 +1,15 @@
 """Define record model factories for the domain app."""
 
 import factory
-from faker import Faker
 
-fake = Faker()
+from tests.factories.fakers import fake
 
 
 class RecordFactory(factory.django.DjangoModelFactory):
-    """Factory for creating Record instances."""
+    """Generate record fixtures titled in the corpus's patterns."""
 
     class Meta:
         model = 'domain.Record'
 
-    name = fake.sentence()
-    short_name = fake.word()
+    name = factory.LazyFunction(fake.record_title)
+    short_name = factory.LazyFunction(fake.archival_reference)
