@@ -16,6 +16,7 @@ import structlog
 from configurations import Configuration, pristinemethod
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.functional import lazy
 
 THIRTY_SECONDS = datetime.timedelta(seconds=30)
 ONE_HOUR = datetime.timedelta(hours=1)
@@ -41,6 +42,20 @@ class TENANT:
     def __iter__(self):
         """Allow destructuring assignment."""
         return iter(dataclasses.astuple(self))
+
+
+def current_project_name():
+    """Name the project whose schema the connection is on.
+
+    Wagtail reads `WAGTAIL_SITE_NAME` itself, so the setting is computed on
+    each read rather than written per request: settings are shared by every
+    thread in the process. The public schema has no CMS, and IDA names it.
+
+    """
+    # Imported here because this module is loaded before the database is.
+    from django.db import connection
+
+    return getattr(getattr(connection, 'tenant', None), 'name', 'IDA')
 
 
 class Base(Configuration):
@@ -541,6 +556,7 @@ class Base(Configuration):
 
     # Wagtail
     SITE_ID = 1
+    WAGTAIL_SITE_NAME = lazy(current_project_name, str)()
     WAGTAILADMIN_BASE_URL = 'cms/'
     WAGTAILADMIN_RICH_TEXT_EDITORS = {
         'default': {

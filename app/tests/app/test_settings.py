@@ -6,8 +6,10 @@ from datetime import timedelta
 from unittest import mock
 
 import pytest
+from django_tenants.utils import tenant_context
 from jwcrypto import jwk
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 import app.settings as settings_mod
@@ -19,6 +21,15 @@ CONFIGURATIONS = [
     (settings_mod.Production, 'production'),
     (settings_mod.Staging, 'staging'),
 ]
+
+
+@pytest.mark.django_db
+def test_the_wagtail_site_name_is_the_current_projects(test_tenant, other_tenant):
+    with tenant_context(test_tenant):
+        assert test_tenant.name == settings.WAGTAIL_SITE_NAME
+    with tenant_context(other_tenant):
+        assert test_tenant.name != settings.WAGTAIL_SITE_NAME
+        assert other_tenant.name == settings.WAGTAIL_SITE_NAME
 
 
 def test_token_expiries_default_to_seconds():

@@ -61,6 +61,18 @@ def test_a_failing_view_releases_the_tenant(rf, test_domain):
     assert not get_current_tenant()
 
 
+@pytest.mark.django_db
+def test_middleware_writes_neither_the_site_name_nor_a_public_url(rf, settings, test_domain):
+    site_name = settings.WAGTAIL_SITE_NAME
+    request = rf.get('/', headers={'HOST': test_domain.domain})
+    request.tenant = test_domain.tenant
+
+    TenantContextMiddleware(mock.MagicMock())(request)
+
+    assert settings.WAGTAIL_SITE_NAME is site_name
+    assert not hasattr(settings, 'PUBLIC_URL')
+
+
 @mock.patch('tenants.middleware.tenant_context_middleware._tenant')
 @pytest.mark.django_db
 def test_middleware(mock_ctx, rf, settings, test_domain):
@@ -76,7 +88,6 @@ def test_middleware(mock_ctx, rf, settings, test_domain):
 
     assert f'.{test_domain.domain}' == settings.CSRF_COOKIE_DOMAIN
     assert f'.{test_domain.domain}' == settings.SESSION_COOKIE_DOMAIN
-    assert tenant.name == settings.WAGTAIL_SITE_NAME
     assert isinstance(set_tenant, LocalProxy)
     assert mock_ctx.mock_calls == [
         mock.call.set(tenant),
