@@ -7,8 +7,32 @@ from django_structlog.middlewares.request import get_request_header
 from django.conf import settings
 from django.dispatch import receiver
 
+REDACTED = '*** REDACTED ***'
+CREDENTIAL_KEYS = frozenset(
+    {
+        'access_token',
+        'authorization',
+        'client_secret',
+        'code_verifier',
+        'password',
+        'refresh_token',
+        'secret',
+        'token',
+    }
+)
+
+
+def redact_credentials(_logger, _method_name, event_dict):
+    """Mask the value of any event key that may carry a credential."""
+    for key in event_dict:
+        if key.lower() in CREDENTIAL_KEYS:
+            event_dict[key] = REDACTED
+    return event_dict
+
+
 BASE_PROCESSORS = [
     structlog.contextvars.merge_contextvars,
+    redact_credentials,
     structlog.stdlib.filter_by_level,
     structlog.stdlib.add_logger_name,
     structlog.stdlib.add_log_level,
