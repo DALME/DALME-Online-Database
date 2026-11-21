@@ -20,6 +20,10 @@ CONFIGURATIONS = [
 ]
 
 
+def test_ci_runs_the_suite_on_the_test_storages():
+    assert settings_mod.CI.STORAGES == settings_mod.Test.STORAGES
+
+
 @pytest.mark.parametrize(('configuration', 'env'), CONFIGURATIONS)
 def test_each_configuration_loads_under_its_own_env(configuration, env):
     with mock.patch.object(configuration, 'ENV', env):

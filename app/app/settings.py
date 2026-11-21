@@ -807,8 +807,8 @@ class Test(Development):
     }
 
 
-class CI(Development):
-    """Continuous integration pipeline settings."""
+class CI(Test):
+    """Continuous integration pipeline settings: the test configuration, with CI's services."""
 
     ENVIRONMENT = 'ci'
     DEBUG = False
