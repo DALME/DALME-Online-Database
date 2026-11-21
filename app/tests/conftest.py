@@ -1,5 +1,6 @@
 """Configure pytest for the tests module."""
 
+import contextlib
 import uuid
 
 import pytest
@@ -11,6 +12,7 @@ from django.core.management import call_command
 from django.db import connections
 
 from app.settings import TenantTypes
+from tenants.middleware.tenant_context_middleware import _tenant
 from tenants.models import Domain, Tenant
 
 from tests.factories import ResourceFactory
@@ -91,6 +93,34 @@ def test_tenant(test_domain):
 def public_tenant():
     """Inject the public test tenant."""
     return Tenant.objects.get(schema_name='public')
+
+
+@pytest.fixture
+def other_tenant(db):  # noqa: ARG001
+    """Inject a second project tenant, distinct from `test_tenant`."""
+    return Tenant.objects.get(schema_name='pharmacopeias')
+
+
+@pytest.fixture
+def as_tenant():
+    """Inject a context manager that binds a tenant, as the middleware does per request."""
+
+    @contextlib.contextmanager
+    def bind(tenant):
+        token = _tenant.set(tenant)
+        try:
+            yield tenant
+        finally:
+            _tenant.reset(token)
+
+    return bind
+
+
+@pytest.fixture
+def current_tenant(as_tenant, test_tenant):
+    """Bind the test tenant for the whole test."""
+    with as_tenant(test_tenant):
+        yield test_tenant
 
 
 @pytest.fixture

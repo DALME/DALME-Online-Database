@@ -24,8 +24,11 @@ class Attachments(viewsets.ModelViewSet):
     oauth_permission_classes = [TokenHasReadWriteScope & AttachmentAccessPolicy]
 
     parser_classes = (MultiPartParser, FormParser, FileUploadParser)
-    queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
+
+    def get_queryset(self):
+        """Build the queryset per request, so it filters by the requesting tenant."""
+        return Attachment.objects.all()
 
     def create(self, request, fmt=None):  # noqa: ARG002
         """Create new attachment record."""

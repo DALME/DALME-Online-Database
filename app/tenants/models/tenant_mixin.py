@@ -40,5 +40,7 @@ class TenantMixin(models.Model):
     def save(self, *args, **kwargs):
         """Add tenant when saving record."""
         if not hasattr(self, 'tenant') and not os.environ.get('DATA_MIGRATION'):
-            self.tenant = get_current_tenant()
+            # The tenant itself, not the context proxy: a cached proxy would
+            # later resolve to whatever tenant is current when it is read.
+            self.tenant = get_current_tenant()._get_current_object()  # noqa: SLF001
         super().save(*args, **kwargs)

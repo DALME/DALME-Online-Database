@@ -27,7 +27,6 @@ class Collections(BaseViewSet):
     permission_classes = [CollectionAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope & CollectionAccessPolicy]
 
-    queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
     filterset_class = CollectionFilter
     search_fields = ['name', 'owner__full_name']
@@ -39,6 +38,10 @@ class Collections(BaseViewSet):
         },
     }
     ordering = ['name']
+
+    def get_queryset(self):
+        """Build the queryset per request, so it filters by the requesting tenant."""
+        return Collection.objects.all()
 
     @action(detail=True, methods=['get'])
     def members(self, request, *args, **kwargs):  # noqa: ARG002

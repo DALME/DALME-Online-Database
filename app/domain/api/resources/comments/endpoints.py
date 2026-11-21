@@ -26,10 +26,9 @@ class Comments(viewsets.ModelViewSet):
     permission_classes = [CommentAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope & CommentAccessPolicy]
 
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self):
         """Return generic queryset or queryset for specific model/object."""
         if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
             model = apps.get_model(app_label='domain', model_name=self.request.GET['model'])
@@ -42,7 +41,8 @@ class Comments(viewsets.ModelViewSet):
             instance = model.objects.get(pk=obj_pk)
             return instance.comments.all()
 
-        return super().get_queryset(*args, **kwargs)
+        # Built here, per request, so it filters by the requesting tenant.
+        return Comment.objects.all()
 
     def create(self, request, *args, **kwargs):  # noqa: ARG002
         """Create comment."""

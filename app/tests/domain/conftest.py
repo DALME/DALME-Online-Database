@@ -3,15 +3,6 @@
 import pytest
 
 from domain.models import PreferenceKey
-from tenants.middleware.tenant_context_middleware import _tenant
-
-
-@pytest.fixture
-def current_tenant(test_tenant):
-    """Bind the current tenant, as the tenant context middleware does per request."""
-    token = _tenant.set(test_tenant)
-    yield test_tenant
-    _tenant.reset(token)
 
 
 @pytest.fixture

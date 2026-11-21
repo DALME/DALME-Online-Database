@@ -30,12 +30,15 @@ class Tasks(BaseViewSet):
     permission_classes = [TaskAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope & TaskAccessPolicy]
 
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
     filterset_class = TaskFilter
     search_fields = ['title', 'description']
     ordering_fields = ['id', 'title', 'description', 'completed', 'creation_user', 'creation_timestamp']
     ordering = ['-creation_timestamp']
+
+    def get_queryset(self):
+        """Build the queryset per request, so it filters by the requesting tenant."""
+        return Task.objects.all()
 
     def list(self, request, *args, **kwargs):
         """Override method to include context data."""
@@ -74,6 +77,9 @@ class TaskLists(BaseViewSet):
     permission_classes = [TaskListAccessPolicy]
     oauth_permission_classes = [TokenHasReadWriteScope & TaskListAccessPolicy]
 
-    queryset = TaskList.objects.all()
     serializer_class = TaskListSerializer
     filterset_class = TasklistFilter
+
+    def get_queryset(self):
+        """Build the queryset per request, so it filters by the requesting tenant."""
+        return TaskList.objects.all()

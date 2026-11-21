@@ -3,11 +3,12 @@
 import os
 
 from django_currentuser.middleware import get_current_user
+from django_tenants.utils import tenant_context
 from wagtail.search import index
 from wagtail.search.signal_handlers import post_delete_signal_handler, post_save_signal_handler
 
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection, models
+from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -110,16 +111,16 @@ def wagtail_index_post_save_signal_handler(instance, update_fields=None, **kwarg
         instance = type(instance).objects.get(pk=instance.pk)
 
     for tenant in Tenant.objects.exclude(schema_name='public').all():
-        connection.set_tenant(tenant)
-        index.insert_or_update_object(instance)
+        with tenant_context(tenant):
+            index.insert_or_update_object(instance)
 
 
 @receiver(models.signals.post_delete, sender=Record)
 def wagtail_index_post_delete_signal_handler(instance, **kwargs):  # noqa: ARG001
     """Update Wagtail search index after delete method on Record objects."""
     for tenant in Tenant.objects.exclude(schema_name='public').all():
-        connection.set_tenant(tenant)
-        index.remove_object(instance)
+        with tenant_context(tenant):
+            index.remove_object(instance)
 
 
 @receiver(models.signals.post_save, sender=Workflow)
