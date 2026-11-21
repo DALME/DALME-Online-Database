@@ -1,61 +1,50 @@
 # Multitenancy
 
-The DALME codebase was originally designed for just a single 'tenant' or team,
-DALME itself. The decision to open the system up for the use of multiple,
-concurrent parties has led to the need for a significant refactoring in order
-to become a 'multitenant architecture'.
+IDA hosts several research projects on one platform. The IDA itself is the
+{term}`Central Tenant`, which holds the shared research, and each research
+project is an {term}`Orbiting Tenant`. The root `CONTEXT.md` states the model;
+this page says how it is built today. #89 documents the system in full,
+including which models each kind of tenancy covers.
 
-## Multitenancy Modes
+Tenancy comes in two kinds. They are built differently, bound by different
+middleware, and must not be confused.
 
-We've had to implement three different modes of multitenancy in order to meet
-our desired requirements.
+## Schema tenancy
 
-### #1 Postgres Schemas
+Each orbiting tenant's CMS lives in its own Postgres schema: the Wagtail sites
+and the `web` apps (`PROJECT_TENANT_APPS`), with their own admin log, sessions
+and messages. The central tenant lives in the `public` schema, which holds
+everything shared (`SHARED_TENANT_APPS`): the ontology, users, OAuth and the
+tenants themselves. Every schema can also read `public`.
 
-Used **only** by the `dalme_public` site (ie. the Wagtail CMS).
+Wagtail keeps data outside its page tree, snippets for example, so filtering one
+tree would still show another project's data. A schema per project isolates
+each CMS completely.
 
-Due to the design of Wagtail, not everything has a place on the CMS tree
-([Snippets](https://docs.wagtail.org/en/stable/topics/snippets/index.html) for
-example), so it's not enough to achieve multitenancy in Wagtail simply by
-making the db tree alone logically isolated and only filtering strictly within
-a particular tree for example. Such a method will still return values from
-other CMS instances which don't reside within the tree, something we don't want
-to happen.
+On each request, `TenantMiddleware` (django-tenants) finds the host among the
+registered domains and switches the connection to that tenant's schema. The
+tenant's type picks the URL configuration: `app.urls.urls` for the central
+tenant, `app.urls.urls_tenant` for an orbiting one (`TENANT_TYPES` in
+`app/app/settings.py`).
 
-Because of this design fact we've had to take a stronger approach and
-absolutely isolate Wagtail/CMS data per tenant within namespaced [postgres
-schemas](https://www.postgresql.org/docs/current/ddl-schemas.html). Only tables
-from the `dalme_public` app use these tenant schemas. Everything else resides
-in the [default `public`
-schema](https://www.postgresql.org/docs/current/ddl-schemas.html#DDL-SCHEMAS-PUBLIC)
+## Row tenancy
 
-:::{note}
-There is some slightly confusing terminology here, but it's just a coincidence.
-Just don't mistake the `public` schema for the `dalme_public` app, even though
-they are related conceptually.
-:::
+A project's working material is drawn from the IDA and lives in the shared
+`public` schema, beside the shared research, but each of its rows carries a
+tenant key (`TenantMixin`,
+`app/tenants/models/tenant_mixin.py`). On each request,
+`TenantContextMiddleware` binds the current tenant into a context variable.
+Tenanted managers (`CustomManager`) filter by it when a queryset is built, and
+`TenantMixin.save` writes it onto a new row.
 
-### #2 ORM Scoped (aka "Core")
+The schema and the current tenant are bound separately, so outside a request
+they can disagree (#74).
 
-Using a `tenant` column on a table we can scope our queries to the
-appropriate tenant which is determined via the origin of the incoming request.
+## Neither: the shared research and users
 
+The ontology is not scoped by tenancy. Every project sees the same records,
+people, places and attributes, and the data is secured instead by ownership and
+authorization over it.
 
-### #3 Unscoped (aka "Research")
-
-Falling out of this design is a third category. Certain resources should be
-available to all tenants and so do not fall under the remit of any scoping
-mechanisms.
-
-For example the IDA data models fall into this category. That data set
-represents the common documentary substrata out of which all tenants can curate
-their own scoped 'research' data.
-
-Technically speaking this mode is not really 'multitenant' at all, not being
-scoped in any way. However in the context of our particular architecture it
-makes up a significant part of the system and so should be seen as a kind of
-negative complement to the overall multitenancy patterns.
-
-## Tenant Middleware
-
-- https://django-tenants.readthedocs.io/en/latest/
+Users are shared too. A user belongs to no tenant, and is a {term}`Member` of
+projects through `Tenant.members`.

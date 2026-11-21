@@ -117,10 +117,16 @@ Backend packages under `app/`:
 - `search/`: Elasticsearch/OpenSearch indexing.
 - `authorization/`: drf-access-policy statements.
 
-Tenancy comes in two kinds: Postgres schemas for each project's CMS, and a tenant
-key on the rows of each project's working material (collections, tasks,
-comments, tags, saved searches). The ontology itself is deliberately **shared**
-across projects (#57).
+The IDA is the **central tenant** and each research project an **orbiting
+tenant** (`CONTEXT.md`). Tenancy comes in two kinds, never to be confused
+(`docs/source/multitenancy.md`):
+
+- **Schema tenancy**: each orbiting tenant's CMS lives in its own Postgres
+  schema, chosen per request from the host.
+- **Row tenancy**: each project's working material (drawn from the IDA) carries
+  a tenant key in the shared schema, bound per request into a context variable.
+
+The ontology and users are in neither: they are deliberately **shared** (#57).
 
 Frontend in `ui/`; infrastructure in `tf/` (Terragrunt on AWS); docs in `docs/`
 (Sphinx + MyST).

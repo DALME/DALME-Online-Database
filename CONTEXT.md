@@ -18,9 +18,21 @@ Pizzorno, realized today in `app/domain`. Its bounded contexts are TBD: each is
 written down with the people who designed it, never reverse-engineered from the
 code.
 
-Tenancy is part of the model, not an implementation detail. Some data belongs to
-a single tenant; the rest is deliberately shared across tenants. Which is which
-is stated per context.
+Tenancy is part of the model, not an implementation detail.
+
+- The **IDA** is the **central tenant**: the repository, and in time the
+  service, of the shared research. Sites, systems, clients and applications
+  orbit it and consume what it shares. It has no public site of its own (yet).
+- Every other tenant is an **orbiting tenant**, a research project such as
+  DALME or Historical Pharmacopeias. Each has its own public site and CMS, which
+  stand wholly apart from every other project's. Each also has its own working
+  material, drawn from the IDA, which belongs to it alone.
+- The shared research is not enclosed by tenancy. It is shared freely with the
+  orbiting tenants, and secured by ownership and authorization over it.
+- A **user** belongs to no tenant. A user is a **member** of the projects they
+  work in.
+
+Which material is shared and which a project owns is stated per context.
 
 ## How we write a CONTEXT.md
 

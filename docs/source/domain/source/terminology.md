@@ -24,6 +24,13 @@ consistent.
 different contexts. [Martin Fowler](https://martinfowler.com/bliki/BoundedContext.html)
 
 {.glossary}
+**Central Tenant**
+
+: The IDA: the repository, and in time the service, of the shared research,
+which every {term}`Orbiting Tenant` consumes. The root `CONTEXT.md` states the
+model.
+
+{.glossary}
 **Closure**
 
 : A piece of work together with everything beneath it: an entry point (a META)
@@ -48,6 +55,19 @@ attributes. [Martin Fowler](https://martinfowler.com/bliki/EvansClassification.h
 
 : A rule that must always hold within its scope, typically enforced by an
 {term}`Aggregate`'s root.
+
+{.glossary}
+**Member**
+
+: A user's relation to a project they work in. A user belongs to no tenant, and
+may be a member of several projects.
+
+{.glossary}
+**Orbiting Tenant**
+
+: A research project, such as DALME or Historical Pharmacopeias, that consumes
+the shared research of the {term}`Central Tenant`. It has its own public site
+and CMS, and its own working material.
 
 {.glossary}
 **The Process**
