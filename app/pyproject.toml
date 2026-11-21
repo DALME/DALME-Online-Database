@@ -71,6 +71,7 @@ dev = [
   "pytest-django-queries==1.2.0",
   "pytest-django==4.11.1",
   "pytest-mock==3.14.0",
+  "pytest-randomly==5.1.0",
   "pytest-structlog==1.1",
   "pytest-watcher==0.4.3",
   "pytest==8.3.5",
@@ -85,7 +86,9 @@ package = false
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = 'app.settings'
-addopts = "--strict-markers --reuse-db"
+# pytest-randomly reseeds Faker and factory_boy each run and prints the seed.
+# It keeps file order until #82 removes the tests' dependence on it.
+addopts = "--strict-markers --reuse-db --randomly-dont-reorganize"
 markers = [
   "integration: marks integration tests",
   "property: marks property tests",

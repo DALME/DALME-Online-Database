@@ -20,7 +20,7 @@ graph TD
   E1 --> E2[EPIC]
   E1 --> T1[TASK]
   E2 --> T2[TASK]
-  M --> FX[FIX]
+  FX[FIX]
   E1 -. realizes .-> S2
   FX -. realizes .-> S3
 ```
@@ -83,7 +83,7 @@ type as a badge.
 | **Story** | green | Tech-free domain behaviour, scoped to one bounded context. |
 | **Epic** | orange | Technical composite of epics and tasks that realizes a story. |
 | **Task** | yellow | A single leaf of technical work. |
-| **Fix** | pink | A focused change to a known issue. May hang off a META, or stand alone. |
+| **Fix** | pink | A focused change to a known issue that stands alone. Once it has a parent, it is a Task. |
 | **Bug** | red | An unexpected problem or behaviour. |
 | **Feature** | blue | A request or idea not yet scoped into a closure. |
 | **Intake** | gray | The rolling triage inbox. Sits before everything else. |
