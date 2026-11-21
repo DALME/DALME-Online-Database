@@ -8,6 +8,7 @@ from unittest import mock
 import pytest
 
 from django.core.management.base import CommandError
+from django.db import connection
 
 from tenants.management.commands.collectstatic_tenants import Command as CollectstaticTenants
 from tenants.models import Tenant
@@ -32,29 +33,17 @@ def test_collectstatic_tenants_args():
     assert parser.parse_args(['--force', '--max-workers', '4']) == argparse.Namespace(force=True, max_workers=4)
 
 
+@pytest.mark.django_db
 @mock.patch.dict(os.environ, {'ENV': 'development'})
-@mock.patch('tenants.management.commands.collectstatic_tenants.connection')
-@mock.patch('tenants.management.commands.collectstatic_tenants.call_command')
-@mock.patch('tenants.management.commands.collectstatic_tenants.Tenant')
-@mock.patch('tenants.management.commands.collectstatic_tenants.logger')
-def test_collectstatic_tenants_development(mock_logger, mock_tenant, mock_call_command, mock_connection):
-    tenant_1 = mock.MagicMock(spec=Tenant)
-    tenant_1.schema_name = 'tenant1'
-    tenant_2 = mock.MagicMock(spec=Tenant)
-    tenant_2.schema_name = 'tenant2'
-    mock_tenant.objects.all.return_value = [tenant_1, tenant_2]
+def test_collectstatic_tenants_collects_each_schema_once():
+    collected = []
+    with mock.patch(
+        'tenants.management.commands.collectstatic_tenants.call_command',
+        side_effect=lambda *_: collected.append(connection.schema_name),
+    ):
+        CollectstaticTenants().handle()
 
-    CollectstaticTenants().handle()
-
-    assert mock_call_command.called
-    assert mock_connection.mock_calls == [
-        mock.call.set_schema_to_public(),
-    ]
-    assert mock_logger.mock_calls == [
-        mock.call.info('Collecting staticfiles for tenant: %s', tenant='public'),
-        mock.call.info('Collecting staticfiles for tenant: %s', tenant='tenant1'),
-        mock.call.info('Collecting staticfiles for tenant: %s', tenant='tenant2'),
-    ]
+    assert sorted(collected) == sorted(Tenant.objects.values_list('schema_name', flat=True))
 
 
 @mock.patch.dict(os.environ, {'ENV': 'production'})
@@ -79,5 +68,5 @@ def test_collectstatic_tenants_insufficient_workers(mock_logger, mock_tenant, mo
         mock.call.set_schema_to_public(),
     ]
     assert mock_logger.mock_calls == [
-        mock.call.info('Collecting staticfiles for tenant: %s', tenant='public'),
+        mock.call.info('Collecting staticfiles for tenant: %s', tenant='tenant1'),
     ]

@@ -48,6 +48,9 @@ def test_avatar_url_retrieval(team_member, avatar_image):
 
 @pytest.mark.django_db
 @pytest.mark.urls('app.urls.urls_tenant')
+# The first reverse() imports the domain API, whose filtersets build tenanted
+# querysets when their classes are defined, so a tenant must be bound (#75).
+@pytest.mark.usefixtures('project_schema', 'current_tenant')
 def test_avatar_rendering_in_views(superuser, avatar_image, test_username, test_password, test_domain):
     client = Client(HTTP_HOST=test_domain.domain)
     client.login(username=test_username, password=test_password)

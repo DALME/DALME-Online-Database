@@ -130,9 +130,6 @@ class Command(BaseCommand):
 
         command = self.collectstatic if self.is_dev else self.collectstatic_s3
         connection.set_schema_to_public()
-        logger.info('Collecting staticfiles for tenant: %s', tenant='public')
-        command(connection.tenant)
-
         for tenant in Tenant.objects.all():
             logger.info('Collecting staticfiles for tenant: %s', tenant=tenant.schema_name)
             command(tenant)

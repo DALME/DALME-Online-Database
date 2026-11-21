@@ -4,6 +4,7 @@ import io
 from pathlib import Path
 
 import pytest
+from django_tenants.utils import tenant_context
 from faker import Faker
 from PIL import Image
 
@@ -13,7 +14,14 @@ from web.models import Essay, FeaturedInventory, FeaturedObject
 
 
 @pytest.fixture
-def team_member(factories):
+def project_schema(test_tenant):
+    """Bind the test project's schema, where its CMS lives."""
+    with tenant_context(test_tenant):
+        yield test_tenant
+
+
+@pytest.fixture
+def team_member(factories, project_schema):  # noqa: ARG001
     """Inject a regular team member."""
     return factories.team_members.create()
 
@@ -39,7 +47,7 @@ def avatar_image():
 
 
 @pytest.fixture
-def featured_pages(factories):
+def featured_pages(factories, project_schema):  # noqa: ARG001
     """Inject a queryset of featured essays, objects, and inventories."""
     essays = factories.essay_pages.create_batch(3)
     objects = factories.featured_object_pages.create_batch(3)
@@ -49,13 +57,13 @@ def featured_pages(factories):
 
 
 @pytest.fixture
-def featured_pages_qs():
+def featured_pages_qs(project_schema):  # noqa: ARG001
     """Inject a queryset of featured pages."""
     return FeaturedInventory.objects.all().union(FeaturedObject.objects.all(), Essay.objects.all())
 
 
 @pytest.fixture
-def test_site(factories):
+def test_site(factories, project_schema):  # noqa: ARG001
     home_page = factories.home_pages.create()
     factories.flat_pages.create(parent=home_page)  # home page child (i.e. content)
     site = factories.sites.create(root_page=home_page)
