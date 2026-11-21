@@ -2,7 +2,25 @@
 
 import pytest
 
-from oauth.models import User
+from django.contrib.auth.models import Group
+
+from oauth.models import GroupProperties, User
+
+from tests.factories.fakers import fake
+
+
+@pytest.mark.django_db
+def test_a_group_keeps_the_tenant_it_was_created_under(as_tenant, test_tenant, other_tenant):
+    with as_tenant(test_tenant):
+        group = Group.objects.create(name=fake.word())
+        properties = GroupProperties.objects.create(
+            group=group,
+            group_type=GroupProperties.TEAM,
+            description=fake.sentence(),
+        )
+
+    with as_tenant(other_tenant):
+        assert properties.tenant.pk == test_tenant.pk
 
 
 def test_user_creation_error():

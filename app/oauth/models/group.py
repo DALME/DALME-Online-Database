@@ -54,5 +54,5 @@ class GroupProperties(models.Model):
         if created:
             tenant = get_current_tenant()
             if bool(tenant):  # This just checks the proxy is actually bound to a value.
-                self.tenant = tenant
+                self.tenant = tenant._get_current_object()  # noqa: SLF001
         super().save(*args, **kwargs)
