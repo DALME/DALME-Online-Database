@@ -117,6 +117,16 @@ class CustomManager(models.Manager):
 
         return qs
 
+    def create(self, **kwargs):
+        """Create a row without first building a scoped queryset.
+
+        Django's `Manager.create` goes through `get_queryset`, which would read
+        the current tenant even when the row names its own. A row without one
+        still takes the bound tenant in `TenantMixin.save`.
+
+        """
+        return models.QuerySet(self.model, using=self._db).create(**kwargs)
+
     def unscoped(self):
         """Return a non-tenant-scoped queryset when calling a related manager."""
         qs = models.QuerySet(self.model, using=self._db)

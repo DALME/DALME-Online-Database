@@ -8,7 +8,7 @@ from rest_framework.request import Request
 from django.db import connection
 from django.db.models import QuerySet
 
-from domain.models import Record, TaskList
+from domain.models import OptionsValue, Record, TaskList
 from domain.signals import wagtail_index_post_delete_signal_handler, wagtail_index_post_save_signal_handler
 
 from tests.factories.fakers import fake
@@ -62,6 +62,22 @@ def test_a_saved_row_keeps_the_tenant_it_was_saved_under(as_tenant, test_tenant,
         assert task_list.tenant.pk == test_tenant.pk
 
     assert task_list.tenant.pk == test_tenant.pk
+
+
+@pytest.mark.django_db
+def test_creating_a_row_that_names_its_tenant_needs_none_bound(test_tenant, factories):
+    op_list = factories.options_lists.create()
+
+    value = OptionsValue.objects.create(op_list=op_list, payload=fake.words(nb=2), tenant=test_tenant)
+    task_list = TaskList.objects.create(name=fake.sentence(nb_words=3)[:60], tenant=test_tenant)
+
+    assert (value.tenant.pk, task_list.tenant.pk) == (test_tenant.pk, test_tenant.pk)
+
+
+@pytest.mark.django_db
+def test_creating_a_row_without_a_tenant_needs_one_bound():
+    with pytest.raises(RuntimeError, match='not bound'):
+        TaskList.objects.create(name=fake.sentence(nb_words=3)[:60])
 
 
 @pytest.mark.django_db

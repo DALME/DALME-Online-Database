@@ -29,12 +29,6 @@ class TenantedFactory(factory.django.DjangoModelFactory):
 
     tenant = factory.LazyFunction(bound_tenant)
 
-    @classmethod
-    def _get_manager(cls, model_class):
-        # The factory always names the tenant, so creating must not also need
-        # one bound: the default manager scopes even `create` by the context.
-        return model_class.unscoped
-
 
 class TaskListFactory(TenantedFactory):
     """Generate task list fixtures."""
