@@ -275,7 +275,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
     assert response.status_code == status.HTTP_200_OK
     assert authorization_payload == {
         'access_token': mock.ANY,
-        'expires_in': int(settings.OAUTH2_ACCESS_TOKEN_EXPIRY),
+        'expires_in': settings.OAUTH2_ACCESS_TOKEN_EXPIRY,
         'token_type': 'Bearer',
         'scope': ' '.join(settings.OAUTH2_SCOPES.keys()),
         'id_token': mock.ANY,
@@ -387,7 +387,7 @@ def test_oauth_complete_cycle(  # noqa: PLR0915
     assert response.status_code == status.HTTP_200_OK
     assert refresh_payload == {
         'access_token': mock.ANY,
-        'expires_in': int(settings.OAUTH2_ACCESS_TOKEN_EXPIRY),
+        'expires_in': settings.OAUTH2_ACCESS_TOKEN_EXPIRY,
         'token_type': 'Bearer',
         'scope': ' '.join(settings.OAUTH2_SCOPES.keys()),
         'id_token': mock.ANY,

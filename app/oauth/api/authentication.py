@@ -84,7 +84,7 @@ class OAuthToken(TokenView):
             response.set_cookie(
                 'refresh_token',
                 refresh_token,
-                max_age=int(settings.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY),
+                max_age=settings.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY,
                 httponly=True,
                 samesite='Lax',
                 secure=not settings.IS_DEV,

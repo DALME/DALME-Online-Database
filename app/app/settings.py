@@ -5,6 +5,7 @@ Uses: https://github.com/jazzband/django-configurations
 """
 
 import dataclasses
+import datetime
 import enum
 import json
 import os
@@ -15,6 +16,11 @@ import structlog
 from configurations import Configuration, pristinemethod
 
 from django.core.exceptions import ImproperlyConfigured
+
+THIRTY_SECONDS = datetime.timedelta(seconds=30)
+ONE_HOUR = datetime.timedelta(hours=1)
+TWO_WEEKS = datetime.timedelta(weeks=2)
+ONE_YEAR = datetime.timedelta(weeks=52, days=1)
 
 
 class TenantTypes(str, enum.Enum):
@@ -73,7 +79,7 @@ class Base(Configuration):
     LOGOUT_REDIRECT_URL = '/'
     LOGOUT_URL = '/db/?logout=true'
     TIME_ZONE = 'America/New_York'
-    SQL_TIMEOUT = 30000
+    SQL_TIMEOUT = int(THIRTY_SECONDS.total_seconds() * 1000)  # Milliseconds, as statement_timeout takes.
     USE_I18N = True
     USE_TZ = True
     WSGI_APPLICATION = 'app.wsgi.application'
@@ -475,10 +481,10 @@ class Base(Configuration):
     ]
 
     OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.Application'
-    OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', '3600')  # 1 hour
-    OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get(
-        'OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', str(3600 * 24 * 14)
-    )  # 14 days
+    OAUTH2_ACCESS_TOKEN_EXPIRY = int(os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', ONE_HOUR.total_seconds()))
+    OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = int(
+        os.environ.get('OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', TWO_WEEKS.total_seconds()),
+    )
 
     OAUTH2_APPLICATION_DEFAULTS = {
         'algorithm': 'RS256',
@@ -738,7 +744,7 @@ class Development(Base):
         """
         with (self.PROJECT_ROOT / '.config' / 'oidc.key').open() as f:
             return {
-                'ACCESS_TOKEN_EXPIRE_SECONDS': int(self.OAUTH2_ACCESS_TOKEN_EXPIRY),
+                'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
                 'ALLOWED_REDIRECT_URI_SCHEMES': ['http'],
                 'OAUTH2_VALIDATOR_CLASS': 'oauth.validators.OAuth2Validator',
                 'OIDC_ENABLED': True,
@@ -922,7 +928,7 @@ class Production(Base):
     def OAUTH2_PROVIDER(self):
         """Configure OAuth and OIDC."""
         return {
-            'ACCESS_TOKEN_EXPIRE_SECONDS': int(self.OAUTH2_ACCESS_TOKEN_EXPIRY),
+            'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
             'ALLOWED_REDIRECT_URI_SCHEMES': ['https'],
             'OAUTH2_VALIDATOR_CLASS': 'oauth.validators.OAuth2Validator',
             'OIDC_ENABLED': True,
@@ -964,7 +970,7 @@ class Production(Base):
 
     SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_HSTS_SECONDS = 3600  # TODO: Increase to 31536000 when stable.
+    SECURE_HSTS_SECONDS = int(ONE_HOUR.total_seconds())  # TODO: Increase to ONE_YEAR when stable.
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
     AWS_DEFAULT_ACL = None

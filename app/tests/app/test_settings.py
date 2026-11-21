@@ -2,6 +2,7 @@
 
 import json
 import os
+from datetime import timedelta
 from unittest import mock
 
 import pytest
@@ -18,6 +19,13 @@ CONFIGURATIONS = [
     (settings_mod.Production, 'production'),
     (settings_mod.Staging, 'staging'),
 ]
+
+
+def test_token_expiries_default_to_seconds():
+    assert timedelta(hours=1).total_seconds() == settings_mod.Base.OAUTH2_ACCESS_TOKEN_EXPIRY
+    assert timedelta(weeks=2).total_seconds() == settings_mod.Base.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY
+    assert isinstance(settings_mod.Base.OAUTH2_ACCESS_TOKEN_EXPIRY, int)
+    assert isinstance(settings_mod.Base.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY, int)
 
 
 def test_the_default_database_checks_and_times_out_connections():
