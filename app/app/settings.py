@@ -315,6 +315,20 @@ class Base(Configuration):
                 'PASSWORD': self.POSTGRES_PASSWORD,
                 'HOST': self.POSTGRES_HOST,
                 'PORT': self.POSTGRES_PORT,
+                'CONN_HEALTH_CHECKS': True,
+                'CONN_MAX_AGE': 0,  # The pool holds connections; Django must not as well.
+                'OPTIONS': {
+                    'connect_timeout': 10,
+                    # Each gthread worker runs 4 threads, each holding one
+                    # connection, so max_size leaves room above that.
+                    'pool': {
+                        'min_size': 1,
+                        'max_size': 10,
+                        'max_idle': 60,
+                        'max_lifetime': 300,
+                        'reconnect_timeout': 5,
+                    },
+                },
             },
             'dam': {
                 'ENGINE': 'django.db.backends.mysql',

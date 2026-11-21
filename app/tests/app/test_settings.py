@@ -20,6 +20,28 @@ CONFIGURATIONS = [
 ]
 
 
+def test_the_default_database_checks_and_times_out_connections():
+    default = settings_mod.Development().DATABASES['default']
+
+    assert default['CONN_HEALTH_CHECKS'] is True
+    assert default['OPTIONS']['connect_timeout'] > 0
+
+
+@pytest.mark.django_db
+def test_connections_come_from_a_pool():
+    from django.db import connection
+
+    assert connection.pool is not None
+
+
+def test_pooled_connections_reset_the_tenant_schema_on_every_cursor():
+    # django-tenants re-sets the search path per cursor unless this is set, so
+    # a connection back from the pool never keeps the previous tenant's schema.
+    from django.conf import settings
+
+    assert not getattr(settings, 'TENANT_LIMIT_SET_CALLS', False)
+
+
 def test_ci_runs_the_suite_on_the_test_storages():
     assert settings_mod.CI.STORAGES == settings_mod.Test.STORAGES
 

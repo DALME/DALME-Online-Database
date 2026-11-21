@@ -36,6 +36,7 @@ dependencies = [
   "pandas==2.2.3",
   "passlib==1.7.4",
   "psycopg==3.2.3",
+  "psycopg-pool==3.3.3",
   "PyMySQL==1.2.4",
   "pyhumps==3.8.0",
   "pyzotero==1.5.28",
