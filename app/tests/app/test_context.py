@@ -1,8 +1,30 @@
 """Tests for the app.context module."""
 
+import contextvars
 from unittest import mock
 
+import pytest
+from django_tenants.utils import tenant_context
+
 from app import context
+
+
+@pytest.mark.django_db
+def test_bibliography_choices_follow_the_project_on_one_thread(factories, test_tenant, other_tenant):
+    with tenant_context(test_tenant):
+        ours = factories.bibliography_pages.create()
+    with tenant_context(other_tenant):
+        theirs = factories.bibliography_pages.create()
+
+    def choices_in(tenant):
+        with tenant_context(tenant):
+            return context.get_biblio_pages()
+
+    # One context stands for one worker thread serving both projects in turn.
+    first, second = contextvars.copy_context().run(lambda: (choices_in(test_tenant), choices_in(other_tenant)))
+
+    assert first == [(ours.pk, ours.short_title)]
+    assert second == [(theirs.pk, theirs.short_title)]
 
 
 def test_get_gradient_pages_sets_and_returns_ids():
@@ -33,28 +55,12 @@ def test_get_gradient_pages_returns_cached_value():
     assert context.get_gradient_pages() == [1, 2, 3]
 
 
-def test_get_biblio_pages_sets_and_returns_titles():
-    mock_model = mock.Mock()
-    mock_obj1 = mock.Mock()
-    mock_obj1.id = 1
-    mock_obj1.short_title = 'Short'
-    mock_obj1.title = 'Title1'
-    mock_obj2 = mock.Mock()
-    mock_obj2.id = 2
-    mock_obj2.short_title = ''
-    mock_obj2.title = 'Title2'
-    mock_model.objects.all.return_value = [mock_obj1, mock_obj2]
+@pytest.mark.django_db
+def test_a_bibliography_without_a_short_title_is_listed_by_its_title(factories, test_tenant):
+    with tenant_context(test_tenant):
+        page = factories.bibliography_pages.create(short_title='')
 
-    with mock.patch('app.context.apps.get_model', return_value=mock_model):
-        result = context.get_biblio_pages()
-        assert result == [(1, 'Short'), (2, 'Title2')]
-        # Should return cached value on second call
-        assert context.get_biblio_pages() == [(1, 'Short'), (2, 'Title2')]
-
-
-def test_get_biblio_pages_returns_cached_value():
-    context._biblio_pages.set([(1, 'A'), (2, 'B')])  # noqa: SLF001
-    assert context.get_biblio_pages() == [(1, 'A'), (2, 'B')]
+        assert context.get_biblio_pages() == [(page.pk, page.title)]
 
 
 def test_get_current_username_returns_username(test_username):

@@ -15,9 +15,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 
 _gradient_pages = contextvars.ContextVar('gradient_pages', default=None)
-_biblio_pages = contextvars.ContextVar('biblio_pages', default=None)
 _gradient_pages.set([])
-_biblio_pages.set([])
 
 
 def get_gradient_pages():
@@ -34,10 +32,8 @@ def get_gradient_pages():
 
 
 def get_biblio_pages():
-    if not _biblio_pages.get():
-        model = apps.get_model('web', 'Bibliography')
-        _biblio_pages.set([(p.id, p.short_title if p.short_title else p.title) for p in model.objects.all()])
-    return _biblio_pages.get()
+    model = apps.get_model('web', 'Bibliography')
+    return [(p.id, p.short_title or p.title) for p in model.objects.all()]
 
 
 def get_current_tenant():
