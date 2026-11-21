@@ -197,6 +197,7 @@ class Base(Configuration):
         'tenants.middleware.TenantContextMiddleware',
         'django_structlog.middlewares.RequestMiddleware',
         'django.middleware.security.SecurityMiddleware',
+        'django_permissions_policy.PermissionsPolicyMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'app.middleware.SubdomainRedirectMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
@@ -343,6 +344,25 @@ class Base(Configuration):
                 'OPTIONS': {'ssl_disabled': True},
             },
         }
+
+    # Browser features the sites never use, denied to every page and frame.
+    PERMISSIONS_POLICY = {
+        'accelerometer': [],
+        'ambient-light-sensor': [],
+        'autoplay': [],
+        'camera': [],
+        'display-capture': [],
+        'encrypted-media': [],
+        # The editors' app has a full screen button (`NavBar.vue`).
+        'fullscreen': ['self'],
+        'geolocation': [],
+        'gyroscope': [],
+        'magnetometer': [],
+        'microphone': [],
+        'midi': [],
+        'payment': [],
+        'usb': [],
+    }
 
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
 

@@ -35,6 +35,7 @@ dependencies = [
   "opencv-python-headless==4.10.0.84",
   "pandas==2.2.3",
   "passlib==1.7.4",
+  "django-permissions-policy==4.31.0",
   "psycopg==3.2.3",
   "psycopg-pool==3.3.3",
   "PyMySQL==1.2.4",

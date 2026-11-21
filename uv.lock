@@ -440,6 +440,7 @@ dependencies = [
     { name = "django-filter" },
     { name = "django-maintenance-mode" },
     { name = "django-oauth-toolkit" },
+    { name = "django-permissions-policy" },
     { name = "django-recaptcha" },
     { name = "django-sortedm2m" },
     { name = "django-storages" },
@@ -521,6 +522,7 @@ requires-dist = [
     { name = "django-filter", specifier = "==24.3" },
     { name = "django-maintenance-mode", specifier = "==0.21.1" },
     { name = "django-oauth-toolkit", specifier = "==3.0.1" },
+    { name = "django-permissions-policy", specifier = "==4.31.0" },
     { name = "django-recaptcha", specifier = "==4.0.0" },
     { name = "django-sortedm2m", specifier = "==4.0.0" },
     { name = "django-storages", specifier = "==1.14.4" },
@@ -800,6 +802,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/94/4b/364fe61a161ead607dc6af311901ba8e62f537f8fdab94b5252cb6efe6d7/django-permissionedforms-0.1.tar.gz", hash = "sha256:4340bb20c4477fffb13b4cc5cccf9f1b1010b64f79956c291c72d2ad2ed243f8", size = 5856, upload-time = "2022-02-28T19:40:27.892Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e6/5b/216157ff053f955b15b9dcdc13bfb6e406666445164fee9e332e141be96d/django_permissionedforms-0.1-py2.py3-none-any.whl", hash = "sha256:d341a961a27cc77fde8cc42141c6ab55cc1f0cb886963cc2d6967b9674fa47d6", size = 5744, upload-time = "2022-02-28T19:40:26.337Z" },
+]
+
+[[package]]
+name = "django-permissions-policy"
+version = "4.31.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0d/96/e5efc8b2baf1570cd8770195c161c536abe145cbdd375064409bffe6ddff/django_permissions_policy-4.31.0.tar.gz", hash = "sha256:58dbe0d3eeed58894ca90ae59eb0e4453271f3197555bd73f80399fbd80edf02", size = 14919, upload-time = "2026-06-12T16:17:19.385Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/e3/6ec24943d5d41fe2b811d951e142c38359c2ecd222499c0e47f1103ad458/django_permissions_policy-4.31.0-py3-none-any.whl", hash = "sha256:b8d874394dcc91b10d501378604bf4492e56c6fe8116d41a31f4a8918041b2e2", size = 8648, upload-time = "2026-06-12T16:17:18.318Z" },
 ]
 
 [[package]]
