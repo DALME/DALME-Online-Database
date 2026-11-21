@@ -57,8 +57,8 @@ def test_get_biblio_pages_returns_cached_value():
     assert context.get_biblio_pages() == [(1, 'A'), (2, 'B')]
 
 
-def test_get_current_username_returns_username():
+def test_get_current_username_returns_username(test_username):
     mock_user = mock.Mock()
-    mock_user.username = 'testuser'
+    mock_user.username = test_username
     with mock.patch('app.context.get_current_user', return_value=mock_user):
-        assert context.get_current_username() == 'testuser'
+        assert context.get_current_username() == test_username

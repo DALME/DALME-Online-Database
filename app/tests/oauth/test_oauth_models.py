@@ -12,22 +12,22 @@ def test_user_creation_error():
     assert str(exc.value) == 'The given username must be set'
 
 
-def test_superuser_creation_error_is_staff(test_username):
+def test_superuser_creation_error_is_staff(test_username, test_password):
     with pytest.raises(ValueError) as exc:  # noqa: PT011
         User.objects.create_superuser(
             username=test_username,
-            password='password123',
+            password=test_password,
             is_staff=False,
         )
 
     assert str(exc.value) == 'Superuser must have is_staff=True.'
 
 
-def test_superuser_creation_error_is_superuser(test_username):
+def test_superuser_creation_error_is_superuser(test_username, test_password):
     with pytest.raises(ValueError) as exc:  # noqa: PT011
         User.objects.create_superuser(
             username=test_username,
-            password='password123',
+            password=test_password,
             is_superuser=False,
         )
 
@@ -41,14 +41,14 @@ def test_user_creation(test_username):
 
 
 @pytest.mark.django_db
-def test_superuser_creation(test_username):
-    user = User.objects.create_superuser(username=test_username, password='password123')
+def test_superuser_creation(test_username, test_password):
+    user = User.objects.create_superuser(username=test_username, password=test_password)
     assert isinstance(user.pk, int)
 
 
 @pytest.mark.django_db
-def test_user_creation_bulk(test_username):
-    objs = [User(username=test_username), User(username='another.username')]
+def test_user_creation_bulk(test_username, factories):
+    objs = [User(username=test_username), User(username=factories.users.build().username)]
     users = User.objects.bulk_create(objs)
 
     assert all(isinstance(user.pk, int) for user in users)

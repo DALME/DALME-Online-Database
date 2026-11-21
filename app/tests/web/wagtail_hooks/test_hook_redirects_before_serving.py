@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 
+from web.models import Section
 from web.wagtail_hooks.redirects_before_serving import add_redirects_before_serving_pages
 
 
@@ -28,7 +29,7 @@ def test_redirects_root_page(mock_redirect, mock_get_current_tenant, test_site, 
 def test_redirects_section_with_child(mock_redirect, mock_get_current_tenant, test_site, test_tenant, rf):
     mock_get_current_tenant.return_value = test_tenant
     home_page = test_site.root_page
-    section = home_page.get_children().filter(title='Section 1').first().specific
+    section = home_page.get_children().type(Section).first().specific
     assert section._meta.label == 'web.Section'  # noqa: SLF001
     request = rf.get(f'{section.get_full_url()}', headers={'HOST': test_site.hostname})
     child_slug = section.get_children().live().first().slug
@@ -44,7 +45,7 @@ def test_redirects_section_with_child(mock_redirect, mock_get_current_tenant, te
 def test_redirects_section_without_child(mock_redirect, mock_get_current_tenant, factories, test_site, test_tenant, rf):
     mock_get_current_tenant.return_value = test_tenant
     home_page = test_site.root_page
-    section = factories.pages_sections.create(parent=home_page, slug='section')
+    section = factories.pages_sections.create(parent=home_page)
     assert section._meta.label == 'web.Section'  # noqa: SLF001
     assert section.get_children().live().first() is None
     assert section.get_ancestors().last().slug == home_page.slug
@@ -60,7 +61,7 @@ def test_redirects_section_without_child(mock_redirect, mock_get_current_tenant,
 def test_no_redirect_for_other_pages(mock_get_current_tenant, test_site, factories, test_tenant, rf):
     mock_get_current_tenant.return_value = test_tenant
     home_page = test_site.root_page
-    page = factories.flat_pages.create(parent=home_page, slug='some-page')
+    page = factories.flat_pages.create(parent=home_page)
     request = rf.get(f'{page.get_full_url()}', headers={'HOST': test_site.hostname})
     result = add_redirects_before_serving_pages(page, request, None, None)
     assert result is None

@@ -129,39 +129,38 @@ def test_ensure_oauth_refresh(mock_application, mock_call_command, log):
 
 
 @pytest.mark.django_db
-def test_createsuperuser_refuses():
+def test_createsuperuser_refuses(test_username, test_email):
     with pytest.raises(CommandError, match='create_superuser'):
-        call_command('createsuperuser', interactive=False, username='dev', email='dev@example.com')
+        call_command('createsuperuser', interactive=False, username=test_username, email=test_email)
 
-    assert not User.objects.filter(username='dev').exists()
+    assert not User.objects.filter(username=test_username).exists()
 
 
 @pytest.mark.django_db
 @override_settings(ENV='production')
-def test_create_superuser_refuses_outside_development():
+def test_create_superuser_refuses_outside_development(test_username, test_email):
     with pytest.raises(CommandError, match='development'):
-        call_command('create_superuser', interactive=False, username='dev', email='dev@example.com')
+        call_command('create_superuser', interactive=False, username=test_username, email=test_email)
 
-    assert not User.objects.filter(username='dev').exists()
+    assert not User.objects.filter(username=test_username).exists()
 
 
 @pytest.mark.django_db
 @override_settings(ENV='development')
-@mock.patch.dict(os.environ, {'DJANGO_SUPERUSER_PASSWORD': 'password123'})
-def test_create_superuser():
-    call_command('create_superuser', interactive=False, username='dev', email='dev@example.com')
+def test_create_superuser(test_username, test_email, test_password):
+    with mock.patch.dict(os.environ, {'DJANGO_SUPERUSER_PASSWORD': test_password}):
+        call_command('create_superuser', interactive=False, username=test_username, email=test_email)
 
-    user = User.objects.get(username='dev')
+    user = User.objects.get(username=test_username)
     assert user.is_superuser
     assert user.first_name == 'Development'
     assert user.last_name == 'Superuser'
     assert user.full_name == 'Development Superuser'
 
 
-@mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'test@example.com'})
 @override_settings(ENV='production')
-def test_ensure_superuser_no_creds(log):
-    with pytest.raises(KeyError) as exc:
+def test_ensure_superuser_no_creds(log, test_email):
+    with mock.patch.dict(os.environ, {'ADMIN_USERNAME': test_email}), pytest.raises(KeyError) as exc:
         EnsureSuperuser().handle()
 
     assert str(exc.value) == "'ADMIN_PASSWORD'"
@@ -177,38 +176,38 @@ def test_ensure_superuser_no_creds(log):
 
 
 @pytest.mark.django_db
-@mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
 @override_settings(ENV='development')
-def test_ensure_superuser_refuses_outside_deployment():
-    with pytest.raises(CommandError, match='create_superuser'):
+def test_ensure_superuser_refuses_outside_deployment(test_username, test_password):
+    credentials = {'ADMIN_USERNAME': test_username, 'ADMIN_PASSWORD': test_password}
+    with mock.patch.dict(os.environ, credentials), pytest.raises(CommandError, match='create_superuser'):
         EnsureSuperuser().handle()
 
-    assert not User.objects.filter(username='foo').exists()
+    assert not User.objects.filter(username=test_username).exists()
 
 
 @pytest.mark.django_db
-@mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
 @override_settings(ENV='production')
-def test_ensure_superuser_create():
-    EnsureSuperuser().handle()
+def test_ensure_superuser_create(test_username, test_password):
+    with mock.patch.dict(os.environ, {'ADMIN_USERNAME': test_username, 'ADMIN_PASSWORD': test_password}):
+        EnsureSuperuser().handle()
 
-    user = User.objects.get(username='foo')
+    user = User.objects.get(username=test_username)
     assert user.is_superuser
-    assert user.check_password('bar')
+    assert user.check_password(test_password)
 
 
-@mock.patch.dict(os.environ, {'ADMIN_USERNAME': 'foo', 'ADMIN_PASSWORD': 'bar'})
 @override_settings(ENV='production')
 @mock.patch('oauth.management.commands.ensure_superuser.User')
 @mock.patch('oauth.management.commands.ensure_superuser.logger')
-def test_ensure_superuser_refresh(mock_logger, mock_user):
-    EnsureSuperuser().handle()
+def test_ensure_superuser_refresh(mock_logger, mock_user, test_username, test_password):
+    with mock.patch.dict(os.environ, {'ADMIN_USERNAME': test_username, 'ADMIN_PASSWORD': test_password}):
+        EnsureSuperuser().handle()
 
     assert mock_user.mock_calls == [
-        mock.call.objects.get(username='foo'),
-        mock.call.objects.get().set_password('bar'),
+        mock.call.objects.get(username=test_username),
+        mock.call.objects.get().set_password(test_password),
         mock.call.objects.get().save(),
     ]
     assert mock_logger.mock_calls == [
-        mock.call.info('Refreshed password for superuser', user='foo'),
+        mock.call.info('Refreshed password for superuser', user=test_username),
     ]

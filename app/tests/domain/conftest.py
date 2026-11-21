@@ -2,8 +2,6 @@
 
 import pytest
 
-from domain.models import PreferenceKey
-
 
 @pytest.fixture
 def preferences_view(db, current_tenant):  # noqa: ARG001
@@ -19,13 +17,6 @@ def preferences_view(db, current_tenant):  # noqa: ARG001
 
 
 @pytest.fixture
-def preference_key(db):  # noqa: ARG001
+def preference_key(db, factories):  # noqa: ARG001
     """Inject a preference key, which gives every user a preference for it."""
-    return PreferenceKey.objects.create(
-        name='theme',
-        label='Theme',
-        description='',
-        data_type='STR',
-        group='Record Editor',
-        default='oneDark',
-    )
+    return factories.preference_keys.create()

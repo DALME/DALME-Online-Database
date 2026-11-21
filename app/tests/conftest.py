@@ -16,6 +16,7 @@ from tenants.middleware.tenant_context_middleware import _tenant
 from tenants.models import Domain, Tenant
 
 from tests.factories import ResourceFactory
+from tests.factories.fakers import fake
 
 
 def pytest_collection_modifyitems(items):
@@ -131,20 +132,20 @@ def arf():
 
 @pytest.fixture
 def test_username():
-    """Inject a test username."""
-    return 'hari.seldon'
+    """Inject a generated username."""
+    return fake.user_name()
 
 
 @pytest.fixture
 def test_email():
-    """Inject a test email address."""
-    return 'hari.seldon@streeling.edu'
+    """Inject a generated email address."""
+    return fake.email()
 
 
 @pytest.fixture
 def test_password():
-    """Inject a test password."""
-    return 'password123'
+    """Inject a generated password."""
+    return fake.password(length=16)
 
 
 @pytest.fixture

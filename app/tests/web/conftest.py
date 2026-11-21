@@ -57,8 +57,8 @@ def featured_pages_qs():
 @pytest.fixture
 def test_site(factories):
     home_page = factories.home_pages.create()
-    factories.flat_pages.create(parent=home_page, slug='home')  # home page child (i.e. content)
+    factories.flat_pages.create(parent=home_page)  # home page child (i.e. content)
     site = factories.sites.create(root_page=home_page)
-    section1 = factories.pages_sections.create(title='Section 1', parent=home_page, slug='section-1')
-    factories.flat_pages.create_batch(3, parent=section1)
+    section = factories.pages_sections.create(parent=home_page)
+    factories.flat_pages.create_batch(3, parent=section)
     return site

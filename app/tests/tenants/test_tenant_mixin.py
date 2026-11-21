@@ -10,7 +10,7 @@ from django.db import models
 
 @pytest.mark.django_db
 def test_tenant_field_exists(factories, current_tenant):  # noqa: ARG001
-    instance = factories.tenanted_models.create(name='TestFieldExists')
+    instance = factories.tenanted_models.create()
     field = instance._meta.model._meta.get_field('tenant')  # noqa: SLF001
     assert isinstance(field, models.ForeignKey)
     assert field.related_model.__name__ == 'Tenant'
@@ -18,14 +18,14 @@ def test_tenant_field_exists(factories, current_tenant):  # noqa: ARG001
 
 @pytest.mark.django_db
 def test_is_tenanted_class_attr(factories, current_tenant):  # noqa: ARG001
-    instance = factories.tenanted_models.create(name='TestIsTenanted')
+    instance = factories.tenanted_models.create()
     assert hasattr(instance._meta.model, 'is_tenanted')  # noqa: SLF001
     assert instance._meta.model.is_tenanted is True  # noqa: SLF001
 
 
 @pytest.mark.django_db
 def test_objects_and_unscoped_managers_exist(factories, current_tenant):  # noqa: ARG001
-    instance = factories.tenanted_models.create(name='TestObjectsAndUnscoped')
+    instance = factories.tenanted_models.create()
     assert hasattr(instance._meta.model, 'objects')  # noqa: SLF001
     assert hasattr(instance._meta.model, 'unscoped')  # noqa: SLF001
 
@@ -36,6 +36,6 @@ def test_save_does_not_set_tenant_if_data_migration(factories, test_tenant):
         mock.patch.dict(os.environ, {'DATA_MIGRATION': '1'}),
         mock.patch('tenants.models.tenant_mixin.get_current_tenant') as mock_get_current_tenant,
     ):
-        instance = factories.tenanted_models.create(name='TestMigration', tenant=test_tenant)
+        instance = factories.tenanted_models.create(tenant=test_tenant)
         instance.save()
         mock_get_current_tenant.assert_not_called()

@@ -3,13 +3,17 @@
 import pytest
 from django_tenants.utils import get_tenant_type_choices
 
+from tests.factories.fakers import fake
+
 
 @pytest.mark.django_db
 def test_tenant_creation(factories):
-    tenant = factories.tenants.create(name='TestTenant', schema_name='test_tenant')
-    assert tenant.name == 'TestTenant'
+    name = fake.company()
+    schema_name = fake.slug().replace('-', '_')
+    tenant = factories.tenants.create(name=name, schema_name=schema_name)
+    assert tenant.name == name
     assert tenant.tenant_type == 'project'
-    assert tenant.schema_name == 'test_tenant'
+    assert tenant.schema_name == schema_name
     assert tenant.id is not None
 
 
