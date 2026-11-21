@@ -1,5 +1,6 @@
 import mimetypes
-import urllib
+import urllib.parse
+import urllib.request
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
@@ -34,7 +35,7 @@ def DownloadAttachment(request, path):
         filename_header = ''
     else:
         # For others like Firefox, we follow RFC2231 (encoding extension in HTTP headers).
-        filename_header = 'filename*=UTF-8\'\'%s' % urllib.quote(original_filename.encode('utf-8'))
+        filename_header = 'filename*=UTF-8\'\'%s' % urllib.parse.quote(original_filename)
     response['Content-Disposition'] = 'attachment; ' + filename_header
     return response
 
