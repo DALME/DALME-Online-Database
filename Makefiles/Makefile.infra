@@ -54,6 +54,7 @@ endif
 
 infra.rebuild:
 	docker compose up -d --build --force-recreate
+	docker compose build $(NAMESPACE).deploy
 .PHONY: infra.rebuild
 
 infra.start:
@@ -67,6 +68,7 @@ infra.stop:
 ### Private (non-interface) targets.
 _infra.build:
 	docker compose up -d --build
+	docker compose build $(NAMESPACE).deploy
 .PHONY: _infra.build
 
 _infra.env:

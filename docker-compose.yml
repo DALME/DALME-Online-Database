@@ -120,6 +120,9 @@ services:
   ida.deploy:
     image: ida.deploy:dev
     container_name: ida.deploy
+    # The deploy.* targets start it on demand with `docker compose run`, and
+    # `up --build` skips it, so the build targets build it by name.
+    profiles: [deploy]
     build:
       context: ./
       dockerfile: ./config/docker/Dockerfile.deploy
