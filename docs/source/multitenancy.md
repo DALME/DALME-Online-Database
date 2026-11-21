@@ -17,6 +17,10 @@ and messages. The central tenant lives in the `public` schema, which holds
 everything shared (`SHARED_TENANT_APPS`): the ontology, users, OAuth and the
 tenants themselves. Every schema can also read `public`.
 
+Each project keeps its own admin log, because the log points at CMS objects by
+id and those ids repeat across schemas. A project's sessions are stored with it,
+beside the host that set the cookie.
+
 Wagtail keeps data outside its page tree, snippets for example, so filtering one
 tree would still show another project's data. A schema per project isolates
 each CMS completely.

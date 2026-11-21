@@ -199,7 +199,9 @@ class Base(Configuration):
         },
         'project': {
             'APPS': [
-                # NOTE: GHP: do these belong here?
+                # Each project keeps its own admin log, because the log points at CMS
+                # objects by id and ids repeat across schemas. Its sessions then live
+                # with the project whose host set the cookie.
                 'django.contrib.admin',
                 'django.contrib.sessions',
                 'django.contrib.messages',
