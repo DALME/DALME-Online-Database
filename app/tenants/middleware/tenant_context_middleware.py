@@ -41,9 +41,7 @@ class TenantContextMiddleware:
         settings.PUBLIC_URL = f'{settings.URL_PROTOCOL}{domain}{settings.URL_PORT}'
 
         token = _tenant.set(request.tenant)
-
-        response = self.get_response(request)
-
-        _tenant.reset(token)
-
-        return response
+        try:
+            return self.get_response(request)
+        finally:
+            _tenant.reset(token)

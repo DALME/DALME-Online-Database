@@ -6,6 +6,7 @@ import pytest
 from werkzeug.local import LocalProxy
 
 from django.core.exceptions import DisallowedHost
+from django.http import HttpResponse
 
 from app.context import get_current_tenant
 from tenants.middleware.tenant_context_middleware import TenantContextMiddleware
@@ -27,6 +28,37 @@ def test_middleware_throws_if_tenant_not_on_request(rf):
 
     with pytest.raises(DisallowedHost):
         middleware(request)
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('settings')
+def test_the_view_runs_with_the_tenant_bound_and_releases_it(rf, test_domain):
+    seen = []
+
+    def view(request):  # noqa: ARG001
+        seen.append(get_current_tenant()._get_current_object())  # noqa: SLF001
+        return HttpResponse()
+
+    request = rf.get('/', headers={'HOST': test_domain.domain})
+    request.tenant = test_domain.tenant
+
+    TenantContextMiddleware(view)(request)
+
+    assert seen == [test_domain.tenant]
+    assert not get_current_tenant()
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('settings')
+def test_a_failing_view_releases_the_tenant(rf, test_domain):
+    request = rf.get('/', headers={'HOST': test_domain.domain})
+    request.tenant = test_domain.tenant
+    middleware = TenantContextMiddleware(mock.Mock(side_effect=ValueError))
+
+    with pytest.raises(ValueError):  # noqa: PT011
+        middleware(request)
+
+    assert not get_current_tenant()
 
 
 @mock.patch('tenants.middleware.tenant_context_middleware._tenant')
