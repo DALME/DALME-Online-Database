@@ -7,28 +7,19 @@ loaded. So just put this at the top-level so it's clean and ready for use.
 
 """
 
-import contextvars
-
 from django_currentuser.middleware import get_current_user
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 
-_gradient_pages = contextvars.ContextVar('gradient_pages', default=None)
-_gradient_pages.set([])
-
 
 def get_gradient_pages():
-    if not _gradient_pages.get():
-        app_config = apps.get_app_config('web')
-        if app_config.models_module is not None:
-            models = [
-                m.__name__.lower()
-                for m in app_config.get_models()
-                if any(f.name == 'gradient' for f in m._meta.get_fields())  # noqa: SLF001
-            ]
-            _gradient_pages.set([ct.id for ct in ContentType.objects.filter(app_label='public', model__in=models)])
-    return _gradient_pages.get()
+    models = [
+        m
+        for m in apps.get_app_config('web').get_models()
+        if any(f.name == 'gradient' for f in m._meta.get_fields())  # noqa: SLF001
+    ]
+    return [ct.id for ct in ContentType.objects.get_for_models(*models).values()]
 
 
 def get_biblio_pages():

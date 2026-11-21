@@ -6,7 +6,11 @@ from unittest import mock
 import pytest
 from django_tenants.utils import tenant_context
 
+from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
+
 from app import context
+from web.extensions.gradients.models import GradientMixin
 
 
 @pytest.mark.django_db
@@ -27,32 +31,16 @@ def test_bibliography_choices_follow_the_project_on_one_thread(factories, test_t
     assert second == [(theirs.pk, theirs.short_title)]
 
 
-def test_get_gradient_pages_sets_and_returns_ids():
-    mock_app_config = mock.Mock()
-    mock_model = mock.Mock()
-    mock_model.__name__ = 'TestModel'
-    mock_field = mock.Mock()
-    mock_field.name = 'gradient'
-    mock_model._meta.get_fields.return_value = [mock_field]  # noqa: SLF001
-    mock_app_config.models_module = True
-    mock_app_config.get_models.return_value = [mock_model]
+@pytest.mark.django_db
+def test_gradient_pages_are_the_page_types_that_carry_a_gradient():
+    expected = {
+        ContentType.objects.get_for_model(model).id
+        for model in apps.get_app_config('web').get_models()
+        if issubclass(model, GradientMixin)
+    }
 
-    with (
-        mock.patch('app.context.apps.get_app_config', return_value=mock_app_config),
-        mock.patch('app.context.ContentType.objects.filter') as mock_filter,
-    ):
-        mock_ct = mock.Mock()
-        mock_ct.id = 42
-        mock_filter.return_value = [mock_ct]
-        result = context.get_gradient_pages()
-        assert result == [42]
-        # Should return cached value on second call
-        assert context.get_gradient_pages() == [42]
-
-
-def test_get_gradient_pages_returns_cached_value():
-    context._gradient_pages.set([1, 2, 3])  # noqa: SLF001
-    assert context.get_gradient_pages() == [1, 2, 3]
+    assert expected
+    assert set(context.get_gradient_pages()) == expected
 
 
 @pytest.mark.django_db
